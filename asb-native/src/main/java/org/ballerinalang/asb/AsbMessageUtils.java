@@ -26,6 +26,9 @@ import org.ballerinalang.jvm.api.BStringUtils;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Util class for Asb Message handling.
+ */
 public class AsbMessageUtils {
     public static Object getTextContent(BArray messageContent) {
         byte[] messageCont = messageContent.getBytes();

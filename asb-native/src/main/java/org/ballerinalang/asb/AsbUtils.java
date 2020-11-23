@@ -22,7 +22,16 @@ import org.ballerinalang.jvm.api.values.BError;
 import org.ballerinalang.jvm.api.BErrorCreator;
 import org.ballerinalang.jvm.api.BStringUtils;
 
+/**
+ * Util class for Asb Error handling.
+ */
 public class AsbUtils {
+    /**
+     * Returns a Ballerina Error with the given String message.
+     *
+     * @param errorMessage   The error message
+     * @return Resulting Ballerina Error
+     */
     public static BError returnErrorValue(String errorMessage) {
         return BErrorCreator.createDistinctError(AsbConstants.ASB_ERROR,
                 AsbConstants.PACKAGE_ID_ASB,

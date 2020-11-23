@@ -22,13 +22,15 @@ import org.ballerinalang.jvm.api.BStringUtils;
 import org.ballerinalang.jvm.api.values.BString;
 import org.ballerinalang.jvm.types.BPackage;
 
+/**
+ * Asb Connector Constants.
+ */
 public class AsbConstants {
-    // RabbitMQ package name constant fields
+    // Asb package name constant fields
     public static final String ORG_NAME = "ballerinax";
-    static final String ASB = "asb";
+    public static final String ASB = "asb";
     public static final String ASB_VERSION = "0.1.0";
-    public static final BPackage PACKAGE_ID_ASB =
-            new BPackage(ORG_NAME, "asb", ASB_VERSION);
+    public static final BPackage PACKAGE_ID_ASB = new BPackage(ORG_NAME, "asb", ASB_VERSION);
 
     // Error constant fields
     static final String ASB_ERROR = "AsbError";
