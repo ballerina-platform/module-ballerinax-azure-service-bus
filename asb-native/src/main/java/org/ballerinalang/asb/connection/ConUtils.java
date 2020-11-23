@@ -140,7 +140,7 @@ public class ConUtils {
             throws Exception {
         try {
             // Send messages to queue
-            System.out.printf("\tSending messages to %s ...\n", sender.getEntityPath());
+            LOG.info("\tSending messages to ...\n" + sender.getEntityPath());
             IMessage message = new Message();
             message.setMessageId(messageId);
             message.setTimeToLive(Duration.ofMinutes(timeToLive));
@@ -155,10 +155,9 @@ public class ConUtils {
             message.setCorrelationId(correlationId);
             Map<String,String> map = toStringMap(properties);
             message.setProperties(map);
-            System.out.println(map);
 
             sender.send(message);
-            System.out.printf("\t=> Sent a message with messageId %s\n", message.getMessageId());
+            LOG.info("\t=> Sent a message with messageId \n" + message.getMessageId());
         } catch (Exception e) {
             throw AsbUtils.returnErrorValue(e.getMessage());
         }
@@ -214,9 +213,7 @@ public class ConUtils {
 
         try {
             // Send messages to queue
-            LOG.info("\tSending messages to  ...\n");
-            System.out.printf("\tSending messages to %s ...\n", sender.getEntityPath());
-            LOG.info("\tSending messages to  ...\n");
+            LOG.info("\tSending messages to ...\n" + sender.getEntityPath());
             IMessage message = new Message();
             message.setMessageId(messageId);
             message.setTimeToLive(Duration.ofMinutes(timeToLive));
@@ -233,7 +230,7 @@ public class ConUtils {
             message.setProperties(propertiesMap);
 
             sender.send(message);
-            System.out.printf("\t=> Sent a message with messageId %s\n", message.getMessageId());
+            LOG.info("\t=> Sent a message with messageId \n" + message.getMessageId());
         } catch (Exception e) {
             throw AsbUtils.returnErrorValue(e.getMessage());
         }
@@ -249,19 +246,19 @@ public class ConUtils {
      */
     public static Object receiveMessage(IMessageReceiver receiver) throws Exception {
         try {
-            System.out.printf("\n\tWaiting up to 5 seconds for messages from %s ...\n", receiver.getEntityPath());
+            LOG.info("\n\tWaiting up to 5 seconds for messages from ...\n" + receiver.getEntityPath());
 
             IMessage receivedMessage = receiver.receive(Duration.ofSeconds(5));
 
             if (receivedMessage == null) {
                 return null;
             }
-            System.out.printf("\t<= Received a message with messageId %s\n", receivedMessage.getMessageId());
-            System.out.printf("\t<= Received a message with messageBody %s\n",
+            LOG.info("\t<= Received a message with messageId \n" + receivedMessage.getMessageId());
+            LOG.info("\t<= Received a message with messageBody \n" +
                     new String(receivedMessage.getBody(), UTF_8));
             receiver.complete(receivedMessage.getLockToken());
 
-            System.out.printf("\tDone receiving messages from %s\n", receiver.getEntityPath());
+            LOG.info("\tDone receiving messages from \n" + receiver.getEntityPath());
 
             BObject messageBObject = BValueCreator.createObjectValue(AsbConstants.PACKAGE_ID_ASB,
                     AsbConstants.MESSAGE_OBJECT);
