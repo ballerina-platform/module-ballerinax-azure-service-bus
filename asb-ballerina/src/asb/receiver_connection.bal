@@ -58,7 +58,6 @@ public class ReceiverConnection {
     public isolated function receiveMessage() returns Message|Error {
         return receiveMessage(self.asbReceiverConnection);
     }
-
 }
 
 isolated function createReceiverConnection(handle connectionString, handle entityPath) 
