@@ -23,14 +23,6 @@ public class ReceiverConnection{
         return closeReceiverConnection(self.asbReceiverConnection);
     }
 
-    public isolated function receiveBytesMessageViaReceiverConnectionWithConfigurableParameters() returns handle|error? {
-        return receiveBytesMessageViaReceiverConnectionWithConfigurableParameters(self.asbReceiverConnection);
-    }
-
-    public isolated function checkMessage(handle imessages) returns error? {
-        checkpanic checkMessage(imessages);
-    }
-
     public isolated function getTextContent(byte[] content) returns @tainted string|Error {
 
         return nativeGetTextContent(content);
@@ -49,16 +41,6 @@ isolated function createReceiverConnection(handle connectionString, handle entit
 
 isolated function closeReceiverConnection(handle imessageSender) returns error? = @java:Method {
     name: "closeReceiverConnection",
-    'class: "org.ballerinalang.asb.connection.ConUtils"
-} external;
-
-isolated function receiveBytesMessageViaReceiverConnectionWithConfigurableParameters(handle imessageReceiver) returns handle|error? = @java:Method {
-    name: "receiveBytesMessageViaReceiverConnectionWithConfigurableParameters",
-    'class: "org.ballerinalang.asb.connection.ConUtils"
-} external;
-
-isolated function checkMessage(handle imessage) returns error? = @java:Method {
-    name: "checkMessage",
     'class: "org.ballerinalang.asb.connection.ConUtils"
 } external;
 

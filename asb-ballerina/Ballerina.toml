@@ -10,5 +10,5 @@ observability-included=true
 target = "java8"
 
    [[platform.libraries]]
-   path = "./javalibs/asb-native-1.0.0-jar-with-dependencies.jar"
+   path = "../asb-native/target/asb-native-1.0.0-jar-with-dependencies.jar"
    modules = ["asb"]
