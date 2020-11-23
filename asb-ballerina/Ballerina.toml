@@ -1,8 +1,16 @@
 [project]
-org-name= "roland"
+org-name= "ballerinax"
+name = "asb"
 version= "0.1.0"
 
 [build-options]
 observability-included=true
 
 [dependencies]
+
+[platform]
+target = "java8"
+
+   [[platform.libraries]]
+   path = "./javalibs/asb-native-1.0.0-jar-with-dependencies.jar"
+   modules = ["asb"]
