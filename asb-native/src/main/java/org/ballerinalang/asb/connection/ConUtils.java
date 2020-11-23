@@ -234,7 +234,6 @@ public class ConUtils {
         } catch (Exception e) {
             throw AsbUtils.returnErrorValue(e.getMessage());
         }
-
     }
 
     /**
