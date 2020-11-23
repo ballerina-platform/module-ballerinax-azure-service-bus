@@ -16,7 +16,7 @@
 
 import ballerina/java;
 
-public class SenderConnection{
+public class SenderConnection {
 
     handle asbSenderConnection;
 
