@@ -3,6 +3,7 @@ package org.ballerinalang.asb.connection;
 import com.microsoft.azure.servicebus.*;
 import com.microsoft.azure.servicebus.primitives.ConnectionStringBuilder;
 import org.ballerinalang.asb.AsbConstants;
+import org.ballerinalang.asb.AsbUtils;
 import org.ballerinalang.jvm.api.values.BArray;
 import org.ballerinalang.jvm.api.values.BMap;
 import org.ballerinalang.jvm.api.values.BObject;
@@ -31,42 +32,42 @@ public class ConUtils {
 
     // Create Sender Connection
     public static IMessageSender createSenderConnection(String connectionString, String entityPath) throws Exception {
-        try{
+        try {
             IMessageSender sender = ClientFactory.createMessageSenderFromConnectionStringBuilder(
                     new ConnectionStringBuilder(connectionString, entityPath));
             return sender;
         } catch (Exception e) {
-            throw e;
+            throw AsbUtils.returnErrorValue(e.getMessage());
         }
     }
 
     // Close Receiver Connection
     public static void closeSenderConnection(IMessageSender sender) throws Exception {
-        try{
+        try {
             sender.close();
         } catch (Exception e) {
-            throw e;
+            throw AsbUtils.returnErrorValue(e.getMessage());
         }
     }
 
     // Create Receiver Connection
     public static IMessageReceiver createReceiverConnection(String connectionString, String entityPath)
             throws Exception {
-        try{
+        try {
             IMessageReceiver receiver = ClientFactory.createMessageReceiverFromConnectionStringBuilder(
                     new ConnectionStringBuilder(connectionString, entityPath), ReceiveMode.PEEKLOCK);
             return receiver;
         } catch (Exception e) {
-            throw e;
+            throw AsbUtils.returnErrorValue(e.getMessage());
         }
     }
 
     // Close Receiver Connection
     public static void closeReceiverConnection(IMessageReceiver receiver) throws Exception {
-        try{
+        try {
             receiver.close();
         } catch (Exception e) {
-            throw e;
+            throw AsbUtils.returnErrorValue(e.getMessage());
         }
     }
 
