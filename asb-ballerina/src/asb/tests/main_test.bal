@@ -1,4 +1,3 @@
-import ballerina/io;
 import ballerina/test;
 import ballerina/log;
 
@@ -28,8 +27,6 @@ map<string> properties = {a: "nimal", b: "saman"};
 # Before Suite Function
 @test:BeforeSuite
 function beforeSuiteFunc() {
-    io:println("I'm the before suite function!");
-
     log:printInfo("Creating a ballerina Asb Sender connection.");
     SenderConnection? con = new ({connectionString: connectionString, entityPath: queuePath});
     senderConnection = con;
@@ -88,17 +85,13 @@ function testReceiveFromQueueOperation() {
 
     if (receiverConnection is ReceiverConnection) {
         log:printInfo("Receiving from Asb receiver connection.");
-        Message messageReceived = checkpanic receiverConnection.receiveMessage();
-        string messageReceived1 = checkpanic messageReceived.getTextContent();
-        log:printInfo(messageReceived1);
-        // var messages = receiverConnection.receiveBytesMessageViaReceiverConnectionWithConfigurableParameters();
-        // if(messages is handle) {
-        //     checkpanic receiverConnection.checkMessage(messages);
-        //     string messageReceived = checkpanic receiverConnection.getTextContent(byteContent);
-        //     log:printInfo(messageReceived);
-        // } else {
-        //     test:assertFail("Receiving message via Asb receiver connection failed.");
-        // }
+        Message|Error messageReceived = receiverConnection.receiveMessage();
+        if (messageReceived is Message) {
+            string messageRead = checkpanic messageReceived.getTextContent();
+            log:printInfo("Reading Received Message : " + messageRead);
+        } else {
+            test:assertFail("Receiving message via Asb receiver connection failed.");
+        }
     } else {
         test:assertFail("Asb receiver connection creation failed.");
     }
@@ -112,8 +105,6 @@ function testReceiveFromQueueOperation() {
 # After Suite Function
 @test:AfterSuite {}
 function afterSuiteFunc() {
-    io:println("I'm the after suite function!");
-
     SenderConnection? con = senderConnection;
     if (con is SenderConnection) {
         log:printInfo("Closing the Sender Connection");
