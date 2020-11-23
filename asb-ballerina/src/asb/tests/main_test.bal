@@ -1,5 +1,7 @@
 import ballerina/test;
 import ballerina/log;
+import ballerina/system;
+import ballerina/config;
 
 // Connection Configuration
 string connectionString = "Endpoint=sb://roland1.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=OckfvtMMw6GHIftqU0Jj0A0jy0uIUjufhV5dCToiGJk=";
@@ -116,4 +118,8 @@ function afterSuiteFunc() {
         log:printInfo("Closing the Receiver Connection");
         checkpanic rec.closeReceiverConnection();
     }
+}
+
+function getConfigValue(string key) returns string {
+    return (system:getEnv(key) != "") ? system:getEnv(key) : config:getAsString(key);
 }
