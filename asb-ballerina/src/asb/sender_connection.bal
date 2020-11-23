@@ -30,7 +30,7 @@ public class SenderConnection{
         self.connectionString = connectionConfiguration.connectionString;
         self.entityPath = connectionConfiguration.entityPath;
         self.asbSenderConnection = <handle> createSenderConnection(java:fromString(self.connectionString),
-        java:fromString(self.entityPath));
+            java:fromString(self.entityPath));
     }
 
     # Creates a Asb Sender Connection using the given connection parameters.
@@ -38,7 +38,7 @@ public class SenderConnection{
     # + connectionConfiguration - Configurations used to create a `asb:Connection`
     # + return - An `asb:Error` if failed to create connection or else `()`
     public isolated function createSenderConnection(ConnectionConfiguration connectionConfiguration) 
-            returns handle|Error? {
+        returns handle|Error? {
         self.connectionString = connectionConfiguration.connectionString;
         self.entityPath = connectionConfiguration.entityPath;
         self.asbSenderConnection = <handle> createSenderConnection(java:fromString(self.connectionString),
@@ -104,7 +104,7 @@ isolated function sendMessageWithConfigurableParameters(handle imessageSender, b
     'class: "org.ballerinalang.asb.connection.ConUtils"
 } external;
 
-isolated function sendMessage(handle imessageSender, byte[] content,handle contentType, handle messageId, handle to, 
+isolated function sendMessage(handle imessageSender, byte[] content, handle contentType, handle messageId, handle to, 
     handle replyTo, handle label, handle sessionId, handle correlationId, map<string> properties, int timeToLive) 
     returns Error? = @java:Method {
     name: "sendMessage",
