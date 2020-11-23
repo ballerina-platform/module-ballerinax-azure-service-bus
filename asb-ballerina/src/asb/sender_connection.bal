@@ -7,6 +7,9 @@ public class SenderConnection{
     private string connectionString;
     private string entityPath;
 
+    # Initiates an Asb Sender Connection using the given connection configuration.
+    # 
+    # + connectionConfiguration - Configurations used to create a `asb:Connection`
     public isolated function init(ConnectionConfiguration connectionConfiguration) {
         self.connectionString = connectionConfiguration.connectionString;
         self.entityPath = connectionConfiguration.entityPath;
