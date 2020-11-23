@@ -1,3 +1,19 @@
+// Copyright (c) 2020 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+//
+// WSO2 Inc. licenses this file to you under the Apache License,
+// Version 2.0 (the "License"); you may not use this file except
+// in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 import ballerina/java;
 
 public class SenderConnection{
@@ -21,10 +37,12 @@ public class SenderConnection{
     # 
     # + connectionConfiguration - Configurations used to create a `asb:Connection`
     # + return - An `asb:Error` if failed to create connection or else `()`
-    public isolated function createSenderConnection(ConnectionConfiguration connectionConfiguration) returns handle|Error? {
+    public isolated function createSenderConnection(ConnectionConfiguration connectionConfiguration) 
+            returns handle|Error? {
         self.connectionString = connectionConfiguration.connectionString;
         self.entityPath = connectionConfiguration.entityPath;
-        self.asbSenderConnection = <handle> createSenderConnection(java:fromString(self.connectionString),java:fromString(self.entityPath));
+        self.asbSenderConnection = <handle> createSenderConnection(java:fromString(self.connectionString),
+            java:fromString(self.entityPath));
     }
 
     # Closes the Asb Sender Connection using the given connection parameters.
@@ -40,7 +58,8 @@ public class SenderConnection{
     # + parameters - Optional Message parameters 
     # + properties - Message properties
     # + return - An `asb:Error` if failed to send message or else `()`
-    public isolated function sendMessageWithConfigurableParameters(byte[] content, map<string> parameters,map<string> properties) returns Error? {
+    public isolated function sendMessageWithConfigurableParameters(byte[] content, map<string> parameters,
+        map<string> properties) returns Error? {
         return sendMessageWithConfigurableParameters(self.asbSenderConnection, content, parameters, properties);
     }
 
@@ -55,15 +74,21 @@ public class SenderConnection{
     # + sessionId - Identifier of the session
     # + correlationId - Identifier of the correlation
     # + properties - Message properties
-    # + timeToLive - This is the duration, in ticks, that a message is valid. The duration starts from when the message is sent to the Service Bus.
+    # + timeToLive - This is the duration, in ticks, that a message is valid. The duration starts from when the 
+    #                message is sent to the Service Bus.
     # + return - An `asb:Error` if failed to send message or else `()`
-    public isolated function sendMessage(byte[] content, string contentType, string messageId, string to, string replyTo, string label, string sessionId, string correlationId, map<string> properties, int timeToLive) returns Error? {
-        return sendMessage(self.asbSenderConnection, content, java:fromString(contentType), java:fromString(messageId), java:fromString(to), java:fromString(replyTo), java:fromString(label), java:fromString(sessionId), java:fromString(correlationId), properties, timeToLive);
+    public isolated function sendMessage(byte[] content, string contentType, string messageId, string to, 
+        string replyTo, string label, string sessionId, string correlationId, map<string> properties, int timeToLive) 
+        returns Error? {
+        return sendMessage(self.asbSenderConnection, content, java:fromString(contentType), java:fromString(messageId), 
+            java:fromString(to), java:fromString(replyTo), java:fromString(label), java:fromString(sessionId), 
+            java:fromString(correlationId), properties, timeToLive);
     }
 
 }
 
-isolated function createSenderConnection(handle connectionString, handle entityPath) returns handle|Error? = @java:Method {
+isolated function createSenderConnection(handle connectionString, handle entityPath) 
+    returns handle|Error? = @java:Method {
     name: "createSenderConnection",
     'class: "org.ballerinalang.asb.connection.ConUtils"
 } external;
@@ -73,12 +98,15 @@ isolated function closeSenderConnection(handle imessageSender) returns Error? = 
     'class: "org.ballerinalang.asb.connection.ConUtils"
 } external;
 
-isolated function sendMessageWithConfigurableParameters(handle imessageSender, byte[] content, map<string> parameters, map<string> properties) returns Error? = @java:Method {
+isolated function sendMessageWithConfigurableParameters(handle imessageSender, byte[] content, 
+    map<string> parameters, map<string> properties) returns Error? = @java:Method {
     name: "sendMessageWithConfigurableParameters",
     'class: "org.ballerinalang.asb.connection.ConUtils"
 } external;
 
-isolated function sendMessage(handle imessageSender, byte[] content,handle contentType, handle messageId, handle to, handle replyTo, handle label, handle sessionId, handle correlationId, map<string> properties, int timeToLive) returns Error? = @java:Method {
+isolated function sendMessage(handle imessageSender, byte[] content,handle contentType, handle messageId, handle to, 
+    handle replyTo, handle label, handle sessionId, handle correlationId, map<string> properties, int timeToLive) 
+    returns Error? = @java:Method {
     name: "sendMessage",
     'class: "org.ballerinalang.asb.connection.ConUtils"
 } external;
