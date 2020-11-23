@@ -40,10 +40,6 @@ public class ReceiverConnection{
         return receiveOneBytesMessageViaReceiverConnectionWithConfigurableParameters(self.asbReceiverConnection);
     }
 
-    public isolated function receiveTwoBytesMessageViaReceiverConnectionWithConfigurableParameters() returns handle|error {
-        return receiveTwoBytesMessageViaReceiverConnectionWithConfigurableParameters(self.asbReceiverConnection);
-    }
-
 }
 
 isolated function createReceiverConnection(handle connectionString, handle entityPath) returns handle|error? = @java:Method {
@@ -74,10 +70,5 @@ isolated function nativeGetTextContent(byte[] messageContent) returns string|Err
 
 isolated function receiveOneBytesMessageViaReceiverConnectionWithConfigurableParameters(handle imessageReceiver) returns Message|error = @java:Method {
     name: "receiveOneBytesMessageViaReceiverConnectionWithConfigurableParameters",
-    'class: "org.ballerinalang.asb.connection.ConUtils"
-} external;
-
-isolated function receiveTwoBytesMessageViaReceiverConnectionWithConfigurableParameters(handle imessageReceiver) returns handle|error = @java:Method {
-    name: "receiveTwoBytesMessageViaReceiverConnectionWithConfigurableParameters",
     'class: "org.ballerinalang.asb.connection.ConUtils"
 } external;
