@@ -43,5 +43,4 @@ public class AsbConstants {
     public static final String TEXT_CONTENT_ERROR = "Error while retrieving the string content of the message. ";
     public static final String INT_CONTENT_ERROR = "Error while retrieving the int content of the message. ";
     public static final String FLOAT_CONTENT_ERROR = "Error while retrieving the float content of the message. ";
-
 }
