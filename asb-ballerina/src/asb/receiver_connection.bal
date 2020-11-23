@@ -48,36 +48,36 @@ public class ReceiverConnection{
 
 isolated function createReceiverConnection(handle connectionString, handle entityPath) returns handle|error? = @java:Method {
     name: "createReceiverConnection",
-    'class: "com.roland.asb.connection.ConUtils"
+    'class: "org.ballerinalang.asb.connection.ConUtils"
 } external;
 
 isolated function closeReceiverConnection(handle imessageSender) returns error? = @java:Method {
     name: "closeReceiverConnection",
-    'class: "com.roland.asb.connection.ConUtils"
+    'class: "org.ballerinalang.asb.connection.ConUtils"
 } external;
 
 isolated function receiveBytesMessageViaReceiverConnectionWithConfigurableParameters(handle imessageReceiver) returns handle|error? = @java:Method {
     name: "receiveBytesMessageViaReceiverConnectionWithConfigurableParameters",
-    'class: "com.roland.asb.connection.ConUtils"
+    'class: "org.ballerinalang.asb.connection.ConUtils"
 } external;
 
 isolated function checkMessage(handle imessage) returns error? = @java:Method {
     name: "checkMessage",
-    'class: "com.roland.asb.connection.ConUtils"
+    'class: "org.ballerinalang.asb.connection.ConUtils"
 } external;
 
 isolated function nativeGetTextContent(byte[] messageContent) returns string|Error =
 @java:Method {
     name: "getTextContent",
-    'class: "com.roland.asb.AsbMessageUtils"
+    'class: "org.ballerinalang.asb.AsbMessageUtils"
 } external;
 
 isolated function receiveOneBytesMessageViaReceiverConnectionWithConfigurableParameters(handle imessageReceiver) returns Message|error = @java:Method {
     name: "receiveOneBytesMessageViaReceiverConnectionWithConfigurableParameters",
-    'class: "com.roland.asb.connection.ConUtils"
+    'class: "org.ballerinalang.asb.connection.ConUtils"
 } external;
 
 isolated function receiveTwoBytesMessageViaReceiverConnectionWithConfigurableParameters(handle imessageReceiver) returns handle|error = @java:Method {
     name: "receiveTwoBytesMessageViaReceiverConnectionWithConfigurableParameters",
-    'class: "com.roland.asb.connection.ConUtils"
+    'class: "org.ballerinalang.asb.connection.ConUtils"
 } external;
