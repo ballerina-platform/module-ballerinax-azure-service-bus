@@ -16,7 +16,7 @@
 
 import ballerina/java;
 
-public class ReceiverConnection{
+public class ReceiverConnection {
 
     handle asbReceiverConnection;
 
