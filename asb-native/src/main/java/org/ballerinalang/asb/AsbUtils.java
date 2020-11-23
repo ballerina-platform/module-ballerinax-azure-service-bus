@@ -33,8 +33,7 @@ public class AsbUtils {
      * @return Resulting Ballerina Error
      */
     public static BError returnErrorValue(String errorMessage) {
-        return BErrorCreator.createDistinctError(AsbConstants.ASB_ERROR,
-                AsbConstants.PACKAGE_ID_ASB,
+        return BErrorCreator.createDistinctError(AsbConstants.ASB_ERROR, AsbConstants.PACKAGE_ID_ASB,
                 BStringUtils.fromString(errorMessage));
     }
 }
