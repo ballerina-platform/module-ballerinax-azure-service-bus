@@ -4,13 +4,8 @@ import ballerina/system;
 import ballerina/config;
 
 // Connection Configuration
-string connectionString = "Endpoint=sb://roland1.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=OckfvtMMw6GHIftqU0Jj0A0jy0uIUjufhV5dCToiGJk=";
-string queuePath = "roland1queue";
-string topicPath = "roland1topic";
-string subscriptionPath1 = "roland1topic/subscriptions/roland1subscription1";
-string subscriptionPath2 = "roland1topic/subscriptions/roland1subscription2";
-string subscriptionPath3 = "roland1topic/subscriptions/roland1subscription3";
-int maxMessageCount = 3;
+string connectionString = getConfigValue("CONNECTION_STRING");
+string queuePath = getConfigValue("QUEUE_PATH");
 
 SenderConnection? senderConnection = ();
 ReceiverConnection? receiverConnection = ();
