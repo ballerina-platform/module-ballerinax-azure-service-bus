@@ -13,44 +13,33 @@ public class ReceiverConnection{
         self.asbReceiverConnection = <handle> createReceiverConnection(java:fromString(self.connectionString),java:fromString(self.entityPath));
     }
 
-    public isolated function createReceiverConnection(ConnectionConfiguration connectionConfiguration) returns handle|error? {
+    public isolated function createReceiverConnection(ConnectionConfiguration connectionConfiguration) returns handle|Error? {
         self.connectionString = connectionConfiguration.connectionString;
         self.entityPath = connectionConfiguration.entityPath;
         self.asbReceiverConnection = <handle> createReceiverConnection(java:fromString(self.connectionString),java:fromString(self.entityPath));
     }
 
-    public isolated function closeReceiverConnection() returns error? {
+    public isolated function closeReceiverConnection() returns Error? {
         return closeReceiverConnection(self.asbReceiverConnection);
     }
 
-    public isolated function getTextContent(byte[] content) returns @tainted string|Error {
-
-        return nativeGetTextContent(content);
-    }
-
-    public isolated function receiveMessage() returns Message|error {
+    public isolated function receiveMessage() returns Message|Error {
         return receiveMessage(self.asbReceiverConnection);
     }
 
 }
 
-isolated function createReceiverConnection(handle connectionString, handle entityPath) returns handle|error? = @java:Method {
+isolated function createReceiverConnection(handle connectionString, handle entityPath) returns handle|Error? = @java:Method {
     name: "createReceiverConnection",
     'class: "org.ballerinalang.asb.connection.ConUtils"
 } external;
 
-isolated function closeReceiverConnection(handle imessageSender) returns error? = @java:Method {
+isolated function closeReceiverConnection(handle imessageSender) returns Error? = @java:Method {
     name: "closeReceiverConnection",
     'class: "org.ballerinalang.asb.connection.ConUtils"
 } external;
 
-isolated function nativeGetTextContent(byte[] messageContent) returns string|Error =
-@java:Method {
-    name: "getTextContent",
-    'class: "org.ballerinalang.asb.AsbMessageUtils"
-} external;
-
-isolated function receiveMessage(handle imessageReceiver) returns Message|error = @java:Method {
+isolated function receiveMessage(handle imessageReceiver) returns Message|Error = @java:Method {
     name: "receiveMessage",
     'class: "org.ballerinalang.asb.connection.ConUtils"
 } external;

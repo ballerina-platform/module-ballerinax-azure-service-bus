@@ -89,7 +89,7 @@ function testReceiveFromQueueOperation() {
     if (receiverConnection is ReceiverConnection) {
         log:printInfo("Receiving from Asb receiver connection.");
         Message messageReceived = checkpanic receiverConnection.receiveMessage();
-        string messageReceived1 = checkpanic messageReceived.getTextContent1();
+        string messageReceived1 = checkpanic messageReceived.getTextContent();
         log:printInfo(messageReceived1);
         // var messages = receiverConnection.receiveBytesMessageViaReceiverConnectionWithConfigurableParameters();
         // if(messages is handle) {
