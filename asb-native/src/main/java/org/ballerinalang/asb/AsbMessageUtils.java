@@ -43,8 +43,7 @@ public class AsbMessageUtils {
         try {
             return Double.parseDouble(new String(messageContent.getBytes(), StandardCharsets.UTF_8.name()));
         } catch (UnsupportedEncodingException exception) {
-            return AsbUtils.returnErrorValue(AsbConstants.FLOAT_CONTENT_ERROR
-                    + exception.getMessage());
+            return AsbUtils.returnErrorValue(AsbConstants.FLOAT_CONTENT_ERROR + exception.getMessage());
         }
     }
 
