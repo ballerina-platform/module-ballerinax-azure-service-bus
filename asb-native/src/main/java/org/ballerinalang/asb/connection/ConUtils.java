@@ -37,19 +37,17 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * Util class used to bridge the Asb connector's native code and the Ballerina API.
  */
 public class ConUtils {
-
     private static final Logger LOG = Logger.getLogger(ConUtils.class.getName());
 
     private String connectionString;
 
-    public ConUtils() {
-    }
-
-    public ConUtils(String connectionString) {
-        this.connectionString = connectionString;
-    }
-
-    // Create Sender Connection
+    /**
+     * Creates a Asb Sender Connection using the given connection parameters.
+     *
+     * @param connectionString Azure Service Bus Primary key string used to initialize the connection.
+     * @param entityPath Resource entity path.
+     * @return Asb Sender Connection object.
+     */
     public static IMessageSender createSenderConnection(String connectionString, String entityPath) throws Exception {
         try {
             IMessageSender sender = ClientFactory.createMessageSenderFromConnectionStringBuilder(
@@ -60,7 +58,11 @@ public class ConUtils {
         }
     }
 
-    // Close Receiver Connection
+    /**
+     * Closes the Asb Sender Connection using the given connection parameters.
+     *
+     * @param sender Created IMessageSender instance used to close the connection.
+     */
     public static void closeSenderConnection(IMessageSender sender) throws Exception {
         try {
             sender.close();
@@ -69,7 +71,13 @@ public class ConUtils {
         }
     }
 
-    // Create Receiver Connection
+    /**
+     * Creates a Asb Receiver Connection using the given connection parameters.
+     *
+     * @param connectionString Primary key string used to initialize the connection.
+     * @param entityPath Resource entity path.
+     * @return Asb Receiver Connection object.
+     */
     public static IMessageReceiver createReceiverConnection(String connectionString, String entityPath)
             throws Exception {
         try {
@@ -81,7 +89,11 @@ public class ConUtils {
         }
     }
 
-    // Close Receiver Connection
+    /**
+     * Closes the Asb Receiver Connection using the given connection parameters.
+     *
+     * @param receiver Created IMessageReceiver instance used to close the connection.
+     */
     public static void closeReceiverConnection(IMessageReceiver receiver) throws Exception {
         try {
             receiver.close();
@@ -90,8 +102,38 @@ public class ConUtils {
         }
     }
 
-    // Send Message with configurable parameters when Sender Connection is given as a parameter and
-    // message content as a byte array
+    /**
+     * Convert BMap to Map.
+     *
+     * @param map Input BMap used to convert to Map.
+     * @return Converted Map object.
+     */
+    public static Map<String, String> toStringMap(BMap map) {
+        Map<String, String> returnMap = new HashMap<>();
+        if (map != null) {
+            for (Object aKey : map.getKeys()) {
+                returnMap.put(aKey.toString(), map.get(aKey).toString());
+            }
+        }
+        return returnMap;
+    }
+
+    /**
+     * Send Message with configurable parameters when Sender Connection is given as a parameter and
+     * message content as a byte array.
+     *
+     * @param sender Input Sender connection.
+     * @param content Input message content as byte array
+     * @param contentType Input message content type
+     * @param messageId Input Message Id
+     * @param to Input Message to
+     * @param replyTo Input Message reply to
+     * @param label Input Message label
+     * @param sessionId Input Message session Id
+     * @param correlationId Input Message correlationId
+     * @param properties Input Message properties
+     * @param timeToLive Input Message time to live in minutes
+     */
     public static void sendBytesMessageWithConfigurableParameters(IMessageSender sender, BArray content,
                                                                   String contentType, String messageId, String to,
                                                                   String replyTo, String label,
@@ -124,19 +166,15 @@ public class ConUtils {
         }
     }
 
-    // Convert BMap to Map
-    public static Map<String, String> toStringMap(BMap map) {
-        Map<String, String> returnMap = new HashMap<>();
-        if (map != null) {
-            for (Object aKey : map.getKeys()) {
-                returnMap.put(aKey.toString(), map.get(aKey).toString());
-            }
-        }
-        return returnMap;
-    }
-
-    // Send Message with configurable parameters as Map when Sender Connection is given as a parameter and
-    // message content as a byte array
+    /**
+     * Send Message with configurable parameters when Sender Connection is given as a parameter and
+     * message content as a byte array and optional parameters as a BMap.
+     *
+     * @param sender Input Sender connection.
+     * @param content Input message content as byte array
+     * @param parameters Input message optional parameters specified as a BMap
+     * @param properties Input Message properties
+     */
     public static void sendBytesMessageViaSenderConnectionWithConfigurableParameters(IMessageSender sender,
                                                                                      BArray content,
                                                                                      BMap<String, String> parameters,
@@ -205,48 +243,16 @@ public class ConUtils {
 
     }
 
-    // Receive Message with configurable parameters as Map when Receiver Connection is given as a parameter and
-    // message content as a byte array and return message list
-    public static ArrayList<IMessage> receiveBytesMessageViaReceiverConnectionWithConfigurableParameters(
-            IMessageReceiver receiver) throws Exception {
-        try {
-            // receive messages from queue or subscription
-            String receivedMessageId = "";
-
-            ArrayList<IMessage> messages = new ArrayList<>();
-
-            System.out.printf("\n\tWaiting up to 5 seconds for messages from %s ...\n", receiver.getEntityPath());
-            while (true) {
-                IMessage receivedMessage = receiver.receive(Duration.ofSeconds(5));
-
-                if (receivedMessage == null) {
-                    break;
-                }
-                System.out.printf("\t<= Received a message with messageId %s\n", receivedMessage.getMessageId());
-                System.out.printf("\t<= Received a message with messageBody %s\n",
-                        new String(receivedMessage.getBody(), UTF_8));
-                receiver.complete(receivedMessage.getLockToken());
-                messages.add(receivedMessage);
-                if (receivedMessageId.contentEquals(receivedMessage.getMessageId())) {
-                    throw new Exception("Received a duplicate message!");
-                }
-                receivedMessageId = receivedMessage.getMessageId();
-            }
-            System.out.printf("\tDone receiving messages from %s\n", receiver.getEntityPath());
-            return messages;
-        } catch (Exception e) {
-            throw AsbUtils.returnErrorValue(e.getMessage());
-        }
-    }
-
-    // Receive Message with configurable parameters as Map when Receiver Connection is given as a parameter and
-    // message content as a byte array and return message list
+    /**
+     * Receive Message with configurable parameters as Map when Receiver Connection is given as a parameter and
+     * message content as a byte array and return Message object.
+     *
+     * @param receiver Output Receiver connection.
+     * @return Message Object of the received message.
+     */
     public static Object receiveOneBytesMessageViaReceiverConnectionWithConfigurableParameters(
             IMessageReceiver receiver) throws Exception {
         try {
-            // receive messages from queue or subscription
-            String receivedMessageId = "";
-
             System.out.printf("\n\tWaiting up to 5 seconds for messages from %s ...\n", receiver.getEntityPath());
 
             IMessage receivedMessage = receiver.receive(Duration.ofSeconds(5));
@@ -258,10 +264,6 @@ public class ConUtils {
             System.out.printf("\t<= Received a message with messageBody %s\n",
                     new String(receivedMessage.getBody(), UTF_8));
             receiver.complete(receivedMessage.getLockToken());
-            if (receivedMessageId.contentEquals(receivedMessage.getMessageId())) {
-                throw new Exception("Received a duplicate message!");
-            }
-            receivedMessageId = receivedMessage.getMessageId();
 
             System.out.printf("\tDone receiving messages from %s\n", receiver.getEntityPath());
 
@@ -275,261 +277,10 @@ public class ConUtils {
         }
     }
 
-    // check message
-    public static void checkMessage(ArrayList<IMessage> messages) throws Exception {
-        for (IMessage msg:messages
-        ) {
-            System.out.printf("\t<= Received a message with messageId %s\n", msg.getMessageId());
-            System.out.printf("\t<= Received a message with messageBody %s\n", new String(msg.getBody(), UTF_8));
-            System.out.printf("\t<= Received a message with contentType %s\n", msg.getContentType());
-            System.out.printf("\t<= Received a message with to %s\n", msg.getTo());
-            System.out.printf("\t<= Received a message with replyTo %s\n", msg.getReplyTo());
-            System.out.printf("\t<= Received a message with label %s\n", msg.getLabel());
-            System.out.printf("\t<= Received a message with sessionId %s\n", msg.getSessionId());
-            System.out.printf("\t<= Received a message with correlationId %s\n", msg.getCorrelationId());
-            System.out.printf("\t<= Received a message with timeToLive %s min\n", msg.getTimeToLive().toMinutes());
-        }
-        System.out.printf("\tDone viewing messages\n");
+    public ConUtils() {
     }
 
-    // Send batch of messages to Queue or Topic with Message Content input as Byte Array
-    public static void sendBatchMessages(String connectionString, String entityPath, BArray content,
-                                         int maxMessageCount) throws Exception {
-        IMessageSender sender = ClientFactory.createMessageSenderFromConnectionStringBuilder(
-                new ConnectionStringBuilder(connectionString, entityPath));
-
-        List<IMessage> messages = new ArrayList<>();
-
-        for(int i=0; i<maxMessageCount; i++){
-            String messageId = UUID.randomUUID().toString();
-            IMessage message = new Message();
-            message.setMessageId(messageId);
-            message.setTimeToLive(Duration.ofMinutes(1));
-            byte[] byteArray = content.get(i).toString().getBytes();
-            message.setBody(byteArray);
-
-            messages.add(message);
-            System.out.printf("\t=> Sending a message with messageId %s\n", message.getMessageId());
-        }
-
-        // Send messages to queue
-        System.out.printf("\tSending messages to %s ...\n", sender.getEntityPath());
-        sender.sendBatch(messages);
-        System.out.printf("\t=> Sent %s messages\n", messages.size());
-
-        sender.close();
+    public ConUtils(String connectionString) {
+        this.connectionString = connectionString;
     }
-
-    // Receive batch of messages from Queue or Subscription with Message Content input as Byte Array
-    public static void receiveBatchMessages(String connectionString, String entityPath, int maxMessageCount)
-            throws Exception {
-        IMessageReceiver receiver = ClientFactory.createMessageReceiverFromConnectionStringBuilder(
-                new ConnectionStringBuilder(connectionString, entityPath), ReceiveMode.PEEKLOCK);
-
-        // receive messages from queue
-        String receivedMessageId = "";
-
-        System.out.printf("\n\tWaiting up to 5 seconds for messages from %s ...\n", receiver.getEntityPath());
-        for(int i=0; i<maxMessageCount; i++) {
-            IMessage receivedMessage = receiver.receive(Duration.ofSeconds(5));
-
-            if (receivedMessage == null) {
-                continue;
-            }
-            System.out.printf("\t<= Received a message with messageId %s\n", receivedMessage.getMessageId());
-            System.out.printf("\t<= Received a message with messageBody %s\n",
-                    new String(receivedMessage.getBody(), UTF_8));
-            receiver.complete(receivedMessage.getLockToken());
-            if (receivedMessageId.contentEquals(receivedMessage.getMessageId())) {
-                throw new Exception("Received a duplicate message!");
-            }
-            receivedMessageId = receivedMessage.getMessageId();
-        }
-        System.out.printf("\tDone receiving messages from %s\n", receiver.getEntityPath());
-
-        receiver.close();
-    }
-
-    // -----------------------------------------------------------------------------------------------------------------
-
-    // Send message to Queue or Topic
-    public static void send(String connectionString, String entityPath, String content) throws Exception {
-        IMessageSender sender = ClientFactory.createMessageSenderFromConnectionStringBuilder(
-                new ConnectionStringBuilder(connectionString, entityPath));
-
-        String messageId = UUID.randomUUID().toString();
-        // Send messages to queue
-        System.out.printf("\tSending messages to %s ...\n", sender.getEntityPath());
-        IMessage message = new Message();
-        message.setMessageId(messageId);
-        message.setTimeToLive(Duration.ofMinutes(1));
-        byte[] byteArray = content.getBytes();
-        message.setBody(byteArray);
-        sender.send(message);
-        System.out.printf("\t=> Sent a message with messageId %s\n", message.getMessageId());
-
-        sender.close();
-    }
-
-    // Receive message from Queue or Subscription
-    public static void receive(String connectionString, String entityPath) throws Exception {
-        IMessageReceiver receiver = ClientFactory.createMessageReceiverFromConnectionStringBuilder(
-                new ConnectionStringBuilder(connectionString, entityPath), ReceiveMode.PEEKLOCK);
-
-        // receive messages from queue
-        String receivedMessageId = "";
-
-        System.out.printf("\n\tWaiting up to 5 seconds for messages from %s ...\n", receiver.getEntityPath());
-        while (true) {
-            IMessage receivedMessage = receiver.receive(Duration.ofSeconds(5));
-
-            if (receivedMessage == null) {
-                break;
-            }
-            System.out.printf("\t<= Received a message with messageId %s\n", receivedMessage.getMessageId());
-            System.out.printf("\t<= Received a message with messageBody %s\n",
-                    new String(receivedMessage.getBody(), UTF_8));
-            receiver.complete(receivedMessage.getLockToken());
-            if (receivedMessageId.contentEquals(receivedMessage.getMessageId())) {
-                throw new Exception("Received a duplicate message!");
-            }
-            receivedMessageId = receivedMessage.getMessageId();
-        }
-        System.out.printf("\tDone receiving messages from %s\n", receiver.getEntityPath());
-
-        receiver.close();
-    }
-
-    // Send batch of messages to Queue or Topic
-    public static void sendBatch(String connectionString, String entityPath, String content, int maxMessageCount)
-            throws Exception {
-        IMessageSender sender = ClientFactory.createMessageSenderFromConnectionStringBuilder(
-                new ConnectionStringBuilder(connectionString, entityPath));
-
-        List<IMessage> messages = new ArrayList<>();
-
-        for(int i=0; i<maxMessageCount; i++){
-            String messageId = UUID.randomUUID().toString();
-            IMessage message = new Message();
-            message.setMessageId(messageId);
-            message.setTimeToLive(Duration.ofMinutes(1));
-            String contentMod = content + Integer.toString(i);
-            byte[] byteArray = contentMod.getBytes();
-            message.setBody(byteArray);
-
-            messages.add(message);
-            System.out.printf("\t=> Sending a message with messageId %s\n", message.getMessageId());
-        }
-
-        // Send messages to queue
-        System.out.printf("\tSending messages to %s ...\n", sender.getEntityPath());
-        sender.sendBatch(messages);
-        System.out.printf("\t=> Sent %s messages\n", messages.size());
-
-        sender.close();
-    }
-
-    // Receive batch of messages from Queue or Subscription
-    public static void receiveBatch(String connectionString, String entityPath, int maxMessageCount) throws Exception {
-        IMessageReceiver receiver = ClientFactory.createMessageReceiverFromConnectionStringBuilder(
-                new ConnectionStringBuilder(connectionString, entityPath), ReceiveMode.PEEKLOCK);
-
-        // receive messages from queue
-        String receivedMessageId = "";
-
-        System.out.printf("\n\tWaiting up to 5 seconds for messages from %s ...\n", receiver.getEntityPath());
-        for(int i=0; i<maxMessageCount; i++) {
-            IMessage receivedMessage = receiver.receive(Duration.ofSeconds(5));
-
-            if (receivedMessage == null) {
-                continue;
-            }
-            System.out.printf("\t<= Received a message with messageId %s\n", receivedMessage.getMessageId());
-            System.out.printf("\t<= Received a message with messageBody %s\n",
-                    new String(receivedMessage.getBody(), UTF_8));
-            receiver.complete(receivedMessage.getLockToken());
-            if (receivedMessageId.contentEquals(receivedMessage.getMessageId())) {
-                throw new Exception("Received a duplicate message!");
-            }
-            receivedMessageId = receivedMessage.getMessageId();
-        }
-        System.out.printf("\tDone receiving messages from %s\n", receiver.getEntityPath());
-
-        receiver.close();
-    }
-
-    // Completes messages from Queue or Subscription based on messageLockToken
-    public static void complete(String connectionString, String entityPath) throws Exception {
-        IMessageReceiver receiver = ClientFactory.createMessageReceiverFromConnectionStringBuilder(
-                new ConnectionStringBuilder(connectionString, entityPath), ReceiveMode.PEEKLOCK);
-
-        // receive messages from queue
-        String receivedMessageId = "";
-
-        System.out.printf("\n\tWaiting up to 5 seconds for messages from %s ...\n", receiver.getEntityPath());
-        while (true) {
-            IMessage receivedMessage = receiver.receive(Duration.ofSeconds(5));
-
-            if (receivedMessage == null) {
-                break;
-            }
-            System.out.printf("\t<= Received a message with messageId %s\n", receivedMessage.getMessageId());
-            System.out.printf("\t<= Completes a message with messageLockToken %s\n", receivedMessage.getLockToken());
-            receiver.complete(receivedMessage.getLockToken());
-            if (receivedMessageId.contentEquals(receivedMessage.getMessageId())) {
-                throw new Exception("Received a duplicate message!");
-            }
-            receivedMessageId = receivedMessage.getMessageId();
-        }
-        System.out.printf("\tDone completing a message using its lock token from %s\n", receiver.getEntityPath());
-
-        receiver.close();
-    }
-
-    // Completes message from Queue or Subscription based on messageLockToken
-    public static void completeMessage(String connectionString, String entityPath) throws Exception {
-        IMessageReceiver receiver = ClientFactory.createMessageReceiverFromConnectionStringBuilder(
-                new ConnectionStringBuilder(connectionString, entityPath), ReceiveMode.PEEKLOCK);
-
-        System.out.printf("\nWaiting up to default server wait time for messages from %s ...\n",
-                receiver.getEntityPath());
-
-        IMessage receivedMessage = receiver.receive();
-
-        if (receivedMessage != null) {
-            System.out.printf("\t<= Received a message with messageId %s\n", receivedMessage.getMessageId());
-            System.out.printf("\t<= Completes a message with messageLockToken %s\n", receivedMessage.getLockToken());
-            receiver.complete(receivedMessage.getLockToken());
-
-            System.out.printf("\tDone completing a message using its lock token from %s\n", receiver.getEntityPath());
-        } else {
-            System.out.println("\tNo message in the queue\n");
-        }
-
-        receiver.close();
-    }
-
-    // Abandon message & make available again for processing from Queue or Subscription based on messageLockToken
-    public static void abandon(String connectionString, String entityPath) throws Exception {
-        IMessageReceiver receiver = ClientFactory.createMessageReceiverFromConnectionStringBuilder(
-                new ConnectionStringBuilder(connectionString, entityPath), ReceiveMode.PEEKLOCK);
-
-        System.out.printf("\n\tWaiting up to default server wait time for messages from %s ...\n",
-                receiver.getEntityPath());
-        IMessage receivedMessage = receiver.receive();
-
-        if (receivedMessage != null) {
-            System.out.printf("\t<= Received a message with messageId %s\n", receivedMessage.getMessageId());
-            System.out.printf("\t<= Abandon a message with messageLockToken %s\n", receivedMessage.getLockToken());
-            receiver.abandon(receivedMessage.getLockToken());
-
-            System.out.printf("\tDone abandoning a message using its lock token from %s\n", receiver.getEntityPath());
-
-        } else {
-            System.out.println("\t<= No message in the queue \n");;
-        }
-
-        receiver.close();
-    }
-
 }
