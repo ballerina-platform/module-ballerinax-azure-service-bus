@@ -24,7 +24,6 @@ string[] stringArrayContent = ["apple","mango","lemon","orange"];
 int[] integerArrayContent = [4, 5, 6];
 map<string> parameters = {contentType: "application/json", messageId: "one", to: "sanju", replyTo: "carol", label: "a1", sessionId: "b1", correlationId: "c1", timeToLive: "2"};
 map<string> properties = {a: "nimal", b: "saman"};
-map<string> parameters1 = {contentType: "application/json", messageId: "one"};
 
 # Before Suite Function
 @test:BeforeSuite
@@ -70,7 +69,7 @@ function testSendToQueueOperation() {
 
     if (senderConnection is SenderConnection) {
         log:printInfo("Sending via Asb sender connection.");
-        checkpanic senderConnection.sendBytesMessageViaSenderConnectionWithConfigurableParameters(byteContent, parameters1, properties);
+        checkpanic senderConnection.sendMessageWithConfigurableParameters(byteContent, parameters, properties);
     } else {
         test:assertFail("Asb sender connection creation failed.");
     }
@@ -89,7 +88,7 @@ function testReceiveFromQueueOperation() {
 
     if (receiverConnection is ReceiverConnection) {
         log:printInfo("Receiving from Asb receiver connection.");
-        Message messageReceived = checkpanic receiverConnection.receiveOneBytesMessageViaReceiverConnectionWithConfigurableParameters();
+        Message messageReceived = checkpanic receiverConnection.receiveMessage();
         string messageReceived1 = checkpanic messageReceived.getTextContent1();
         log:printInfo(messageReceived1);
         // var messages = receiverConnection.receiveBytesMessageViaReceiverConnectionWithConfigurableParameters();

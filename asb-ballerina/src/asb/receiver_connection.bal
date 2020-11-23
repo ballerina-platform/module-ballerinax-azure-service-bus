@@ -28,8 +28,8 @@ public class ReceiverConnection{
         return nativeGetTextContent(content);
     }
 
-    public isolated function receiveOneBytesMessageViaReceiverConnectionWithConfigurableParameters() returns Message|error {
-        return receiveOneBytesMessageViaReceiverConnectionWithConfigurableParameters(self.asbReceiverConnection);
+    public isolated function receiveMessage() returns Message|error {
+        return receiveMessage(self.asbReceiverConnection);
     }
 
 }
@@ -50,7 +50,7 @@ isolated function nativeGetTextContent(byte[] messageContent) returns string|Err
     'class: "org.ballerinalang.asb.AsbMessageUtils"
 } external;
 
-isolated function receiveOneBytesMessageViaReceiverConnectionWithConfigurableParameters(handle imessageReceiver) returns Message|error = @java:Method {
-    name: "receiveOneBytesMessageViaReceiverConnectionWithConfigurableParameters",
+isolated function receiveMessage(handle imessageReceiver) returns Message|error = @java:Method {
+    name: "receiveMessage",
     'class: "org.ballerinalang.asb.connection.ConUtils"
 } external;

@@ -134,11 +134,9 @@ public class ConUtils {
      * @param properties Input Message properties
      * @param timeToLive Input Message time to live in minutes
      */
-    public static void sendBytesMessageWithConfigurableParameters(IMessageSender sender, BArray content,
-                                                                  String contentType, String messageId, String to,
-                                                                  String replyTo, String label,
-                                                                  String sessionId, String correlationId,
-                                                                  BMap<String, String> properties, int timeToLive)
+    public static void sendMessage(IMessageSender sender, BArray content, String contentType, String messageId,
+                                   String to, String replyTo, String label, String sessionId, String correlationId,
+                                   BMap<String, String> properties, int timeToLive)
             throws Exception {
         try {
             // Send messages to queue
@@ -175,10 +173,9 @@ public class ConUtils {
      * @param parameters Input message optional parameters specified as a BMap
      * @param properties Input Message properties
      */
-    public static void sendBytesMessageViaSenderConnectionWithConfigurableParameters(IMessageSender sender,
-                                                                                     BArray content,
-                                                                                     BMap<String, String> parameters,
-                                                                                     BMap<String, String> properties)
+    public static void sendMessageWithConfigurableParameters(IMessageSender sender, BArray content,
+                                                             BMap<String, String> parameters,
+                                                             BMap<String, String> properties)
             throws Exception {
         Map<String,String> map = toStringMap(parameters);
 
@@ -250,8 +247,7 @@ public class ConUtils {
      * @param receiver Output Receiver connection.
      * @return Message Object of the received message.
      */
-    public static Object receiveOneBytesMessageViaReceiverConnectionWithConfigurableParameters(
-            IMessageReceiver receiver) throws Exception {
+    public static Object receiveMessage(IMessageReceiver receiver) throws Exception {
         try {
             System.out.printf("\n\tWaiting up to 5 seconds for messages from %s ...\n", receiver.getEntityPath());
 

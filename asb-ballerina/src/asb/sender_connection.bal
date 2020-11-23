@@ -23,13 +23,13 @@ public class SenderConnection{
         return closeSenderConnection(self.asbSenderConnection);
     }
 
-    public isolated function sendBytesMessageViaSenderConnectionWithConfigurableParameters(byte[] content, map<string> parameters,map<string> properties) returns error? {
-        return sendBytesMessageViaSenderConnectionWithConfigurableParameters(self.asbSenderConnection, content, parameters, properties);
+    public isolated function sendMessageWithConfigurableParameters(byte[] content, map<string> parameters,map<string> properties) returns error? {
+        return sendMessageWithConfigurableParameters(self.asbSenderConnection, content, parameters, properties);
     }
 
-    public isolated function sendBytesMessageWithConfigurableParameters(byte[] content) returns error? {
+    public isolated function sendMessage(byte[] content) returns error? {
         map<string> m = {a: "rol", b: "12"};
-        return sendBytesMessageWithConfigurableParameters(self.asbSenderConnection, content, java:fromString("content"), java:fromString("content"), java:fromString("content"), java:fromString("content"), java:fromString("content"), java:fromString("content"), java:fromString("content"),m, 1);
+        return sendMessage(self.asbSenderConnection, content, java:fromString("content"), java:fromString("content"), java:fromString("content"), java:fromString("content"), java:fromString("content"), java:fromString("content"), java:fromString("content"),m, 1);
     }
 
 }
@@ -44,12 +44,12 @@ isolated function closeSenderConnection(handle imessageSender) returns error? = 
     'class: "org.ballerinalang.asb.connection.ConUtils"
 } external;
 
-isolated function sendBytesMessageViaSenderConnectionWithConfigurableParameters(handle imessageSender, byte[] content, map<string> parameters, map<string> properties) returns error? = @java:Method {
-    name: "sendBytesMessageViaSenderConnectionWithConfigurableParameters",
+isolated function sendMessageWithConfigurableParameters(handle imessageSender, byte[] content, map<string> parameters, map<string> properties) returns error? = @java:Method {
+    name: "sendMessageWithConfigurableParameters",
     'class: "org.ballerinalang.asb.connection.ConUtils"
 } external;
 
-isolated function sendBytesMessageWithConfigurableParameters(handle imessageSender, byte[] content,handle contentType, handle messageId, handle to, handle replyTo, handle label, handle sessionId, handle correlationId, map<string> properties, int timeToLive) returns error? = @java:Method {
-    name: "sendBytesMessageWithConfigurableParameters",
+isolated function sendMessage(handle imessageSender, byte[] content,handle contentType, handle messageId, handle to, handle replyTo, handle label, handle sessionId, handle correlationId, map<string> properties, int timeToLive) returns error? = @java:Method {
+    name: "sendMessage",
     'class: "org.ballerinalang.asb.connection.ConUtils"
 } external;
