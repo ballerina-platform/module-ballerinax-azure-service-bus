@@ -32,11 +32,11 @@ byte[] byteContent = stringContent.toBytes();
 json jsonContent = {name: "apple", color: "red", price: 5.36};
 byte[] byteContentFromJson = jsonContent.toJsonString().toBytes();
 json[] jsonArrayContent = [{name: "apple", color: "red", price: 5.36}, {first: "John", last: "Pala"}];
-string[] stringArrayContent = ["apple","mango","lemon","orange"];
+string[] stringArrayContent = ["apple", "mango", "lemon", "orange"];
 int[] integerArrayContent = [4, 5, 6];
 map<string> parameters = {contentType: "application/json", messageId: "one", to: "sanju", replyTo: "carol", 
     label: "a1", sessionId: "b1", correlationId: "c1", timeToLive: "2"};
-map<string> properties = {a: "nimal", b: "saman"};
+map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
 
 # Before Suite Function
 @test:BeforeSuite
@@ -81,6 +81,7 @@ function testSendToQueueOperation() {
     if (senderConnection is SenderConnection) {
         log:printInfo("Sending via Asb sender connection.");
         checkpanic senderConnection.sendMessageWithConfigurableParameters(byteContent, parameters, properties);
+        checkpanic senderConnection.sendMessageWithConfigurableParameters(byteContentFromJson, parameters, properties);
     } else {
         test:assertFail("Asb sender connection creation failed.");
     }
@@ -100,9 +101,12 @@ function testReceiveFromQueueOperation() {
     if (receiverConnection is ReceiverConnection) {
         log:printInfo("Receiving from Asb receiver connection.");
         Message|Error messageReceived = receiverConnection.receiveMessage();
-        if (messageReceived is Message) {
+        Message|Error jsonMessageReceived = receiverConnection.receiveMessage();
+        if (messageReceived is Message && jsonMessageReceived is Message) {
             string messageRead = checkpanic messageReceived.getTextContent();
             log:printInfo("Reading Received Message : " + messageRead);
+            json jsonMessageRead = checkpanic jsonMessageReceived.getJSONContent();
+            log:printInfo("Reading Received Message : " + jsonMessageRead.toString());
         } else {
             test:assertFail("Receiving message via Asb receiver connection failed.");
         }
