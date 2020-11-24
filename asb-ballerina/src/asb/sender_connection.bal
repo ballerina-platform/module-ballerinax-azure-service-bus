@@ -98,8 +98,8 @@ isolated function closeSenderConnection(handle imessageSender) returns Error? = 
     'class: "org.ballerinalang.asb.connection.ConUtils"
 } external;
 
-isolated function sendMessageWithConfigurableParameters(handle imessageSender, byte[] content, 
-    map<string> parameters, map<string> properties) returns Error? = @java:Method {
+isolated function sendMessageWithConfigurableParameters(handle imessageSender, byte[] content, map<string> parameters, 
+    map<string> properties) returns Error? = @java:Method {
     name: "sendMessageWithConfigurableParameters",
     'class: "org.ballerinalang.asb.connection.ConUtils"
 } external;
