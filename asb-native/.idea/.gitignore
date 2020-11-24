@@ -1,3 +1,6 @@
 # Default ignored files
 /shelf/
 /workspace.xml
+../.idea
+../asb-native.iml
+../target
