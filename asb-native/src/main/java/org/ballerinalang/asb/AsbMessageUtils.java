@@ -64,8 +64,7 @@ public class AsbMessageUtils {
             }
             return json;
         } catch (UnsupportedEncodingException exception) {
-            return AsbUtils.returnErrorValue
-                    (AsbConstants.JSON_CONTENT_ERROR + exception.getMessage());
+            return AsbUtils.returnErrorValue(AsbConstants.JSON_CONTENT_ERROR + exception.getMessage());
         }
     }
 
