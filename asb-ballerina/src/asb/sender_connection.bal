@@ -79,7 +79,7 @@ public class SenderConnection {
     # + return - An `asb:Error` if failed to send message or else `()`
     public isolated function sendMessage(byte[] content, string contentType, string messageId, string to, 
         string replyTo, string label, string sessionId, string correlationId, map<string> properties, int timeToLive) 
-        returns Error? {
+            returns Error? {
         return sendMessage(self.asbSenderConnection, content, java:fromString(contentType), java:fromString(messageId), 
             java:fromString(to), java:fromString(replyTo), java:fromString(label), java:fromString(sessionId), 
             java:fromString(correlationId), properties, timeToLive);
@@ -106,7 +106,7 @@ isolated function sendMessageWithConfigurableParameters(handle imessageSender, b
 
 isolated function sendMessage(handle imessageSender, byte[] content, handle contentType, handle messageId, handle to, 
     handle replyTo, handle label, handle sessionId, handle correlationId, map<string> properties, int timeToLive) 
-    returns Error? = @java:Method {
+        returns Error? = @java:Method {
     name: "sendMessage",
     'class: "org.ballerinalang.asb.connection.ConUtils"
 } external;
