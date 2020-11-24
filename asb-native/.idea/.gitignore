@@ -2,8 +2,5 @@
 /shelf/
 /workspace.xml
 ../.idea
-../asb-native.iml
 ../target
-asb-native/target
-asb-native/asb-native.iml
-asb-native/.idea
+../asb-native.iml
