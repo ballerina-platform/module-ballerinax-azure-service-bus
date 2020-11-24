@@ -261,7 +261,6 @@ public class ConUtils {
             BObject messageBObject = BValueCreator.createObjectValue(AsbConstants.PACKAGE_ID_ASB,
                     AsbConstants.MESSAGE_OBJECT);
             messageBObject.set(AsbConstants.MESSAGE_CONTENT, BValueCreator.createArrayValue(receivedMessage.getBody()));
-
             return messageBObject;
         } catch (Exception e) {
             throw AsbUtils.returnErrorValue(e.getMessage());
