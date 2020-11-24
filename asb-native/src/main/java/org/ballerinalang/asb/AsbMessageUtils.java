@@ -51,8 +51,7 @@ public class AsbMessageUtils {
         try {
             return Integer.parseInt(new String(messageContent.getBytes(), StandardCharsets.UTF_8.name()));
         } catch (UnsupportedEncodingException exception) {
-            return AsbUtils.returnErrorValue(AsbConstants.INT_CONTENT_ERROR
-                    + exception.getMessage());
+            return AsbUtils.returnErrorValue(AsbConstants.INT_CONTENT_ERROR + exception.getMessage());
         }
     }
 
