@@ -5,3 +5,5 @@
 ../asb-native.iml
 ../target
 asb-native/target
+asb-native/asb-native.iml
+asb-native/.idea
