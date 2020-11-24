@@ -173,8 +173,7 @@ public class ConUtils {
      */
     public static void sendMessageWithConfigurableParameters(IMessageSender sender, BArray content,
                                                              BMap<String, String> parameters,
-                                                             BMap<String, String> properties)
-            throws Exception {
+                                                             BMap<String, String> properties) throws Exception {
         Map<String,String> map = toStringMap(parameters);
 
         String contentType = "";
