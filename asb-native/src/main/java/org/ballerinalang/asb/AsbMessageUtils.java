@@ -72,8 +72,7 @@ public class AsbMessageUtils {
         try {
             return XMLFactory.parse(new String(messageContent.getBytes(), StandardCharsets.UTF_8.name()));
         } catch (UnsupportedEncodingException exception) {
-            return AsbUtils.returnErrorValue(AsbConstants.XML_CONTENT_ERROR
-                    + exception.getMessage());
+            return AsbUtils.returnErrorValue(AsbConstants.XML_CONTENT_ERROR + exception.getMessage());
         }
     }
 }
