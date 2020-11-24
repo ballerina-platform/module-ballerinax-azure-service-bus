@@ -136,8 +136,7 @@ public class ConUtils {
      */
     public static void sendMessage(IMessageSender sender, BArray content, String contentType, String messageId,
                                    String to, String replyTo, String label, String sessionId, String correlationId,
-                                   BMap<String, String> properties, int timeToLive)
-            throws Exception {
+                                   BMap<String, String> properties, int timeToLive) throws Exception {
         try {
             // Send messages to queue
             LOG.info("\tSending messages to ...\n" + sender.getEntityPath());
