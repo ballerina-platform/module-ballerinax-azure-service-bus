@@ -20,6 +20,7 @@ package org.ballerinalang.asb;
 
 import com.google.gson.JsonParser;
 import com.microsoft.azure.servicebus.*;
+import org.ballerinalang.asb.connection.ListenerUtils;
 import org.ballerinalang.jvm.XMLFactory;
 import org.ballerinalang.jvm.api.BStringUtils;
 import org.ballerinalang.jvm.api.BValueCreator;
@@ -42,6 +43,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Logger;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.ballerinalang.asb.AsbConstants.*;
@@ -51,6 +53,8 @@ import static org.ballerinalang.asb.connection.ListenerUtils.isClosing;
  * Handles and dispatched messages with data binding.
  */
 public class MessageDispatcher {
+    private static final Logger LOG = Logger.getLogger(MessageDispatcher.class.getName());
+
     private BObject service;
     private String queueName;
     private String connectionKey;
@@ -106,80 +110,18 @@ public class MessageDispatcher {
         return queueConfig.getStringValue(CONNECTION_STRING).getValue();
     }
 
+    /**
+     * Starts consuming the messages asynchronously by calling the pumpMessage functionality.
+     *
+     * @param listener Ballerina listener object.
+     */
     public void receiveMessages(BObject listener) {
-        String connectionString = connectionKey;
-        String entityPath = queueName;
-        System.out.println("[ballerina/rabbitmq] Consumer service started for queue " + queueName);
-
-//        try{
-////            IMessageReceiver receiver = ClientFactory.createMessageReceiverFromConnectionStringBuilder(new ConnectionStringBuilder(connectionString, entityPath), ReceiveMode.PEEKLOCK);
-//            String receivedMessageId = "";
-//
-//            System.out.printf("\n\tWaiting up to 5 seconds for messages from %s ...\n", receiver.getEntityPath());
-//            while (true) {
-//                IMessage receivedMessage = receiver.receive(Duration.ofSeconds(5));
-//
-//                if (receivedMessage == null) {
-//                    break;
-//                }
-//                System.out.printf("\t<= Received a message with messageId %s\n", receivedMessage.getMessageId());
-//                System.out.printf("\t<= Received a message with messageBody %s\n", new String(receivedMessage.getBody(), UTF_8));
-//                handleDispatch(receivedMessage.getBody());
-//                receiver.complete(receivedMessage.getLockToken());
-//                if (receivedMessageId.contentEquals(receivedMessage.getMessageId())) {
-//                    throw new Exception("Received a duplicate message!");
-//                }
-//                receivedMessageId = receivedMessage.getMessageId();
-//            }
-//            System.out.printf("\tDone receiving messages from %s\n", receiver.getEntityPath());
-//        } catch (Exception e) {
-//
-//        }
-
-//        try{
-//            IMessageReceiver receiver = ClientFactory.createMessageReceiverFromConnectionStringBuilder(new ConnectionStringBuilder(connectionString, entityPath), ReceiveMode.PEEKLOCK);
-//            String receivedMessageId = "";
-//
-//            System.out.printf("\n\tWaiting up to 5 seconds for messages from %s ...\n", receiver.getEntityPath());
-//            while (true) {
-//                CompletableFuture<IMessage> mg = receiver.receiveAsync();
-//                IMessage receivedMessage = mg.get();
-//
-//                if (receivedMessage == null) {
-//                    break;
-//                }
-//                System.out.printf("\t<= Received a message with messageId %s\n", receivedMessage.getMessageId());
-//                System.out.printf("\t<= Received a message with messageBody %s\n", new String(receivedMessage.getBody(), UTF_8));
-//                handleDispatch(receivedMessage.getBody());
-//                receiver.complete(receivedMessage.getLockToken());
-//                if (receivedMessageId.contentEquals(receivedMessage.getMessageId())) {
-//                    throw new Exception("Received a duplicate message!");
-//                }
-//                receivedMessageId = receivedMessage.getMessageId();
-//            }
-//            System.out.printf("\tDone receiving messages from %s\n", receiver.getEntityPath());
-//        } catch (Exception e) {
-//
-//        }
-
-//        try{
-////            QueueClient receiveClient = new QueueClient(new ConnectionStringBuilder(connectionString, entityPath), ReceiveMode.PEEKLOCK);
-//            ExecutorService executorService = Executors.newSingleThreadExecutor();
-//            this.registerReceiver(receiver, executorService);
-//
-//            waitForEnter(120);
-//
-//            System.out.printf("\tDone receiving messages from %s\n", receiver.getEntityPath());
-//            receiver.close();
-//        } catch (Exception e) {
-//
-//        }
+        LOG.info("Consumer service started for queue " + queueName);
 
         try {
             ExecutorService executorService = Executors.newSingleThreadExecutor();
             this.pumpMessage(receiver, executorService);
-
-            System.out.printf("\tDone receiving messages from %s\n", receiver.getEntityPath());
+            LOG.info("\tDone receiving messages from \n" + receiver.getEntityPath());
         } catch (Exception e) {
             AsbUtils.returnErrorValue(e.getMessage());
         }
@@ -190,10 +132,16 @@ public class MessageDispatcher {
         service.addNativeData(AsbConstants.QUEUE_NAME.getValue(), queueName);
     }
 
+    /**
+     * Asynchronously pump messages from the Azure service bus.
+     *
+     * @param receiver Ballerina listener object.
+     * @param executorService Thread executor for processing the messages.
+     */
     public void pumpMessage(IMessageReceiver receiver, ExecutorService executorService) {
         if(isClosing()) {
             CompletableFuture<IMessage> receiveMessageFuture = receiver.receiveAsync(Duration.ofSeconds(5));
-            System.out.printf("\n\tWaiting up to 5 seconds for messages from %s ...\n", receiver.getEntityPath());
+            LOG.info("\n\tWaiting up to 5 seconds for messages from %s ...\n" + receiver.getEntityPath());
 
             receiveMessageFuture.handleAsync((message, receiveEx) -> {
                 if (receiveEx != null) {
