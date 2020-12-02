@@ -95,6 +95,9 @@ public class ReceiverConnection {
         return abandonMessage(self.asbReceiverConnection);
     }
 
+    # Get the asbReceiverConnection instance
+    # 
+    # + return - asbReceiverConnection instance
     isolated function getAsbReceiverConnection() returns handle {
         return self.asbReceiverConnection;
     }
