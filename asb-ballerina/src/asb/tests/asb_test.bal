@@ -36,6 +36,9 @@ string[] stringArrayContent = ["apple", "mango", "lemon", "orange"];
 int[] integerArrayContent = [4, 5, 6];
 map<string> parameters = {contentType: "application/json", messageId: "one", to: "sanju", replyTo: "carol", 
     label: "a1", sessionId: "b1", correlationId: "c1", timeToLive: "2"};
+map<string> parameters1 = {contentType: "application/json", messageId: "one"};
+map<string> parameters2 = {contentType: "application/json", messageId: "two", to: "sanju", replyTo: "carol", 
+    label: "a1", sessionId: "b1", correlationId: "c1", timeToLive: "2"};
 map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
 
 # Before Suite Function
@@ -80,8 +83,8 @@ function testSendToQueueOperation() {
 
     if (senderConnection is SenderConnection) {
         log:printInfo("Sending via Asb sender connection.");
-        checkpanic senderConnection.sendMessageWithConfigurableParameters(byteContent, parameters, properties);
-        checkpanic senderConnection.sendMessageWithConfigurableParameters(byteContentFromJson, parameters, properties);
+        checkpanic senderConnection.sendMessageWithConfigurableParameters(byteContent, parameters1, properties);
+        checkpanic senderConnection.sendMessageWithConfigurableParameters(byteContentFromJson, parameters2, properties);
     } else {
         test:assertFail("Asb sender connection creation failed.");
     }
@@ -93,7 +96,7 @@ function testSendToQueueOperation() {
 }
 
 # Test receive one message from queue operation
-@test:Config{enable: true}
+@test:Config{dependsOn: ["testSendToQueueOperation"], enable: false}
 function testReceiveFromQueueOperation() {
     log:printInfo("Creating Asb receiver connection.");
     ReceiverConnection? receiverConnection = new ({connectionString: connectionString, entityPath: queuePath});
@@ -121,7 +124,7 @@ function testReceiveFromQueueOperation() {
 }
 
 # Test receive messages from queue operation
-@test:Config{enable: false}
+@test:Config{dependsOn: ["testSendToQueueOperation"], enable: true}
 function testReceiveMessagesFromQueueOperation() {
     log:printInfo("Creating Asb receiver connection.");
     ReceiverConnection? receiverConnection = new ({connectionString: connectionString, entityPath: queuePath});
