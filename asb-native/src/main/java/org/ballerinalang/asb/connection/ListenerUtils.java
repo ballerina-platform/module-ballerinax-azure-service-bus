@@ -19,8 +19,14 @@ public class ListenerUtils {
     private static boolean started = false;
     private static ArrayList<BObject> services = new ArrayList<>();
     private static ArrayList<BObject> startedServices = new ArrayList<>();
-    private static boolean runn = false;
+    private static boolean serviceAttached = false;
 
+    /**
+     * Initialize the ballerina listener object.
+     *
+     * @param listenerBObject Ballerina listener object.
+     * @param iMessageReceiver Asb MessageReceiver instance.
+     */
     public static void init(BObject listenerBObject, IMessageReceiver iMessageReceiver) {
         listenerBObject.addNativeData(AsbConstants.CONSUMER_SERVICES, services);
         listenerBObject.addNativeData(AsbConstants.STARTED_SERVICES, startedServices);
@@ -77,7 +83,7 @@ public class ListenerUtils {
         if (services == null || services.isEmpty()) {
             return null;
         }
-        runn = true;
+        serviceAttached = true;
         for (BObject service : services) {
             if (startedServices == null || !startedServices.contains(service)) {
                 MessageDispatcher messageDispatcher =
@@ -111,7 +117,7 @@ public class ListenerUtils {
                 removeFromList(services, service));
         listenerBObject.addNativeData(AsbConstants.STARTED_SERVICES,
                 removeFromList(startedServices, service));
-        runn = false;
+        serviceAttached = false;
         return null;
     }
 
@@ -160,6 +166,6 @@ public class ListenerUtils {
     }
 
     public static boolean isClosing() {
-        return runn;
+        return serviceAttached;
     }
 }
