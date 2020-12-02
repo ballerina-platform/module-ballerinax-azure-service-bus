@@ -32,7 +32,6 @@ import org.ballerinalang.jvm.api.BRuntime;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
@@ -183,17 +182,10 @@ public class MessageDispatcher {
      * @param message Received azure service bus message instance.
      */
     private void dispatchMessage(byte[] message) {
-        CountDownLatch countDownLatch = new CountDownLatch(1);
         try {
-            AsyncFunctionCallback callback = new AsbResourceCallback(countDownLatch, queueName,
-                    message.length);
-//            ResponseCallback callback = new ResponseCallback();
+            AsyncFunctionCallback callback = new AsbResourceCallback();
             BObject messageBObject = getMessageBObject(message);
             executeResourceOnMessage(callback, messageBObject, true);
-            countDownLatch.await();
-        } catch (InterruptedException e) {
-            AsbUtils.returnErrorValue("Interrupted dispatching the message to the service " +
-                    e.getMessage());
         } catch (BError exception) {
             AsbUtils.returnErrorValue("Error occur while dispatching the message to the service " +
                     exception.getMessage());
