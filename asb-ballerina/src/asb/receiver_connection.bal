@@ -16,6 +16,7 @@
 
 import ballerina/java;
 
+# Represents a single network receiver connection to the RabbitMQ broker.
 public class ReceiverConnection {
 
     handle asbReceiverConnection;
