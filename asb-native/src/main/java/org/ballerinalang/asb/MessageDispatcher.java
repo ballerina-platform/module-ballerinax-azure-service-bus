@@ -185,6 +185,11 @@ public class MessageDispatcher {
         dispatchMessage(message);
     }
 
+    /**
+     * Dispatch message to the service.
+     *
+     * @param message Received azure service bus message instance.
+     */
     private void dispatchMessage(byte[] message) {
         CountDownLatch countDownLatch = new CountDownLatch(1);
         try {
@@ -195,48 +200,26 @@ public class MessageDispatcher {
             executeResourceOnMessage(callback, messageBObject, true);
             countDownLatch.await();
         } catch (InterruptedException e) {
-
+            AsbUtils.returnErrorValue("Interrupted dispatching the message to the service " +
+                    e.getMessage());
         } catch (BError exception) {
-
+            AsbUtils.returnErrorValue("Error occur while dispatching the message to the service " +
+                    exception.getMessage());
         }
     }
 
+    /**
+     * Get the ballerina Message object from the azure service bus message object.
+     *
+     * @param message Received azure service bus message instance.
+     */
     private BObject getMessageBObject(byte[] message)  {
-        System.out.printf("\t<= Received a message with messageBody %s\n", new String(message, UTF_8));
-
+        LOG.info("\t<= Received a message with messageBody \n" + new String(message, UTF_8));
         BObject messageBObject = BValueCreator.createObjectValue(AsbConstants.PACKAGE_ID_ASB,
                 AsbConstants.MESSAGE_OBJECT);
         messageBObject.set(AsbConstants.MESSAGE_CONTENT, BValueCreator.createArrayValue(message));
 
         return messageBObject;
-    }
-
-    private Object getMessageContentForType(byte[] message, BType dataType) throws UnsupportedEncodingException {
-        int dataTypeTag = dataType.getTag();
-        switch (dataTypeTag) {
-            case TypeTags.STRING_TAG:
-                return BStringUtils.fromString(new String(message, StandardCharsets.UTF_8.name()));
-            case TypeTags.JSON_TAG:
-                return JsonParser.parseString(new String(message, StandardCharsets.UTF_8.name()));
-            case TypeTags.XML_TAG:
-                return XMLFactory.parse(new String(message, StandardCharsets.UTF_8.name()));
-            case TypeTags.FLOAT_TAG:
-                return Float.parseFloat(new String(message, StandardCharsets.UTF_8.name()));
-            case TypeTags.INT_TAG:
-                return Integer.parseInt(new String(message, StandardCharsets.UTF_8.name()));
-//            case TypeTags.RECORD_TYPE_TAG:
-//                return JSONUtils.convertJSONToRecord(JsonParser.parseString(new String(message,
-//                                StandardCharsets.UTF_8.name())),
-//                        (StructureType) dataType);
-            case TypeTags.ARRAY_TAG:
-                if (((BArray) dataType).getElementType().getTag() == TypeTags.BYTE_TAG) {
-                    return message;
-                } else {
-
-                }
-            default:
-                return "";
-        }
     }
 
     private void executeResourceOnMessage(AsyncFunctionCallback callback, Object... args) {
