@@ -74,6 +74,12 @@ public class MessageDispatcher {
         this.receiver = iMessageReceiver;
     }
 
+    /**
+     * Get queue name from annotation configuration attached to the service.
+     *
+     * @param service Ballerina service instance.
+     * @return Queue name from annotation configuration attached to the service.
+     */
     public static String getQueueNameFromConfig(BObject service) {
         BMap serviceConfig = (BMap) ((AnnotatableType) service.getType())
                 .getAnnotation(BStringUtils.fromString(AsbConstants.PACKAGE_RABBITMQ_FQN + ":"
@@ -84,6 +90,12 @@ public class MessageDispatcher {
         return queueConfig.getStringValue(AsbConstants.QUEUE_NAME).getValue();
     }
 
+    /**
+     * Get connection string from annotation configuration attached to the service.
+     *
+     * @param service Ballerina service instance.
+     * @return Connection string from annotation configuration attached to the service.
+     */
     public static String getConnectionStringFromConfig(BObject service) {
         BMap serviceConfig = (BMap) ((AnnotatableType) service.getType())
                 .getAnnotation(BStringUtils.fromString(AsbConstants.PACKAGE_RABBITMQ_FQN + ":"
