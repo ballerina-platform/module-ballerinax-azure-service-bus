@@ -51,22 +51,26 @@ public class ListenerUtils {
 //        listenerBObject.addNativeData(AsbConstants.CONNECTION_NATIVE_OBJECT, iMessageReceiver);
     }
 
+    /**
+     * Attaches the service to the Asb listener endpoint.
+     *
+     * @param listenerBObject Ballerina listener object..
+     * @param service Ballerina service instance.
+     * @return An error if failed to create IMessageReceiver connection instance.
+     */
     public static Object registerListener(BObject listenerBObject, BObject service) {
         runtime = BRuntime.getCurrentRuntime();
-//        IMessageReceiver iMessageReceiver = (IMessageReceiver) listenerBObject.getNativeData(AsbConstants.CONNECTION_NATIVE_OBJECT);
         try {
             String connectionString = getConnectionStringFromConfig(service);
             String entityPath = getQueueNameFromConfig(service);
-//            QueueClient receiveClient = new QueueClient(new ConnectionStringBuilder(connectionString, entityPath), ReceiveMode.PEEKLOCK);
             IMessageReceiver receiver = ClientFactory.createMessageReceiverFromConnectionStringBuilder(
                     new ConnectionStringBuilder(connectionString, entityPath), ReceiveMode.PEEKLOCK);
             listenerBObject.addNativeData(AsbConstants.CONNECTION_NATIVE_OBJECT, receiver);
         } catch (Exception e) {
-            return AsbUtils.returnErrorValue("Error occurred while initializing the Queue Client");
+            return AsbUtils.returnErrorValue("Error occurred while initializing the IMessageReceiver");
         }
-
-        IMessageReceiver receiveClient = (IMessageReceiver) listenerBObject.getNativeData(AsbConstants.CONNECTION_NATIVE_OBJECT);
-
+        IMessageReceiver receiveClient = (IMessageReceiver)
+                listenerBObject.getNativeData(AsbConstants.CONNECTION_NATIVE_OBJECT);
         if (service == null) {
             return null;
         }
