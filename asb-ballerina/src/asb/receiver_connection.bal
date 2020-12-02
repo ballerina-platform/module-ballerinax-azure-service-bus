@@ -58,6 +58,13 @@ public class ReceiverConnection {
     public isolated function receiveMessage() returns Message|Error {
         return receiveMessage(self.asbReceiverConnection);
     }
+
+    # Receive messages from queue.
+    # 
+    # + return - A Messages object with an array of Message objects
+    public isolated function receiveMessages() returns Messages|Error {
+        return receiveMessages(self.asbReceiverConnection);
+    }
 }
 
 isolated function createReceiverConnection(handle connectionString, handle entityPath) 
@@ -73,5 +80,10 @@ isolated function closeReceiverConnection(handle imessageSender) returns Error? 
 
 isolated function receiveMessage(handle imessageReceiver) returns Message|Error = @java:Method {
     name: "receiveMessage",
+    'class: "org.ballerinalang.asb.connection.ConUtils"
+} external;
+
+isolated function receiveMessages(handle imessageReceiver) returns Messages|Error = @java:Method {
+    name: "receiveMessages",
     'class: "org.ballerinalang.asb.connection.ConUtils"
 } external;
