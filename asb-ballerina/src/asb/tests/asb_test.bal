@@ -18,6 +18,7 @@ import ballerina/test;
 import ballerina/log;
 import ballerina/system;
 import ballerina/config;
+import ballerina/runtime;
 
 // Connection Configuration
 string connectionString = getConfigValue("CONNECTION_STRING");
@@ -662,6 +663,30 @@ service {
         }
     }
 };
+
+# Test Listener capabilities
+@test:Config {dependsOn: ["testSendToQueueOperation"], enable: true}
+public function testAsyncConsumer() {
+
+    ConnectionConfiguration config = {
+        connectionString: connectionString,
+        entityPath: queuePath
+    };
+
+    string message = "Testing Async Consumer";
+    Listener? channelListener = new(config);
+    if (channelListener is Listener) {
+        checkpanic channelListener.__attach(asyncTestService);
+        checkpanic channelListener.__start();
+        log:printInfo("start");
+        runtime:sleep(20000);
+        log:printInfo("end");
+        checkpanic channelListener.__detach(asyncTestService);
+        // checkpanic channelListener.__gracefulStop();
+        // checkpanic channelListener.__immediateStop();
+        test:assertEquals(asyncConsumerMessage, message, msg = "Message received does not match.");
+    }
+}
 
 # After Suite Function
 @test:AfterSuite {}
