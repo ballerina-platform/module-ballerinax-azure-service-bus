@@ -96,7 +96,7 @@ isolated function detach(Listener lis, service serviceType) returns Error? =
 
 isolated function stop(Listener lis) returns Error? =
 @java:Method {
-    'class: "com.roland.asb.connection.ListenerUtils"
+    'class: "org.ballerinalang.asb.connection.ListenerUtils"
 } external;
 
 isolated function abortConnection(Listener lis) returns Error? =
