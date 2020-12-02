@@ -59,6 +59,13 @@ public class MessageDispatcher {
     private static final StrandMetadata ON_MESSAGE_METADATA = new StrandMetadata(ORG_NAME, ASB,
             ASB_VERSION, FUNC_ON_MESSAGE);
 
+    /**
+     * Initialize the Message Dispatcher.
+     *
+     * @param service Ballerina service instance.
+     * @param runtime Ballerina runtime instance.
+     * @param iMessageReceiver Asb MessageReceiver instance.
+     */
     public MessageDispatcher(BObject service, BRuntime runtime, IMessageReceiver iMessageReceiver) {
         this.service = service;
         this.queueName = getQueueNameFromConfig(service);
