@@ -123,5 +123,5 @@ isolated function completeMessages(handle imessageReceiver) returns Error? = @ja
 
 isolated function completeOneMessage(handle imessageReceiver) returns Error? = @java:Method {
     name: "completeOneMessage",
-    'class: "com.roland.asb.connection.ConUtils"
+    'class: "org.ballerinalang.asb.connection.ConUtils"
 } external;
