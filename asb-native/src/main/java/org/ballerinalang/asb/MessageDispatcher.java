@@ -111,7 +111,7 @@ public class MessageDispatcher {
     }
 
     /**
-     * Starts consuming the messages asynchronously by calling the pumpMessage functionality.
+     * Start receiving messages asynchronously and dispatch the messages to the attached service.
      *
      * @param listener Ballerina listener object.
      */
@@ -167,6 +167,11 @@ public class MessageDispatcher {
         }
     }
 
+    /**
+     * Handle the dispatch of message to the service.
+     *
+     * @param message Received azure service bus message instance.
+     */
     private void handleDispatch(byte[] message) {
         AttachedFunction[] attachedFunctions = service.getType().getAttachedFunctions();
         AttachedFunction onMessageFunction;
