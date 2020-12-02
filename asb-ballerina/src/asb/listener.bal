@@ -81,7 +81,7 @@ isolated function externInit(Listener lis, handle asbReceiverConnection) =
 
 isolated function registerListener(Listener lis, service serviceType) returns Error? =
 @java:Method {
-    'class: "com.roland.asb.connection.ListenerUtils"
+    'class: "org.ballerinalang.asb.connection.ListenerUtils"
 } external;
 
 isolated function 'start(Listener lis) returns Error? =
