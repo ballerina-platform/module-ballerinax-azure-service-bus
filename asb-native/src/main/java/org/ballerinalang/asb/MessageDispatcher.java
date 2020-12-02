@@ -141,18 +141,18 @@ public class MessageDispatcher {
     public void pumpMessage(IMessageReceiver receiver, ExecutorService executorService) {
         if(isClosing()) {
             CompletableFuture<IMessage> receiveMessageFuture = receiver.receiveAsync(Duration.ofSeconds(5));
-            LOG.info("\n\tWaiting up to 5 seconds for messages from %s ...\n" + receiver.getEntityPath());
+            LOG.info("\n\tWaiting up to 5 seconds for messages from  ...\n" + receiver.getEntityPath());
 
             receiveMessageFuture.handleAsync((message, receiveEx) -> {
                 if (receiveEx != null) {
-                    System.out.println("Receiving message from entity failed.");
+                    LOG.info("Receiving message from entity failed.");
                     pumpMessage(receiver, executorService);
                 } else if (message == null) {
-                    System.out.println("Receive from entity returned no messages.");
+                    LOG.info("Receive from entity returned no messages.");
                     pumpMessage(receiver, executorService);
                 } else {
-                    System.out.printf("\t<= Received a message with messageId %s\n", message.getMessageId());
-                    System.out.printf("\t<= Received a message with messageBody %s\n", new String(message.getBody(), UTF_8));
+                    LOG.info("\t<= Received a message with messageId \n" + message.getMessageId());
+                    LOG.info("\t<= Received a message with messageBody \n" + new String(message.getBody(), UTF_8));
                     handleDispatch(message.getBody());
                     try {
                         receiver.complete(message.getLockToken());
@@ -164,46 +164,6 @@ public class MessageDispatcher {
                 }
                 return null;
             }, executorService);
-        }
-    }
-
-    public void registerReceiver(QueueClient queueClient, ExecutorService executorService) throws Exception {
-        // register the RegisterMessageHandler callback with executor service
-        queueClient.registerMessageHandler(new IMessageHandler() {
-                                               // callback invoked when the message handler loop has obtained a message
-                                               public CompletableFuture<Void> onMessageAsync(IMessage message) {
-
-                                                   byte[] body = message.getBody();
-                                                   System.out.printf("\t<= Received a message with messageId %s\n", message.getMessageId());
-                                                   System.out.printf("\t<= Received a message with messageBody %s\n", new String(message.getBody(), UTF_8));
-                                                   handleDispatch(message.getBody());
-
-                                                   return CompletableFuture.completedFuture(null);
-                                               }
-
-                                               // callback invoked when the message handler has an exception to report
-                                               public void notifyException(Throwable throwable, ExceptionPhase exceptionPhase) {
-                                                   System.out.printf(exceptionPhase + "-" + throwable.getMessage());
-                                               }
-                                           },
-                // 1 concurrent call, messages are auto-completed, auto-renew duration
-                new MessageHandlerOptions(1, true, Duration.ofMinutes(1)),
-                executorService);
-
-    }
-
-    private void waitForEnter(int seconds) {
-        ExecutorService executor = Executors.newCachedThreadPool();
-        try {
-            executor.invokeAny(Arrays.asList(() -> {
-                System.in.read();
-                return 0;
-            }, () -> {
-                Thread.sleep(seconds * 1000);
-                return 0;
-            }));
-        } catch (Exception e) {
-            // absorb
         }
     }
 
