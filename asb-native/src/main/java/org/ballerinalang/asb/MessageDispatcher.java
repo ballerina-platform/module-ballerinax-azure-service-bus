@@ -2,7 +2,6 @@ package org.ballerinalang.asb;
 
 import com.google.gson.JsonParser;
 import com.microsoft.azure.servicebus.*;
-import com.microsoft.azure.servicebus.primitives.ConnectionStringBuilder;
 import org.ballerinalang.jvm.XMLFactory;
 import org.ballerinalang.jvm.api.BStringUtils;
 import org.ballerinalang.jvm.api.BValueCreator;
@@ -28,6 +27,7 @@ import java.util.concurrent.Executors;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.ballerinalang.asb.AsbConstants.*;
+import static org.ballerinalang.asb.connection.ListenerUtils.isClosing;
 
 public class MessageDispatcher {
     private String consumerTag;
