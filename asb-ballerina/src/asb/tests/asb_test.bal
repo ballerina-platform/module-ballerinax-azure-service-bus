@@ -390,6 +390,90 @@ function testSendBatchToTopicOperation() {
     }
 }
 
+# Test receive batch from subscription operation
+@test:Config{dependsOn: ["testSendBatchToTopicOperation"], enable: true}
+function testReceiveBatchFromSubscriptionOperation() {
+    log:printInfo("Creating Asb receiver connection.");
+    ReceiverConnection? receiverConnection1 = new ({connectionString: connectionString, entityPath: subscriptionPath1});
+    ReceiverConnection? receiverConnection2 = new ({connectionString: connectionString, entityPath: subscriptionPath2});
+    ReceiverConnection? receiverConnection3 = new ({connectionString: connectionString, entityPath: subscriptionPath3});
+
+    if (receiverConnection1 is ReceiverConnection) {
+        log:printInfo("Receiving from Asb receiver connection 1.");
+        var messagesReceived = receiverConnection1.receiveBatchMessage(maxMessageCount);
+        if(messagesReceived is Messages) {
+            int val = messagesReceived.getDeliveryTag();
+            log:printInfo("No. of messages received : " + val.toString());
+            Message[] messages = messagesReceived.getMessages();
+            string messageReceived1 =  checkpanic messages[0].getTextContent();
+            log:printInfo("Message1 content : " + messageReceived1);
+            string messageReceived2 =  checkpanic messages[1].getTextContent();
+            log:printInfo("Message2 content : " + messageReceived2);
+            string messageReceived3 =  checkpanic messages[2].getTextContent();
+            log:printInfo("Message3 content : " + messageReceived3);
+        }else {
+            test:assertFail("Receiving message via Asb receiver connection failed.");
+        }
+    } else {
+        test:assertFail("Asb receiver connection creation failed.");
+    }
+
+    if (receiverConnection2 is ReceiverConnection) {
+        log:printInfo("Receiving from Asb receiver connection 2.");
+        var messagesReceived = receiverConnection2.receiveBatchMessage(maxMessageCount);
+        if(messagesReceived is Messages) {
+            int val = messagesReceived.getDeliveryTag();
+            log:printInfo("No. of messages received : " + val.toString());
+            Message[] messages = messagesReceived.getMessages();
+            string messageReceived1 =  checkpanic messages[0].getTextContent();
+            log:printInfo("Message1 content : " + messageReceived1);
+            string messageReceived2 =  checkpanic messages[1].getTextContent();
+            log:printInfo("Message2 content : " + messageReceived2);
+            string messageReceived3 =  checkpanic messages[2].getTextContent();
+            log:printInfo("Message3 content : " + messageReceived3);
+        } else {
+            test:assertFail("Receiving message via Asb receiver connection failed.");
+        }
+    } else {
+        test:assertFail("Asb receiver connection creation failed.");
+    }
+
+    if (receiverConnection3 is ReceiverConnection) {
+        log:printInfo("Receiving from Asb receiver connection 3.");
+        var messagesReceived = receiverConnection3.receiveBatchMessage(maxMessageCount);
+        if(messagesReceived is Messages) {
+            int val = messagesReceived.getDeliveryTag();
+            log:printInfo("No. of messages received : " + val.toString());
+            Message[] messages = messagesReceived.getMessages();
+            string messageReceived1 =  checkpanic messages[0].getTextContent();
+            log:printInfo("Message1 content : " + messageReceived1);
+            string messageReceived2 =  checkpanic messages[1].getTextContent();
+            log:printInfo("Message2 content : " + messageReceived2);
+            string messageReceived3 =  checkpanic messages[2].getTextContent();
+            log:printInfo("Message3 content : " + messageReceived3);
+        } else {
+            test:assertFail("Receiving message via Asb receiver connection failed.");
+        }
+    } else {
+        test:assertFail("Asb receiver connection creation failed.");
+    }
+
+    if (receiverConnection1 is ReceiverConnection) {
+        log:printInfo("Closing Asb receiver connection 1.");
+        checkpanic receiverConnection1.closeReceiverConnection();
+    }
+
+    if (receiverConnection2 is ReceiverConnection) {
+        log:printInfo("Closing Asb receiver connection 2.");
+        checkpanic receiverConnection2.closeReceiverConnection();
+    }
+
+    if (receiverConnection3 is ReceiverConnection) {
+        log:printInfo("Closing Asb receiver connection 3.");
+        checkpanic receiverConnection3.closeReceiverConnection();
+    }
+}
+
 # After Suite Function
 @test:AfterSuite {}
 function afterSuiteFunc() {
