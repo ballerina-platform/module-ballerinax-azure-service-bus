@@ -403,6 +403,62 @@ public class ConUtils {
         }
     }
 
+    /**
+     * Receive Batch of Messages with configurable parameters as Map when Receiver Connection is given as a parameter,
+     * message content as a byte array, maximum message count in a batch as int and return Messages object.
+     *
+     * @param receiver Output Receiver connection.
+     * @param maxMessageCount Maximum no. of messages in a batch
+     * @return Message Object of the received message.
+     */
+    public static Object receiveBatchMessage(IMessageReceiver receiver, int maxMessageCount) throws Exception {
+        try {
+            // receive messages from queue or subscription
+            String receivedMessageId = "";
+            BArrayType sourceArrayType = null;
+            BObject[] bObjectArray = new BObject[maxMessageCount];
+            int i = 0;
+
+            BObject messagesBObject = BValueCreator.createObjectValue(AsbConstants.PACKAGE_ID_ASB,
+                    AsbConstants.MESSAGES_OBJECT);
+
+            System.out.printf("\n\tWaiting up to 5 seconds for messages from %s ...\n", receiver.getEntityPath());
+            for(int j=0; j<maxMessageCount; j++) {
+                IMessage receivedMessage = receiver.receive(Duration.ofSeconds(5));
+
+                if (receivedMessage == null) {
+                    continue;
+                }
+                System.out.printf("\t<= Received a message with messageId %s\n", receivedMessage.getMessageId());
+                System.out.printf("\t<= Received a message with messageBody %s\n",
+                        new String(receivedMessage.getBody(), UTF_8));
+                receiver.complete(receivedMessage.getLockToken());
+
+                if (receivedMessageId.contentEquals(receivedMessage.getMessageId())) {
+                    return AsbUtils.returnErrorValue("Received a duplicate message!");
+                }
+                receivedMessageId = receivedMessage.getMessageId();
+
+                BObject messageBObject = BValueCreator.createObjectValue(AsbConstants.PACKAGE_ID_ASB,
+                        AsbConstants.MESSAGE_OBJECT);
+                messageBObject.set(AsbConstants.MESSAGE_CONTENT,
+                        BValueCreator.createArrayValue(receivedMessage.getBody()));
+                bObjectArray[i] = messageBObject;
+                i = i + 1;
+                sourceArrayType = new BArrayType(messageBObject.getType());
+            }
+            System.out.printf("\tDone receiving messages from %s\n", receiver.getEntityPath());
+            if(sourceArrayType != null) {
+                messagesBObject.set(AsbConstants.MESSAGES_CONTENT,
+                        BValueCreator.createArrayValue(bObjectArray, sourceArrayType));
+                messagesBObject.set(AsbConstants.DELIVERY_TAG, i);
+            }
+            return messagesBObject;
+        } catch (Exception e) {
+            return AsbUtils.returnErrorValue(e.getMessage());
+        }
+    }
+
     public ConUtils() {
     }
 
