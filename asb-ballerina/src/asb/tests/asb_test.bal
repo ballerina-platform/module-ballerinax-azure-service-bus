@@ -45,6 +45,7 @@ map<string> parameters2 = {contentType: "application/json", messageId: "two", to
     label: "a1", sessionId: "b1", correlationId: "c1", timeToLive: "2"};
 map<string> parameters3 = {contentType: "application/json"};
 map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
+string asyncConsumerMessage = "";
 int maxMessageCount = 3;
 
 # Before Suite Function
@@ -641,6 +642,26 @@ function testAbandonMessageFromSubscriptionOperation() {
         checkpanic receiverConnection3.closeReceiverConnection();
     }
 }
+
+# Async test service used to attached to the listener
+service asyncTestService = 
+@ServiceConfig {
+    queueConfig: {
+        connectionString: connectionString,
+        queueName: queuePath
+    }
+}
+service {
+    resource function onMessage(Message message) {
+        var messageContent = message.getTextContent();
+        if (messageContent is string) {
+            asyncConsumerMessage = <@untainted> messageContent;
+            log:printInfo("The message received: " + messageContent);
+        } else {
+            log:printError("Error occurred while retrieving the message content.");
+        }
+    }
+};
 
 # After Suite Function
 @test:AfterSuite {}
