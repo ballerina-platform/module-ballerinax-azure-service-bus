@@ -16,6 +16,7 @@
 
 import ballerina/java;
 
+# Represents a single network sender connection to the Asb broker.
 public class SenderConnection {
 
     handle asbSenderConnection;
