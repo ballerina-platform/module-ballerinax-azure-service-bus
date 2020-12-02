@@ -125,5 +125,5 @@ isolated function sendMessage(handle imessageSender, byte[] content, handle cont
 isolated function sendBatchMessage(handle imessageSender, string[] content, map<string> parameters, 
     map<string> properties, int maxMessageCount) returns Error? = @java:Method {
     name: "sendBatchMessage",
-    'class: "com.roland.asb.connection.ConUtils"
+    'class: "org.ballerinalang.asb.connection.ConUtils"
 } external;

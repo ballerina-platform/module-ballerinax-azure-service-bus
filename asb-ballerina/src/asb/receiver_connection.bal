@@ -99,5 +99,5 @@ isolated function receiveMessages(handle imessageReceiver) returns Messages|Erro
 isolated function receiveBatchMessage(handle imessageReceiver, int maxMessageCount) 
     returns Messages|error = @java:Method {
     name: "receiveBatchMessage",
-    'class: "com.roland.asb.connection.ConUtils"
+    'class: "org.ballerinalang.asb.connection.ConUtils"
 } external;
