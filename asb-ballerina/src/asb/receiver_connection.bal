@@ -65,6 +65,14 @@ public class ReceiverConnection {
     public isolated function receiveMessages() returns Messages|Error {
         return receiveMessages(self.asbReceiverConnection);
     }
+
+    # Receive batch of messages from queue.
+    # 
+    # + maxMessageCount - Maximum no. of messages in a batch
+    # + return - A Message object
+    public isolated function receiveBatchMessage(int maxMessageCount) returns Messages|error {
+        return receiveBatchMessage(self.asbReceiverConnection, maxMessageCount);
+    }
 }
 
 isolated function createReceiverConnection(handle connectionString, handle entityPath) 
@@ -86,4 +94,10 @@ isolated function receiveMessage(handle imessageReceiver) returns Message|Error 
 isolated function receiveMessages(handle imessageReceiver) returns Messages|Error = @java:Method {
     name: "receiveMessages",
     'class: "org.ballerinalang.asb.connection.ConUtils"
+} external;
+
+isolated function receiveBatchMessage(handle imessageReceiver, int maxMessageCount) 
+    returns Messages|error = @java:Method {
+    name: "receiveBatchMessage",
+    'class: "com.roland.asb.connection.ConUtils"
 } external;
