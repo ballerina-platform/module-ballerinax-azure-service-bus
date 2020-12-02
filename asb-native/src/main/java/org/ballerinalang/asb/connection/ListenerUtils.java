@@ -72,8 +72,8 @@ public class ListenerUtils {
         } catch (Exception e) {
             return AsbUtils.returnErrorValue("Error occurred while initializing the IMessageReceiver");
         }
-        IMessageReceiver receiveClient = (IMessageReceiver)
-                listenerBObject.getNativeData(AsbConstants.CONNECTION_NATIVE_OBJECT);
+        IMessageReceiver receiveClient =
+                (IMessageReceiver) listenerBObject.getNativeData(AsbConstants.CONNECTION_NATIVE_OBJECT);
         if (service == null) {
             return null;
         }
@@ -92,8 +92,8 @@ public class ListenerUtils {
      */
     public static Object start(BObject listenerBObject) {
         runtime = BRuntime.getCurrentRuntime();
-        IMessageReceiver iMessageReceiver = (IMessageReceiver)
-                listenerBObject.getNativeData(AsbConstants.CONNECTION_NATIVE_OBJECT);
+        IMessageReceiver iMessageReceiver =
+                (IMessageReceiver) listenerBObject.getNativeData(AsbConstants.CONNECTION_NATIVE_OBJECT);
         @SuppressWarnings(AsbConstants.UNCHECKED)
         ArrayList<BObject> services =
                 (ArrayList<BObject>) listenerBObject.getNativeData(AsbConstants.CONSUMER_SERVICES);
@@ -123,7 +123,8 @@ public class ListenerUtils {
      * @return An error if failed detaching the service.
      */
     public static Object detach(BObject listenerBObject, BObject service) {
-        IMessageReceiver iMessageReceiver = (IMessageReceiver) listenerBObject.getNativeData(AsbConstants.CONNECTION_NATIVE_OBJECT);
+        IMessageReceiver iMessageReceiver =
+                (IMessageReceiver) listenerBObject.getNativeData(AsbConstants.CONNECTION_NATIVE_OBJECT);
         @SuppressWarnings(AsbConstants.UNCHECKED)
         ArrayList<BObject> startedServices =
                 (ArrayList<BObject>) listenerBObject.getNativeData(AsbConstants.STARTED_SERVICES);
@@ -145,14 +146,20 @@ public class ListenerUtils {
         return null;
     }
 
+    /**
+     * Stops consuming messages through all consumer services by terminating the connection.
+     *
+     * @param listenerBObject Ballerina listener object.
+     */
     public static Object stop(BObject listenerBObject) {
-        IMessageReceiver iMessageReceiver = (IMessageReceiver) listenerBObject.getNativeData(AsbConstants.CONNECTION_NATIVE_OBJECT);
+        IMessageReceiver iMessageReceiver =
+                (IMessageReceiver) listenerBObject.getNativeData(AsbConstants.CONNECTION_NATIVE_OBJECT);
         if(iMessageReceiver == null) {
             return AsbUtils.returnErrorValue("IMessageReceiver is not properly initialised.");
         } else {
             try {
                 iMessageReceiver.close();
-                System.out.println("[ballerina/rabbitmq] Consumer service stopped");
+                LOG.info("Consumer service stopped");
             } catch (Exception e) {
                 return AsbUtils.returnErrorValue("Error occurred while stopping the service");
             }
@@ -160,14 +167,20 @@ public class ListenerUtils {
         return null;
     }
 
+    /**
+     * Stops consuming messages through all the consumer services and terminates the connection with server.
+     *
+     * @param listenerBObject Ballerina listener object.
+     */
     public static Object abortConnection(BObject listenerBObject) {
-        IMessageReceiver iMessageReceiver = (IMessageReceiver) listenerBObject.getNativeData(AsbConstants.CONNECTION_NATIVE_OBJECT);
+        IMessageReceiver iMessageReceiver =
+                (IMessageReceiver) listenerBObject.getNativeData(AsbConstants.CONNECTION_NATIVE_OBJECT);
         if(iMessageReceiver == null) {
             return AsbUtils.returnErrorValue("IMessageReceiver is not properly initialised.");
         } else {
             try {
                 iMessageReceiver.close();
-                System.out.println("[ballerina/rabbitmq] Consumer service stopped");
+                LOG.info("Consumer service stopped");
             } catch (Exception e) {
                 return AsbUtils.returnErrorValue("Error occurred while stopping the service");
             }
@@ -175,6 +188,12 @@ public class ListenerUtils {
         return null;
     }
 
+    /**
+     * Starts consuming the messages by calling the message dispatcher.
+     *
+     * @param service Ballerina service instance.
+     * @param listener Ballerina listener object.
+     */
     private static void startReceivingMessages(BObject service, BObject listener, IMessageReceiver iMessageReceiver) {
         MessageDispatcher messageDispatcher =
                 new MessageDispatcher(service, runtime, iMessageReceiver);
