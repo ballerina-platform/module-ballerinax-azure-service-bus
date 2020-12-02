@@ -279,7 +279,7 @@ function testAbandonMessageFromQueueOperation() {
 }
 
 # Test send to topic operation
-@test:Config{enable: true}
+@test:Config{enable: false}
 function testSendToTopicOperation() {
     log:printInfo("Creating Asb sender connection.");
     SenderConnection? senderConnection = new ({connectionString: connectionString, entityPath: topicPath});
@@ -299,7 +299,7 @@ function testSendToTopicOperation() {
 }
 
 # Test receive from subscription operation
-@test:Config{dependsOn: ["testSendToTopicOperation"], enable: true}
+@test:Config{dependsOn: ["testSendToTopicOperation"], enable: false}
 function testReceiveFromSubscriptionOperation() {
     log:printInfo("Creating Asb receiver connection.");
     ReceiverConnection? receiverConnection1 = new ({connectionString: connectionString, entityPath: subscriptionPath1});
@@ -368,6 +368,25 @@ function testReceiveFromSubscriptionOperation() {
     if (receiverConnection3 is ReceiverConnection) {
         log:printInfo("Closing Asb receiver connection 3.");
         checkpanic receiverConnection3.closeReceiverConnection();
+    }
+}
+
+# Test send batch to topic operation
+@test:Config{enable: true}
+function testSendBatchToTopicOperation() {
+    log:printInfo("Creating Asb sender connection.");
+    SenderConnection? senderConnection = new ({connectionString: connectionString, entityPath: topicPath});
+
+    if (senderConnection is SenderConnection) {
+        log:printInfo("Sending via Asb sender connection.");
+        checkpanic senderConnection.sendBatchMessage(stringArrayContent, parameters3, properties, maxMessageCount);
+    } else {
+        test:assertFail("Asb sender connection creation failed.");
+    }
+
+    if (senderConnection is SenderConnection) {
+        log:printInfo("Closing Asb sender connection.");
+        checkpanic senderConnection.closeSenderConnection();
     }
 }
 
