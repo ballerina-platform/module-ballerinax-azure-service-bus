@@ -70,8 +70,15 @@ public class ReceiverConnection {
     # 
     # + maxMessageCount - Maximum no. of messages in a batch
     # + return - A Message object
-    public isolated function receiveBatchMessage(int maxMessageCount) returns Messages|error {
+    public isolated function receiveBatchMessage(int maxMessageCount) returns Messages|Error {
         return receiveBatchMessage(self.asbReceiverConnection, maxMessageCount);
+    }
+
+    # Complete Messages from Queue or Subscription based on messageLockToken.
+    # 
+    # + return - An `asb:Error` if failed to complete message or else `()`
+    public isolated function completeMessages() returns Error? {
+        return completeMessages(self.asbReceiverConnection);
     }
 }
 
@@ -97,7 +104,12 @@ isolated function receiveMessages(handle imessageReceiver) returns Messages|Erro
 } external;
 
 isolated function receiveBatchMessage(handle imessageReceiver, int maxMessageCount) 
-    returns Messages|error = @java:Method {
+    returns Messages|Error = @java:Method {
     name: "receiveBatchMessage",
+    'class: "org.ballerinalang.asb.connection.ConUtils"
+} external;
+
+isolated function completeMessages(handle imessageReceiver) returns Error? = @java:Method {
+    name: "completeMessages",
     'class: "org.ballerinalang.asb.connection.ConUtils"
 } external;
