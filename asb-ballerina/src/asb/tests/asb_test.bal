@@ -84,7 +84,7 @@ public function testReceieverConnection() {
 }
 
 # Test send to queue operation
-@test:Config{enable: false}
+@test:Config{enable: true}
 function testSendToQueueOperation() {
     log:printInfo("Creating Asb sender connection.");
     SenderConnection? senderConnection = new ({connectionString: connectionString, entityPath: queuePath});
@@ -281,7 +281,7 @@ function testAbandonMessageFromQueueOperation() {
 }
 
 # Test send to topic operation
-@test:Config{enable: true}
+@test:Config{enable: false}
 function testSendToTopicOperation() {
     log:printInfo("Creating Asb sender connection.");
     SenderConnection? senderConnection = new ({connectionString: connectionString, entityPath: topicPath});
@@ -588,7 +588,7 @@ function testCompleteOneMessageFromSubscriptionOperation() {
 }
 
 # Test abandon Message from subscription operation
-@test:Config{dependsOn: ["testSendToTopicOperation"], enable: true}
+@test:Config{dependsOn: ["testSendToTopicOperation"], enable: false}
 function testAbandonMessageFromSubscriptionOperation() {
     log:printInfo("Creating Asb receiver connection.");
     ReceiverConnection? receiverConnection1 = new ({connectionString: connectionString, entityPath: subscriptionPath1});
@@ -673,7 +673,7 @@ public function testAsyncConsumer() {
         entityPath: queuePath
     };
 
-    string message = "Testing Async Consumer";
+    string message = string `{"name":"apple", "color":"red", "price":5.36}`;
     Listener? channelListener = new(config);
     if (channelListener is Listener) {
         checkpanic channelListener.__attach(asyncTestService);
