@@ -18,27 +18,19 @@
 
 package org.ballerinalang.asb;
 
-import com.google.gson.JsonParser;
 import com.microsoft.azure.servicebus.*;
-import org.ballerinalang.asb.connection.ListenerUtils;
-import org.ballerinalang.jvm.XMLFactory;
 import org.ballerinalang.jvm.api.BStringUtils;
 import org.ballerinalang.jvm.api.BValueCreator;
 import org.ballerinalang.jvm.api.values.*;
 import org.ballerinalang.jvm.scheduling.StrandMetadata;
 import org.ballerinalang.jvm.types.AnnotatableType;
 import org.ballerinalang.jvm.types.BType;
-import org.ballerinalang.jvm.types.TypeTags;
 import org.ballerinalang.jvm.types.AttachedFunction;
 import org.ballerinalang.jvm.runtime.AsyncFunctionCallback;
 import org.ballerinalang.jvm.api.BRuntime;
 
-
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
