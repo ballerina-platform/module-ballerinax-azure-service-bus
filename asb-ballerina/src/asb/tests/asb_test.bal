@@ -22,6 +22,7 @@ import ballerina/config;
 // Connection Configuration
 string connectionString = getConfigValue("CONNECTION_STRING");
 string queuePath = getConfigValue("QUEUE_PATH");
+string topicPath = getConfigValue("TOPIC_PATH");
 
 SenderConnection? senderConnection = ();
 ReceiverConnection? receiverConnection = ();
@@ -271,6 +272,26 @@ function testAbandonMessageFromQueueOperation() {
     if (receiverConnection is ReceiverConnection) {
         log:printInfo("Closing Asb receiver connection.");
         checkpanic receiverConnection.closeReceiverConnection();
+    }
+}
+
+# Test send to topic operation
+@test:Config{enable: false}
+function testSendToTopicOperation() {
+    log:printInfo("Creating Asb sender connection.");
+    SenderConnection? senderConnection = new ({connectionString: connectionString, entityPath: topicPath});
+
+    if (senderConnection is SenderConnection) {
+        log:printInfo("Sending via Asb sender connection.");
+        checkpanic senderConnection.sendMessageWithConfigurableParameters(byteContent, parameters1, properties);
+        checkpanic senderConnection.sendMessageWithConfigurableParameters(byteContentFromJson, parameters2, properties);
+    } else {
+        test:assertFail("Asb sender connection creation failed.");
+    }
+
+    if (senderConnection is SenderConnection) {
+        log:printInfo("Closing Asb sender connection.");
+        checkpanic senderConnection.closeSenderConnection();
     }
 }
 
