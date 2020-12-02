@@ -87,6 +87,13 @@ public class ReceiverConnection {
     public isolated function completeOneMessage() returns Error? {
         return completeOneMessage(self.asbReceiverConnection);
     }
+
+    # Abandon message & make available again for processing from Queue or Subscription based on messageLockToken
+    # 
+    # + return - An `asb:Error` if failed to abandon message or else `()`
+    public isolated function abandonMessage() returns Error? {
+        return abandonMessage(self.asbReceiverConnection);
+    }
 }
 
 isolated function createReceiverConnection(handle connectionString, handle entityPath) 
@@ -123,5 +130,10 @@ isolated function completeMessages(handle imessageReceiver) returns Error? = @ja
 
 isolated function completeOneMessage(handle imessageReceiver) returns Error? = @java:Method {
     name: "completeOneMessage",
+    'class: "org.ballerinalang.asb.connection.ConUtils"
+} external;
+
+isolated function abandonMessage(handle imessageReceiver) returns Error? = @java:Method {
+    name: "abandonMessage",
     'class: "org.ballerinalang.asb.connection.ConUtils"
 } external;
