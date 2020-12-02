@@ -279,7 +279,7 @@ function testAbandonMessageFromQueueOperation() {
 }
 
 # Test send to topic operation
-@test:Config{enable: false}
+@test:Config{enable: true}
 function testSendToTopicOperation() {
     log:printInfo("Creating Asb sender connection.");
     SenderConnection? senderConnection = new ({connectionString: connectionString, entityPath: topicPath});
@@ -372,7 +372,7 @@ function testReceiveFromSubscriptionOperation() {
 }
 
 # Test send batch to topic operation
-@test:Config{enable: true}
+@test:Config{enable: false}
 function testSendBatchToTopicOperation() {
     log:printInfo("Creating Asb sender connection.");
     SenderConnection? senderConnection = new ({connectionString: connectionString, entityPath: topicPath});
@@ -391,7 +391,7 @@ function testSendBatchToTopicOperation() {
 }
 
 # Test receive batch from subscription operation
-@test:Config{dependsOn: ["testSendBatchToTopicOperation"], enable: true}
+@test:Config{dependsOn: ["testSendBatchToTopicOperation"], enable: false}
 function testReceiveBatchFromSubscriptionOperation() {
     log:printInfo("Creating Asb receiver connection.");
     ReceiverConnection? receiverConnection1 = new ({connectionString: connectionString, entityPath: subscriptionPath1});
@@ -454,6 +454,63 @@ function testReceiveBatchFromSubscriptionOperation() {
         } else {
             test:assertFail("Receiving message via Asb receiver connection failed.");
         }
+    } else {
+        test:assertFail("Asb receiver connection creation failed.");
+    }
+
+    if (receiverConnection1 is ReceiverConnection) {
+        log:printInfo("Closing Asb receiver connection 1.");
+        checkpanic receiverConnection1.closeReceiverConnection();
+    }
+
+    if (receiverConnection2 is ReceiverConnection) {
+        log:printInfo("Closing Asb receiver connection 2.");
+        checkpanic receiverConnection2.closeReceiverConnection();
+    }
+
+    if (receiverConnection3 is ReceiverConnection) {
+        log:printInfo("Closing Asb receiver connection 3.");
+        checkpanic receiverConnection3.closeReceiverConnection();
+    }
+}
+
+# Test complete Messages from subscription operation
+@test:Config{dependsOn: ["testSendToTopicOperation"], enable: true}
+function testCompleteMessagesFromSubscriptionOperation() {
+    log:printInfo("Creating Asb receiver connection.");
+    ReceiverConnection? receiverConnection1 = new ({connectionString: connectionString, entityPath: subscriptionPath1});
+    ReceiverConnection? receiverConnection2 = new ({connectionString: connectionString, entityPath: subscriptionPath2});
+    ReceiverConnection? receiverConnection3 = new ({connectionString: connectionString, entityPath: subscriptionPath3});
+
+    if (receiverConnection1 is ReceiverConnection) {
+        log:printInfo("Completing messages from Asb receiver connection.");
+        checkpanic receiverConnection1.completeMessages();
+        log:printInfo("Done completing messages using their lock tokens.");
+        log:printInfo("Completing messages from Asb receiver connection.");
+        checkpanic receiverConnection1.completeMessages();
+        log:printInfo("Done completing messages using their lock tokens.");
+    } else {
+        test:assertFail("Asb receiver connection creation failed.");
+    }
+
+    if (receiverConnection2 is ReceiverConnection) {
+        log:printInfo("Completing messages from Asb receiver connection.");
+        checkpanic receiverConnection2.completeMessages();
+        log:printInfo("Done completing messages using their lock tokens.");
+        log:printInfo("Completing messages from Asb receiver connection.");
+        checkpanic receiverConnection2.completeMessages();
+        log:printInfo("Done completing messages using their lock tokens.");
+    } else {
+        test:assertFail("Asb receiver connection creation failed.");
+    }
+
+    if (receiverConnection3 is ReceiverConnection) {
+        log:printInfo("Completing messages from Asb receiver connection.");
+        checkpanic receiverConnection3.completeMessages();
+        log:printInfo("Done completing messages using their lock tokens.");
+        log:printInfo("Completing messages from Asb receiver connection.");
+        checkpanic receiverConnection3.completeMessages();
+        log:printInfo("Done completing messages using their lock tokens.");
     } else {
         test:assertFail("Asb receiver connection creation failed.");
     }
