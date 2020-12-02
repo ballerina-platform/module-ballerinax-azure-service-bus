@@ -85,6 +85,17 @@ public class SenderConnection {
             java:fromString(correlationId), properties, timeToLive);
     }
 
+    # Send batch of messages to queue with a content and optional parameters
+    #
+    # + content - MessageBody content
+    # + parameters - Optional Message parameters 
+    # + properties - Message properties
+    # + maxMessageCount - Maximum no. of messages in a batch
+    # + return - An `asb:Error` if failed to send message or else `()`
+    public isolated function sendBatchMessage(string[] content, map<string> parameters, map<string> properties, 
+        int maxMessageCount) returns Error? {
+        return sendBatchMessage(self.asbSenderConnection, content, parameters, properties, maxMessageCount);
+    }
 }
 
 isolated function createSenderConnection(handle connectionString, handle entityPath) 
@@ -109,4 +120,10 @@ isolated function sendMessage(handle imessageSender, byte[] content, handle cont
         returns Error? = @java:Method {
     name: "sendMessage",
     'class: "org.ballerinalang.asb.connection.ConUtils"
+} external;
+
+isolated function sendBatchMessage(handle imessageSender, string[] content, map<string> parameters, 
+    map<string> properties, int maxMessageCount) returns Error? = @java:Method {
+    name: "sendBatchMessage",
+    'class: "com.roland.asb.connection.ConUtils"
 } external;
