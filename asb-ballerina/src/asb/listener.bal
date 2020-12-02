@@ -86,7 +86,7 @@ isolated function registerListener(Listener lis, service serviceType) returns Er
 
 isolated function 'start(Listener lis) returns Error? =
 @java:Method {
-    'class: "com.roland.asb.connection.ListenerUtils"
+    'class: "org.ballerinalang.asb.connection.ListenerUtils"
 } external;
 
 isolated function detach(Listener lis, service serviceType) returns Error? =
