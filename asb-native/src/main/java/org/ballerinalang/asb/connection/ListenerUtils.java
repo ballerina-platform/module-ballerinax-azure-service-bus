@@ -35,9 +35,9 @@ public class ListenerUtils {
     private static BRuntime runtime;
 
     private static boolean started = false;
+    private static boolean serviceAttached = false;
     private static ArrayList<BObject> services = new ArrayList<>();
     private static ArrayList<BObject> startedServices = new ArrayList<>();
-    private static boolean serviceAttached = false;
 
     /**
      * Initialize the ballerina listener object.
@@ -82,20 +82,15 @@ public class ListenerUtils {
         return null;
     }
 
-    private static boolean isStarted() {
-        return started;
-    }
-
-    private static void startReceivingMessages(BObject service, BObject listener, IMessageReceiver iMessageReceiver) {
-        MessageDispatcher messageDispatcher =
-                new MessageDispatcher(service, runtime, iMessageReceiver);
-        messageDispatcher.receiveMessages(listener);
-
-    }
-
+    /**
+     * Starts consuming the messages on all the attached services.
+     *
+     * @param listenerBObject Ballerina listener object.
+     */
     public static Object start(BObject listenerBObject) {
         runtime = BRuntime.getCurrentRuntime();
-        IMessageReceiver iMessageReceiver = (IMessageReceiver) listenerBObject.getNativeData(AsbConstants.CONNECTION_NATIVE_OBJECT);
+        IMessageReceiver iMessageReceiver = (IMessageReceiver)
+                listenerBObject.getNativeData(AsbConstants.CONNECTION_NATIVE_OBJECT);
         @SuppressWarnings(AsbConstants.UNCHECKED)
         ArrayList<BObject> services =
                 (ArrayList<BObject>) listenerBObject.getNativeData(AsbConstants.CONSUMER_SERVICES);
@@ -117,6 +112,13 @@ public class ListenerUtils {
         return null;
     }
 
+    /**
+     * Attaches the service to the Asb listener endpoint.
+     *
+     * @param listenerBObject Ballerina listener object..
+     * @param service Ballerina service instance.
+     * @return An error if failed to create IMessageReceiver connection instance.
+     */
     public static Object detach(BObject listenerBObject, BObject service) {
         IMessageReceiver iMessageReceiver = (IMessageReceiver) listenerBObject.getNativeData(AsbConstants.CONNECTION_NATIVE_OBJECT);
         @SuppressWarnings(AsbConstants.UNCHECKED)
@@ -173,6 +175,13 @@ public class ListenerUtils {
         return null;
     }
 
+    private static void startReceivingMessages(BObject service, BObject listener, IMessageReceiver iMessageReceiver) {
+        MessageDispatcher messageDispatcher =
+                new MessageDispatcher(service, runtime, iMessageReceiver);
+        messageDispatcher.receiveMessages(listener);
+
+    }
+
     /**
      * Removes a given element from the provided array list and returns the resulting list.
      *
@@ -185,6 +194,10 @@ public class ListenerUtils {
             arrayList.remove(objectValue);
         }
         return arrayList;
+    }
+
+    private static boolean isStarted() {
+        return started;
     }
 
     public static boolean isClosing() {
