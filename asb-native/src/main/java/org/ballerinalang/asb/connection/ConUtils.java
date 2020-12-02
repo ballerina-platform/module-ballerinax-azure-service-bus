@@ -322,6 +322,87 @@ public class ConUtils {
         }
     }
 
+    /**
+     * Send Batch of Messages with configurable parameters when Sender Connection is given as a parameter and
+     * message content as a byte array, optional parameters as a BMap and maximum message count in a batch as int.
+     *
+     * @param sender Input Sender connection.
+     * @param content Input message content as byte array
+     * @param parameters Input message optional parameters specified as a BMap
+     * @param properties Input Message properties
+     * @param maxMessageCount Maximum no. of messages in a batch
+     */
+    public static void sendBatchMessage(IMessageSender sender, BArray content, BMap<String, String> parameters,
+                                        BMap<String, String> properties, int maxMessageCount) throws Exception {
+        Map<String,String> map = toStringMap(parameters);
+
+        String contentType = "";
+        String messageId = UUID.randomUUID().toString();
+        String to = "";
+        String replyTo = "";
+        String label = "";
+        String sessionId = "";
+        String correlationId = "";
+        int timeToLive = 1;
+        if (map.containsKey("contentType")) {
+            contentType = (String)map.get("contentType");
+        }
+        if (map.containsKey("to")) {
+            to = (String) map.get("to");
+        }
+        if (map.containsKey("replyTo")) {
+            replyTo = (String) map.get("replyTo");
+        }
+        if (map.containsKey("label")) {
+            label = (String) map.get("label");
+        }
+        if (map.containsKey("sessionId")) {
+            sessionId = (String) map.get("sessionId");
+        }
+        if (map.containsKey("correlationId")) {
+            correlationId = (String) map.get("correlationId");
+        }
+        if (map.containsKey("timeToLive")) {
+            timeToLive = Integer.parseInt(map.get("timeToLive"));
+        }
+
+        try {
+            List<IMessage> messages = new ArrayList<>();
+
+            for(int i = 0; i < maxMessageCount; i++) {
+                IMessage message = new Message();
+                if (map.containsKey("messageId")) {
+                    messageId = (String) map.get("messageId");
+                } else {
+                    messageId = UUID.randomUUID().toString();;
+                }
+                message.setMessageId(messageId);
+                message.setTimeToLive(Duration.ofMinutes(timeToLive));
+                byte[] byteArray = content.get(i).toString().getBytes();
+                message.setBody(byteArray);
+                message.setContentType(contentType);
+                message.setMessageId(messageId);
+                message.setTo(to);
+                message.setReplyTo(replyTo);
+                message.setLabel(label);
+                message.setSessionId(sessionId);
+                message.setCorrelationId(correlationId);
+                Map<String,String> propertiesMap = toStringMap(properties);
+                message.setProperties(propertiesMap);
+
+                messages.add(message);
+                System.out.printf("\t=> Sending a message with messageId %s\n", message.getMessageId());
+            }
+
+            // Send messages to queue or topic
+            System.out.printf("\tSending messages to %s ...\n", sender.getEntityPath());
+            sender.sendBatch(messages);
+            System.out.printf("\t=> Sent %s messages\n", messages.size());
+        } catch(Exception e) {
+            throw AsbUtils.returnErrorValue(e.getMessage());
+        }
+    }
+
     public ConUtils() {
     }
 
