@@ -285,15 +285,15 @@ public class ConUtils {
             BObject messagesBObject = BValueCreator.createObjectValue(AsbConstants.PACKAGE_ID_ASB,
                     AsbConstants.MESSAGES_OBJECT);
 
-            System.out.printf("\n\tWaiting up to 5 seconds for messages from %s ...\n", receiver.getEntityPath());
+            LOG.info("\n\tWaiting up to 5 seconds for messages from  ...\n" + receiver.getEntityPath());
             while (true) {
                 IMessage receivedMessage = receiver.receive(Duration.ofSeconds(5));
 
                 if (receivedMessage == null) {
                     break;
                 }
-                System.out.printf("\t<= Received a message with messageId %s\n", receivedMessage.getMessageId());
-                System.out.printf("\t<= Received a message with messageBody %s\n",
+                LOG.info("\t<= Received a message with messageId \n" + receivedMessage.getMessageId());
+                LOG.info("\t<= Received a message with messageBody \n" +
                         new String(receivedMessage.getBody(), UTF_8));
                 receiver.complete(receivedMessage.getLockToken());
 
@@ -310,7 +310,7 @@ public class ConUtils {
                 i = i + 1;
                 sourceArrayType = new BArrayType(messageBObject.getType());
             }
-            System.out.printf("\tDone receiving messages from %s\n", receiver.getEntityPath());
+            LOG.info("\tDone receiving messages from \n" + receiver.getEntityPath());
             if(sourceArrayType != null) {
                 messagesBObject.set(AsbConstants.MESSAGES_CONTENT,
                         BValueCreator.createArrayValue(bObjectArray, sourceArrayType));
@@ -391,13 +391,13 @@ public class ConUtils {
                 message.setProperties(propertiesMap);
 
                 messages.add(message);
-                System.out.printf("\t=> Sending a message with messageId %s\n", message.getMessageId());
+                LOG.info("\t=> Sending a message with messageId \n" + message.getMessageId());
             }
 
             // Send messages to queue or topic
-            System.out.printf("\tSending messages to %s ...\n", sender.getEntityPath());
+            LOG.info("\tSending messages to  ...\n" + sender.getEntityPath());
             sender.sendBatch(messages);
-            System.out.printf("\t=> Sent %s messages\n", messages.size());
+            LOG.info("\t=> Sent  messages\n" + messages.size());
         } catch(Exception e) {
             throw AsbUtils.returnErrorValue(e.getMessage());
         }
@@ -422,15 +422,15 @@ public class ConUtils {
             BObject messagesBObject = BValueCreator.createObjectValue(AsbConstants.PACKAGE_ID_ASB,
                     AsbConstants.MESSAGES_OBJECT);
 
-            System.out.printf("\n\tWaiting up to 5 seconds for messages from %s ...\n", receiver.getEntityPath());
+            LOG.info("\n\tWaiting up to 5 seconds for messages from  ...\n" + receiver.getEntityPath());
             for(int j=0; j<maxMessageCount; j++) {
                 IMessage receivedMessage = receiver.receive(Duration.ofSeconds(5));
 
                 if (receivedMessage == null) {
                     continue;
                 }
-                System.out.printf("\t<= Received a message with messageId %s\n", receivedMessage.getMessageId());
-                System.out.printf("\t<= Received a message with messageBody %s\n",
+                LOG.info("\t<= Received a message with messageId \n" + receivedMessage.getMessageId());
+                LOG.info("\t<= Received a message with messageBody \n" +
                         new String(receivedMessage.getBody(), UTF_8));
                 receiver.complete(receivedMessage.getLockToken());
 
@@ -447,7 +447,7 @@ public class ConUtils {
                 i = i + 1;
                 sourceArrayType = new BArrayType(messageBObject.getType());
             }
-            System.out.printf("\tDone receiving messages from %s\n", receiver.getEntityPath());
+            LOG.info("\tDone receiving messages from \n" + receiver.getEntityPath());
             if(sourceArrayType != null) {
                 messagesBObject.set(AsbConstants.MESSAGES_CONTENT,
                         BValueCreator.createArrayValue(bObjectArray, sourceArrayType));
@@ -470,15 +470,15 @@ public class ConUtils {
             // receive messages from queue
             String receivedMessageId = "";
 
-            System.out.printf("\n\tWaiting up to 5 seconds for messages from %s ...\n", receiver.getEntityPath());
+            LOG.info("\n\tWaiting up to 5 seconds for messages from  ...\n" + receiver.getEntityPath());
             while (true) {
                 IMessage receivedMessage = receiver.receive(Duration.ofSeconds(5));
 
                 if (receivedMessage == null) {
                     break;
                 }
-                System.out.printf("\t<= Received a message with messageId %s\n", receivedMessage.getMessageId());
-                System.out.printf("\t<= Completes a message with messageLockToken %s\n",
+                LOG.info("\t<= Received a message with messageId \n" + receivedMessage.getMessageId());
+                LOG.info("\t<= Completes a message with messageLockToken \n" +
                         receivedMessage.getLockToken());
                 receiver.complete(receivedMessage.getLockToken());
                 if (receivedMessageId.contentEquals(receivedMessage.getMessageId())) {
@@ -486,7 +486,7 @@ public class ConUtils {
                 }
                 receivedMessageId = receivedMessage.getMessageId();
             }
-            System.out.printf("\tDone completing a message using its lock token from %s\n", receiver.getEntityPath());
+            LOG.info("\tDone completing a message using its lock token from \n" + receiver.getEntityPath());
         } catch (Exception e) {
             throw AsbUtils.returnErrorValue(e.getMessage());
         }
@@ -499,21 +499,21 @@ public class ConUtils {
      */
     public static void completeOneMessage(IMessageReceiver receiver) throws Exception {
         try {
-            System.out.printf("\nWaiting up to default server wait time for messages from %s ...\n",
+            LOG.info("\nWaiting up to default server wait time for messages from  ...\n" +
                     receiver.getEntityPath());
 
             IMessage receivedMessage = receiver.receive();
 
             if (receivedMessage != null) {
-                System.out.printf("\t<= Received a message with messageId %s\n", receivedMessage.getMessageId());
-                System.out.printf("\t<= Completes a message with messageLockToken %s\n",
+                LOG.info("\t<= Received a message with messageId \n" + receivedMessage.getMessageId());
+                LOG.info("\t<= Completes a message with messageLockToken \n" +
                         receivedMessage.getLockToken());
                 receiver.complete(receivedMessage.getLockToken());
 
-                System.out.printf("\tDone completing a message using its lock token from %s\n",
+                LOG.info("\tDone completing a message using its lock token from \n" +
                         receiver.getEntityPath());
             } else {
-                System.out.println("\tNo message in the queue\n");
+                LOG.info("\tNo message in the queue\n");
             }
         } catch (Exception e) {
             throw AsbUtils.returnErrorValue(e.getMessage());
@@ -527,19 +527,19 @@ public class ConUtils {
      */
     public static void abandonMessage(IMessageReceiver receiver) throws Exception {
         try {
-            System.out.printf("\n\tWaiting up to default server wait time for messages from %s ...\n",
+            LOG.info("\n\tWaiting up to default server wait time for messages from  ...\n" +
                     receiver.getEntityPath());
             IMessage receivedMessage = receiver.receive();
 
             if (receivedMessage != null) {
-                System.out.printf("\t<= Received a message with messageId %s\n", receivedMessage.getMessageId());
-                System.out.printf("\t<= Abandon a message with messageLockToken %s\n", receivedMessage.getLockToken());
+                LOG.info("\t<= Received a message with messageId \n" + receivedMessage.getMessageId());
+                LOG.info("\t<= Abandon a message with messageLockToken \n" + receivedMessage.getLockToken());
                 receiver.abandon(receivedMessage.getLockToken());
 
-                System.out.printf("\tDone abandoning a message using its lock token from %s\n",
+                LOG.info("\tDone abandoning a message using its lock token from \n" +
                         receiver.getEntityPath());
             } else {
-                System.out.println("\t<= No message in the queue \n");;
+                LOG.info("\t<= No message in the queue \n");
             }
         } catch (Exception e) {
             throw AsbUtils.returnErrorValue(e.getMessage());
