@@ -492,6 +492,34 @@ public class ConUtils {
         }
     }
 
+    /**
+     * Completes a single message from Queue or Subscription based on messageLockToken
+     *
+     * @param receiver Output Receiver connection.
+     */
+    public static void completeOneMessage(IMessageReceiver receiver) throws Exception {
+        try {
+            System.out.printf("\nWaiting up to default server wait time for messages from %s ...\n",
+                    receiver.getEntityPath());
+
+            IMessage receivedMessage = receiver.receive();
+
+            if (receivedMessage != null) {
+                System.out.printf("\t<= Received a message with messageId %s\n", receivedMessage.getMessageId());
+                System.out.printf("\t<= Completes a message with messageLockToken %s\n",
+                        receivedMessage.getLockToken());
+                receiver.complete(receivedMessage.getLockToken());
+
+                System.out.printf("\tDone completing a message using its lock token from %s\n",
+                        receiver.getEntityPath());
+            } else {
+                System.out.println("\tNo message in the queue\n");
+            }
+        } catch (Exception e) {
+            throw AsbUtils.returnErrorValue(e.getMessage());
+        }
+    }
+
     public ConUtils() {
     }
 
