@@ -80,6 +80,13 @@ public class ReceiverConnection {
     public isolated function completeMessages() returns Error? {
         return completeMessages(self.asbReceiverConnection);
     }
+
+    # Complete One Message from Queue or Subscription based on messageLockToken.
+    # 
+    # + return - An `asb:Error` if failed to complete messages or else `()`
+    public isolated function completeOneMessage() returns Error? {
+        return completeOneMessage(self.asbReceiverConnection);
+    }
 }
 
 isolated function createReceiverConnection(handle connectionString, handle entityPath) 
@@ -112,4 +119,9 @@ isolated function receiveBatchMessage(handle imessageReceiver, int maxMessageCou
 isolated function completeMessages(handle imessageReceiver) returns Error? = @java:Method {
     name: "completeMessages",
     'class: "org.ballerinalang.asb.connection.ConUtils"
+} external;
+
+isolated function completeOneMessage(handle imessageReceiver) returns Error? = @java:Method {
+    name: "completeOneMessage",
+    'class: "com.roland.asb.connection.ConUtils"
 } external;
