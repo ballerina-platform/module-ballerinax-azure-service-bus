@@ -704,6 +704,9 @@ function afterSuiteFunc() {
     }
 }
 
+# Get configuration value for the given key from ballerina.conf file.
+# 
+# + return - configuration value of the given key as a string
 function getConfigValue(string key) returns string {
     return (system:getEnv(key) != "") ? system:getEnv(key) : config:getAsString(key);
 }
