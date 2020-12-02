@@ -27,11 +27,14 @@ import org.ballerinalang.jvm.api.BRuntime;
 import org.ballerinalang.jvm.api.values.BObject;
 
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 import static org.ballerinalang.asb.MessageDispatcher.getConnectionStringFromConfig;
 import static org.ballerinalang.asb.MessageDispatcher.getQueueNameFromConfig;
 
 public class ListenerUtils {
+    private static final Logger LOG = Logger.getLogger(ListenerUtils.class.getName());
+
     private static BRuntime runtime;
 
     private static boolean started = false;
@@ -113,11 +116,11 @@ public class ListenerUtils {
     }
 
     /**
-     * Attaches the service to the Asb listener endpoint.
+     * Stops consuming messages and detaches the service from the Asb Listener endpoint.
      *
      * @param listenerBObject Ballerina listener object..
      * @param service Ballerina service instance.
-     * @return An error if failed to create IMessageReceiver connection instance.
+     * @return An error if failed detaching the service.
      */
     public static Object detach(BObject listenerBObject, BObject service) {
         IMessageReceiver iMessageReceiver = (IMessageReceiver) listenerBObject.getNativeData(AsbConstants.CONNECTION_NATIVE_OBJECT);
@@ -127,20 +130,17 @@ public class ListenerUtils {
         @SuppressWarnings(AsbConstants.UNCHECKED)
         ArrayList<BObject> services =
                 (ArrayList<BObject>) listenerBObject.getNativeData(AsbConstants.CONSUMER_SERVICES);
-        String serviceName = service.getType().getName();
         String queueName = (String) service.getNativeData(AsbConstants.QUEUE_NAME.getValue());
 
         try {
             iMessageReceiver.close();
-            System.out.println("[ballerina/rabbitmq] Consumer service unsubscribed from the queue " + queueName);
+            LOG.info("Consumer service unsubscribed from the queue " + queueName);
         } catch (Exception e) {
             return AsbUtils.returnErrorValue("Error occurred while detaching the service");
         }
 
-        listenerBObject.addNativeData(AsbConstants.CONSUMER_SERVICES,
-                removeFromList(services, service));
-        listenerBObject.addNativeData(AsbConstants.STARTED_SERVICES,
-                removeFromList(startedServices, service));
+        listenerBObject.addNativeData(AsbConstants.CONSUMER_SERVICES, removeFromList(services, service));
+        listenerBObject.addNativeData(AsbConstants.STARTED_SERVICES, removeFromList(startedServices, service));
         serviceAttached = false;
         return null;
     }
