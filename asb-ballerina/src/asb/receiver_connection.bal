@@ -94,6 +94,10 @@ public class ReceiverConnection {
     public isolated function abandonMessage() returns Error? {
         return abandonMessage(self.asbReceiverConnection);
     }
+
+    isolated function getAsbReceiverConnection() returns handle {
+        return self.asbReceiverConnection;
+    }
 }
 
 isolated function createReceiverConnection(handle connectionString, handle entityPath) 
