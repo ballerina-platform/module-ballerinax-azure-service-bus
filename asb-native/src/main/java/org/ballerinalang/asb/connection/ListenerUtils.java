@@ -32,6 +32,9 @@ import java.util.logging.Logger;
 import static org.ballerinalang.asb.MessageDispatcher.getConnectionStringFromConfig;
 import static org.ballerinalang.asb.MessageDispatcher.getQueueNameFromConfig;
 
+/**
+ * Util class used to bridge the listener capabilities of the Asb connector's native code and the Ballerina API.
+ */
 public class ListenerUtils {
     private static final Logger LOG = Logger.getLogger(ListenerUtils.class.getName());
 
