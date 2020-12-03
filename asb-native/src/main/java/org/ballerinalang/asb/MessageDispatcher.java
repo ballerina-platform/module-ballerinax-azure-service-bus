@@ -77,7 +77,7 @@ public class MessageDispatcher {
      */
     public static String getQueueNameFromConfig(BObject service) {
         BMap serviceConfig = (BMap) ((AnnotatableType) service.getType())
-                .getAnnotation(BStringUtils.fromString(ASBConstants.PACKAGE_RABBITMQ_FQN + ":"
+                .getAnnotation(BStringUtils.fromString(ASBConstants.PACKAGE_ASB_FQN + ":"
                         + ASBConstants.SERVICE_CONFIG));
         @SuppressWarnings(ASBConstants.UNCHECKED)
         BMap<BString, Object> queueConfig =
@@ -93,7 +93,7 @@ public class MessageDispatcher {
      */
     public static String getConnectionStringFromConfig(BObject service) {
         BMap serviceConfig = (BMap) ((AnnotatableType) service.getType())
-                .getAnnotation(BStringUtils.fromString(ASBConstants.PACKAGE_RABBITMQ_FQN + ":"
+                .getAnnotation(BStringUtils.fromString(ASBConstants.PACKAGE_ASB_FQN + ":"
                         + ASBConstants.SERVICE_CONFIG));
         @SuppressWarnings(ASBConstants.UNCHECKED)
         BMap<BString, Object> queueConfig =

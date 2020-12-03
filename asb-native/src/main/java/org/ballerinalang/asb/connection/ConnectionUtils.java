@@ -33,6 +33,7 @@ import java.util.*;
 import java.util.logging.Logger;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.ballerinalang.asb.ASBConstants.*;
 
 /**
  * Util class used to bridge the Asb connector's native code and the Ballerina API.
@@ -177,14 +178,14 @@ public class ConnectionUtils {
                                                              BMap<String, String> properties) throws Exception {
         Map<String,String> map = toStringMap(parameters);
 
-        String contentType = valueToStringOrEmpty(map, "contentType");
-        String messageId = map.get("messageId") != null ? map.get("messageId") : UUID.randomUUID().toString();
-        String to = valueToStringOrEmpty(map, "to");
-        String replyTo = valueToStringOrEmpty(map, "replyTo");
-        String label = valueToStringOrEmpty(map,"label");
-        String sessionId = valueToStringOrEmpty(map, "sessionId");
-        String correlationId = valueToStringOrEmpty(map, "correlationId");
-        int timeToLive = map.get("timeToLive") != null ? Integer.parseInt(map.get("timeToLive")) : 1;
+        String contentType = valueToStringOrEmpty(map, CONTENT_TYPE);
+        String messageId = map.get(MESSAGE_ID) != null ? map.get(MESSAGE_ID) : UUID.randomUUID().toString();
+        String to = valueToStringOrEmpty(map, TO);
+        String replyTo = valueToStringOrEmpty(map, REPLY_TO);
+        String label = valueToStringOrEmpty(map,LABEL);
+        String sessionId = valueToStringOrEmpty(map, SESSION_ID);
+        String correlationId = valueToStringOrEmpty(map, CORRELATION_ID);
+        int timeToLive = map.get(TIME_TO_LIVE) != null ? Integer.parseInt(map.get(TIME_TO_LIVE)) : DEFAULT_TIME_TO_LIVE;
 
         try {
             // Send messages to queue
@@ -314,25 +315,21 @@ public class ConnectionUtils {
                                         BMap<String, String> properties, int maxMessageCount) throws Exception {
         Map<String,String> map = toStringMap(parameters);
 
-        String contentType = valueToStringOrEmpty(map, "contentType");
-        String messageId = map.get("messageId") != null ? map.get("messageId") : UUID.randomUUID().toString();
-        String to = valueToStringOrEmpty(map, "to");
-        String replyTo = valueToStringOrEmpty(map, "replyTo");
-        String label = valueToStringOrEmpty(map,"label");
-        String sessionId = valueToStringOrEmpty(map, "sessionId");
-        String correlationId = valueToStringOrEmpty(map, "correlationId");
-        int timeToLive = map.get("timeToLive") != null ? Integer.parseInt(map.get("timeToLive")) : 1;
+        String contentType = valueToStringOrEmpty(map, CONTENT_TYPE);
+        String messageId = map.get(MESSAGE_ID) != null ? map.get(MESSAGE_ID) : UUID.randomUUID().toString();
+        String to = valueToStringOrEmpty(map, TO);
+        String replyTo = valueToStringOrEmpty(map, REPLY_TO);
+        String label = valueToStringOrEmpty(map,LABEL);
+        String sessionId = valueToStringOrEmpty(map, SESSION_ID);
+        String correlationId = valueToStringOrEmpty(map, CORRELATION_ID);
+        int timeToLive = map.get(TIME_TO_LIVE) != null ? Integer.parseInt(map.get(TIME_TO_LIVE)) : DEFAULT_TIME_TO_LIVE;
 
         try {
             List<IMessage> messages = new ArrayList<>();
 
             for(int i = 0; i < maxMessageCount; i++) {
                 IMessage message = new Message();
-                if (map.containsKey("messageId")) {
-                    messageId = (String) map.get("messageId");
-                } else {
-                    messageId = UUID.randomUUID().toString();;
-                }
+                messageId = map.get(MESSAGE_ID) != null ? map.get(MESSAGE_ID) : UUID.randomUUID().toString();
                 message.setMessageId(messageId);
                 message.setTimeToLive(Duration.ofMinutes(timeToLive));
                 byte[] byteArray = content.get(i).toString().getBytes();
