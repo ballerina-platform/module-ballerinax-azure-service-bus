@@ -51,7 +51,7 @@ function beforeSuiteFunc() {
 }
 
 # Test Sender Connection
-@test:Config{
+@test:Config {
     enable: false
 }
 public function testSenderConnection() {
@@ -64,7 +64,7 @@ public function testSenderConnection() {
 }
 
 # Test Receiver Connection
-@test:Config{
+@test:Config {
     enable: false
 }
 public function testReceieverConnection() {
@@ -77,7 +77,7 @@ public function testReceieverConnection() {
 }
 
 # Test send to queue operation
-@test:Config{
+@test:Config {
     enable: true
 }
 function testSendToQueueOperation() {
@@ -99,7 +99,7 @@ function testSendToQueueOperation() {
 }
 
 # Test receive from queue operation
-@test:Config{
+@test:Config {
     enable: true
 }
 function testReceiveFromQueueOperation() {
