@@ -90,23 +90,23 @@ public class SenderConnection {
 isolated function createSenderConnection(handle connectionString, handle entityPath) 
     returns handle|Error? = @java:Method {
     name: "createSenderConnection",
-    'class: "org.ballerinalang.asb.connection.ConUtils"
+    'class: "org.ballerinalang.asb.connection.ConnectionUtils"
 } external;
 
 isolated function closeSenderConnection(handle imessageSender) returns Error? = @java:Method {
     name: "closeSenderConnection",
-    'class: "org.ballerinalang.asb.connection.ConUtils"
+    'class: "org.ballerinalang.asb.connection.ConnectionUtils"
 } external;
 
 isolated function sendMessageWithConfigurableParameters(handle imessageSender, byte[] content, map<string> parameters, 
     map<string> properties) returns Error? = @java:Method {
     name: "sendMessageWithConfigurableParameters",
-    'class: "org.ballerinalang.asb.connection.ConUtils"
+    'class: "org.ballerinalang.asb.connection.ConnectionUtils"
 } external;
 
 isolated function sendMessage(handle imessageSender, byte[] content, handle contentType, handle messageId, handle to, 
     handle replyTo, handle label, handle sessionId, handle correlationId, map<string> properties, int timeToLive) 
         returns Error? = @java:Method {
     name: "sendMessage",
-    'class: "org.ballerinalang.asb.connection.ConUtils"
+    'class: "org.ballerinalang.asb.connection.ConnectionUtils"
 } external;
