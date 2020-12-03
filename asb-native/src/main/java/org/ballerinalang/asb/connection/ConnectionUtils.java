@@ -32,6 +32,7 @@ import java.util.*;
 import java.util.logging.Logger;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.ballerinalang.asb.ASBConstants.*;
 
 /**
  * Util class used to bridge the Asb connector's native code and the Ballerina API.
@@ -176,38 +177,14 @@ public class ConnectionUtils {
                                                              BMap<String, String> properties) throws Exception {
         Map<String,String> map = toStringMap(parameters);
 
-        String contentType = "";
-        String messageId = UUID.randomUUID().toString();;
-        String to = "";
-        String replyTo = "";
-        String label = "";
-        String sessionId = "";
-        String correlationId = "";
-        int timeToLive = 1;
-        if (map.containsKey("contentType")) {
-            contentType = (String)map.get("contentType");
-        }
-        if (map.containsKey("messageId")) {
-            messageId = (String) map.get("messageId");
-        }
-        if (map.containsKey("to")) {
-            to = (String) map.get("to");
-        }
-        if (map.containsKey("replyTo")) {
-            replyTo = (String) map.get("replyTo");
-        }
-        if (map.containsKey("label")) {
-            label = (String) map.get("label");
-        }
-        if (map.containsKey("sessionId")) {
-            sessionId = (String) map.get("sessionId");
-        }
-        if (map.containsKey("correlationId")) {
-            correlationId = (String) map.get("correlationId");
-        }
-        if (map.containsKey("timeToLive")) {
-            timeToLive = Integer.parseInt(map.get("timeToLive"));
-        }
+        String contentType = valueToStringOrEmpty(map, CONTENT_TYPE);
+        String messageId = map.get(MESSAGE_ID) != null ? map.get(MESSAGE_ID) : UUID.randomUUID().toString();
+        String to = valueToStringOrEmpty(map, TO);
+        String replyTo = valueToStringOrEmpty(map, REPLY_TO);
+        String label = valueToStringOrEmpty(map,LABEL);
+        String sessionId = valueToStringOrEmpty(map, SESSION_ID);
+        String correlationId = valueToStringOrEmpty(map, CORRELATION_ID);
+        int timeToLive = map.get(TIME_TO_LIVE) != null ? Integer.parseInt(map.get(TIME_TO_LIVE)) : DEFAULT_TIME_TO_LIVE;
 
         try {
             // Send messages to queue
@@ -265,6 +242,18 @@ public class ConnectionUtils {
         } catch (Exception e) {
             throw ASBUtils.returnErrorValue(e.getMessage());
         }
+    }
+
+    /**
+     * Get the map value as string or as empty based on the key.
+     *
+     * @param map Input map.
+     * @param key Input key.
+     * @return map value as a string or empty.
+     */
+    private static String valueToStringOrEmpty(Map<String, ?> map, String key) {
+        Object value = map.get(key);
+        return value == null ? "" : value.toString();
     }
 
     public ConnectionUtils() {
