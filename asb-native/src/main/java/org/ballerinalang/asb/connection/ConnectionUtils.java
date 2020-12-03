@@ -37,7 +37,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * Util class used to bridge the Asb connector's native code and the Ballerina API.
  */
 public class ConnectionUtils {
-    private static final Logger LOG = Logger.getLogger(ConnectionUtils.class.getName());
+    private static final Logger log = Logger.getLogger(ConnectionUtils.class.getName());
 
     private String connectionString;
 
@@ -139,7 +139,7 @@ public class ConnectionUtils {
                                    BMap<String, String> properties, int timeToLive) throws Exception {
         try {
             // Send messages to queue
-            LOG.info("\tSending messages to ...\n" + sender.getEntityPath());
+            log.info("\tSending messages to ...\n" + sender.getEntityPath());
             IMessage message = new Message();
             message.setMessageId(messageId);
             message.setTimeToLive(Duration.ofMinutes(timeToLive));
@@ -156,7 +156,7 @@ public class ConnectionUtils {
             message.setProperties(map);
 
             sender.send(message);
-            LOG.info("\t=> Sent a message with messageId \n" + message.getMessageId());
+            log.info("\t=> Sent a message with messageId \n" + message.getMessageId());
         } catch (Exception e) {
             throw ASBUtils.returnErrorValue(e.getMessage());
         }
@@ -211,7 +211,7 @@ public class ConnectionUtils {
 
         try {
             // Send messages to queue
-            LOG.info("\tSending messages to ...\n" + sender.getEntityPath());
+            log.info("\tSending messages to ...\n" + sender.getEntityPath());
             IMessage message = new Message();
             message.setMessageId(messageId);
             message.setTimeToLive(Duration.ofMinutes(timeToLive));
@@ -228,7 +228,7 @@ public class ConnectionUtils {
             message.setProperties(propertiesMap);
 
             sender.send(message);
-            LOG.info("\t=> Sent a message with messageId \n" + message.getMessageId());
+            log.info("\t=> Sent a message with messageId \n" + message.getMessageId());
         } catch (Exception e) {
             throw ASBUtils.returnErrorValue(e.getMessage());
         }
@@ -243,19 +243,19 @@ public class ConnectionUtils {
      */
     public static Object receiveMessage(IMessageReceiver receiver) throws Exception {
         try {
-            LOG.info("\n\tWaiting up to 5 seconds for messages from ...\n" + receiver.getEntityPath());
+            log.info("\n\tWaiting up to 5 seconds for messages from ...\n" + receiver.getEntityPath());
 
             IMessage receivedMessage = receiver.receive(Duration.ofSeconds(5));
 
             if (receivedMessage == null) {
                 return null;
             }
-            LOG.info("\t<= Received a message with messageId \n" + receivedMessage.getMessageId());
-            LOG.info("\t<= Received a message with messageBody \n" +
+            log.info("\t<= Received a message with messageId \n" + receivedMessage.getMessageId());
+            log.info("\t<= Received a message with messageBody \n" +
                     new String(receivedMessage.getBody(), UTF_8));
             receiver.complete(receivedMessage.getLockToken());
 
-            LOG.info("\tDone receiving messages from \n" + receiver.getEntityPath());
+            log.info("\tDone receiving messages from \n" + receiver.getEntityPath());
 
             BObject messageBObject = BValueCreator.createObjectValue(ASBConstants.PACKAGE_ID_ASB,
                     ASBConstants.MESSAGE_OBJECT);
