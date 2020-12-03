@@ -62,7 +62,9 @@ function beforeSuiteFunc() {
 }
 
 # Test Sender Connection
-@test:Config{enable: false}
+@test:Config {
+    enable: false
+}
 public function testSenderConnection() {
     boolean flag = false;
     SenderConnection? senderConnection = new ({connectionString: connectionString, entityPath: queuePath});
@@ -73,7 +75,9 @@ public function testSenderConnection() {
 }
 
 # Test Receiver Connection
-@test:Config{enable: false}
+@test:Config {
+    enable: false
+}
 public function testReceieverConnection() {
     boolean flag = false;
     ReceiverConnection? receiverConnection = new ({connectionString: connectionString, entityPath: queuePath});
@@ -84,7 +88,9 @@ public function testReceieverConnection() {
 }
 
 # Test send to queue operation
-@test:Config{enable: true}
+@test:Config {
+    enable: true
+}
 function testSendToQueueOperation() {
     log:printInfo("Creating Asb sender connection.");
     SenderConnection? senderConnection = new ({connectionString: connectionString, entityPath: queuePath});
@@ -104,7 +110,10 @@ function testSendToQueueOperation() {
 }
 
 # Test receive one message from queue operation
-@test:Config{dependsOn: ["testSendToQueueOperation"], enable: false}
+@test:Config {
+    dependsOn: ["testSendToQueueOperation"], 
+    enable: false
+}
 function testReceiveFromQueueOperation() {
     log:printInfo("Creating Asb receiver connection.");
     ReceiverConnection? receiverConnection = new ({connectionString: connectionString, entityPath: queuePath});
@@ -132,7 +141,10 @@ function testReceiveFromQueueOperation() {
 }
 
 # Test receive messages from queue operation
-@test:Config{dependsOn: ["testSendToQueueOperation"], enable: false}
+@test:Config {
+    dependsOn: ["testSendToQueueOperation"], 
+    enable: false
+}
 function testReceiveMessagesFromQueueOperation() {
     log:printInfo("Creating Asb receiver connection.");
     ReceiverConnection? receiverConnection = new ({connectionString: connectionString, entityPath: queuePath});
@@ -162,7 +174,9 @@ function testReceiveMessagesFromQueueOperation() {
 }
 
 # Test send batch to queue operation
-@test:Config{enable: false}
+@test:Config {
+    enable: false
+}
 function testSendBatchToQueueOperation() {
     log:printInfo("Creating Asb sender connection.");
     SenderConnection? senderConnection = new ({connectionString: connectionString, entityPath: queuePath});
@@ -181,7 +195,10 @@ function testSendBatchToQueueOperation() {
 }
 
 # Test receive batch from queue operation
-@test:Config{dependsOn: ["testSendBatchToQueueOperation"], enable: false}
+@test:Config {
+    dependsOn: ["testSendBatchToQueueOperation"], 
+    enable: false
+}
 function testReceiveBatchFromQueueOperation() {
     log:printInfo("Creating Asb receiver connection.");
     ReceiverConnection? receiverConnection = new ({connectionString: connectionString, entityPath: queuePath});
@@ -213,7 +230,10 @@ function testReceiveBatchFromQueueOperation() {
 }
 
 # Test complete Messages from queue operation
-@test:Config{dependsOn: ["testSendToQueueOperation"], enable: false}
+@test:Config {
+    dependsOn: ["testSendToQueueOperation"], 
+    enable: false
+}
 function testCompleteMessagesFromQueueOperation() {
     log:printInfo("Creating Asb receiver connection.");
     ReceiverConnection? receiverConnection = new ({connectionString: connectionString, entityPath: queuePath});
@@ -236,7 +256,10 @@ function testCompleteMessagesFromQueueOperation() {
 }
 
 # Test complete single messages from queue operation
-@test:Config{dependsOn: ["testSendToQueueOperation"], enable: false}
+@test:Config {
+    dependsOn: ["testSendToQueueOperation"], 
+    enable: false
+}
 function testCompleteOneMessageFromQueueOperation() {
     log:printInfo("Creating Asb receiver connection.");
     ReceiverConnection? receiverConnection = new ({connectionString: connectionString, entityPath: queuePath});
@@ -258,7 +281,10 @@ function testCompleteOneMessageFromQueueOperation() {
 }
 
 # Test abandon Message from queue operation
-@test:Config{dependsOn: ["testSendToQueueOperation"], enable: false}
+@test:Config {
+    dependsOn: ["testSendToQueueOperation"], 
+    enable: false
+}
 function testAbandonMessageFromQueueOperation() {
     log:printInfo("Creating Asb receiver connection.");
     ReceiverConnection? receiverConnection = new ({connectionString: connectionString, entityPath: queuePath});
@@ -281,7 +307,9 @@ function testAbandonMessageFromQueueOperation() {
 }
 
 # Test send to topic operation
-@test:Config{enable: false}
+@test:Config {
+    enable: false
+}
 function testSendToTopicOperation() {
     log:printInfo("Creating Asb sender connection.");
     SenderConnection? senderConnection = new ({connectionString: connectionString, entityPath: topicPath});
@@ -301,7 +329,10 @@ function testSendToTopicOperation() {
 }
 
 # Test receive from subscription operation
-@test:Config{dependsOn: ["testSendToTopicOperation"], enable: false}
+@test:Config {
+    dependsOn: ["testSendToTopicOperation"], 
+    enable: false
+}
 function testReceiveFromSubscriptionOperation() {
     log:printInfo("Creating Asb receiver connection.");
     ReceiverConnection? receiverConnection1 = new ({connectionString: connectionString, entityPath: subscriptionPath1});
@@ -374,7 +405,9 @@ function testReceiveFromSubscriptionOperation() {
 }
 
 # Test send batch to topic operation
-@test:Config{enable: false}
+@test:Config {
+    enable: false
+}
 function testSendBatchToTopicOperation() {
     log:printInfo("Creating Asb sender connection.");
     SenderConnection? senderConnection = new ({connectionString: connectionString, entityPath: topicPath});
@@ -393,7 +426,10 @@ function testSendBatchToTopicOperation() {
 }
 
 # Test receive batch from subscription operation
-@test:Config{dependsOn: ["testSendBatchToTopicOperation"], enable: false}
+@test:Config {
+    dependsOn: ["testSendBatchToTopicOperation"], 
+    enable: false
+}
 function testReceiveBatchFromSubscriptionOperation() {
     log:printInfo("Creating Asb receiver connection.");
     ReceiverConnection? receiverConnection1 = new ({connectionString: connectionString, entityPath: subscriptionPath1});
@@ -477,7 +513,10 @@ function testReceiveBatchFromSubscriptionOperation() {
 }
 
 # Test complete Messages from subscription operation
-@test:Config{dependsOn: ["testSendToTopicOperation"], enable: false}
+@test:Config { 
+    dependsOn: ["testSendToTopicOperation"], 
+    enable: false
+}
 function testCompleteMessagesFromSubscriptionOperation() {
     log:printInfo("Creating Asb receiver connection.");
     ReceiverConnection? receiverConnection1 = new ({connectionString: connectionString, entityPath: subscriptionPath1});
@@ -534,7 +573,10 @@ function testCompleteMessagesFromSubscriptionOperation() {
 }
 
 # Test complete single messages from subscription operation
-@test:Config{dependsOn: ["testSendToTopicOperation"], enable: false}
+@test:Config {
+    dependsOn: ["testSendToTopicOperation"], 
+    enable: false
+}
 function testCompleteOneMessageFromSubscriptionOperation() {
     log:printInfo("Creating Asb receiver connection.");
     ReceiverConnection? receiverConnection1 = new ({connectionString: connectionString, entityPath: subscriptionPath1});
@@ -588,7 +630,10 @@ function testCompleteOneMessageFromSubscriptionOperation() {
 }
 
 # Test abandon Message from subscription operation
-@test:Config{dependsOn: ["testSendToTopicOperation"], enable: false}
+@test:Config {
+    dependsOn: ["testSendToTopicOperation"], 
+    enable: false
+}
 function testAbandonMessageFromSubscriptionOperation() {
     log:printInfo("Creating Asb receiver connection.");
     ReceiverConnection? receiverConnection1 = new ({connectionString: connectionString, entityPath: subscriptionPath1});
@@ -665,7 +710,10 @@ service {
 };
 
 # Test Listener capabilities
-@test:Config {dependsOn: ["testSendToQueueOperation"], enable: true}
+@test:Config {
+    dependsOn: ["testSendToQueueOperation"], 
+    enable: true
+}
 public function testAsyncConsumer() {
 
     ConnectionConfiguration config = {
