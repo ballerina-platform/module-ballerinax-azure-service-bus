@@ -177,38 +177,14 @@ public class ConnectionUtils {
                                                              BMap<String, String> properties) throws Exception {
         Map<String,String> map = toStringMap(parameters);
 
-        String contentType = "";
-        String messageId = UUID.randomUUID().toString();;
-        String to = "";
-        String replyTo = "";
-        String label = "";
-        String sessionId = "";
-        String correlationId = "";
-        int timeToLive = 1;
-        if (map.containsKey("contentType")) {
-            contentType = (String)map.get("contentType");
-        }
-        if (map.containsKey("messageId")) {
-            messageId = (String) map.get("messageId");
-        }
-        if (map.containsKey("to")) {
-            to = (String) map.get("to");
-        }
-        if (map.containsKey("replyTo")) {
-            replyTo = (String) map.get("replyTo");
-        }
-        if (map.containsKey("label")) {
-            label = (String) map.get("label");
-        }
-        if (map.containsKey("sessionId")) {
-            sessionId = (String) map.get("sessionId");
-        }
-        if (map.containsKey("correlationId")) {
-            correlationId = (String) map.get("correlationId");
-        }
-        if (map.containsKey("timeToLive")) {
-            timeToLive = Integer.parseInt(map.get("timeToLive"));
-        }
+        String contentType = valueToStringOrEmpty(map, "contentType");
+        String messageId = map.get("messageId") != null ? map.get("messageId") : UUID.randomUUID().toString();
+        String to = valueToStringOrEmpty(map, "to");
+        String replyTo = valueToStringOrEmpty(map, "replyTo");
+        String label = valueToStringOrEmpty(map,"label");
+        String sessionId = valueToStringOrEmpty(map, "sessionId");
+        String correlationId = valueToStringOrEmpty(map, "correlationId");
+        int timeToLive = map.get("timeToLive") != null ? Integer.parseInt(map.get("timeToLive")) : 1;
 
         try {
             // Send messages to queue
@@ -338,35 +314,14 @@ public class ConnectionUtils {
                                         BMap<String, String> properties, int maxMessageCount) throws Exception {
         Map<String,String> map = toStringMap(parameters);
 
-        String contentType = "";
-        String messageId = UUID.randomUUID().toString();
-        String to = "";
-        String replyTo = "";
-        String label = "";
-        String sessionId = "";
-        String correlationId = "";
-        int timeToLive = 1;
-        if (map.containsKey("contentType")) {
-            contentType = (String)map.get("contentType");
-        }
-        if (map.containsKey("to")) {
-            to = (String) map.get("to");
-        }
-        if (map.containsKey("replyTo")) {
-            replyTo = (String) map.get("replyTo");
-        }
-        if (map.containsKey("label")) {
-            label = (String) map.get("label");
-        }
-        if (map.containsKey("sessionId")) {
-            sessionId = (String) map.get("sessionId");
-        }
-        if (map.containsKey("correlationId")) {
-            correlationId = (String) map.get("correlationId");
-        }
-        if (map.containsKey("timeToLive")) {
-            timeToLive = Integer.parseInt(map.get("timeToLive"));
-        }
+        String contentType = valueToStringOrEmpty(map, "contentType");
+        String messageId = map.get("messageId") != null ? map.get("messageId") : UUID.randomUUID().toString();
+        String to = valueToStringOrEmpty(map, "to");
+        String replyTo = valueToStringOrEmpty(map, "replyTo");
+        String label = valueToStringOrEmpty(map,"label");
+        String sessionId = valueToStringOrEmpty(map, "sessionId");
+        String correlationId = valueToStringOrEmpty(map, "correlationId");
+        int timeToLive = map.get("timeToLive") != null ? Integer.parseInt(map.get("timeToLive")) : 1;
 
         try {
             List<IMessage> messages = new ArrayList<>();
@@ -546,6 +501,18 @@ public class ConnectionUtils {
         } catch (Exception e) {
             throw ASBUtils.returnErrorValue(e.getMessage());
         }
+    }
+
+    /**
+     * Get the map value as string or as empty based on the key.
+     *
+     * @param map Input map.
+     * @param key Input key.
+     * @return map value as a string or empty.
+     */
+    private static String valueToStringOrEmpty(Map<String, ?> map, String key) {
+        Object value = map.get(key);
+        return value == null ? "" : value.toString();
     }
 
     public ConnectionUtils() {
