@@ -20,7 +20,7 @@ package org.ballerinalang.asb.connection;
 
 import com.microsoft.azure.servicebus.*;
 import com.microsoft.azure.servicebus.primitives.ConnectionStringBuilder;
-import org.ballerinalang.asb.AsbConstants;
+import org.ballerinalang.asb.ASBConstants;
 import org.ballerinalang.asb.AsbUtils;
 import org.ballerinalang.jvm.api.values.BArray;
 import org.ballerinalang.jvm.api.values.BMap;
@@ -257,9 +257,9 @@ public class ConUtils {
 
             LOG.info("\tDone receiving messages from \n" + receiver.getEntityPath());
 
-            BObject messageBObject = BValueCreator.createObjectValue(AsbConstants.PACKAGE_ID_ASB,
-                    AsbConstants.MESSAGE_OBJECT);
-            messageBObject.set(AsbConstants.MESSAGE_CONTENT, BValueCreator.createArrayValue(receivedMessage.getBody()));
+            BObject messageBObject = BValueCreator.createObjectValue(ASBConstants.PACKAGE_ID_ASB,
+                    ASBConstants.MESSAGE_OBJECT);
+            messageBObject.set(ASBConstants.MESSAGE_CONTENT, BValueCreator.createArrayValue(receivedMessage.getBody()));
             return messageBObject;
         } catch (Exception e) {
             throw AsbUtils.returnErrorValue(e.getMessage());

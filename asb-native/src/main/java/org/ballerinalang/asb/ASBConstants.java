@@ -25,7 +25,7 @@ import org.ballerinalang.jvm.types.BPackage;
 /**
  * Asb Connector Constants.
  */
-public class AsbConstants {
+public class ASBConstants {
     // Asb package name constant fields
     public static final String ORG_NAME = "ballerinax";
     public static final String ASB = "asb";
