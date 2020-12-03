@@ -36,7 +36,7 @@ import static org.ballerinalang.asb.MessageDispatcher.getQueueNameFromConfig;
  * Util class used to bridge the listener capabilities of the Asb connector's native code and the Ballerina API.
  */
 public class ListenerUtils {
-    private static final Logger LOG = Logger.getLogger(ListenerUtils.class.getName());
+    private static final Logger log = Logger.getLogger(ListenerUtils.class.getName());
 
     private static BRuntime runtime;
 
@@ -138,7 +138,7 @@ public class ListenerUtils {
 
         try {
             iMessageReceiver.close();
-            LOG.info("Consumer service unsubscribed from the queue " + queueName);
+            log.info("Consumer service unsubscribed from the queue " + queueName);
         } catch (Exception e) {
             return ASBUtils.returnErrorValue("Error occurred while detaching the service");
         }
@@ -162,7 +162,7 @@ public class ListenerUtils {
         } else {
             try {
                 iMessageReceiver.close();
-                LOG.info("Consumer service stopped");
+                log.info("Consumer service stopped");
             } catch (Exception e) {
                 return ASBUtils.returnErrorValue("Error occurred while stopping the service");
             }
@@ -183,7 +183,7 @@ public class ListenerUtils {
         } else {
             try {
                 iMessageReceiver.close();
-                LOG.info("Consumer service stopped");
+                log.info("Consumer service stopped");
             } catch (Exception e) {
                 return ASBUtils.returnErrorValue("Error occurred while stopping the service");
             }

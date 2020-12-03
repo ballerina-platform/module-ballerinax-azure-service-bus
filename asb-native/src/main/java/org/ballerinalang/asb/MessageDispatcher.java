@@ -44,7 +44,7 @@ import static org.ballerinalang.asb.connection.ListenerUtils.isClosing;
  * Handles and dispatched messages with data binding.
  */
 public class MessageDispatcher {
-    private static final Logger LOG = Logger.getLogger(MessageDispatcher.class.getName());
+    private static final Logger log = Logger.getLogger(MessageDispatcher.class.getName());
 
     private BObject service;
     private String queueName;
@@ -107,12 +107,12 @@ public class MessageDispatcher {
      * @param listener Ballerina listener object.
      */
     public void receiveMessages(BObject listener) {
-        LOG.info("Consumer service started for queue " + queueName);
+        log.info("Consumer service started for queue " + queueName);
 
         try {
             ExecutorService executorService = Executors.newSingleThreadExecutor();
             this.pumpMessage(receiver, executorService);
-            LOG.info("\tDone receiving messages from \n" + receiver.getEntityPath());
+            log.info("\tDone receiving messages from \n" + receiver.getEntityPath());
         } catch (Exception e) {
             ASBUtils.returnErrorValue(e.getMessage());
         }
@@ -132,18 +132,18 @@ public class MessageDispatcher {
     public void pumpMessage(IMessageReceiver receiver, ExecutorService executorService) {
         if(isClosing()) {
             CompletableFuture<IMessage> receiveMessageFuture = receiver.receiveAsync(Duration.ofSeconds(5));
-            LOG.info("\n\tWaiting up to 5 seconds for messages from  ...\n" + receiver.getEntityPath());
+            log.info("\n\tWaiting up to 5 seconds for messages from  ...\n" + receiver.getEntityPath());
 
             receiveMessageFuture.handleAsync((message, receiveEx) -> {
                 if (receiveEx != null) {
-                    LOG.info("Receiving message from entity failed.");
+                    log.info("Receiving message from entity failed.");
                     pumpMessage(receiver, executorService);
                 } else if (message == null) {
-                    LOG.info("Receive from entity returned no messages.");
+                    log.info("Receive from entity returned no messages.");
                     pumpMessage(receiver, executorService);
                 } else {
-                    LOG.info("\t<= Received a message with messageId \n" + message.getMessageId());
-                    LOG.info("\t<= Received a message with messageBody \n" + new String(message.getBody(), UTF_8));
+                    log.info("\t<= Received a message with messageId \n" + message.getMessageId());
+                    log.info("\t<= Received a message with messageBody \n" + new String(message.getBody(), UTF_8));
                     handleDispatch(message.getBody());
                     try {
                         receiver.complete(message.getLockToken());
@@ -198,7 +198,7 @@ public class MessageDispatcher {
      * @param message Received azure service bus message instance.
      */
     private BObject getMessageBObject(byte[] message)  {
-        LOG.info("\t<= Received a message with messageBody \n" + new String(message, UTF_8));
+        log.info("\t<= Received a message with messageBody \n" + new String(message, UTF_8));
         BObject messageBObject = BValueCreator.createObjectValue(ASBConstants.PACKAGE_ID_ASB,
                 ASBConstants.MESSAGE_OBJECT);
         messageBObject.set(ASBConstants.MESSAGE_CONTENT, BValueCreator.createArrayValue(message));

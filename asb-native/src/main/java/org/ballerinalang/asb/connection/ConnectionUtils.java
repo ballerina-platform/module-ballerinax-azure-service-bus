@@ -38,7 +38,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * Util class used to bridge the Asb connector's native code and the Ballerina API.
  */
 public class ConnectionUtils {
-    private static final Logger LOG = Logger.getLogger(ConnectionUtils.class.getName());
+    private static final Logger log = Logger.getLogger(ConnectionUtils.class.getName());
 
     private String connectionString;
 
@@ -140,7 +140,7 @@ public class ConnectionUtils {
                                    BMap<String, String> properties, int timeToLive) throws Exception {
         try {
             // Send messages to queue
-            LOG.info("\tSending messages to ...\n" + sender.getEntityPath());
+            log.info("\tSending messages to ...\n" + sender.getEntityPath());
             IMessage message = new Message();
             message.setMessageId(messageId);
             message.setTimeToLive(Duration.ofMinutes(timeToLive));
@@ -157,7 +157,7 @@ public class ConnectionUtils {
             message.setProperties(map);
 
             sender.send(message);
-            LOG.info("\t=> Sent a message with messageId \n" + message.getMessageId());
+            log.info("\t=> Sent a message with messageId \n" + message.getMessageId());
         } catch (Exception e) {
             throw ASBUtils.returnErrorValue(e.getMessage());
         }
@@ -212,7 +212,7 @@ public class ConnectionUtils {
 
         try {
             // Send messages to queue
-            LOG.info("\tSending messages to ...\n" + sender.getEntityPath());
+            log.info("\tSending messages to ...\n" + sender.getEntityPath());
             IMessage message = new Message();
             message.setMessageId(messageId);
             message.setTimeToLive(Duration.ofMinutes(timeToLive));
@@ -229,7 +229,7 @@ public class ConnectionUtils {
             message.setProperties(propertiesMap);
 
             sender.send(message);
-            LOG.info("\t=> Sent a message with messageId \n" + message.getMessageId());
+            log.info("\t=> Sent a message with messageId \n" + message.getMessageId());
         } catch (Exception e) {
             throw ASBUtils.returnErrorValue(e.getMessage());
         }
@@ -244,19 +244,19 @@ public class ConnectionUtils {
      */
     public static Object receiveMessage(IMessageReceiver receiver) throws Exception {
         try {
-            LOG.info("\n\tWaiting up to 5 seconds for messages from ...\n" + receiver.getEntityPath());
+            log.info("\n\tWaiting up to 5 seconds for messages from ...\n" + receiver.getEntityPath());
 
             IMessage receivedMessage = receiver.receive(Duration.ofSeconds(5));
 
             if (receivedMessage == null) {
                 return null;
             }
-            LOG.info("\t<= Received a message with messageId \n" + receivedMessage.getMessageId());
-            LOG.info("\t<= Received a message with messageBody \n" +
+            log.info("\t<= Received a message with messageId \n" + receivedMessage.getMessageId());
+            log.info("\t<= Received a message with messageBody \n" +
                     new String(receivedMessage.getBody(), UTF_8));
             receiver.complete(receivedMessage.getLockToken());
 
-            LOG.info("\tDone receiving messages from \n" + receiver.getEntityPath());
+            log.info("\tDone receiving messages from \n" + receiver.getEntityPath());
 
             BObject messageBObject = BValueCreator.createObjectValue(ASBConstants.PACKAGE_ID_ASB,
                     ASBConstants.MESSAGE_OBJECT);
@@ -285,15 +285,15 @@ public class ConnectionUtils {
             BObject messagesBObject = BValueCreator.createObjectValue(ASBConstants.PACKAGE_ID_ASB,
                     ASBConstants.MESSAGES_OBJECT);
 
-            LOG.info("\n\tWaiting up to 5 seconds for messages from  ...\n" + receiver.getEntityPath());
+            log.info("\n\tWaiting up to 5 seconds for messages from  ...\n" + receiver.getEntityPath());
             while (true) {
                 IMessage receivedMessage = receiver.receive(Duration.ofSeconds(5));
 
                 if (receivedMessage == null) {
                     break;
                 }
-                LOG.info("\t<= Received a message with messageId \n" + receivedMessage.getMessageId());
-                LOG.info("\t<= Received a message with messageBody \n" +
+                log.info("\t<= Received a message with messageId \n" + receivedMessage.getMessageId());
+                log.info("\t<= Received a message with messageBody \n" +
                         new String(receivedMessage.getBody(), UTF_8));
                 receiver.complete(receivedMessage.getLockToken());
 
@@ -310,7 +310,7 @@ public class ConnectionUtils {
                 i = i + 1;
                 sourceArrayType = new BArrayType(messageBObject.getType());
             }
-            LOG.info("\tDone receiving messages from \n" + receiver.getEntityPath());
+            log.info("\tDone receiving messages from \n" + receiver.getEntityPath());
             if(sourceArrayType != null) {
                 messagesBObject.set(ASBConstants.MESSAGES_CONTENT,
                         BValueCreator.createArrayValue(bObjectArray, sourceArrayType));
@@ -391,13 +391,13 @@ public class ConnectionUtils {
                 message.setProperties(propertiesMap);
 
                 messages.add(message);
-                LOG.info("\t=> Sending a message with messageId \n" + message.getMessageId());
+                log.info("\t=> Sending a message with messageId \n" + message.getMessageId());
             }
 
             // Send messages to queue or topic
-            LOG.info("\tSending messages to  ...\n" + sender.getEntityPath());
+            log.info("\tSending messages to  ...\n" + sender.getEntityPath());
             sender.sendBatch(messages);
-            LOG.info("\t=> Sent  messages\n" + messages.size());
+            log.info("\t=> Sent  messages\n" + messages.size());
         } catch(Exception e) {
             throw ASBUtils.returnErrorValue(e.getMessage());
         }
@@ -422,15 +422,15 @@ public class ConnectionUtils {
             BObject messagesBObject = BValueCreator.createObjectValue(ASBConstants.PACKAGE_ID_ASB,
                     ASBConstants.MESSAGES_OBJECT);
 
-            LOG.info("\n\tWaiting up to 5 seconds for messages from  ...\n" + receiver.getEntityPath());
+            log.info("\n\tWaiting up to 5 seconds for messages from  ...\n" + receiver.getEntityPath());
             for(int j=0; j<maxMessageCount; j++) {
                 IMessage receivedMessage = receiver.receive(Duration.ofSeconds(5));
 
                 if (receivedMessage == null) {
                     continue;
                 }
-                LOG.info("\t<= Received a message with messageId \n" + receivedMessage.getMessageId());
-                LOG.info("\t<= Received a message with messageBody \n" +
+                log.info("\t<= Received a message with messageId \n" + receivedMessage.getMessageId());
+                log.info("\t<= Received a message with messageBody \n" +
                         new String(receivedMessage.getBody(), UTF_8));
                 receiver.complete(receivedMessage.getLockToken());
 
@@ -447,7 +447,7 @@ public class ConnectionUtils {
                 i = i + 1;
                 sourceArrayType = new BArrayType(messageBObject.getType());
             }
-            LOG.info("\tDone receiving messages from \n" + receiver.getEntityPath());
+            log.info("\tDone receiving messages from \n" + receiver.getEntityPath());
             if(sourceArrayType != null) {
                 messagesBObject.set(ASBConstants.MESSAGES_CONTENT,
                         BValueCreator.createArrayValue(bObjectArray, sourceArrayType));
@@ -470,15 +470,15 @@ public class ConnectionUtils {
             // receive messages from queue
             String receivedMessageId = "";
 
-            LOG.info("\n\tWaiting up to 5 seconds for messages from  ...\n" + receiver.getEntityPath());
+            log.info("\n\tWaiting up to 5 seconds for messages from  ...\n" + receiver.getEntityPath());
             while (true) {
                 IMessage receivedMessage = receiver.receive(Duration.ofSeconds(5));
 
                 if (receivedMessage == null) {
                     break;
                 }
-                LOG.info("\t<= Received a message with messageId \n" + receivedMessage.getMessageId());
-                LOG.info("\t<= Completes a message with messageLockToken \n" +
+                log.info("\t<= Received a message with messageId \n" + receivedMessage.getMessageId());
+                log.info("\t<= Completes a message with messageLockToken \n" +
                         receivedMessage.getLockToken());
                 receiver.complete(receivedMessage.getLockToken());
                 if (receivedMessageId.contentEquals(receivedMessage.getMessageId())) {
@@ -486,7 +486,7 @@ public class ConnectionUtils {
                 }
                 receivedMessageId = receivedMessage.getMessageId();
             }
-            LOG.info("\tDone completing a message using its lock token from \n" + receiver.getEntityPath());
+            log.info("\tDone completing a message using its lock token from \n" + receiver.getEntityPath());
         } catch (Exception e) {
             throw ASBUtils.returnErrorValue(e.getMessage());
         }
@@ -499,21 +499,21 @@ public class ConnectionUtils {
      */
     public static void completeOneMessage(IMessageReceiver receiver) throws Exception {
         try {
-            LOG.info("\nWaiting up to default server wait time for messages from  ...\n" +
+            log.info("\nWaiting up to default server wait time for messages from  ...\n" +
                     receiver.getEntityPath());
 
             IMessage receivedMessage = receiver.receive();
 
             if (receivedMessage != null) {
-                LOG.info("\t<= Received a message with messageId \n" + receivedMessage.getMessageId());
-                LOG.info("\t<= Completes a message with messageLockToken \n" +
+                log.info("\t<= Received a message with messageId \n" + receivedMessage.getMessageId());
+                log.info("\t<= Completes a message with messageLockToken \n" +
                         receivedMessage.getLockToken());
                 receiver.complete(receivedMessage.getLockToken());
 
-                LOG.info("\tDone completing a message using its lock token from \n" +
+                log.info("\tDone completing a message using its lock token from \n" +
                         receiver.getEntityPath());
             } else {
-                LOG.info("\tNo message in the queue\n");
+                log.info("\tNo message in the queue\n");
             }
         } catch (Exception e) {
             throw ASBUtils.returnErrorValue(e.getMessage());
@@ -527,19 +527,19 @@ public class ConnectionUtils {
      */
     public static void abandonMessage(IMessageReceiver receiver) throws Exception {
         try {
-            LOG.info("\n\tWaiting up to default server wait time for messages from  ...\n" +
+            log.info("\n\tWaiting up to default server wait time for messages from  ...\n" +
                     receiver.getEntityPath());
             IMessage receivedMessage = receiver.receive();
 
             if (receivedMessage != null) {
-                LOG.info("\t<= Received a message with messageId \n" + receivedMessage.getMessageId());
-                LOG.info("\t<= Abandon a message with messageLockToken \n" + receivedMessage.getLockToken());
+                log.info("\t<= Received a message with messageId \n" + receivedMessage.getMessageId());
+                log.info("\t<= Abandon a message with messageLockToken \n" + receivedMessage.getLockToken());
                 receiver.abandon(receivedMessage.getLockToken());
 
-                LOG.info("\tDone abandoning a message using its lock token from \n" +
+                log.info("\tDone abandoning a message using its lock token from \n" +
                         receiver.getEntityPath());
             } else {
-                LOG.info("\t<= No message in the queue \n");
+                log.info("\t<= No message in the queue \n");
             }
         } catch (Exception e) {
             throw ASBUtils.returnErrorValue(e.getMessage());
