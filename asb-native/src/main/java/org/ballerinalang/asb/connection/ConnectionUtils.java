@@ -239,13 +239,14 @@ public class ConnectionUtils {
      * message content as a byte array and return Message object.
      *
      * @param receiver Output Receiver connection.
+     * @param serverWaitTime Specified server wait time in seconds to receive message.
      * @return Message Object of the received message.
      */
-    public static Object receiveMessage(IMessageReceiver receiver) throws Exception {
+    public static Object receiveMessage(IMessageReceiver receiver, int serverWaitTime) throws Exception {
         try {
-            log.info("\n\tWaiting up to 5 seconds for messages from ...\n" + receiver.getEntityPath());
+            log.info("\n\tWaiting up to 'serverWaitTime' seconds for messages from \n" + receiver.getEntityPath());
 
-            IMessage receivedMessage = receiver.receive(Duration.ofSeconds(5));
+            IMessage receivedMessage = receiver.receive(Duration.ofSeconds(serverWaitTime));
 
             if (receivedMessage == null) {
                 return null;

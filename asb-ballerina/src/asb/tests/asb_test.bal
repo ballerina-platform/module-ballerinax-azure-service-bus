@@ -37,6 +37,7 @@ int[] integerArrayContent = [4, 5, 6];
 map<string> parameters = {contentType: "application/json", messageId: "one", to: "sanju", replyTo: "carol", 
     label: "a1", sessionId: "b1", correlationId: "c1", timeToLive: "2"};
 map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
+int serverWaitTime = 5;
 
 # Before Suite Function
 @test:BeforeSuite
@@ -108,8 +109,8 @@ function testReceiveFromQueueOperation() {
 
     if (receiverConnection is ReceiverConnection) {
         log:printInfo("Receiving from Asb receiver connection.");
-        Message|Error messageReceived = receiverConnection.receiveMessage();
-        Message|Error jsonMessageReceived = receiverConnection.receiveMessage();
+        Message|Error messageReceived = receiverConnection.receiveMessage(serverWaitTime);
+        Message|Error jsonMessageReceived = receiverConnection.receiveMessage(serverWaitTime);
         if (messageReceived is Message && jsonMessageReceived is Message) {
             string messageRead = checkpanic messageReceived.getTextContent();
             log:printInfo("Reading Received Message : " + messageRead);
