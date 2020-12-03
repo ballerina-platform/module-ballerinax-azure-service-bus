@@ -152,7 +152,7 @@ function testReceiveMessagesFromQueueOperation() {
 
     if (receiverConnection is ReceiverConnection) {
         log:printInfo("Receiving from Asb receiver connection.");
-        var messageReceived = receiverConnection.receiveMessages();
+        var messageReceived = receiverConnection.receiveMessages(serverWaitTime);
         if(messageReceived is Messages) {
             int val = messageReceived.getDeliveryTag();
             log:printInfo("No. of messages received : " + val.toString());
