@@ -51,7 +51,9 @@ function beforeSuiteFunc() {
 }
 
 # Test Sender Connection
-@test:Config{enable: false}
+@test:Config{
+    enable: false
+}
 public function testSenderConnection() {
     boolean flag = false;
     SenderConnection? senderConnection = new ({connectionString: connectionString, entityPath: queuePath});
@@ -62,7 +64,9 @@ public function testSenderConnection() {
 }
 
 # Test Receiver Connection
-@test:Config{enable: false}
+@test:Config{
+    enable: false
+}
 public function testReceieverConnection() {
     boolean flag = false;
     ReceiverConnection? receiverConnection = new ({connectionString: connectionString, entityPath: queuePath});
@@ -73,7 +77,9 @@ public function testReceieverConnection() {
 }
 
 # Test send to queue operation
-@test:Config{enable: true}
+@test:Config{
+    enable: true
+}
 function testSendToQueueOperation() {
     log:printInfo("Creating Asb sender connection.");
     SenderConnection? senderConnection = new ({connectionString: connectionString, entityPath: queuePath});
@@ -93,7 +99,9 @@ function testSendToQueueOperation() {
 }
 
 # Test receive from queue operation
-@test:Config{enable: true}
+@test:Config{
+    enable: true
+}
 function testReceiveFromQueueOperation() {
     log:printInfo("Creating Asb receiver connection.");
     ReceiverConnection? receiverConnection = new ({connectionString: connectionString, entityPath: queuePath});
