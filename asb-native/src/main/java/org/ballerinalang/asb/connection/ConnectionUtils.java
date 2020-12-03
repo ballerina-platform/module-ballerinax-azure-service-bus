@@ -21,7 +21,7 @@ package org.ballerinalang.asb.connection;
 import com.microsoft.azure.servicebus.*;
 import com.microsoft.azure.servicebus.primitives.ConnectionStringBuilder;
 import org.ballerinalang.asb.ASBConstants;
-import org.ballerinalang.asb.AsbUtils;
+import org.ballerinalang.asb.ASBUtils;
 import org.ballerinalang.jvm.api.values.BArray;
 import org.ballerinalang.jvm.api.values.BMap;
 import org.ballerinalang.jvm.api.values.BObject;
@@ -54,7 +54,7 @@ public class ConnectionUtils {
                     new ConnectionStringBuilder(connectionString, entityPath));
             return sender;
         } catch (Exception e) {
-            throw AsbUtils.returnErrorValue(e.getMessage());
+            throw ASBUtils.returnErrorValue(e.getMessage());
         }
     }
 
@@ -67,7 +67,7 @@ public class ConnectionUtils {
         try {
             sender.close();
         } catch (Exception e) {
-            throw AsbUtils.returnErrorValue(e.getMessage());
+            throw ASBUtils.returnErrorValue(e.getMessage());
         }
     }
 
@@ -85,7 +85,7 @@ public class ConnectionUtils {
                     new ConnectionStringBuilder(connectionString, entityPath), ReceiveMode.PEEKLOCK);
             return receiver;
         } catch (Exception e) {
-            throw AsbUtils.returnErrorValue(e.getMessage());
+            throw ASBUtils.returnErrorValue(e.getMessage());
         }
     }
 
@@ -98,7 +98,7 @@ public class ConnectionUtils {
         try {
             receiver.close();
         } catch (Exception e) {
-            throw AsbUtils.returnErrorValue(e.getMessage());
+            throw ASBUtils.returnErrorValue(e.getMessage());
         }
     }
 
@@ -158,7 +158,7 @@ public class ConnectionUtils {
             sender.send(message);
             LOG.info("\t=> Sent a message with messageId \n" + message.getMessageId());
         } catch (Exception e) {
-            throw AsbUtils.returnErrorValue(e.getMessage());
+            throw ASBUtils.returnErrorValue(e.getMessage());
         }
     }
 
@@ -230,7 +230,7 @@ public class ConnectionUtils {
             sender.send(message);
             LOG.info("\t=> Sent a message with messageId \n" + message.getMessageId());
         } catch (Exception e) {
-            throw AsbUtils.returnErrorValue(e.getMessage());
+            throw ASBUtils.returnErrorValue(e.getMessage());
         }
     }
 
@@ -262,7 +262,7 @@ public class ConnectionUtils {
             messageBObject.set(ASBConstants.MESSAGE_CONTENT, BValueCreator.createArrayValue(receivedMessage.getBody()));
             return messageBObject;
         } catch (Exception e) {
-            throw AsbUtils.returnErrorValue(e.getMessage());
+            throw ASBUtils.returnErrorValue(e.getMessage());
         }
     }
 

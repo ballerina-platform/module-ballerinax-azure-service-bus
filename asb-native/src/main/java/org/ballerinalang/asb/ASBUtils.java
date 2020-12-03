@@ -25,7 +25,7 @@ import org.ballerinalang.jvm.api.BStringUtils;
 /**
  * Util class for Asb Error handling.
  */
-public class AsbUtils {
+public class ASBUtils {
     /**
      * Returns a Ballerina Error with the given String message.
      *
