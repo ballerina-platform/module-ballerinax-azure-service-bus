@@ -20,6 +20,7 @@ package org.ballerinalang.asb.connection;
 
 import com.microsoft.azure.servicebus.*;
 import com.microsoft.azure.servicebus.primitives.ConnectionStringBuilder;
+import com.microsoft.azure.servicebus.primitives.ServiceBusException;
 import org.ballerinalang.asb.ASBConstants;
 import org.ballerinalang.asb.ASBUtils;
 import org.ballerinalang.jvm.api.values.BArray;
@@ -55,8 +56,12 @@ public class ConnectionUtils {
             IMessageSender sender = ClientFactory.createMessageSenderFromConnectionStringBuilder(
                     new ConnectionStringBuilder(connectionString, entityPath));
             return sender;
-        } catch (Exception e) {
-            throw ASBUtils.returnErrorValue(e.getMessage());
+        } catch (InterruptedException e) {
+            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
+                    + e.getMessage());
+        } catch (ServiceBusException e) {
+            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
+                    + e.getMessage());
         }
     }
 
@@ -68,8 +73,8 @@ public class ConnectionUtils {
     public static void closeSenderConnection(IMessageSender sender) throws Exception {
         try {
             sender.close();
-        } catch (Exception e) {
-            throw ASBUtils.returnErrorValue(e.getMessage());
+        } catch (ServiceBusException e) {
+            throw ASBUtils.returnErrorValue("object cannot be properly closed " + e.getMessage());
         }
     }
 
@@ -86,8 +91,12 @@ public class ConnectionUtils {
             IMessageReceiver receiver = ClientFactory.createMessageReceiverFromConnectionStringBuilder(
                     new ConnectionStringBuilder(connectionString, entityPath), ReceiveMode.PEEKLOCK);
             return receiver;
-        } catch (Exception e) {
-            throw ASBUtils.returnErrorValue(e.getMessage());
+        } catch (InterruptedException e) {
+            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
+                    + e.getMessage());
+        } catch (ServiceBusException e) {
+            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
+                    + e.getMessage());
         }
     }
 
@@ -99,8 +108,8 @@ public class ConnectionUtils {
     public static void closeReceiverConnection(IMessageReceiver receiver) throws Exception {
         try {
             receiver.close();
-        } catch (Exception e) {
-            throw ASBUtils.returnErrorValue(e.getMessage());
+        } catch (ServiceBusException e) {
+            throw ASBUtils.returnErrorValue("object cannot be properly closed " + e.getMessage());
         }
     }
 
@@ -159,8 +168,12 @@ public class ConnectionUtils {
 
             sender.send(message);
             log.info("\t=> Sent a message with messageId \n" + message.getMessageId());
-        } catch (Exception e) {
-            throw ASBUtils.returnErrorValue(e.getMessage());
+        } catch (InterruptedException e) {
+            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
+                    + e.getMessage());
+        } catch (ServiceBusException e) {
+            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
+                    + e.getMessage());
         }
     }
 
@@ -207,8 +220,12 @@ public class ConnectionUtils {
 
             sender.send(message);
             log.info("\t=> Sent a message with messageId \n" + message.getMessageId());
-        } catch (Exception e) {
-            throw ASBUtils.returnErrorValue(e.getMessage());
+        } catch (InterruptedException e) {
+            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
+                    + e.getMessage());
+        } catch (ServiceBusException e) {
+            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
+                    + e.getMessage());
         }
     }
 
@@ -240,8 +257,12 @@ public class ConnectionUtils {
                     ASBConstants.MESSAGE_OBJECT);
             messageBObject.set(ASBConstants.MESSAGE_CONTENT, BValueCreator.createArrayValue(receivedMessage.getBody()));
             return messageBObject;
-        } catch (Exception e) {
-            throw ASBUtils.returnErrorValue(e.getMessage());
+        } catch (InterruptedException e) {
+            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
+                    + e.getMessage());
+        } catch (ServiceBusException e) {
+            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
+                    + e.getMessage());
         }
     }
 
@@ -296,8 +317,12 @@ public class ConnectionUtils {
                 messagesBObject.set(ASBConstants.DELIVERY_TAG, i);
             }
             return messagesBObject;
-        } catch (Exception e) {
-            return ASBUtils.returnErrorValue(e.getMessage());
+        } catch (InterruptedException e) {
+            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
+                    + e.getMessage());
+        } catch (ServiceBusException e) {
+            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
+                    + e.getMessage());
         }
     }
 
@@ -352,8 +377,12 @@ public class ConnectionUtils {
             log.info("\tSending messages to  ...\n" + sender.getEntityPath());
             sender.sendBatch(messages);
             log.info("\t=> Sent  messages\n" + messages.size());
-        } catch(Exception e) {
-            throw ASBUtils.returnErrorValue(e.getMessage());
+        } catch (InterruptedException e) {
+            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
+                    + e.getMessage());
+        } catch (ServiceBusException e) {
+            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
+                    + e.getMessage());
         }
     }
 
@@ -408,8 +437,12 @@ public class ConnectionUtils {
                 messagesBObject.set(ASBConstants.DELIVERY_TAG, i);
             }
             return messagesBObject;
-        } catch (Exception e) {
-            return ASBUtils.returnErrorValue(e.getMessage());
+        } catch (InterruptedException e) {
+            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
+                    + e.getMessage());
+        } catch (ServiceBusException e) {
+            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
+                    + e.getMessage());
         }
     }
 
@@ -441,8 +474,12 @@ public class ConnectionUtils {
                 receivedMessageId = receivedMessage.getMessageId();
             }
             log.info("\tDone completing a message using its lock token from \n" + receiver.getEntityPath());
-        } catch (Exception e) {
-            throw ASBUtils.returnErrorValue(e.getMessage());
+        } catch (InterruptedException e) {
+            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
+                    + e.getMessage());
+        } catch (ServiceBusException e) {
+            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
+                    + e.getMessage());
         }
     }
 
@@ -469,8 +506,12 @@ public class ConnectionUtils {
             } else {
                 log.info("\tNo message in the queue\n");
             }
-        } catch (Exception e) {
-            throw ASBUtils.returnErrorValue(e.getMessage());
+        } catch (InterruptedException e) {
+            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
+                    + e.getMessage());
+        } catch (ServiceBusException e) {
+            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
+                    + e.getMessage());
         }
     }
 
@@ -495,8 +536,12 @@ public class ConnectionUtils {
             } else {
                 log.info("\t<= No message in the queue \n");
             }
-        } catch (Exception e) {
-            throw ASBUtils.returnErrorValue(e.getMessage());
+        } catch (InterruptedException e) {
+            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
+                    + e.getMessage());
+        } catch (ServiceBusException e) {
+            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
+                    + e.getMessage());
         }
     }
 

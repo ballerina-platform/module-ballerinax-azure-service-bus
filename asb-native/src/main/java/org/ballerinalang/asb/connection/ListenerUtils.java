@@ -20,6 +20,7 @@ package org.ballerinalang.asb.connection;
 
 import com.microsoft.azure.servicebus.*;
 import com.microsoft.azure.servicebus.primitives.ConnectionStringBuilder;
+import com.microsoft.azure.servicebus.primitives.ServiceBusException;
 import org.ballerinalang.asb.ASBConstants;
 import org.ballerinalang.asb.ASBUtils;
 import org.ballerinalang.asb.MessageDispatcher;
@@ -72,8 +73,12 @@ public class ListenerUtils {
             IMessageReceiver receiver = ClientFactory.createMessageReceiverFromConnectionStringBuilder(
                     new ConnectionStringBuilder(connectionString, entityPath), ReceiveMode.PEEKLOCK);
             listenerBObject.addNativeData(ASBConstants.CONNECTION_NATIVE_OBJECT, receiver);
-        } catch (Exception e) {
-            return ASBUtils.returnErrorValue("Error occurred while initializing the IMessageReceiver");
+        } catch (InterruptedException e) {
+            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
+                    + e.getMessage());
+        } catch (ServiceBusException e) {
+            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
+                    + e.getMessage());
         }
         IMessageReceiver receiveClient =
                 (IMessageReceiver) listenerBObject.getNativeData(ASBConstants.CONNECTION_NATIVE_OBJECT);
@@ -139,7 +144,7 @@ public class ListenerUtils {
         try {
             iMessageReceiver.close();
             log.info("Consumer service unsubscribed from the queue " + queueName);
-        } catch (Exception e) {
+        } catch (ServiceBusException e) {
             return ASBUtils.returnErrorValue("Error occurred while detaching the service");
         }
 
@@ -163,7 +168,7 @@ public class ListenerUtils {
             try {
                 iMessageReceiver.close();
                 log.info("Consumer service stopped");
-            } catch (Exception e) {
+            } catch (ServiceBusException e) {
                 return ASBUtils.returnErrorValue("Error occurred while stopping the service");
             }
         }
@@ -184,7 +189,7 @@ public class ListenerUtils {
             try {
                 iMessageReceiver.close();
                 log.info("Consumer service stopped");
-            } catch (Exception e) {
+            } catch (ServiceBusException e) {
                 return ASBUtils.returnErrorValue("Error occurred while stopping the service");
             }
         }

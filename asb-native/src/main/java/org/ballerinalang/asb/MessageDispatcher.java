@@ -113,7 +113,7 @@ public class MessageDispatcher {
             ExecutorService executorService = Executors.newSingleThreadExecutor();
             this.pumpMessage(receiver, executorService);
             log.info("\tDone receiving messages from \n" + receiver.getEntityPath());
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             ASBUtils.returnErrorValue(e.getMessage());
         }
 
