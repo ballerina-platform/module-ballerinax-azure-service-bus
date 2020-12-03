@@ -37,8 +37,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 /**
  * Util class used to bridge the Asb connector's native code and the Ballerina API.
  */
-public class ConUtils {
-    private static final Logger LOG = Logger.getLogger(ConUtils.class.getName());
+public class ConnectionUtils {
+    private static final Logger LOG = Logger.getLogger(ConnectionUtils.class.getName());
 
     private String connectionString;
 
@@ -546,10 +546,10 @@ public class ConUtils {
         }
     }
 
-    public ConUtils() {
+    public ConnectionUtils() {
     }
 
-    public ConUtils(String connectionString) {
+    public ConnectionUtils(String connectionString) {
         this.connectionString = connectionString;
     }
 }

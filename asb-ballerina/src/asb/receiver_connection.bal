@@ -107,41 +107,41 @@ public class ReceiverConnection {
 isolated function createReceiverConnection(handle connectionString, handle entityPath) 
     returns handle|Error? = @java:Method {
     name: "createReceiverConnection",
-    'class: "org.ballerinalang.asb.connection.ConUtils"
+    'class: "org.ballerinalang.asb.connection.ConnectionUtils"
 } external;
 
 isolated function closeReceiverConnection(handle imessageSender) returns Error? = @java:Method {
     name: "closeReceiverConnection",
-    'class: "org.ballerinalang.asb.connection.ConUtils"
+    'class: "org.ballerinalang.asb.connection.ConnectionUtils"
 } external;
 
 isolated function receiveMessage(handle imessageReceiver) returns Message|Error = @java:Method {
     name: "receiveMessage",
-    'class: "org.ballerinalang.asb.connection.ConUtils"
+    'class: "org.ballerinalang.asb.connection.ConnectionUtils"
 } external;
 
 isolated function receiveMessages(handle imessageReceiver) returns Messages|Error = @java:Method {
     name: "receiveMessages",
-    'class: "org.ballerinalang.asb.connection.ConUtils"
+    'class: "org.ballerinalang.asb.connection.ConnectionUtils"
 } external;
 
 isolated function receiveBatchMessage(handle imessageReceiver, int maxMessageCount) 
     returns Messages|Error = @java:Method {
     name: "receiveBatchMessage",
-    'class: "org.ballerinalang.asb.connection.ConUtils"
+    'class: "org.ballerinalang.asb.connection.ConnectionUtils"
 } external;
 
 isolated function completeMessages(handle imessageReceiver) returns Error? = @java:Method {
     name: "completeMessages",
-    'class: "org.ballerinalang.asb.connection.ConUtils"
+    'class: "org.ballerinalang.asb.connection.ConnectionUtils"
 } external;
 
 isolated function completeOneMessage(handle imessageReceiver) returns Error? = @java:Method {
     name: "completeOneMessage",
-    'class: "org.ballerinalang.asb.connection.ConUtils"
+    'class: "org.ballerinalang.asb.connection.ConnectionUtils"
 } external;
 
 isolated function abandonMessage(handle imessageReceiver) returns Error? = @java:Method {
     name: "abandonMessage",
-    'class: "org.ballerinalang.asb.connection.ConUtils"
+    'class: "org.ballerinalang.asb.connection.ConnectionUtils"
 } external;
