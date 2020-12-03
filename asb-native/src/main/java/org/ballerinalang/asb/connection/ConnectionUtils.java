@@ -21,7 +21,7 @@ package org.ballerinalang.asb.connection;
 import com.microsoft.azure.servicebus.*;
 import com.microsoft.azure.servicebus.primitives.ConnectionStringBuilder;
 import org.ballerinalang.asb.ASBConstants;
-import org.ballerinalang.asb.AsbUtils;
+import org.ballerinalang.asb.ASBUtils;
 import org.ballerinalang.jvm.api.values.BArray;
 import org.ballerinalang.jvm.api.values.BMap;
 import org.ballerinalang.jvm.api.values.BObject;
@@ -55,7 +55,7 @@ public class ConnectionUtils {
                     new ConnectionStringBuilder(connectionString, entityPath));
             return sender;
         } catch (Exception e) {
-            throw AsbUtils.returnErrorValue(e.getMessage());
+            throw ASBUtils.returnErrorValue(e.getMessage());
         }
     }
 
@@ -68,7 +68,7 @@ public class ConnectionUtils {
         try {
             sender.close();
         } catch (Exception e) {
-            throw AsbUtils.returnErrorValue(e.getMessage());
+            throw ASBUtils.returnErrorValue(e.getMessage());
         }
     }
 
@@ -86,7 +86,7 @@ public class ConnectionUtils {
                     new ConnectionStringBuilder(connectionString, entityPath), ReceiveMode.PEEKLOCK);
             return receiver;
         } catch (Exception e) {
-            throw AsbUtils.returnErrorValue(e.getMessage());
+            throw ASBUtils.returnErrorValue(e.getMessage());
         }
     }
 
@@ -99,7 +99,7 @@ public class ConnectionUtils {
         try {
             receiver.close();
         } catch (Exception e) {
-            throw AsbUtils.returnErrorValue(e.getMessage());
+            throw ASBUtils.returnErrorValue(e.getMessage());
         }
     }
 
@@ -159,7 +159,7 @@ public class ConnectionUtils {
             sender.send(message);
             LOG.info("\t=> Sent a message with messageId \n" + message.getMessageId());
         } catch (Exception e) {
-            throw AsbUtils.returnErrorValue(e.getMessage());
+            throw ASBUtils.returnErrorValue(e.getMessage());
         }
     }
 
@@ -231,7 +231,7 @@ public class ConnectionUtils {
             sender.send(message);
             LOG.info("\t=> Sent a message with messageId \n" + message.getMessageId());
         } catch (Exception e) {
-            throw AsbUtils.returnErrorValue(e.getMessage());
+            throw ASBUtils.returnErrorValue(e.getMessage());
         }
     }
 
@@ -263,7 +263,7 @@ public class ConnectionUtils {
             messageBObject.set(ASBConstants.MESSAGE_CONTENT, BValueCreator.createArrayValue(receivedMessage.getBody()));
             return messageBObject;
         } catch (Exception e) {
-            throw AsbUtils.returnErrorValue(e.getMessage());
+            throw ASBUtils.returnErrorValue(e.getMessage());
         }
     }
 
@@ -298,7 +298,7 @@ public class ConnectionUtils {
                 receiver.complete(receivedMessage.getLockToken());
 
                 if (receivedMessageId.contentEquals(receivedMessage.getMessageId())) {
-                    return AsbUtils.returnErrorValue("Received a duplicate message!");
+                    return ASBUtils.returnErrorValue("Received a duplicate message!");
                 }
                 receivedMessageId = receivedMessage.getMessageId();
 
@@ -318,7 +318,7 @@ public class ConnectionUtils {
             }
             return messagesBObject;
         } catch (Exception e) {
-            return AsbUtils.returnErrorValue(e.getMessage());
+            return ASBUtils.returnErrorValue(e.getMessage());
         }
     }
 
@@ -399,7 +399,7 @@ public class ConnectionUtils {
             sender.sendBatch(messages);
             LOG.info("\t=> Sent  messages\n" + messages.size());
         } catch(Exception e) {
-            throw AsbUtils.returnErrorValue(e.getMessage());
+            throw ASBUtils.returnErrorValue(e.getMessage());
         }
     }
 
@@ -435,7 +435,7 @@ public class ConnectionUtils {
                 receiver.complete(receivedMessage.getLockToken());
 
                 if (receivedMessageId.contentEquals(receivedMessage.getMessageId())) {
-                    return AsbUtils.returnErrorValue("Received a duplicate message!");
+                    return ASBUtils.returnErrorValue("Received a duplicate message!");
                 }
                 receivedMessageId = receivedMessage.getMessageId();
 
@@ -455,7 +455,7 @@ public class ConnectionUtils {
             }
             return messagesBObject;
         } catch (Exception e) {
-            return AsbUtils.returnErrorValue(e.getMessage());
+            return ASBUtils.returnErrorValue(e.getMessage());
         }
     }
 
@@ -482,13 +482,13 @@ public class ConnectionUtils {
                         receivedMessage.getLockToken());
                 receiver.complete(receivedMessage.getLockToken());
                 if (receivedMessageId.contentEquals(receivedMessage.getMessageId())) {
-                    throw AsbUtils.returnErrorValue("Received a duplicate message!");
+                    throw ASBUtils.returnErrorValue("Received a duplicate message!");
                 }
                 receivedMessageId = receivedMessage.getMessageId();
             }
             LOG.info("\tDone completing a message using its lock token from \n" + receiver.getEntityPath());
         } catch (Exception e) {
-            throw AsbUtils.returnErrorValue(e.getMessage());
+            throw ASBUtils.returnErrorValue(e.getMessage());
         }
     }
 
@@ -516,7 +516,7 @@ public class ConnectionUtils {
                 LOG.info("\tNo message in the queue\n");
             }
         } catch (Exception e) {
-            throw AsbUtils.returnErrorValue(e.getMessage());
+            throw ASBUtils.returnErrorValue(e.getMessage());
         }
     }
 
@@ -542,7 +542,7 @@ public class ConnectionUtils {
                 LOG.info("\t<= No message in the queue \n");
             }
         } catch (Exception e) {
-            throw AsbUtils.returnErrorValue(e.getMessage());
+            throw ASBUtils.returnErrorValue(e.getMessage());
         }
     }
 

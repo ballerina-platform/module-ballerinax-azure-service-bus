@@ -73,29 +73,29 @@ public class Message {
 isolated function nativeGetTextContent(byte[] messageContent) returns string|Error =
 @java:Method {
     name: "getTextContent",
-    'class: "org.ballerinalang.asb.AsbMessageUtils"
+    'class: "org.ballerinalang.asb.ASBMessageUtils"
 } external;
 
 isolated function nativeGetFloatContent(byte[] messageContent) returns float|Error =
 @java:Method {
     name: "getFloatContent",
-    'class: "org.ballerinalang.asb.AsbMessageUtils"
+    'class: "org.ballerinalang.asb.ASBMessageUtils"
 } external;
 
 isolated function nativeGetIntContent(byte[] messageContent) returns int|Error =
 @java:Method {
     name: "getIntContent",
-    'class: "org.ballerinalang.asb.AsbMessageUtils"
+    'class: "org.ballerinalang.asb.ASBMessageUtils"
 } external;
 
 isolated function nativeGetJSONContent(byte[] messageContent) returns json|Error =
 @java:Method {
     name: "getJSONContent",
-    'class: "org.ballerinalang.asb.AsbMessageUtils"
+    'class: "org.ballerinalang.asb.ASBMessageUtils"
 } external;
 
 isolated function nativeGetXMLContent(byte[] messageContent) returns xml|Error =
 @java:Method {
     name: "getXMLContent",
-    'class: "org.ballerinalang.asb.AsbMessageUtils"
+    'class: "org.ballerinalang.asb.ASBMessageUtils"
 } external;

@@ -114,7 +114,7 @@ public class MessageDispatcher {
             this.pumpMessage(receiver, executorService);
             LOG.info("\tDone receiving messages from \n" + receiver.getEntityPath());
         } catch (Exception e) {
-            AsbUtils.returnErrorValue(e.getMessage());
+            ASBUtils.returnErrorValue(e.getMessage());
         }
 
         ArrayList<BObject> startedServices =
@@ -148,7 +148,7 @@ public class MessageDispatcher {
                     try {
                         receiver.complete(message.getLockToken());
                     } catch (Exception e) {
-                        return AsbUtils.returnErrorValue(e.getMessage());
+                        return ASBUtils.returnErrorValue(e.getMessage());
                     }
                     pumpMessage(receiver, executorService);
                     return null;
@@ -187,7 +187,7 @@ public class MessageDispatcher {
             BObject messageBObject = getMessageBObject(message);
             executeResourceOnMessage(callback, messageBObject, true);
         } catch (BError exception) {
-            AsbUtils.returnErrorValue("Error occur while dispatching the message to the service " +
+            ASBUtils.returnErrorValue("Error occur while dispatching the message to the service " +
                     exception.getMessage());
         }
     }

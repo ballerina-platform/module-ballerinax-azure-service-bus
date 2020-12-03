@@ -35,7 +35,7 @@ public class ASBMessageUtils {
         try {
             return BStringUtils.fromString(new String(messageCont, StandardCharsets.UTF_8.name()));
         } catch (UnsupportedEncodingException exception) {
-            return AsbUtils.returnErrorValue(ASBConstants.TEXT_CONTENT_ERROR + exception.getMessage());
+            return ASBUtils.returnErrorValue(ASBConstants.TEXT_CONTENT_ERROR + exception.getMessage());
         }
     }
 
@@ -43,7 +43,7 @@ public class ASBMessageUtils {
         try {
             return Double.parseDouble(new String(messageContent.getBytes(), StandardCharsets.UTF_8.name()));
         } catch (UnsupportedEncodingException exception) {
-            return AsbUtils.returnErrorValue(ASBConstants.FLOAT_CONTENT_ERROR + exception.getMessage());
+            return ASBUtils.returnErrorValue(ASBConstants.FLOAT_CONTENT_ERROR + exception.getMessage());
         }
     }
 
@@ -51,7 +51,7 @@ public class ASBMessageUtils {
         try {
             return Integer.parseInt(new String(messageContent.getBytes(), StandardCharsets.UTF_8.name()));
         } catch (UnsupportedEncodingException exception) {
-            return AsbUtils.returnErrorValue(ASBConstants.INT_CONTENT_ERROR + exception.getMessage());
+            return ASBUtils.returnErrorValue(ASBConstants.INT_CONTENT_ERROR + exception.getMessage());
         }
     }
 
@@ -63,7 +63,7 @@ public class ASBMessageUtils {
             }
             return json;
         } catch (UnsupportedEncodingException exception) {
-            return AsbUtils.returnErrorValue(ASBConstants.JSON_CONTENT_ERROR + exception.getMessage());
+            return ASBUtils.returnErrorValue(ASBConstants.JSON_CONTENT_ERROR + exception.getMessage());
         }
     }
 
@@ -71,7 +71,7 @@ public class ASBMessageUtils {
         try {
             return XMLFactory.parse(new String(messageContent.getBytes(), StandardCharsets.UTF_8.name()));
         } catch (UnsupportedEncodingException exception) {
-            return AsbUtils.returnErrorValue(ASBConstants.XML_CONTENT_ERROR + exception.getMessage());
+            return ASBUtils.returnErrorValue(ASBConstants.XML_CONTENT_ERROR + exception.getMessage());
         }
     }
 }

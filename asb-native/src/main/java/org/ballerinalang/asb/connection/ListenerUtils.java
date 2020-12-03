@@ -21,7 +21,7 @@ package org.ballerinalang.asb.connection;
 import com.microsoft.azure.servicebus.*;
 import com.microsoft.azure.servicebus.primitives.ConnectionStringBuilder;
 import org.ballerinalang.asb.ASBConstants;
-import org.ballerinalang.asb.AsbUtils;
+import org.ballerinalang.asb.ASBUtils;
 import org.ballerinalang.asb.MessageDispatcher;
 import org.ballerinalang.jvm.api.BRuntime;
 import org.ballerinalang.jvm.api.values.BObject;
@@ -73,7 +73,7 @@ public class ListenerUtils {
                     new ConnectionStringBuilder(connectionString, entityPath), ReceiveMode.PEEKLOCK);
             listenerBObject.addNativeData(ASBConstants.CONNECTION_NATIVE_OBJECT, receiver);
         } catch (Exception e) {
-            return AsbUtils.returnErrorValue("Error occurred while initializing the IMessageReceiver");
+            return ASBUtils.returnErrorValue("Error occurred while initializing the IMessageReceiver");
         }
         IMessageReceiver receiveClient =
                 (IMessageReceiver) listenerBObject.getNativeData(ASBConstants.CONNECTION_NATIVE_OBJECT);
@@ -140,7 +140,7 @@ public class ListenerUtils {
             iMessageReceiver.close();
             LOG.info("Consumer service unsubscribed from the queue " + queueName);
         } catch (Exception e) {
-            return AsbUtils.returnErrorValue("Error occurred while detaching the service");
+            return ASBUtils.returnErrorValue("Error occurred while detaching the service");
         }
 
         listenerBObject.addNativeData(ASBConstants.CONSUMER_SERVICES, removeFromList(services, service));
@@ -158,13 +158,13 @@ public class ListenerUtils {
         IMessageReceiver iMessageReceiver =
                 (IMessageReceiver) listenerBObject.getNativeData(ASBConstants.CONNECTION_NATIVE_OBJECT);
         if(iMessageReceiver == null) {
-            return AsbUtils.returnErrorValue("IMessageReceiver is not properly initialised.");
+            return ASBUtils.returnErrorValue("IMessageReceiver is not properly initialised.");
         } else {
             try {
                 iMessageReceiver.close();
                 LOG.info("Consumer service stopped");
             } catch (Exception e) {
-                return AsbUtils.returnErrorValue("Error occurred while stopping the service");
+                return ASBUtils.returnErrorValue("Error occurred while stopping the service");
             }
         }
         return null;
@@ -179,13 +179,13 @@ public class ListenerUtils {
         IMessageReceiver iMessageReceiver =
                 (IMessageReceiver) listenerBObject.getNativeData(ASBConstants.CONNECTION_NATIVE_OBJECT);
         if(iMessageReceiver == null) {
-            return AsbUtils.returnErrorValue("IMessageReceiver is not properly initialised.");
+            return ASBUtils.returnErrorValue("IMessageReceiver is not properly initialised.");
         } else {
             try {
                 iMessageReceiver.close();
                 LOG.info("Consumer service stopped");
             } catch (Exception e) {
-                return AsbUtils.returnErrorValue("Error occurred while stopping the service");
+                return ASBUtils.returnErrorValue("Error occurred while stopping the service");
             }
         }
         return null;
