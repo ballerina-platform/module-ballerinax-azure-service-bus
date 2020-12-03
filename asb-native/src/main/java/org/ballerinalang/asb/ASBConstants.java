@@ -43,4 +43,15 @@ public class ASBConstants {
     public static final String TEXT_CONTENT_ERROR = "Error while retrieving the string content of the message. ";
     public static final String INT_CONTENT_ERROR = "Error while retrieving the int content of the message. ";
     public static final String FLOAT_CONTENT_ERROR = "Error while retrieving the float content of the message. ";
+
+    // Keys of the input message optional parameters specified as a Map
+    public static final String CONTENT_TYPE = "contentType";
+    public static final String MESSAGE_ID = "messageId";
+    public static final String TO = "to";
+    public static final String REPLY_TO = "replyTo";
+    public static final String LABEL = "label";
+    public static final String SESSION_ID = "sessionId";
+    public static final String CORRELATION_ID = "correlationId";
+    public static final String TIME_TO_LIVE = "timeToLive";
+    public static final int DEFAULT_TIME_TO_LIVE = 1;
 }
