@@ -55,9 +55,10 @@ public class ReceiverConnection {
 
     # Receive Message from queue.
     # 
+    # + serverWaitTime - Specified server wait time in seconds to receive message.
     # + return - A Message object
-    public isolated function receiveMessage() returns Message|Error {
-        return receiveMessage(self.asbReceiverConnection);
+    public isolated function receiveMessage(int serverWaitTime) returns Message|Error {
+        return receiveMessage(self.asbReceiverConnection, serverWaitTime);
     }
 
     # Receive messages from queue.
@@ -115,7 +116,7 @@ isolated function closeReceiverConnection(handle imessageSender) returns Error? 
     'class: "org.ballerinalang.asb.connection.ConnectionUtils"
 } external;
 
-isolated function receiveMessage(handle imessageReceiver) returns Message|Error = @java:Method {
+isolated function receiveMessage(handle imessageReceiver, int serverWaitTime) returns Message|Error = @java:Method {
     name: "receiveMessage",
     'class: "org.ballerinalang.asb.connection.ConnectionUtils"
 } external;

@@ -48,6 +48,7 @@ map<string> parameters3 = {contentType: "application/json"};
 map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
 string asyncConsumerMessage = "";
 int maxMessageCount = 3;
+int serverWaitTime = 5;
 
 # Before Suite Function
 @test:BeforeSuite
@@ -120,8 +121,8 @@ function testReceiveFromQueueOperation() {
 
     if (receiverConnection is ReceiverConnection) {
         log:printInfo("Receiving from Asb receiver connection.");
-        Message|Error messageReceived = receiverConnection.receiveMessage();
-        Message|Error jsonMessageReceived = receiverConnection.receiveMessage();
+        Message|Error messageReceived = receiverConnection.receiveMessage(serverWaitTime);
+        Message|Error jsonMessageReceived = receiverConnection.receiveMessage(serverWaitTime);
         if (messageReceived is Message && jsonMessageReceived is Message) {
             string messageRead = checkpanic messageReceived.getTextContent();
             log:printInfo("Reading Received Message : " + messageRead);
@@ -341,8 +342,8 @@ function testReceiveFromSubscriptionOperation() {
 
     if (receiverConnection1 is ReceiverConnection) {
         log:printInfo("Receiving from Asb receiver connection 1.");
-        Message|error messageReceived = receiverConnection1.receiveMessage();
-        Message|error jsonMessageReceived = receiverConnection1.receiveMessage();
+        Message|error messageReceived = receiverConnection1.receiveMessage(serverWaitTime);
+        Message|error jsonMessageReceived = receiverConnection1.receiveMessage(serverWaitTime);
         if (messageReceived is Message && jsonMessageReceived is Message) {
             string messageRead = checkpanic messageReceived.getTextContent();
             log:printInfo("Reading Received Message : " + messageRead);
@@ -358,8 +359,8 @@ function testReceiveFromSubscriptionOperation() {
 
     if (receiverConnection2 is ReceiverConnection) {
         log:printInfo("Receiving from Asb receiver connection 2.");
-        Message|error messageReceived = receiverConnection2.receiveMessage();
-        Message|error jsonMessageReceived = receiverConnection2.receiveMessage();
+        Message|error messageReceived = receiverConnection2.receiveMessage(serverWaitTime);
+        Message|error jsonMessageReceived = receiverConnection2.receiveMessage(serverWaitTime);
         if (messageReceived is Message && jsonMessageReceived is Message) {
             string messageRead = checkpanic messageReceived.getTextContent();
             log:printInfo("Reading Received Message : " + messageRead);
@@ -374,8 +375,8 @@ function testReceiveFromSubscriptionOperation() {
 
     if (receiverConnection3 is ReceiverConnection) {
         log:printInfo("Receiving from Asb receiver connection 3.");
-        Message|error messageReceived = receiverConnection3.receiveMessage();
-        Message|error jsonMessageReceived = receiverConnection3.receiveMessage();
+        Message|error messageReceived = receiverConnection3.receiveMessage(serverWaitTime);
+        Message|error jsonMessageReceived = receiverConnection3.receiveMessage(serverWaitTime);
         if (messageReceived is Message && jsonMessageReceived is Message) {
             string messageRead = checkpanic messageReceived.getTextContent();
             log:printInfo("Reading Received Message : " + messageRead);
