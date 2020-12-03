@@ -29,7 +29,7 @@ import java.nio.charset.StandardCharsets;
 /**
  * Util class for Asb Message handling.
  */
-public class AsbMessageUtils {
+public class ASBMessageUtils {
     public static Object getTextContent(BArray messageContent) {
         byte[] messageCont = messageContent.getBytes();
         try {
