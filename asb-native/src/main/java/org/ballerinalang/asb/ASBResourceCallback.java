@@ -24,7 +24,7 @@ import org.ballerinalang.jvm.runtime.AsyncFunctionCallback;
 /**
  * Handles the Azure service bus resource callback.
  */
-public class AsbResourceCallback extends AsyncFunctionCallback {
+public class ASBResourceCallback extends AsyncFunctionCallback {
     @Override
     public void notifySuccess() {
         // do nothing

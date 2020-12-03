@@ -183,7 +183,7 @@ public class MessageDispatcher {
      */
     private void dispatchMessage(byte[] message) {
         try {
-            AsyncFunctionCallback callback = new AsbResourceCallback();
+            AsyncFunctionCallback callback = new ASBResourceCallback();
             BObject messageBObject = getMessageBObject(message);
             executeResourceOnMessage(callback, messageBObject, true);
         } catch (BError exception) {
