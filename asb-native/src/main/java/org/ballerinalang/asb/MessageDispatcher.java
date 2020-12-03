@@ -37,7 +37,7 @@ import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.ballerinalang.asb.AsbConstants.*;
+import static org.ballerinalang.asb.ASBConstants.*;
 import static org.ballerinalang.asb.connection.ListenerUtils.isClosing;
 
 /**
@@ -77,12 +77,12 @@ public class MessageDispatcher {
      */
     public static String getQueueNameFromConfig(BObject service) {
         BMap serviceConfig = (BMap) ((AnnotatableType) service.getType())
-                .getAnnotation(BStringUtils.fromString(AsbConstants.PACKAGE_RABBITMQ_FQN + ":"
-                        + AsbConstants.SERVICE_CONFIG));
-        @SuppressWarnings(AsbConstants.UNCHECKED)
+                .getAnnotation(BStringUtils.fromString(ASBConstants.PACKAGE_RABBITMQ_FQN + ":"
+                        + ASBConstants.SERVICE_CONFIG));
+        @SuppressWarnings(ASBConstants.UNCHECKED)
         BMap<BString, Object> queueConfig =
-                (BMap) serviceConfig.getMapValue(AsbConstants.ALIAS_QUEUE_CONFIG);
-        return queueConfig.getStringValue(AsbConstants.QUEUE_NAME).getValue();
+                (BMap) serviceConfig.getMapValue(ASBConstants.ALIAS_QUEUE_CONFIG);
+        return queueConfig.getStringValue(ASBConstants.QUEUE_NAME).getValue();
     }
 
     /**
@@ -93,11 +93,11 @@ public class MessageDispatcher {
      */
     public static String getConnectionStringFromConfig(BObject service) {
         BMap serviceConfig = (BMap) ((AnnotatableType) service.getType())
-                .getAnnotation(BStringUtils.fromString(AsbConstants.PACKAGE_RABBITMQ_FQN + ":"
-                        + AsbConstants.SERVICE_CONFIG));
-        @SuppressWarnings(AsbConstants.UNCHECKED)
+                .getAnnotation(BStringUtils.fromString(ASBConstants.PACKAGE_RABBITMQ_FQN + ":"
+                        + ASBConstants.SERVICE_CONFIG));
+        @SuppressWarnings(ASBConstants.UNCHECKED)
         BMap<BString, Object> queueConfig =
-                (BMap) serviceConfig.getMapValue(AsbConstants.ALIAS_QUEUE_CONFIG);
+                (BMap) serviceConfig.getMapValue(ASBConstants.ALIAS_QUEUE_CONFIG);
         return queueConfig.getStringValue(CONNECTION_STRING).getValue();
     }
 
@@ -118,9 +118,9 @@ public class MessageDispatcher {
         }
 
         ArrayList<BObject> startedServices =
-                (ArrayList<BObject>) listener.getNativeData(AsbConstants.STARTED_SERVICES);
+                (ArrayList<BObject>) listener.getNativeData(ASBConstants.STARTED_SERVICES);
         startedServices.add(service);
-        service.addNativeData(AsbConstants.QUEUE_NAME.getValue(), queueName);
+        service.addNativeData(ASBConstants.QUEUE_NAME.getValue(), queueName);
     }
 
     /**
@@ -199,15 +199,15 @@ public class MessageDispatcher {
      */
     private BObject getMessageBObject(byte[] message)  {
         LOG.info("\t<= Received a message with messageBody \n" + new String(message, UTF_8));
-        BObject messageBObject = BValueCreator.createObjectValue(AsbConstants.PACKAGE_ID_ASB,
-                AsbConstants.MESSAGE_OBJECT);
-        messageBObject.set(AsbConstants.MESSAGE_CONTENT, BValueCreator.createArrayValue(message));
+        BObject messageBObject = BValueCreator.createObjectValue(ASBConstants.PACKAGE_ID_ASB,
+                ASBConstants.MESSAGE_OBJECT);
+        messageBObject.set(ASBConstants.MESSAGE_CONTENT, BValueCreator.createArrayValue(message));
 
         return messageBObject;
     }
 
     private void executeResourceOnMessage(AsyncFunctionCallback callback, Object... args) {
-        executeResource(AsbConstants.FUNC_ON_MESSAGE, callback, ON_MESSAGE_METADATA, args);
+        executeResource(ASBConstants.FUNC_ON_MESSAGE, callback, ON_MESSAGE_METADATA, args);
     }
 
     private void executeResource(String function, AsyncFunctionCallback callback, StrandMetadata metaData,

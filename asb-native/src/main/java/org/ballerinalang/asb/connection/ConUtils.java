@@ -20,7 +20,7 @@ package org.ballerinalang.asb.connection;
 
 import com.microsoft.azure.servicebus.*;
 import com.microsoft.azure.servicebus.primitives.ConnectionStringBuilder;
-import org.ballerinalang.asb.AsbConstants;
+import org.ballerinalang.asb.ASBConstants;
 import org.ballerinalang.asb.AsbUtils;
 import org.ballerinalang.jvm.api.values.BArray;
 import org.ballerinalang.jvm.api.values.BMap;
@@ -258,9 +258,9 @@ public class ConUtils {
 
             LOG.info("\tDone receiving messages from \n" + receiver.getEntityPath());
 
-            BObject messageBObject = BValueCreator.createObjectValue(AsbConstants.PACKAGE_ID_ASB,
-                    AsbConstants.MESSAGE_OBJECT);
-            messageBObject.set(AsbConstants.MESSAGE_CONTENT, BValueCreator.createArrayValue(receivedMessage.getBody()));
+            BObject messageBObject = BValueCreator.createObjectValue(ASBConstants.PACKAGE_ID_ASB,
+                    ASBConstants.MESSAGE_OBJECT);
+            messageBObject.set(ASBConstants.MESSAGE_CONTENT, BValueCreator.createArrayValue(receivedMessage.getBody()));
             return messageBObject;
         } catch (Exception e) {
             throw AsbUtils.returnErrorValue(e.getMessage());
@@ -282,8 +282,8 @@ public class ConUtils {
             BObject[] bObjectArray = new BObject[2];
             int i = 0;
 
-            BObject messagesBObject = BValueCreator.createObjectValue(AsbConstants.PACKAGE_ID_ASB,
-                    AsbConstants.MESSAGES_OBJECT);
+            BObject messagesBObject = BValueCreator.createObjectValue(ASBConstants.PACKAGE_ID_ASB,
+                    ASBConstants.MESSAGES_OBJECT);
 
             LOG.info("\n\tWaiting up to 5 seconds for messages from  ...\n" + receiver.getEntityPath());
             while (true) {
@@ -302,9 +302,9 @@ public class ConUtils {
                 }
                 receivedMessageId = receivedMessage.getMessageId();
 
-                BObject messageBObject = BValueCreator.createObjectValue(AsbConstants.PACKAGE_ID_ASB,
-                        AsbConstants.MESSAGE_OBJECT);
-                messageBObject.set(AsbConstants.MESSAGE_CONTENT,
+                BObject messageBObject = BValueCreator.createObjectValue(ASBConstants.PACKAGE_ID_ASB,
+                        ASBConstants.MESSAGE_OBJECT);
+                messageBObject.set(ASBConstants.MESSAGE_CONTENT,
                         BValueCreator.createArrayValue(receivedMessage.getBody()));
                 bObjectArray[i] = messageBObject;
                 i = i + 1;
@@ -312,9 +312,9 @@ public class ConUtils {
             }
             LOG.info("\tDone receiving messages from \n" + receiver.getEntityPath());
             if(sourceArrayType != null) {
-                messagesBObject.set(AsbConstants.MESSAGES_CONTENT,
+                messagesBObject.set(ASBConstants.MESSAGES_CONTENT,
                         BValueCreator.createArrayValue(bObjectArray, sourceArrayType));
-                messagesBObject.set(AsbConstants.DELIVERY_TAG, i);
+                messagesBObject.set(ASBConstants.DELIVERY_TAG, i);
             }
             return messagesBObject;
         } catch (Exception e) {
@@ -419,8 +419,8 @@ public class ConUtils {
             BObject[] bObjectArray = new BObject[maxMessageCount];
             int i = 0;
 
-            BObject messagesBObject = BValueCreator.createObjectValue(AsbConstants.PACKAGE_ID_ASB,
-                    AsbConstants.MESSAGES_OBJECT);
+            BObject messagesBObject = BValueCreator.createObjectValue(ASBConstants.PACKAGE_ID_ASB,
+                    ASBConstants.MESSAGES_OBJECT);
 
             LOG.info("\n\tWaiting up to 5 seconds for messages from  ...\n" + receiver.getEntityPath());
             for(int j=0; j<maxMessageCount; j++) {
@@ -439,9 +439,9 @@ public class ConUtils {
                 }
                 receivedMessageId = receivedMessage.getMessageId();
 
-                BObject messageBObject = BValueCreator.createObjectValue(AsbConstants.PACKAGE_ID_ASB,
-                        AsbConstants.MESSAGE_OBJECT);
-                messageBObject.set(AsbConstants.MESSAGE_CONTENT,
+                BObject messageBObject = BValueCreator.createObjectValue(ASBConstants.PACKAGE_ID_ASB,
+                        ASBConstants.MESSAGE_OBJECT);
+                messageBObject.set(ASBConstants.MESSAGE_CONTENT,
                         BValueCreator.createArrayValue(receivedMessage.getBody()));
                 bObjectArray[i] = messageBObject;
                 i = i + 1;
@@ -449,9 +449,9 @@ public class ConUtils {
             }
             LOG.info("\tDone receiving messages from \n" + receiver.getEntityPath());
             if(sourceArrayType != null) {
-                messagesBObject.set(AsbConstants.MESSAGES_CONTENT,
+                messagesBObject.set(ASBConstants.MESSAGES_CONTENT,
                         BValueCreator.createArrayValue(bObjectArray, sourceArrayType));
-                messagesBObject.set(AsbConstants.DELIVERY_TAG, i);
+                messagesBObject.set(ASBConstants.DELIVERY_TAG, i);
             }
             return messagesBObject;
         } catch (Exception e) {
