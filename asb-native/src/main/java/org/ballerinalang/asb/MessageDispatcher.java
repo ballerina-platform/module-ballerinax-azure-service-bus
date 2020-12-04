@@ -112,7 +112,6 @@ public class MessageDispatcher {
         try {
             ExecutorService executorService = Executors.newSingleThreadExecutor();
             this.pumpMessage(receiver, executorService);
-            log.info("\tDone receiving messages from \n" + receiver.getEntityPath());
         } catch (IllegalArgumentException e) {
             ASBUtils.returnErrorValue(e.getMessage());
         }
@@ -131,8 +130,7 @@ public class MessageDispatcher {
      */
     public void pumpMessage(IMessageReceiver receiver, ExecutorService executorService) {
         if(isClosing()) {
-            CompletableFuture<IMessage> receiveMessageFuture = receiver.receiveAsync(Duration.ofSeconds(5));
-            log.info("\n\tWaiting up to 5 seconds for messages from  ...\n" + receiver.getEntityPath());
+            CompletableFuture<IMessage> receiveMessageFuture = receiver.receiveAsync();
 
             receiveMessageFuture.handleAsync((message, receiveEx) -> {
                 if (receiveEx != null) {
@@ -142,8 +140,6 @@ public class MessageDispatcher {
                     log.info("Receive from entity returned no messages.");
                     pumpMessage(receiver, executorService);
                 } else {
-                    log.info("\t<= Received a message with messageId \n" + message.getMessageId());
-                    log.info("\t<= Received a message with messageBody \n" + new String(message.getBody(), UTF_8));
                     handleDispatch(message.getBody());
                     try {
                         receiver.complete(message.getLockToken());
@@ -198,7 +194,6 @@ public class MessageDispatcher {
      * @param message Received azure service bus message instance.
      */
     private BObject getMessageBObject(byte[] message)  {
-        log.info("\t<= Received a message with messageBody \n" + new String(message, UTF_8));
         BObject messageBObject = BValueCreator.createObjectValue(ASBConstants.PACKAGE_ID_ASB,
                 ASBConstants.MESSAGE_OBJECT);
         messageBObject.set(ASBConstants.MESSAGE_CONTENT, BValueCreator.createArrayValue(message));
