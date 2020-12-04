@@ -406,7 +406,7 @@ public class ConnectionUtils {
                     ASBConstants.MESSAGES_OBJECT);
 
             log.info("\n\tWaiting up to 5 seconds for messages from  ...\n" + receiver.getEntityPath());
-            for(int j=0; j<maxMessageCount; j++) {
+            for(int j=0; j < maxMessageCount; j++) {
                 IMessage receivedMessage = receiver.receive(Duration.ofSeconds(5));
 
                 if (receivedMessage == null) {
