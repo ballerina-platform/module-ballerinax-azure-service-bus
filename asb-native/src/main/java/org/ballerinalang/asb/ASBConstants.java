@@ -67,6 +67,8 @@ public class ASBConstants {
     public static final String CONSUMER_SERVICES = "consumer_services";
     public static final String STARTED_SERVICES = "started_services";
     public static final String FUNC_ON_MESSAGE = "onMessage";
+    public static final String FUNC_ON_ERROR = "onError";
+    public static final String DISPATCH_ERROR = "Error occurred while dispatching the message. ";
 
     public static final BString QUEUE_NAME = BStringUtils.fromString("queueName");
     public static final BString CONNECTION_STRING = BStringUtils.fromString("connectionString");

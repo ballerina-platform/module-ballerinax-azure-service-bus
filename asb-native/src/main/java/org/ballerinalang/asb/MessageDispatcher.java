@@ -51,6 +51,8 @@ public class MessageDispatcher {
     private IMessageReceiver receiver;
     private static final StrandMetadata ON_MESSAGE_METADATA = new StrandMetadata(ORG_NAME, ASB,
             ASB_VERSION, FUNC_ON_MESSAGE);
+    private static final StrandMetadata ON_ERROR_METADATA = new StrandMetadata(ORG_NAME, ASB,
+            ASB_VERSION, FUNC_ON_ERROR);
 
     /**
      * Initialize the Message Dispatcher.
@@ -183,6 +185,23 @@ public class MessageDispatcher {
         } catch (BError exception) {
             ASBUtils.returnErrorValue("Error occur while dispatching the message to the service " +
                     exception.getMessage());
+            handleError(message);
+        }
+    }
+
+    /**
+     * Handle error when dispatching message to the service.
+     *
+     * @param message Received azure service bus message instance.
+     */
+    private void handleError(byte[] message) {
+        BError error = ASBUtils.returnErrorValue(ASBConstants.DISPATCH_ERROR);
+        BObject messageBObject = getMessageBObject(message);
+        try {
+            AsyncFunctionCallback callback = new ASBResourceCallback();
+            executeResourceOnError(callback, messageBObject, true, error, true);
+        } catch (BError exception) {
+            throw ASBUtils.returnErrorValue("Error occurred in RabbitMQ service. ");
         }
     }
 
@@ -201,6 +220,10 @@ public class MessageDispatcher {
 
     private void executeResourceOnMessage(AsyncFunctionCallback callback, Object... args) {
         executeResource(ASBConstants.FUNC_ON_MESSAGE, callback, ON_MESSAGE_METADATA, args);
+    }
+
+    private void executeResourceOnError(AsyncFunctionCallback callback, Object... args) {
+        executeResource(ASBConstants.FUNC_ON_ERROR, callback, ON_ERROR_METADATA, args);
     }
 
     private void executeResource(String function, AsyncFunctionCallback callback, StrandMetadata metaData,
