@@ -111,9 +111,9 @@ public class ListenerUtils {
         if (services == null || services.isEmpty()) {
             return null;
         }
-        serviceAttached = true;
         for (BObject service : services) {
             if (startedServices == null || !startedServices.contains(service)) {
+                serviceAttached = true;
                 MessageDispatcher messageDispatcher =
                         new MessageDispatcher(service, runtime, iMessageReceiver);
                 messageDispatcher.receiveMessages(listenerBObject);
@@ -141,16 +141,11 @@ public class ListenerUtils {
                 (ArrayList<BObject>) listenerBObject.getNativeData(ASBConstants.CONSUMER_SERVICES);
         String queueName = (String) service.getNativeData(ASBConstants.QUEUE_NAME.getValue());
 
-        try {
-            iMessageReceiver.close();
-            log.info("Consumer service unsubscribed from the queue " + queueName);
-        } catch (ServiceBusException e) {
-            return ASBUtils.returnErrorValue("Error occurred while detaching the service");
-        }
+        serviceAttached = false;
+        log.info("Consumer service unsubscribed from the queue " + queueName);
 
         listenerBObject.addNativeData(ASBConstants.CONSUMER_SERVICES, removeFromList(services, service));
         listenerBObject.addNativeData(ASBConstants.STARTED_SERVICES, removeFromList(startedServices, service));
-        serviceAttached = false;
         return null;
     }
 
@@ -166,6 +161,7 @@ public class ListenerUtils {
             return ASBUtils.returnErrorValue("IMessageReceiver is not properly initialised.");
         } else {
             try {
+                serviceAttached = false;
                 iMessageReceiver.close();
                 log.info("Consumer service stopped");
             } catch (ServiceBusException e) {
