@@ -223,7 +223,7 @@ public class ListenerUtils {
         return started;
     }
 
-    public static boolean isClosing() {
+    public static boolean isServiceAttached() {
         return serviceAttached;
     }
 }

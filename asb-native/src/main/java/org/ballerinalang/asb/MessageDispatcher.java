@@ -29,16 +29,14 @@ import org.ballerinalang.jvm.types.AttachedFunction;
 import org.ballerinalang.jvm.runtime.AsyncFunctionCallback;
 import org.ballerinalang.jvm.api.BRuntime;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.ballerinalang.asb.ASBConstants.*;
-import static org.ballerinalang.asb.connection.ListenerUtils.isClosing;
+import static org.ballerinalang.asb.connection.ListenerUtils.isServiceAttached;
 
 /**
  * Handles and dispatched messages with data binding.
@@ -129,7 +127,7 @@ public class MessageDispatcher {
      * @param executorService Thread executor for processing the messages.
      */
     public void pumpMessage(IMessageReceiver receiver, ExecutorService executorService) {
-        if(isClosing()) {
+        if(isServiceAttached()) {
             CompletableFuture<IMessage> receiveMessageFuture = receiver.receiveAsync();
 
             receiveMessageFuture.handleAsync((message, receiveEx) -> {
