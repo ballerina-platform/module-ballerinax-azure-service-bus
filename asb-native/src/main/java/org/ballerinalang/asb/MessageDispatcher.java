@@ -228,6 +228,6 @@ public class MessageDispatcher {
 
     private void executeResource(String function, AsyncFunctionCallback callback, StrandMetadata metaData,
                                  Object... args) {
-        runtime.invokeMethodAsync(service, function, null, metaData, callback,args);
+        runtime.invokeMethodAsync(service, function, null, metaData, callback, args);
     }
 }

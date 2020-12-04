@@ -87,7 +87,7 @@ public class ListenerUtils {
         }
         if (isStarted()) {
             services = (ArrayList<BObject>) listenerBObject.getNativeData(ASBConstants.CONSUMER_SERVICES);
-            startReceivingMessages(service,  listenerBObject, receiveClient);
+            startReceivingMessages(service, listenerBObject, receiveClient);
         }
         services.add(service);
         return null;
