@@ -465,9 +465,9 @@ public class ConnectionUtils {
             // receive messages from queue
             String receivedMessageId = "";
 
-            log.info("\n\tWaiting up to 5 seconds for messages from  ...\n" + receiver.getEntityPath());
+            log.info("\n\tWaiting up to default server time for messages from  ...\n" + receiver.getEntityPath());
             while (true) {
-                IMessage receivedMessage = receiver.receive(Duration.ofSeconds(5));
+                IMessage receivedMessage = receiver.receive();
 
                 if (receivedMessage == null) {
                     break;
