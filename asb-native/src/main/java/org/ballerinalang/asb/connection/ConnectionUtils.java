@@ -350,6 +350,7 @@ public class ConnectionUtils {
         String messageId = map.get(MESSAGE_ID) != null ? map.get(MESSAGE_ID) : UUID.randomUUID().toString();
         String to = valueToStringOrEmpty(map, TO);
         String replyTo = valueToStringOrEmpty(map, REPLY_TO);
+        String replyToSessionId = valueToStringOrEmpty(map, REPLY_TO_SESSION_ID);
         String label = valueToStringOrEmpty(map,LABEL);
         String sessionId = valueToStringOrEmpty(map, SESSION_ID);
         String correlationId = valueToStringOrEmpty(map, CORRELATION_ID);
@@ -369,6 +370,7 @@ public class ConnectionUtils {
                 message.setMessageId(messageId);
                 message.setTo(to);
                 message.setReplyTo(replyTo);
+                message.setReplyToSessionId(replyToSessionId);
                 message.setLabel(label);
                 message.setSessionId(sessionId);
                 message.setCorrelationId(correlationId);
