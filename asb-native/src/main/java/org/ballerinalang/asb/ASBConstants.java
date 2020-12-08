@@ -57,6 +57,7 @@ public class ASBConstants {
     public static final String MESSAGE_ID = "messageId";
     public static final String TO = "to";
     public static final String REPLY_TO = "replyTo";
+    public static final String REPLY_TO_SESSION_ID = "replyToSessionId";
     public static final String LABEL = "label";
     public static final String SESSION_ID = "sessionId";
     public static final String CORRELATION_ID = "correlationId";
