@@ -71,6 +71,7 @@ public class SenderConnection {
     # + messageId - This is a user-defined value that Service Bus can use to identify duplicate messages, if enabled
     # + to - Send to address
     # + replyTo - Address of the queue to reply to
+    # + replyToSessionId - Identifier of the session to reply to
     # + label - Application specific label
     # + sessionId - Identifier of the session
     # + correlationId - Identifier of the correlation
@@ -79,11 +80,11 @@ public class SenderConnection {
     #                message is sent to the Service Bus.
     # + return - An `asb:Error` if failed to send message or else `()`
     public isolated function sendMessage(byte[] content, string contentType, string messageId, string to, 
-        string replyTo, string label, string sessionId, string correlationId, map<string> properties, int timeToLive) 
-            returns Error? {
+        string replyTo, string replyToSessionId, string label, string sessionId, string correlationId, 
+        map<string> properties, int timeToLive) returns Error? {
         return sendMessage(self.asbSenderConnection, content, java:fromString(contentType), java:fromString(messageId), 
-            java:fromString(to), java:fromString(replyTo), java:fromString(label), java:fromString(sessionId), 
-            java:fromString(correlationId), properties, timeToLive);
+            java:fromString(to), java:fromString(replyTo), java:fromString(replyToSessionId), java:fromString(label), 
+            java:fromString(sessionId), java:fromString(correlationId), properties, timeToLive);
     }
 
     # Send batch of messages to queue with a content and optional parameters
@@ -117,8 +118,8 @@ isolated function sendMessageWithConfigurableParameters(handle imessageSender, b
 } external;
 
 isolated function sendMessage(handle imessageSender, byte[] content, handle contentType, handle messageId, handle to, 
-    handle replyTo, handle label, handle sessionId, handle correlationId, map<string> properties, int timeToLive) 
-        returns Error? = @java:Method {
+    handle replyTo, handle replyToSessionId, handle label, handle sessionId, handle correlationId, 
+    map<string> properties, int timeToLive) returns Error? = @java:Method {
     name: "sendMessage",
     'class: "org.ballerinalang.asb.connection.ConnectionUtils"
 } external;
