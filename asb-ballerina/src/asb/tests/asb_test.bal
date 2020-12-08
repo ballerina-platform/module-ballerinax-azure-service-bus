@@ -48,6 +48,7 @@ map<string> parameters3 = {contentType: "application/json"};
 map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
 string asyncConsumerMessage = "";
 int maxMessageCount = 3;
+int maxMessageCount1 = 2;
 int serverWaitTime = 5;
 
 # Before Suite Function
@@ -90,7 +91,7 @@ public function testReceieverConnection() {
 
 # Test send to queue operation
 @test:Config {
-    enable: true
+    enable: false
 }
 function testSendToQueueOperation() {
     log:printInfo("Creating Asb sender connection.");
@@ -100,6 +101,7 @@ function testSendToQueueOperation() {
         log:printInfo("Sending via Asb sender connection.");
         checkpanic senderConnection.sendMessageWithConfigurableParameters(byteContent, parameters1, properties);
         checkpanic senderConnection.sendMessageWithConfigurableParameters(byteContentFromJson, parameters2, properties);
+        checkpanic senderConnection.sendMessageWithConfigurableParameters(byteContent, parameters1, properties);
     } else {
         test:assertFail("Asb sender connection creation failed.");
     }
@@ -152,7 +154,7 @@ function testReceiveMessagesFromQueueOperation() {
 
     if (receiverConnection is ReceiverConnection) {
         log:printInfo("Receiving from Asb receiver connection.");
-        var messageReceived = receiverConnection.receiveMessages(serverWaitTime);
+        var messageReceived = receiverConnection.receiveMessages(serverWaitTime, maxMessageCount);
         if(messageReceived is Messages) {
             int val = messageReceived.getDeliveryTag();
             log:printInfo("No. of messages received : " + val.toString());
@@ -162,7 +164,7 @@ function testReceiveMessagesFromQueueOperation() {
             json messageReceived2 =  checkpanic messages[1].getJSONContent();
             log:printInfo("Message2 content : " +messageReceived2.toString());
         } else {
-            test:assertFail("Asb sender connection creation failed.");
+            test:assertFail(msg = messageReceived.message());
         }
     } else {
         test:assertFail("Asb receiver connection creation failed.");
@@ -713,7 +715,7 @@ service {
 # Test Listener capabilities
 @test:Config {
     dependsOn: ["testSendToQueueOperation"], 
-    enable: true
+    enable: false
 }
 public function testAsyncConsumer() {
 
@@ -734,6 +736,62 @@ public function testAsyncConsumer() {
         checkpanic channelListener.__gracefulStop();
         checkpanic channelListener.__immediateStop();
         test:assertEquals(asyncConsumerMessage, message, msg = "Message received does not match.");
+    }
+}
+
+# Test send duplicate to queue operation
+@test:Config {
+    enable: true
+}
+function testSendDuplicateToQueueOperation() {
+    log:printInfo("Creating Asb sender connection.");
+    SenderConnection? senderConnection = new ({connectionString: connectionString, entityPath: queuePath});
+
+    if (senderConnection is SenderConnection) {
+        log:printInfo("Sending via Asb sender connection.");
+        checkpanic senderConnection.sendMessageWithConfigurableParameters(byteContent, parameters1, properties);
+        checkpanic senderConnection.sendMessageWithConfigurableParameters(byteContent, parameters1, properties);
+    } else {
+        test:assertFail("Asb sender connection creation failed.");
+    }
+
+    if (senderConnection is SenderConnection) {
+        log:printInfo("Closing Asb sender connection.");
+        checkpanic senderConnection.closeSenderConnection();
+    }
+}
+
+# Test receive duplicate messages from queue operation
+@test:Config {
+    dependsOn: ["testSendDuplicateToQueueOperation"], 
+    enable: true
+}
+function testReceiveDuplicateMessagesFromQueueOperation() {
+    log:printInfo("Creating Asb receiver connection.");
+    ReceiverConnection? receiverConnection = new ({connectionString: connectionString, entityPath: queuePath});
+
+    if (receiverConnection is ReceiverConnection) {
+        log:printInfo("Receiving from Asb receiver connection.");
+        var messageReceived = receiverConnection.receiveMessages(serverWaitTime, maxMessageCount1);
+        if(messageReceived is Messages) {
+            int val = messageReceived.getDeliveryTag();
+            log:printInfo("No. of messages received : " + val.toString());
+            Message[] messages = messageReceived.getMessages();
+            string messageReceived1 =  checkpanic messages[0].getTextContent();
+            log:printInfo("Message1 content : " +messageReceived1);
+            string messageReceived2 =  checkpanic messages[1].getTextContent();
+            log:printInfo("Message2 content : " +messageReceived2.toString());
+        } else {
+            test:assertEquals(messageReceived.message(), "Received a duplicate message!", 
+                msg = "Error message does not match");
+        }
+    } else {
+        test:assertFail("Asb receiver connection creation failed.");
+    }
+
+    if (receiverConnection is ReceiverConnection) {
+        log:printInfo("Closing Asb receiver connection.");
+        checkpanic receiverConnection.closeReceiverConnection();
     }
 }
 
