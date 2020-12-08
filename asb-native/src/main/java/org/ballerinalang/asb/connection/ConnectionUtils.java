@@ -291,7 +291,7 @@ public class ConnectionUtils {
             BObject messagesBObject = BValueCreator.createObjectValue(ASBConstants.PACKAGE_ID_ASB,
                     ASBConstants.MESSAGES_OBJECT);
 
-            log.info("\n\tWaiting up to 'serverWaitTime' seconds for messages from n" + receiver.getEntityPath());
+            log.info("\n\tWaiting up to 'serverWaitTime' seconds for messages from " + receiver.getEntityPath());
             while (true) {
                 IMessage receivedMessage = receiver.receive(Duration.ofSeconds(serverWaitTime));
 
@@ -413,9 +413,9 @@ public class ConnectionUtils {
             BObject messagesBObject = BValueCreator.createObjectValue(ASBConstants.PACKAGE_ID_ASB,
                     ASBConstants.MESSAGES_OBJECT);
 
-            log.info("\n\tWaiting up to 5 seconds for messages from  ...\n" + receiver.getEntityPath());
+            log.info("\n\tWaiting up to default server time for messages from  ...\n" + receiver.getEntityPath());
             for(int j=0; j < maxMessageCount; j++) {
-                IMessage receivedMessage = receiver.receive(Duration.ofSeconds(5));
+                IMessage receivedMessage = receiver.receive();
 
                 if (receivedMessage == null) {
                     continue;
