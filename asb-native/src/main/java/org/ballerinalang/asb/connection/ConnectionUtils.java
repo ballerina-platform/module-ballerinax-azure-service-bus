@@ -278,14 +278,16 @@ public class ConnectionUtils {
      *
      * @param receiver Output Receiver connection.
      * @param serverWaitTime Specified server wait time in seconds to receive message.
+     * @param maxMessageCount Maximum no. of messages in a batch
      * @return Message Object of the received message.
      */
-    public static Object receiveMessages(IMessageReceiver receiver, int serverWaitTime) throws Exception {
+    public static Object receiveMessages(IMessageReceiver receiver, int serverWaitTime, int maxMessageCount)
+            throws Exception {
         try {
             // receive messages from queue or subscription
             String receivedMessageId = "";
             BArrayType sourceArrayType = null;
-            BObject[] bObjectArray = new BObject[2];
+            BObject[] bObjectArray = new BObject[maxMessageCount];
             int i = 0;
 
             BObject messagesBObject = BValueCreator.createObjectValue(ASBConstants.PACKAGE_ID_ASB,
@@ -295,7 +297,7 @@ public class ConnectionUtils {
             while (true) {
                 IMessage receivedMessage = receiver.receive(Duration.ofSeconds(serverWaitTime));
 
-                if (receivedMessage == null) {
+                if (receivedMessage == null || i == maxMessageCount) {
                     break;
                 }
                 log.info("\t<= Received a message with messageId \n" + receivedMessage.getMessageId());
