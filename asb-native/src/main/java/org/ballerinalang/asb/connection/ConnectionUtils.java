@@ -30,6 +30,7 @@ import org.ballerinalang.jvm.api.BValueCreator;
 import org.ballerinalang.jvm.types.BArrayType;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -139,6 +140,7 @@ public class ConnectionUtils {
      * @param messageId Input Message Id
      * @param to Input Message to
      * @param replyTo Input Message reply to
+     * @param replyToSessionId Identifier of the session to reply to
      * @param label Input Message label
      * @param sessionId Input Message session Id
      * @param correlationId Input Message correlationId
@@ -146,8 +148,9 @@ public class ConnectionUtils {
      * @param timeToLive Input Message time to live in minutes
      */
     public static void sendMessage(IMessageSender sender, BArray content, String contentType, String messageId,
-                                   String to, String replyTo, String label, String sessionId, String correlationId,
-                                   BMap<String, String> properties, int timeToLive) throws Exception {
+                                   String to, String replyTo, String replyToSessionId, String label, String sessionId,
+                                   String correlationId, BMap<String, String> properties, int timeToLive)
+            throws Exception {
         try {
             // Send messages to queue
             log.info("\tSending messages to ...\n" + sender.getEntityPath());
@@ -160,6 +163,7 @@ public class ConnectionUtils {
             message.setMessageId(messageId);
             message.setTo(to);
             message.setReplyTo(replyTo);
+            message.setReplyToSessionId(replyToSessionId);
             message.setLabel(label);
             message.setSessionId(sessionId);
             message.setCorrelationId(correlationId);
