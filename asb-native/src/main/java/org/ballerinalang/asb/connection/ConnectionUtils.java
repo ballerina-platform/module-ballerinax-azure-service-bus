@@ -556,6 +556,37 @@ public class ConnectionUtils {
     }
 
     /**
+     * Dead-Letter the message & moves the message to the Dead-Letter Queue based on messageLockToken
+     *
+     * @param receiver Output Receiver connection.
+     */
+    public static void deadLetterMessage(IMessageReceiver receiver, String deadLetterReason,
+                                         String deadLetterErrorDescription) throws Exception {
+        try {
+            log.info("\n\tWaiting up to default server wait time for messages from  ...\n" +
+                    receiver.getEntityPath());
+            IMessage receivedMessage = receiver.receive();
+
+            if (receivedMessage != null) {
+                log.info("\t<= Received a message with messageId \n" + receivedMessage.getMessageId());
+                log.info("\t<= Dead-Letter a message with messageLockToken \n" + receivedMessage.getLockToken());
+                receiver.deadLetter(receivedMessage.getLockToken(), deadLetterReason, deadLetterErrorDescription);
+
+                log.info("\tDone dead-lettering a message using its lock token from \n" +
+                        receiver.getEntityPath());
+            } else {
+                log.info("\t<= No message in the queue \n");
+            }
+        } catch (InterruptedException e) {
+            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
+                    + e.getMessage());
+        } catch (ServiceBusException e) {
+            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
+                    + e.getMessage());
+        }
+    }
+
+    /**
      * Get the map value as string or as empty based on the key.
      *
      * @param map Input map.

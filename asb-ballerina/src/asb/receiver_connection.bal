@@ -92,11 +92,22 @@ public class ReceiverConnection {
         return completeOneMessage(self.asbReceiverConnection);
     }
 
-    # Abandon message & make available again for processing from Queue or Subscription based on messageLockToken
+    # Abandon message & make available again for processing from Queue or Subscription based on messageLockToken.
     # 
     # + return - An `asb:Error` if failed to abandon message or else `()`
     public isolated function abandonMessage() returns Error? {
         return abandonMessage(self.asbReceiverConnection);
+    }
+
+    # Dead-Letter the message & moves the message to the Dead-Letter Queue based on messageLockToken.
+    # 
+    # + deadLetterReason - The deadletter reason.
+    # + deadLetterErrorDescription - The deadletter error description.
+    # + return - An `asb:Error` if failed to abandon message or else `()`
+    public isolated function deadLetterMessage(string deadLetterReason, string deadLetterErrorDescription) 
+        returns Error? {
+        return deadLetterMessage(self.asbReceiverConnection, java:fromString(deadLetterReason), 
+            java:fromString(deadLetterErrorDescription));
     }
 
     # Get the asbReceiverConnection instance
@@ -147,5 +158,11 @@ isolated function completeOneMessage(handle imessageReceiver) returns Error? = @
 
 isolated function abandonMessage(handle imessageReceiver) returns Error? = @java:Method {
     name: "abandonMessage",
+    'class: "org.ballerinalang.asb.connection.ConnectionUtils"
+} external;
+
+isolated function deadLetterMessage(handle imessageReceiver, handle deadLetterReason, handle deadLetterErrorDescription) 
+    returns Error? = @java:Method {
+    name: "deadLetterMessage",
     'class: "org.ballerinalang.asb.connection.ConnectionUtils"
 } external;
