@@ -690,6 +690,24 @@ public class ConnectionUtils {
     }
 
     /**
+     * Set the prefetch count of the receiver.
+     * Prefetch speeds up the message flow by aiming to have a message readily available for local retrieval when and
+     * before the application asks for one using Receive. Setting a non-zero value prefetches PrefetchCount
+     * number of messages. Setting the value to zero turns prefetch off. For both PEEKLOCK mode and
+     * RECEIVEANDDELETE mode, the default value is 0.
+     *
+     * @param receiver Output Receiver connection.
+     * @param prefetchCount The desired prefetch count.
+     */
+    public static void setPrefetchCount(IMessageReceiver receiver, int prefetchCount) throws Exception {
+        try {
+            receiver.setPrefetchCount(prefetchCount);
+        } catch (ServiceBusException e) {
+            throw ASBUtils.returnErrorValue("Setting the prefetch value failed" + e.getMessage());
+        }
+    }
+
+    /**
      * Get the map value as string or as empty based on the key.
      *
      * @param map Input map.

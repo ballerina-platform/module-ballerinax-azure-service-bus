@@ -50,6 +50,8 @@ string asyncConsumerMessage = "";
 int maxMessageCount = 3;
 int maxMessageCount1 = 2;
 int serverWaitTime = 5;
+int prefetchCount = 50;
+int messageCount = 5;
 
 # Before Suite Function
 @test:BeforeSuite
@@ -310,7 +312,7 @@ function testAbandonMessageFromQueueOperation() {
 
 # Test send to topic operation
 @test:Config {
-    enable: true
+    enable: false
 }
 function testSendToTopicOperation() {
     log:printInfo("Creating Asb sender connection.");
@@ -1075,7 +1077,7 @@ function testRenewLockOnMessageFromQueueOperation() {
 # Test Renew Lock on Message from subscription operation
 @test:Config {
     dependsOn: ["testSendToTopicOperation"], 
-    enable: true
+    enable: false
 }
 function testRenewLockOnMessageFromSubscriptionOperation() {
     log:printInfo("Creating Asb receiver connection.");
@@ -1129,6 +1131,59 @@ function testRenewLockOnMessageFromSubscriptionOperation() {
     if (receiverConnection3 is ReceiverConnection) {
         log:printInfo("Closing Asb receiver connection 3.");
         checkpanic receiverConnection3.closeReceiverConnection();
+    }
+}
+
+# Test prefetch count operation
+@test:Config {
+    enable: true
+}
+function testPrefetchCount() {
+    log:printInfo("Creating Asb sender connection.");
+    SenderConnection? senderConnection = new ({connectionString: connectionString, entityPath: queuePath});
+
+    if (senderConnection is SenderConnection) {
+        int i = 1;
+        while (i <= messageCount) {
+            log:printInfo("Sending message " + i.toString() + " via Asb sender connection.");
+            checkpanic senderConnection.sendMessageWithConfigurableParameters(byteContent, parameters1, properties);
+            i = i + 1;
+        }
+    } else {
+        test:assertFail("Asb sender connection creation failed.");
+    }
+
+    if (senderConnection is SenderConnection) {
+        log:printInfo("Closing Asb sender connection.");
+        checkpanic senderConnection.closeSenderConnection();
+    }
+
+    log:printInfo("Creating Asb receiver connection.");
+    ReceiverConnection? receiverConnection = new ({connectionString: connectionString, entityPath: queuePath});
+
+    if (receiverConnection is ReceiverConnection) {
+        log:printInfo("Setting the prefetch count for the Asb receiver connection as : " + prefetchCount.toString());
+        checkpanic receiverConnection.setPrefetchCount(prefetchCount);
+
+        int i = 1;
+        while (i <= messageCount) {
+            log:printInfo("Receiving message " + i.toString() + " from Asb receiver connection.");
+            Message|Error messageReceived = receiverConnection.receiveMessage(serverWaitTime);
+            if (messageReceived is Message) {
+                string messageRead = checkpanic messageReceived.getTextContent();
+                log:printInfo("Reading Received Message " + i.toString() + " : " + messageRead);
+            } else {
+                test:assertFail("Receiving message via Asb receiver connection failed.");
+            }
+            i = i + 1;
+        }
+    } else {
+        test:assertFail("Asb receiver connection creation failed.");
+    }
+
+    if (receiverConnection is ReceiverConnection) {
+        log:printInfo("Closing Asb receiver connection.");
+        checkpanic receiverConnection.closeReceiverConnection();
     }
 }
 

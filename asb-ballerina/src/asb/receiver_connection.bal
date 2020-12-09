@@ -128,18 +128,30 @@ public class ReceiverConnection {
         return receiveDeferredMessage(self.asbReceiverConnection, sequenceNumber);
     }
 
-    # Get the asbReceiverConnection instance
-    # 
-    # + return - asbReceiverConnection instance
-    isolated function getAsbReceiverConnection() returns handle {
-        return self.asbReceiverConnection;
-    }
-
     # The operation renews lock on a message in a queue or subscription based on messageLockToken.
     # 
     # + return - An `asb:Error` if failed to renew message or else `()`
     public isolated function renewLockOnMessage() returns Error? {
         return renewLockOnMessage(self.asbReceiverConnection);
+    }
+
+    # Set the prefetch count of the receiver.
+    # Prefetch speeds up the message flow by aiming to have a message readily available for local retrieval when and
+    # before the application asks for one using Receive. Setting a non-zero value prefetches PrefetchCount
+    # number of messages. Setting the value to zero turns prefetch off. For both PEEKLOCK mode and
+    # RECEIVEANDDELETE mode, the default value is 0.
+    # 
+    # + prefetchCount - The desired prefetch count.
+    # + return - An `asb:Error` if failed to renew message or else `()`
+    public isolated function setPrefetchCount(int prefetchCount) returns Error? {
+        return setPrefetchCount(self.asbReceiverConnection, prefetchCount);
+    }
+
+    # Get the asbReceiverConnection instance
+    # 
+    # + return - asbReceiverConnection instance
+    isolated function getAsbReceiverConnection() returns handle {
+        return self.asbReceiverConnection;
     }
 }
 
@@ -205,5 +217,10 @@ isolated function receiveDeferredMessage(handle imessageReceiver, int sequenceNu
 
 isolated function renewLockOnMessage(handle imessageReceiver) returns Error? = @java:Method {
     name: "renewLockOnMessage",
+    'class: "org.ballerinalang.asb.connection.ConnectionUtils"
+} external;
+
+isolated function setPrefetchCount(handle imessageReceiver, int prefetchCount) returns Error? = @java:Method {
+    name: "setPrefetchCount",
     'class: "org.ballerinalang.asb.connection.ConnectionUtils"
 } external;
