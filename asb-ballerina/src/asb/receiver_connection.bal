@@ -134,6 +134,13 @@ public class ReceiverConnection {
     isolated function getAsbReceiverConnection() returns handle {
         return self.asbReceiverConnection;
     }
+
+    # The operation renews lock on a message in a queue or subscription based on messageLockToken.
+    # 
+    # + return - An `asb:Error` if failed to renew message or else `()`
+    public isolated function renewLockOnMessage() returns Error? {
+        return renewLockOnMessage(self.asbReceiverConnection);
+    }
 }
 
 isolated function createReceiverConnection(handle connectionString, handle entityPath) 
@@ -193,5 +200,10 @@ isolated function deferMessage(handle imessageReceiver) returns int|Error = @jav
 isolated function receiveDeferredMessage(handle imessageReceiver, int sequenceNumber) 
     returns Message|Error = @java:Method {
     name: "receiveDeferredMessage",
+    'class: "org.ballerinalang.asb.connection.ConnectionUtils"
+} external;
+
+isolated function renewLockOnMessage(handle imessageReceiver) returns Error? = @java:Method {
+    name: "renewLockOnMessage",
     'class: "org.ballerinalang.asb.connection.ConnectionUtils"
 } external;

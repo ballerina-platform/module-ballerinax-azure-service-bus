@@ -101,7 +101,6 @@ function testSendToQueueOperation() {
         log:printInfo("Sending via Asb sender connection.");
         checkpanic senderConnection.sendMessageWithConfigurableParameters(byteContent, parameters1, properties);
         checkpanic senderConnection.sendMessageWithConfigurableParameters(byteContentFromJson, parameters2, properties);
-        checkpanic senderConnection.sendMessageWithConfigurableParameters(byteContent, parameters1, properties);
     } else {
         test:assertFail("Asb sender connection creation failed.");
     }
@@ -930,7 +929,7 @@ function testDeferFromQueueOperation() {
 # Test Defer Message from subscription operation
 @test:Config {
     dependsOn: ["testSendToTopicOperation"], 
-    enable: true
+    enable: false
 }
 function testDeferFromSubscriptionOperation() {
     log:printInfo("Creating Asb receiver connection.");
@@ -1027,6 +1026,92 @@ function testDeferFromSubscriptionOperation() {
         } else {
             test:assertFail(msg = sequenceNumber.message());
         }
+    } else {
+        test:assertFail("Asb receiver connection creation failed.");
+    }
+
+    if (receiverConnection1 is ReceiverConnection) {
+        log:printInfo("Closing Asb receiver connection 1.");
+        checkpanic receiverConnection1.closeReceiverConnection();
+    }
+
+    if (receiverConnection2 is ReceiverConnection) {
+        log:printInfo("Closing Asb receiver connection 2.");
+        checkpanic receiverConnection2.closeReceiverConnection();
+    }
+
+    if (receiverConnection3 is ReceiverConnection) {
+        log:printInfo("Closing Asb receiver connection 3.");
+        checkpanic receiverConnection3.closeReceiverConnection();
+    }
+}
+
+# Test Renew Lock on Message from queue operation
+@test:Config {
+    dependsOn: ["testSendToQueueOperation"], 
+    enable: false
+}
+function testRenewLockOnMessageFromQueueOperation() {
+    log:printInfo("Creating Asb receiver connection.");
+    ReceiverConnection? receiverConnection = new ({connectionString: connectionString, entityPath: queuePath});
+
+    if (receiverConnection is ReceiverConnection) {
+        log:printInfo("Renew lock on message from Asb receiver connection.");
+        checkpanic receiverConnection.renewLockOnMessage();
+        log:printInfo("Done renewing a message.");
+        log:printInfo("Completing messages from Asb receiver connection.");
+        checkpanic receiverConnection.completeMessages();
+        log:printInfo("Done completing messages using their lock tokens.");
+    } else {
+        test:assertFail("Asb receiver connection creation failed.");
+    }
+
+    if (receiverConnection is ReceiverConnection) {
+        log:printInfo("Closing Asb receiver connection.");
+        checkpanic receiverConnection.closeReceiverConnection();
+    }
+}
+
+# Test Renew Lock on Message from subscription operation
+@test:Config {
+    dependsOn: ["testSendToTopicOperation"], 
+    enable: true
+}
+function testRenewLockOnMessageFromSubscriptionOperation() {
+    log:printInfo("Creating Asb receiver connection.");
+    ReceiverConnection? receiverConnection1 = new ({connectionString: connectionString, entityPath: subscriptionPath1});
+    ReceiverConnection? receiverConnection2 = new ({connectionString: connectionString, entityPath: subscriptionPath2});
+    ReceiverConnection? receiverConnection3 = new ({connectionString: connectionString, entityPath: subscriptionPath3});
+
+    if (receiverConnection1 is ReceiverConnection) {
+        log:printInfo("Renew lock on message from Asb receiver connection 1.");
+        checkpanic receiverConnection1.renewLockOnMessage();
+        log:printInfo("Done renewing a message.");
+        log:printInfo("Completing messages from Asb receiver connection 1.");
+        checkpanic receiverConnection1.completeMessages();
+        log:printInfo("Done completing messages using their lock tokens.");
+    } else {
+        test:assertFail("Asb receiver connection creation failed.");
+    }
+
+    if (receiverConnection2 is ReceiverConnection) {
+        log:printInfo("Renew lock on message from Asb receiver connection 2.");
+        checkpanic receiverConnection2.renewLockOnMessage();
+        log:printInfo("Done renewing a message.");
+        log:printInfo("Completing messages from Asb receiver connection 2.");
+        checkpanic receiverConnection2.completeMessages();
+        log:printInfo("Done completing messages using their lock tokens.");
+    } else {
+        test:assertFail("Asb receiver connection creation failed.");
+    }
+
+    if (receiverConnection3 is ReceiverConnection) {
+        log:printInfo("Renew lock on message from Asb receiver connection 3.");
+        checkpanic receiverConnection3.renewLockOnMessage();
+        log:printInfo("Done renewing a message.");
+        log:printInfo("Completing messages from Asb receiver connection 3.");
+        checkpanic receiverConnection3.completeMessages();
+        log:printInfo("Done completing messages using their lock tokens.");
     } else {
         test:assertFail("Asb receiver connection creation failed.");
     }
