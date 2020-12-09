@@ -103,11 +103,29 @@ public class ReceiverConnection {
     # 
     # + deadLetterReason - The deadletter reason.
     # + deadLetterErrorDescription - The deadletter error description.
-    # + return - An `asb:Error` if failed to abandon message or else `()`
+    # + return - An `asb:Error` if failed to deadletter message or else `()`
     public isolated function deadLetterMessage(string deadLetterReason, string deadLetterErrorDescription) 
         returns Error? {
         return deadLetterMessage(self.asbReceiverConnection, java:fromString(deadLetterReason), 
             java:fromString(deadLetterErrorDescription));
+    }
+
+    #  Defer the message in a Queue or Subscription based on messageLockToken.
+    # 
+    # + return - An `asb:Error` if failed to defer message or else sequence number
+    public isolated function deferMessage() returns int|Error {
+        return deferMessage(self.asbReceiverConnection);
+    }
+
+    #  Receives a deferred Message. Deferred messages can only be received by using sequence number and return
+    #  Message object.
+    # 
+    # + sequenceNumber - Unique number assigned to a message by Service Bus. The sequence number is a unique 64-bit
+    #                    integer assigned to a message as it is accepted and stored by the broker and functions as
+    #                    its true identifier.
+    # + return - An `asb:Error` if failed to receive deferred message or else `()`
+    public isolated function receiveDeferredMessage(int sequenceNumber) returns Message|Error {
+        return receiveDeferredMessage(self.asbReceiverConnection, sequenceNumber);
     }
 
     # Get the asbReceiverConnection instance
@@ -164,5 +182,16 @@ isolated function abandonMessage(handle imessageReceiver) returns Error? = @java
 isolated function deadLetterMessage(handle imessageReceiver, handle deadLetterReason, handle deadLetterErrorDescription) 
     returns Error? = @java:Method {
     name: "deadLetterMessage",
+    'class: "org.ballerinalang.asb.connection.ConnectionUtils"
+} external;
+
+isolated function deferMessage(handle imessageReceiver) returns int|Error = @java:Method {
+    name: "deferMessage",
+    'class: "org.ballerinalang.asb.connection.ConnectionUtils"
+} external;
+
+isolated function receiveDeferredMessage(handle imessageReceiver, int sequenceNumber) 
+    returns Message|Error = @java:Method {
+    name: "receiveDeferredMessage",
     'class: "org.ballerinalang.asb.connection.ConnectionUtils"
 } external;

@@ -824,7 +824,7 @@ function testDeadLetterFromQueueOperation() {
 # Test Dead-Letter Message from subscription operation
 @test:Config {
     dependsOn: ["testSendToTopicOperation"], 
-    enable: true
+    enable: false
 }
 function testDeadLetterFromSubscriptionOperation() {
     log:printInfo("Creating Asb receiver connection.");
@@ -861,6 +861,172 @@ function testDeadLetterFromSubscriptionOperation() {
         log:printInfo("Completing messages from Asb receiver connection.");
         checkpanic receiverConnection3.completeMessages();
         log:printInfo("Done completing messages using their lock tokens.");
+    } else {
+        test:assertFail("Asb receiver connection creation failed.");
+    }
+
+    if (receiverConnection1 is ReceiverConnection) {
+        log:printInfo("Closing Asb receiver connection 1.");
+        checkpanic receiverConnection1.closeReceiverConnection();
+    }
+
+    if (receiverConnection2 is ReceiverConnection) {
+        log:printInfo("Closing Asb receiver connection 2.");
+        checkpanic receiverConnection2.closeReceiverConnection();
+    }
+
+    if (receiverConnection3 is ReceiverConnection) {
+        log:printInfo("Closing Asb receiver connection 3.");
+        checkpanic receiverConnection3.closeReceiverConnection();
+    }
+}
+
+# Test Defer Message from queue operation
+@test:Config {
+    dependsOn: ["testSendToQueueOperation"], 
+    enable: false
+}
+function testDeferFromQueueOperation() {
+    log:printInfo("Creating Asb receiver connection.");
+    ReceiverConnection? receiverConnection = new ({connectionString: connectionString, entityPath: queuePath});
+
+    if (receiverConnection is ReceiverConnection) {
+        log:printInfo("Defer message from Asb receiver connection.");
+        var sequenceNumber = receiverConnection.deferMessage();
+        log:printInfo("Done Deferring a message using its lock token.");
+        log:printInfo("Receiving from Asb receiver connection.");
+        Message|Error jsonMessageReceived = receiverConnection.receiveMessage(serverWaitTime);
+        if (jsonMessageReceived is Message) {
+            json jsonMessageRead = checkpanic jsonMessageReceived.getJSONContent();
+            log:printInfo("Reading Received Message : " + jsonMessageRead.toString());
+        } else {
+            test:assertFail("Receiving message via Asb receiver connection failed.");
+        }
+        log:printInfo("Receiving Deferred Message from Asb receiver connection.");
+        if(sequenceNumber is int) {
+            if(sequenceNumber == 0) {
+                test:assertFail("No message in the queue");
+            }
+            Message|Error messageReceived = receiverConnection.receiveDeferredMessage(sequenceNumber);
+            if (messageReceived is Message) {
+                string messageRead = checkpanic messageReceived.getTextContent();
+                log:printInfo("Reading Received Message : " + messageRead);
+            } else {
+                test:assertFail(msg = messageReceived.message());
+            }
+        } else {
+            test:assertFail(msg = sequenceNumber.message());
+        }
+    } else {
+        test:assertFail("Asb receiver connection creation failed.");
+    }
+
+    if (receiverConnection is ReceiverConnection) {
+        log:printInfo("Closing Asb receiver connection.");
+        checkpanic receiverConnection.closeReceiverConnection();
+    }
+}
+
+# Test Defer Message from subscription operation
+@test:Config {
+    dependsOn: ["testSendToTopicOperation"], 
+    enable: true
+}
+function testDeferFromSubscriptionOperation() {
+    log:printInfo("Creating Asb receiver connection.");
+    ReceiverConnection? receiverConnection1 = new ({connectionString: connectionString, entityPath: subscriptionPath1});
+    ReceiverConnection? receiverConnection2 = new ({connectionString: connectionString, entityPath: subscriptionPath2});
+    ReceiverConnection? receiverConnection3 = new ({connectionString: connectionString, entityPath: subscriptionPath3});
+
+    if (receiverConnection1 is ReceiverConnection) {
+        log:printInfo("Defer message from Asb receiver connection.");
+        var sequenceNumber = receiverConnection1.deferMessage();
+        log:printInfo("Done Deferring a message using its lock token.");
+        log:printInfo("Receiving from Asb receiver connection.");
+        Message|Error jsonMessageReceived = receiverConnection1.receiveMessage(serverWaitTime);
+        if (jsonMessageReceived is Message) {
+            json jsonMessageRead = checkpanic jsonMessageReceived.getJSONContent();
+            log:printInfo("Reading Received Message : " + jsonMessageRead.toString());
+        } else {
+            test:assertFail("Receiving message via Asb receiver connection failed.");
+        }
+        log:printInfo("Receiving Deferred Message from Asb receiver connection.");
+        if(sequenceNumber is int) {
+            if(sequenceNumber == 0) {
+                test:assertFail("No message in the queue");
+            }
+            Message|Error messageReceived = receiverConnection1.receiveDeferredMessage(sequenceNumber);
+            if (messageReceived is Message) {
+                string messageRead = checkpanic messageReceived.getTextContent();
+                log:printInfo("Reading Received Message : " + messageRead);
+            } else {
+                test:assertFail(msg = messageReceived.message());
+            }
+        } else {
+            test:assertFail(msg = sequenceNumber.message());
+        }
+    } else {
+        test:assertFail("Asb receiver connection creation failed.");
+    }
+
+    if (receiverConnection2 is ReceiverConnection) {
+        log:printInfo("Defer message from Asb receiver connection.");
+        var sequenceNumber = receiverConnection2.deferMessage();
+        log:printInfo("Done Deferring a message using its lock token.");
+        log:printInfo("Receiving from Asb receiver connection.");
+        Message|Error jsonMessageReceived = receiverConnection2.receiveMessage(serverWaitTime);
+        if (jsonMessageReceived is Message) {
+            json jsonMessageRead = checkpanic jsonMessageReceived.getJSONContent();
+            log:printInfo("Reading Received Message : " + jsonMessageRead.toString());
+        } else {
+            test:assertFail("Receiving message via Asb receiver connection failed.");
+        }
+        log:printInfo("Receiving Deferred Message from Asb receiver connection.");
+        if(sequenceNumber is int) {
+            if(sequenceNumber == 0) {
+                test:assertFail("No message in the queue");
+            }
+            Message|Error messageReceived = receiverConnection2.receiveDeferredMessage(sequenceNumber);
+            if (messageReceived is Message) {
+                string messageRead = checkpanic messageReceived.getTextContent();
+                log:printInfo("Reading Received Message : " + messageRead);
+            } else {
+                test:assertFail(msg = messageReceived.message());
+            }
+        } else {
+            test:assertFail(msg = sequenceNumber.message());
+        }
+    } else {
+        test:assertFail("Asb receiver connection creation failed.");
+    }
+
+    if (receiverConnection3 is ReceiverConnection) {
+        log:printInfo("Defer message from Asb receiver connection.");
+        var sequenceNumber = receiverConnection3.deferMessage();
+        log:printInfo("Done Deferring a message using its lock token.");
+        log:printInfo("Receiving from Asb receiver connection.");
+        Message|Error jsonMessageReceived = receiverConnection3.receiveMessage(serverWaitTime);
+        if (jsonMessageReceived is Message) {
+            json jsonMessageRead = checkpanic jsonMessageReceived.getJSONContent();
+            log:printInfo("Reading Received Message : " + jsonMessageRead.toString());
+        } else {
+            test:assertFail("Receiving message via Asb receiver connection failed.");
+        }
+        log:printInfo("Receiving Deferred Message from Asb receiver connection.");
+        if(sequenceNumber is int) {
+            if(sequenceNumber == 0) {
+                test:assertFail("No message in the queue");
+            }
+            Message|Error messageReceived = receiverConnection3.receiveDeferredMessage(sequenceNumber);
+            if (messageReceived is Message) {
+                string messageRead = checkpanic messageReceived.getTextContent();
+                log:printInfo("Reading Received Message : " + messageRead);
+            } else {
+                test:assertFail(msg = messageReceived.message());
+            }
+        } else {
+            test:assertFail(msg = sequenceNumber.message());
+        }
     } else {
         test:assertFail("Asb receiver connection creation failed.");
     }

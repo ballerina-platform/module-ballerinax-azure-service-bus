@@ -559,6 +559,8 @@ public class ConnectionUtils {
      * Dead-Letter the message & moves the message to the Dead-Letter Queue based on messageLockToken
      *
      * @param receiver Output Receiver connection.
+     * @param deadLetterReason The dead letter reason.
+     * @param deadLetterErrorDescription The dead letter error description.
      */
     public static void deadLetterMessage(IMessageReceiver receiver, String deadLetterReason,
                                          String deadLetterErrorDescription) throws Exception {
@@ -577,6 +579,77 @@ public class ConnectionUtils {
             } else {
                 log.info("\t<= No message in the queue \n");
             }
+        } catch (InterruptedException e) {
+            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
+                    + e.getMessage());
+        } catch (ServiceBusException e) {
+            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
+                    + e.getMessage());
+        }
+    }
+
+    /**
+     * Defer the message in a Queue or Subscription based on messageLockToken
+     *
+     * @param receiver Output Receiver connection.
+     */
+    public static long deferMessage(IMessageReceiver receiver) throws Exception {
+        try {
+            log.info("\n\tWaiting up to default server wait time for messages from  ...\n" +
+                    receiver.getEntityPath());
+            IMessage receivedMessage = receiver.receive();
+
+            if (receivedMessage != null) {
+                log.info("\t<= Received a message with messageId \n" + receivedMessage.getMessageId());
+                log.info("\t<= Defer a message with messageLockToken \n" + receivedMessage.getLockToken());
+                long sequenceNumber = receivedMessage.getSequenceNumber();
+                receiver.defer(receivedMessage.getLockToken());
+
+                log.info("\tDone deferring a message using its lock token from \n" +
+                        receiver.getEntityPath());
+                return sequenceNumber;
+            } else {
+                log.info("\t<= No message in the queue \n");
+                return 0;
+            }
+        } catch (InterruptedException e) {
+            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
+                    + e.getMessage());
+        } catch (ServiceBusException e) {
+            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
+                    + e.getMessage());
+        }
+    }
+
+    /**
+     * Receives a deferred Message. Deferred messages can only be received by using sequence number and return
+     * Message object.
+     *
+     * @param receiver Output Receiver connection.
+     * @param sequenceNumber Unique number assigned to a message by Service Bus. The sequence number is a unique 64-bit
+     *                       integer assigned to a message as it is accepted and stored by the broker and functions as
+     *                       its true identifier.
+     * @return The received Message or null if there is no message for given sequence number.
+     */
+    public static Object receiveDeferredMessage(IMessageReceiver receiver, int sequenceNumber) throws Exception {
+        try {
+            log.info("\n\tWaiting up to default server Wait Time for messages from\n" + receiver.getEntityPath());
+
+            IMessage receivedMessage = receiver.receiveDeferredMessage(sequenceNumber);
+
+            if (receivedMessage == null) {
+                return null;
+            }
+            log.info("\t<= Received a message with messageId \n" + receivedMessage.getMessageId());
+            log.info("\t<= Received a message with messageBody \n" +
+                    new String(receivedMessage.getBody(), UTF_8));
+
+            log.info("\tDone receiving messages from \n" + receiver.getEntityPath());
+
+            BObject messageBObject = BValueCreator.createObjectValue(ASBConstants.PACKAGE_ID_ASB,
+                    ASBConstants.MESSAGE_OBJECT);
+            messageBObject.set(ASBConstants.MESSAGE_CONTENT, BValueCreator.createArrayValue(receivedMessage.getBody()));
+            return messageBObject;
         } catch (InterruptedException e) {
             throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
                     + e.getMessage());
