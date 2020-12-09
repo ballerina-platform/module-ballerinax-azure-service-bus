@@ -91,7 +91,7 @@ public function testReceieverConnection() {
 
 # Test send to queue operation
 @test:Config {
-    enable: true
+    enable: false
 }
 function testSendToQueueOperation() {
     log:printInfo("Creating Asb sender connection.");
@@ -311,7 +311,7 @@ function testAbandonMessageFromQueueOperation() {
 
 # Test send to topic operation
 @test:Config {
-    enable: false
+    enable: true
 }
 function testSendToTopicOperation() {
     log:printInfo("Creating Asb sender connection.");
@@ -795,10 +795,10 @@ function testReceiveDuplicateMessagesFromQueueOperation() {
     }
 }
 
-# Test Dead-Letter from queue operation
+# Test Dead-Letter Message from queue operation
 @test:Config {
     dependsOn: ["testSendToQueueOperation"], 
-    enable: true
+    enable: false
 }
 function testDeadLetterFromQueueOperation() {
     log:printInfo("Creating Asb receiver connection.");
@@ -818,6 +818,66 @@ function testDeadLetterFromQueueOperation() {
     if (receiverConnection is ReceiverConnection) {
         log:printInfo("Closing Asb receiver connection.");
         checkpanic receiverConnection.closeReceiverConnection();
+    }
+}
+
+# Test Dead-Letter Message from subscription operation
+@test:Config {
+    dependsOn: ["testSendToTopicOperation"], 
+    enable: true
+}
+function testDeadLetterFromSubscriptionOperation() {
+    log:printInfo("Creating Asb receiver connection.");
+    ReceiverConnection? receiverConnection1 = new ({connectionString: connectionString, entityPath: subscriptionPath1});
+    ReceiverConnection? receiverConnection2 = new ({connectionString: connectionString, entityPath: subscriptionPath2});
+    ReceiverConnection? receiverConnection3 = new ({connectionString: connectionString, entityPath: subscriptionPath3});
+
+    if (receiverConnection1 is ReceiverConnection) {
+        log:printInfo("Dead-Letter message from Asb receiver connection.");
+        checkpanic receiverConnection1.deadLetterMessage("deadLetterReason", "deadLetterErrorDescription");
+        log:printInfo("Done Dead-Letter a message using its lock token.");
+        log:printInfo("Completing messages from Asb receiver connection.");
+        checkpanic receiverConnection1.completeMessages();
+        log:printInfo("Done completing messages using their lock tokens.");
+    } else {
+        test:assertFail("Asb receiver connection creation failed.");
+    }
+
+    if (receiverConnection2 is ReceiverConnection) {
+        log:printInfo("Dead-Letter message from Asb receiver connection.");
+        checkpanic receiverConnection2.deadLetterMessage("deadLetterReason", "deadLetterErrorDescription");
+        log:printInfo("Done Dead-Letter a message using its lock token.");
+        log:printInfo("Completing messages from Asb receiver connection.");
+        checkpanic receiverConnection2.completeMessages();
+        log:printInfo("Done completing messages using their lock tokens.");
+    } else {
+        test:assertFail("Asb receiver connection creation failed.");
+    }
+
+    if (receiverConnection3 is ReceiverConnection) {
+        log:printInfo("Dead-Letter message from Asb receiver connection.");
+        checkpanic receiverConnection3.deadLetterMessage("deadLetterReason", "deadLetterErrorDescription");
+        log:printInfo("Done Dead-Letter a message using its lock token.");
+        log:printInfo("Completing messages from Asb receiver connection.");
+        checkpanic receiverConnection3.completeMessages();
+        log:printInfo("Done completing messages using their lock tokens.");
+    } else {
+        test:assertFail("Asb receiver connection creation failed.");
+    }
+
+    if (receiverConnection1 is ReceiverConnection) {
+        log:printInfo("Closing Asb receiver connection 1.");
+        checkpanic receiverConnection1.closeReceiverConnection();
+    }
+
+    if (receiverConnection2 is ReceiverConnection) {
+        log:printInfo("Closing Asb receiver connection 2.");
+        checkpanic receiverConnection2.closeReceiverConnection();
+    }
+
+    if (receiverConnection3 is ReceiverConnection) {
+        log:printInfo("Closing Asb receiver connection 3.");
+        checkpanic receiverConnection3.closeReceiverConnection();
     }
 }
 
