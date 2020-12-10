@@ -30,7 +30,6 @@ import org.ballerinalang.jvm.api.BValueCreator;
 import org.ballerinalang.jvm.types.BArrayType;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -322,7 +321,7 @@ public class ConnectionUtils {
             if(sourceArrayType != null) {
                 messagesBObject.set(ASBConstants.MESSAGES_CONTENT,
                         BValueCreator.createArrayValue(bObjectArray, sourceArrayType));
-                messagesBObject.set(ASBConstants.DELIVERY_TAG, i);
+                messagesBObject.set(ASBConstants.MESSAGE_COUNT, i);
             }
             return messagesBObject;
         } catch (InterruptedException e) {
@@ -444,7 +443,7 @@ public class ConnectionUtils {
             if(sourceArrayType != null) {
                 messagesBObject.set(ASBConstants.MESSAGES_CONTENT,
                         BValueCreator.createArrayValue(bObjectArray, sourceArrayType));
-                messagesBObject.set(ASBConstants.DELIVERY_TAG, i);
+                messagesBObject.set(ASBConstants.MESSAGE_COUNT, i);
             }
             return messagesBObject;
         } catch (InterruptedException e) {

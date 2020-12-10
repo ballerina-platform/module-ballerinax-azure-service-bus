@@ -16,7 +16,7 @@
 
 # Provides the functionality to handle the messages received by the consumer services.
 public class Messages {
-    private int deliveryTag = -1;
+    private int messageCount = -1;
     private Message[] messages = [];
 
     # Retrieves the Array of Asb message objects.
@@ -29,7 +29,7 @@ public class Messages {
     # Retrieves the count of Message objects.
     # 
     # + return - Count of Message objects
-    public isolated function getDeliveryTag() returns int {
-        return self.deliveryTag;
+    public isolated function getMessageCount() returns int {
+        return self.messageCount;
     }
 }

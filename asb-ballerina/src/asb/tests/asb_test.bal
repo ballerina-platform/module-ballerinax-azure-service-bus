@@ -161,7 +161,7 @@ function testReceiveMessagesFromQueueOperation() {
         log:printInfo("Receiving from Asb receiver connection.");
         var messageReceived = receiverConnection.receiveMessages(serverWaitTime, maxMessageCount);
         if(messageReceived is Messages) {
-            int val = messageReceived.getDeliveryTag();
+            int val = messageReceived.getMessageCount();
             log:printInfo("No. of messages received : " + val.toString());
             Message[] messages = messageReceived.getMessages();
             string messageReceived1 =  checkpanic messages[0].getTextContent();
@@ -215,7 +215,7 @@ function testReceiveBatchFromQueueOperation() {
         log:printInfo("Receiving from Asb receiver connection.");
         var messageReceived = receiverConnection.receiveBatchMessage(maxMessageCount);
         if(messageReceived is Messages) {
-            int val = messageReceived.getDeliveryTag();
+            int val = messageReceived.getMessageCount();
             log:printInfo("No. of messages received : " + val.toString());
             Message[] messages = messageReceived.getMessages();
             string messageReceived1 =  checkpanic messages[0].getTextContent();
@@ -448,7 +448,7 @@ function testReceiveBatchFromSubscriptionOperation() {
         log:printInfo("Receiving from Asb receiver connection 1.");
         var messagesReceived = receiverConnection1.receiveBatchMessage(maxMessageCount);
         if(messagesReceived is Messages) {
-            int val = messagesReceived.getDeliveryTag();
+            int val = messagesReceived.getMessageCount();
             log:printInfo("No. of messages received : " + val.toString());
             Message[] messages = messagesReceived.getMessages();
             string messageReceived1 =  checkpanic messages[0].getTextContent();
@@ -468,7 +468,7 @@ function testReceiveBatchFromSubscriptionOperation() {
         log:printInfo("Receiving from Asb receiver connection 2.");
         var messagesReceived = receiverConnection2.receiveBatchMessage(maxMessageCount);
         if(messagesReceived is Messages) {
-            int val = messagesReceived.getDeliveryTag();
+            int val = messagesReceived.getMessageCount();
             log:printInfo("No. of messages received : " + val.toString());
             Message[] messages = messagesReceived.getMessages();
             string messageReceived1 =  checkpanic messages[0].getTextContent();
@@ -488,7 +488,7 @@ function testReceiveBatchFromSubscriptionOperation() {
         log:printInfo("Receiving from Asb receiver connection 3.");
         var messagesReceived = receiverConnection3.receiveBatchMessage(maxMessageCount);
         if(messagesReceived is Messages) {
-            int val = messagesReceived.getDeliveryTag();
+            int val = messagesReceived.getMessageCount();
             log:printInfo("No. of messages received : " + val.toString());
             Message[] messages = messagesReceived.getMessages();
             string messageReceived1 =  checkpanic messages[0].getTextContent();
@@ -779,7 +779,7 @@ function testReceiveDuplicateMessagesFromQueueOperation() {
         log:printInfo("Receiving from Asb receiver connection.");
         var messageReceived = receiverConnection.receiveMessages(serverWaitTime, maxMessageCount1);
         if(messageReceived is Messages) {
-            int val = messageReceived.getDeliveryTag();
+            int val = messageReceived.getMessageCount();
             log:printInfo("No. of messages received : " + val.toString());
             Message[] messages = messageReceived.getMessages();
             string messageReceived1 =  checkpanic messages[0].getTextContent();

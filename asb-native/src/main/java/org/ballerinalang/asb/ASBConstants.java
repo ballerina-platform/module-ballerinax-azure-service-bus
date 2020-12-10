@@ -45,7 +45,7 @@ public class ASBConstants {
     public static final String MESSAGES_OBJECT = "Messages";
     public static final BString MESSAGE_CONTENT = BStringUtils.fromString("messageContent");
     public static final BString MESSAGES_CONTENT = BStringUtils.fromString("messages");
-    public static final BString DELIVERY_TAG = BStringUtils.fromString("deliveryTag");
+    public static final BString MESSAGE_COUNT = BStringUtils.fromString("deliveryTag");
     public static final String XML_CONTENT_ERROR = "Error while retrieving the xml content of the message. ";
     public static final String JSON_CONTENT_ERROR = "Error while retrieving the json content of the message. ";
     public static final String TEXT_CONTENT_ERROR = "Error while retrieving the string content of the message. ";
