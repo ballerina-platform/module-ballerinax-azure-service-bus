@@ -1334,6 +1334,7 @@ function testSendAndReceiveMessagesWithVariableLoadUsingWorkers() {
         if (senderConnection is SenderConnection) {
             int i = 1;
             while (i <= variableMessageCount) {
+                runtime:sleep(5000);
                 string stringContent = "This is My Message Body " + i.toString(); 
                 byte[] byteContent = stringContent.toBytes();
                 log:printInfo("Sending message " + i.toString() + " via Asb sender connection.");
@@ -1363,7 +1364,7 @@ function testSendAndReceiveMessagesWithVariableLoadUsingWorkers() {
             int startTimeMills = time1.time;
             int i = 1;
             while (i <= variableMessageCount) {
-                runtime:sleep(20000);
+                runtime:sleep(10000);
                 log:printInfo("Receiving message " + i.toString() + " from Asb receiver connection.");
                 Message|Error messageReceived = receiverConnection.receiveMessage(serverWaitTime);
                 if (messageReceived is Message) {
