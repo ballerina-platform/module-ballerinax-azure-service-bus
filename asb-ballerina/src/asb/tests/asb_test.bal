@@ -19,6 +19,7 @@ import ballerina/log;
 import ballerina/system;
 import ballerina/config;
 import ballerina/runtime;
+import ballerina/time;
 
 // Connection Configuration
 string connectionString = getConfigValue("CONNECTION_STRING");
@@ -50,8 +51,9 @@ string asyncConsumerMessage = "";
 int maxMessageCount = 3;
 int maxMessageCount1 = 2;
 int serverWaitTime = 5;
-int prefetchCount = 50;
-int messageCount = 5;
+int prefetchCountDisabled = 0;
+int prefetchCountEnabled = 50;
+int messageCount = 100;
 
 # Before Suite Function
 @test:BeforeSuite
@@ -1134,11 +1136,11 @@ function testRenewLockOnMessageFromSubscriptionOperation() {
     }
 }
 
-# Test prefetch count operation
+# Test prefetch count operation with prefetch disabled
 @test:Config {
-    enable: true
+    enable: false
 }
-function testPrefetchCount() {
+function testPrefetchCountWithPrefetchDisabled() {
     log:printInfo("Creating Asb sender connection.");
     SenderConnection? senderConnection = new ({connectionString: connectionString, entityPath: queuePath});
 
@@ -1162,9 +1164,12 @@ function testPrefetchCount() {
     ReceiverConnection? receiverConnection = new ({connectionString: connectionString, entityPath: queuePath});
 
     if (receiverConnection is ReceiverConnection) {
-        log:printInfo("Setting the prefetch count for the Asb receiver connection as : " + prefetchCount.toString());
-        checkpanic receiverConnection.setPrefetchCount(prefetchCount);
+        log:printInfo("Setting the prefetch count for the Asb receiver connection as : " 
+            + prefetchCountDisabled.toString());
+        checkpanic receiverConnection.setPrefetchCount(prefetchCountDisabled);
 
+        time:Time time1 = time:currentTime();
+        int startTimeMills = time1.time;
         int i = 1;
         while (i <= messageCount) {
             log:printInfo("Receiving message " + i.toString() + " from Asb receiver connection.");
@@ -1177,6 +1182,70 @@ function testPrefetchCount() {
             }
             i = i + 1;
         }
+        time:Time time2 = time:currentTime();
+        int endTimeMills = time2.time;
+        int timeElapsed = endTimeMills - startTimeMills;
+        log:printInfo("Time elapsed : " + timeElapsed.toString() + " milliseconds");
+    } else {
+        test:assertFail("Asb receiver connection creation failed.");
+    }
+
+    if (receiverConnection is ReceiverConnection) {
+        log:printInfo("Closing Asb receiver connection.");
+        checkpanic receiverConnection.closeReceiverConnection();
+    }
+}
+
+# Test prefetch count operation with prefetch enabled
+@test:Config {
+    enable: true
+}
+function testPrefetchCountWithPrefetchEnabled() {
+    log:printInfo("Creating Asb sender connection.");
+    SenderConnection? senderConnection = new ({connectionString: connectionString, entityPath: queuePath});
+
+    if (senderConnection is SenderConnection) {
+        int i = 1;
+        while (i <= messageCount) {
+            log:printInfo("Sending message " + i.toString() + " via Asb sender connection.");
+            checkpanic senderConnection.sendMessageWithConfigurableParameters(byteContent, parameters1, properties);
+            i = i + 1;
+        }
+    } else {
+        test:assertFail("Asb sender connection creation failed.");
+    }
+
+    if (senderConnection is SenderConnection) {
+        log:printInfo("Closing Asb sender connection.");
+        checkpanic senderConnection.closeSenderConnection();
+    }
+
+    log:printInfo("Creating Asb receiver connection.");
+    ReceiverConnection? receiverConnection = new ({connectionString: connectionString, entityPath: queuePath});
+
+    if (receiverConnection is ReceiverConnection) {
+        log:printInfo("Setting the prefetch count for the Asb receiver connection as : " 
+            + prefetchCountEnabled.toString());
+        checkpanic receiverConnection.setPrefetchCount(prefetchCountEnabled);
+
+        time:Time time1 = time:currentTime();
+        int startTimeMills = time1.time;
+        int i = 1;
+        while (i <= messageCount) {
+            log:printInfo("Receiving message " + i.toString() + " from Asb receiver connection.");
+            Message|Error messageReceived = receiverConnection.receiveMessage(serverWaitTime);
+            if (messageReceived is Message) {
+                string messageRead = checkpanic messageReceived.getTextContent();
+                log:printInfo("Reading Received Message " + i.toString() + " : " + messageRead);
+            } else {
+                test:assertFail("Receiving message via Asb receiver connection failed.");
+            }
+            i = i + 1;
+        }
+        time:Time time2 = time:currentTime();
+        int endTimeMills = time2.time;
+        int timeElapsed = endTimeMills - startTimeMills;
+        log:printInfo("Time elapsed : " + timeElapsed.toString() + " milliseconds");
     } else {
         test:assertFail("Asb receiver connection creation failed.");
     }
