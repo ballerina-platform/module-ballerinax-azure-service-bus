@@ -42,15 +42,28 @@ public class ASBConstants {
 
     // Message constant fields
     public static final String MESSAGE_OBJECT = "Message";
-    public static final String MESSAGES_OBJECT = "Messages";
     public static final BString MESSAGE_CONTENT = BStringUtils.fromString("messageContent");
-    public static final BString MESSAGES_CONTENT = BStringUtils.fromString("messages");
-    public static final BString MESSAGE_COUNT = BStringUtils.fromString("deliveryTag");
+    public static final BString MESSAGE_CONTENT_TYPE = BStringUtils.fromString("messageContentType");
+    public static final BString BMESSAGE_ID = BStringUtils.fromString("messageId");
+    public static final BString BTO = BStringUtils.fromString("to");
+    public static final BString BREPLY_TO = BStringUtils.fromString("replyTo");
+    public static final BString BREPLY_TO_SESSION_ID = BStringUtils.fromString("replyToSessionId");
+    public static final BString BLABEL = BStringUtils.fromString("label");
+    public static final BString BSESSION_ID = BStringUtils.fromString("sessionId");
+    public static final BString BCORRELATION_ID = BStringUtils.fromString("correlationId");
+    public static final BString BTIME_TO_LIVE = BStringUtils.fromString("timeToLive");
+
+    // Message content data binding errors
     public static final String XML_CONTENT_ERROR = "Error while retrieving the xml content of the message. ";
     public static final String JSON_CONTENT_ERROR = "Error while retrieving the json content of the message. ";
     public static final String TEXT_CONTENT_ERROR = "Error while retrieving the string content of the message. ";
     public static final String INT_CONTENT_ERROR = "Error while retrieving the int content of the message. ";
     public static final String FLOAT_CONTENT_ERROR = "Error while retrieving the float content of the message. ";
+
+    // Messages constant fields
+    public static final String MESSAGES_OBJECT = "Messages";
+    public static final BString MESSAGES_CONTENT = BStringUtils.fromString("messages");
+    public static final BString MESSAGE_COUNT = BStringUtils.fromString("messageCount");
 
     // Keys of the input message optional parameters specified as a Map
     public static final String CONTENT_TYPE = "contentType";

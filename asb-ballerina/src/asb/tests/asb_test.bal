@@ -1325,7 +1325,7 @@ function testSendAndReceiveMessagesWithVariableLoad() {
     enable: true
 }
 function testSendAndReceiveMessagesWithVariableLoadUsingWorkers() {
-    int variableMessageCount = 10;
+    int variableMessageCount = 5;
     log:printInfo("Worker execution started");
     worker w1 {
         log:printInfo("Creating Asb sender connection.");
@@ -1370,6 +1370,10 @@ function testSendAndReceiveMessagesWithVariableLoadUsingWorkers() {
                 if (messageReceived is Message) {
                     string messageRead = checkpanic messageReceived.getTextContent();
                     log:printInfo("Reading Received Message " + i.toString() + " : " + messageRead);
+                    var messageRead1 = messageReceived.getTimeToLive();
+                    if (messageRead1 is int) {
+                        log:printInfo("Reading Received Message " + i.toString() + " : " + messageRead1.toString());
+                    }
                 } else {
                     test:assertFail("Receiving message via Asb receiver connection failed.");
                 }

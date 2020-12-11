@@ -18,6 +18,15 @@ import ballerina/java;
 
 public class Message {
     private byte[] messageContent = [];
+    private string? messageContentType = ();
+    private string? messageId = ();
+    private string? to = ();
+    private string? replyTo = ();
+    private string? replyToSessionId = ();
+    private string? label = ();
+    private string? sessionId = ();
+    private string? correlationId = ();
+    private int? timeToLive = ();
 
     # Retrieves the text content of the Asb message.
     # ```ballerina
@@ -67,6 +76,70 @@ public class Message {
     # + return - Message data as an XML value or else a `Asb:Error` if an error is encountered
     public isolated function getXMLContent() returns @tainted xml|Error {
         return nativeGetXMLContent(self.messageContent);
+    }
+
+    # Retrieves the Message content type.
+    # 
+    # + return - Message content type as a string or else ()
+    public isolated function getMessageContentType() returns string? {
+        return self.messageContentType;
+    }
+
+    # Retrieves the Message ID.
+    # 
+    # + return - Message ID as a string or else ()
+    public isolated function getMessageId() returns string? {
+        return self.messageId;
+    }
+
+    # Retrieves send to address.
+    # 
+    # + return - Send to address as a string or else ()
+    public isolated function getTo() returns string? {
+        return self.to;
+    }
+
+    # Retrieves address of the queue or subscription to reply to.
+    # 
+    # + return - Address of the queue or subscription to reply to as a string or else ()
+    public isolated function getReplyTo() returns string? {
+        return self.replyTo;
+    }
+
+    # Retrieves Identifier of the session to reply to.
+    # 
+    # + return - Identifier of the session to reply to as a string or else ()
+    public isolated function getReplyToSessionId() returns string? {
+        return self.replyToSessionId;
+    }
+
+    # Retrieves Application specific label.
+    # 
+    # + return - Application specific label as a string or else ()
+    public isolated function getLabel() returns string? {
+        return self.label;
+    }
+
+    # Retrieves Identifier of the session.
+    # 
+    # + return - Identifier of the session as a string or else ()
+    public isolated function getSessionId() returns string? {
+        return self.sessionId;
+    }
+
+    # Retrieves Identifier of the correlation.
+    # 
+    # + return - Identifier of the correlation as a string or else ()
+    public isolated function getCorrelationId() returns string? {
+        return self.correlationId;
+    }
+
+    # Retrieves the duration in seconds, that a message is valid. The duration starts from when the message is sent to 
+    # the Service Bus.
+    # 
+    # + return - Identifier of the correlation as a int or else ()
+    public isolated function getTimeToLive() returns int? {
+        return self.timeToLive;
     }
 }
 

@@ -23,6 +23,7 @@ import com.microsoft.azure.servicebus.primitives.ConnectionStringBuilder;
 import com.microsoft.azure.servicebus.primitives.ServiceBusException;
 import org.ballerinalang.asb.ASBConstants;
 import org.ballerinalang.asb.ASBUtils;
+import org.ballerinalang.jvm.api.BStringUtils;
 import org.ballerinalang.jvm.api.values.BArray;
 import org.ballerinalang.jvm.api.values.BMap;
 import org.ballerinalang.jvm.api.values.BObject;
@@ -261,6 +262,15 @@ public class ConnectionUtils {
             BObject messageBObject = BValueCreator.createObjectValue(ASBConstants.PACKAGE_ID_ASB,
                     ASBConstants.MESSAGE_OBJECT);
             messageBObject.set(ASBConstants.MESSAGE_CONTENT, BValueCreator.createArrayValue(receivedMessage.getBody()));
+            messageBObject.set(MESSAGE_CONTENT_TYPE, BStringUtils.fromString(receivedMessage.getContentType()));
+            messageBObject.set(BMESSAGE_ID, BStringUtils.fromString(receivedMessage.getMessageId()));
+            messageBObject.set(BTO, BStringUtils.fromString(receivedMessage.getTo()));
+            messageBObject.set(BREPLY_TO, BStringUtils.fromString(receivedMessage.getReplyTo()));
+            messageBObject.set(BREPLY_TO_SESSION_ID, BStringUtils.fromString(receivedMessage.getReplyToSessionId()));
+            messageBObject.set(BLABEL, BStringUtils.fromString(receivedMessage.getLabel()));
+            messageBObject.set(BSESSION_ID, BStringUtils.fromString(receivedMessage.getSessionId()));
+            messageBObject.set(BCORRELATION_ID, BStringUtils.fromString(receivedMessage.getCorrelationId()));
+            messageBObject.set(BTIME_TO_LIVE, receivedMessage.getTimeToLive().getSeconds());
             return messageBObject;
         } catch (InterruptedException e) {
             throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
