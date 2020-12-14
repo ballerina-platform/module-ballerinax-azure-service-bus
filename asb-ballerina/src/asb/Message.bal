@@ -27,6 +27,7 @@ public class Message {
     private string? sessionId = ();
     private string? correlationId = ();
     private int? timeToLive = ();
+    private BasicProperties? properties = ();
 
     # Retrieves the text content of the Asb message.
     # ```ballerina
@@ -140,6 +141,13 @@ public class Message {
     # + return - Identifier of the correlation as a int or else ()
     public isolated function getTimeToLive() returns int? {
         return self.timeToLive;
+    }
+
+    # Retrieves basic properties.
+    # 
+    # + return - Basic properties as a record or else ()
+    public isolated function getProperties() returns BasicProperties? {
+        return self.properties;
     }
 }
 

@@ -28,7 +28,9 @@ import org.ballerinalang.jvm.api.values.BArray;
 import org.ballerinalang.jvm.api.values.BMap;
 import org.ballerinalang.jvm.api.values.BObject;
 import org.ballerinalang.jvm.api.BValueCreator;
+import org.ballerinalang.jvm.api.values.BString;
 import org.ballerinalang.jvm.types.BArrayType;
+import org.ballerinalang.jvm.types.BMapType;
 
 import java.time.Duration;
 import java.util.*;
@@ -125,6 +127,17 @@ public class ConnectionUtils {
         if (map != null) {
             for (Object aKey : map.getKeys()) {
                 returnMap.put(aKey.toString(), map.get(aKey).toString());
+            }
+        }
+        return returnMap;
+    }
+
+    public static BMap<BString, Object> toBMap(Map map) {
+        BMap<BString, Object> returnMap = BValueCreator.createMapValue();
+        if (map != null) {
+            for (Object aKey : map.keySet().toArray()) {
+                returnMap.put(BStringUtils.fromString(aKey.toString()),
+                        BStringUtils.fromString(map.get(aKey).toString()));
             }
         }
         return returnMap;
@@ -271,6 +284,15 @@ public class ConnectionUtils {
             messageBObject.set(BSESSION_ID, BStringUtils.fromString(receivedMessage.getSessionId()));
             messageBObject.set(BCORRELATION_ID, BStringUtils.fromString(receivedMessage.getCorrelationId()));
             messageBObject.set(BTIME_TO_LIVE, receivedMessage.getTimeToLive().getSeconds());
+            BMap<BString, Object> basicProperties =
+                    BValueCreator.createRecordValue(PACKAGE_ID_ASB, "BasicProperties");
+            Object[] values = new Object[4];
+            values[0] = valueToStringOrEmpty(receivedMessage.getProperties(), "replyTo");
+            values[1] = valueToStringOrEmpty(receivedMessage.getProperties(), "contentType");
+            values[2] = valueToStringOrEmpty(receivedMessage.getProperties(), "contentEncoding");
+            values[3] = valueToStringOrEmpty(receivedMessage.getProperties(), "correlationId");
+            messageBObject.set(BPROPERTIES, BValueCreator.createRecordValue(basicProperties, values));
+
             return messageBObject;
         } catch (InterruptedException e) {
             throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "

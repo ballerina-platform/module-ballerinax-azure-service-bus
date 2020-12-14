@@ -27,3 +27,16 @@ public type ConnectionConfiguration record {|
     string connectionString;
     string entityPath;
 |};
+
+# Basic properties of the message - routing headers etc.
+#
+# + replyTo - The queue name to which the other apps should send the response
+# + contentType - Content type of the message
+# + contentEncoding - Content encoding of the message
+# + correlationId - Client-specific ID that can be used to mark or identify messages between clients
+public type BasicProperties record {|
+    string replyTo?;
+    string contentEncoding?;
+    string correlationId?;
+    string contentType?;
+|};

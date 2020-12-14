@@ -52,6 +52,7 @@ public class ASBConstants {
     public static final BString BSESSION_ID = BStringUtils.fromString("sessionId");
     public static final BString BCORRELATION_ID = BStringUtils.fromString("correlationId");
     public static final BString BTIME_TO_LIVE = BStringUtils.fromString("timeToLive");
+    public static final BString BPROPERTIES = BStringUtils.fromString("properties");
 
     // Message content data binding errors
     public static final String XML_CONTENT_ERROR = "Error while retrieving the xml content of the message. ";

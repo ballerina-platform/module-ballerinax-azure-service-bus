@@ -1326,6 +1326,8 @@ function testSendAndReceiveMessagesWithVariableLoad() {
 }
 function testSendAndReceiveMessagesWithVariableLoadUsingWorkers() {
     int variableMessageCount = 5;
+    BasicProperties properties = {replyTo: "propertyValue1", contentType: "propertyValue2", 
+        correlationId: "propertyValue4"};
     log:printInfo("Worker execution started");
     worker w1 {
         log:printInfo("Creating Asb sender connection.");
@@ -1367,12 +1369,13 @@ function testSendAndReceiveMessagesWithVariableLoadUsingWorkers() {
                 runtime:sleep(10000);
                 log:printInfo("Receiving message " + i.toString() + " from Asb receiver connection.");
                 Message|Error messageReceived = receiverConnection.receiveMessage(serverWaitTime);
-                if (messageReceived is Message) {
+                if (messageReceived is Message && messageReceived.getMessageContentType() == "application/text") {
                     string messageRead = checkpanic messageReceived.getTextContent();
                     log:printInfo("Reading Received Message " + i.toString() + " : " + messageRead);
-                    var messageRead1 = messageReceived.getTimeToLive();
-                    if (messageRead1 is int) {
-                        log:printInfo("Reading Received Message " + i.toString() + " : " + messageRead1.toString());
+                    var messageProperties = messageReceived.getProperties();
+                    if(messageProperties is BasicProperties) {
+                        log:printInfo("Reading Message Properties " + i.toString() + " : " 
+                            + messageProperties.toString());
                     }
                 } else {
                     test:assertFail("Receiving message via Asb receiver connection failed.");
