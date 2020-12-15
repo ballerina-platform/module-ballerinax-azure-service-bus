@@ -1327,7 +1327,7 @@ function testSendAndReceiveMessagesWithVariableLoad() {
 function testSendAndReceiveMessagesWithVariableLoadUsingWorkers() {
     int variableMessageCount = 5;
     BasicProperties properties = {replyTo: "propertyValue1", contentType: "propertyValue2", 
-        correlationId: "propertyValue4"};
+        contentEncoding: "propertyValue3", correlationId: "propertyValue4"};
     log:printInfo("Worker execution started");
     worker w1 {
         log:printInfo("Creating Asb sender connection.");
