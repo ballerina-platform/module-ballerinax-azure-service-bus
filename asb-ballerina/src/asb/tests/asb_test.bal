@@ -97,7 +97,7 @@ public function testReceieverConnection() {
 
 # Test send to queue operation
 @test:Config {
-    enable: false
+    enable: true
 }
 function testSendToQueueOperation() {
     log:printInfo("Creating Asb sender connection.");
@@ -183,7 +183,7 @@ function testReceiveMessagesFromQueueOperation() {
 
 # Test send batch to queue operation
 @test:Config {
-    enable: true
+    enable: false
 }
 function testSendBatchToQueueOperation() {
     log:printInfo("Creating Asb sender connection.");
@@ -205,7 +205,7 @@ function testSendBatchToQueueOperation() {
 # Test receive batch from queue operation
 @test:Config {
     dependsOn: ["testSendBatchToQueueOperation"], 
-    enable: true
+    enable: false
 }
 function testReceiveBatchFromQueueOperation() {
     log:printInfo("Creating Asb receiver connection.");
@@ -240,7 +240,7 @@ function testReceiveBatchFromQueueOperation() {
 # Test complete Messages from queue operation
 @test:Config {
     dependsOn: ["testSendToQueueOperation"], 
-    enable: false
+    enable: true
 }
 function testCompleteMessagesFromQueueOperation() {
     log:printInfo("Creating Asb receiver connection.");
