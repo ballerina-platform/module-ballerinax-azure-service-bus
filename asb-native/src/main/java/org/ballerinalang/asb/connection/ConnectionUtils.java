@@ -348,6 +348,21 @@ public class ConnectionUtils {
                         ASBConstants.MESSAGE_OBJECT);
                 messageBObject.set(ASBConstants.MESSAGE_CONTENT,
                         BValueCreator.createArrayValue(receivedMessage.getBody()));
+                messageBObject.set(MESSAGE_CONTENT_TYPE, BStringUtils.fromString(receivedMessage.getContentType()));
+                messageBObject.set(BMESSAGE_ID, BStringUtils.fromString(receivedMessage.getMessageId()));
+                messageBObject.set(BTO, BStringUtils.fromString(receivedMessage.getTo()));
+                messageBObject.set(BREPLY_TO, BStringUtils.fromString(receivedMessage.getReplyTo()));
+                messageBObject.set(BREPLY_TO_SESSION_ID,
+                        BStringUtils.fromString(receivedMessage.getReplyToSessionId()));
+                messageBObject.set(BLABEL, BStringUtils.fromString(receivedMessage.getLabel()));
+                messageBObject.set(BSESSION_ID, BStringUtils.fromString(receivedMessage.getSessionId()));
+                messageBObject.set(BCORRELATION_ID, BStringUtils.fromString(receivedMessage.getCorrelationId()));
+                messageBObject.set(BTIME_TO_LIVE, receivedMessage.getTimeToLive().getSeconds());
+                BMap<BString, Object> optionalProperties =
+                        BValueCreator.createRecordValue(PACKAGE_ID_ASB, OPTIONAL_PROPERTIES);
+                Object[] values = new Object[1];
+                values[0] = toBMap(receivedMessage.getProperties());
+                messageBObject.set(BPROPERTIES, BValueCreator.createRecordValue(optionalProperties, values));
                 bObjectArray[i] = messageBObject;
                 i = i + 1;
                 sourceArrayType = new BArrayType(messageBObject.getType());
