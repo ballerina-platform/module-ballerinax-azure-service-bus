@@ -132,6 +132,12 @@ public class ConnectionUtils {
         return returnMap;
     }
 
+    /**
+     * Convert Map to BMap.
+     *
+     * @param map Input Map used to convert to BMap.
+     * @return Converted BMap object.
+     */
     public static BMap<BString, Object> toBMap(Map map) {
         BMap<BString, Object> returnMap = BValueCreator.createMapValue();
         if (map != null) {

@@ -97,7 +97,7 @@ public function testReceieverConnection() {
 
 # Test send to queue operation
 @test:Config {
-    enable: false
+    enable: true
 }
 function testSendToQueueOperation() {
     log:printInfo("Creating Asb sender connection.");
@@ -120,7 +120,7 @@ function testSendToQueueOperation() {
 # Test receive one message from queue operation
 @test:Config {
     dependsOn: ["testSendToQueueOperation"], 
-    enable: false
+    enable: true
 }
 function testReceiveFromQueueOperation() {
     log:printInfo("Creating Asb receiver connection.");
@@ -1322,7 +1322,7 @@ function testSendAndReceiveMessagesWithVariableLoad() {
 
 # Test prefetch count operation with variable loads using different workers
 @test:Config {
-    enable: true
+    enable: false
 }
 function testSendAndReceiveMessagesWithVariableLoadUsingWorkers() {
     int variableMessageCount = 5;
