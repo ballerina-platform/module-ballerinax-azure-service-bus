@@ -284,14 +284,11 @@ public class ConnectionUtils {
             messageBObject.set(BSESSION_ID, BStringUtils.fromString(receivedMessage.getSessionId()));
             messageBObject.set(BCORRELATION_ID, BStringUtils.fromString(receivedMessage.getCorrelationId()));
             messageBObject.set(BTIME_TO_LIVE, receivedMessage.getTimeToLive().getSeconds());
-            BMap<BString, Object> basicProperties =
-                    BValueCreator.createRecordValue(PACKAGE_ID_ASB, "BasicProperties");
-            Object[] values = new Object[4];
-            values[0] = valueToStringOrEmpty(receivedMessage.getProperties(), "replyTo");
-            values[1] = valueToStringOrEmpty(receivedMessage.getProperties(), "contentType");
-            values[2] = valueToStringOrEmpty(receivedMessage.getProperties(), "contentEncoding");
-            values[3] = valueToStringOrEmpty(receivedMessage.getProperties(), "correlationId");
-            messageBObject.set(BPROPERTIES, BValueCreator.createRecordValue(basicProperties, values));
+            BMap<BString, Object> optionalProperties =
+                    BValueCreator.createRecordValue(PACKAGE_ID_ASB, OPTIONAL_PROPERTIES);
+            Object[] values = new Object[1];
+            values[0] = toBMap(receivedMessage.getProperties());
+            messageBObject.set(BPROPERTIES, BValueCreator.createRecordValue(optionalProperties, values));
 
             return messageBObject;
         } catch (InterruptedException e) {

@@ -1326,8 +1326,8 @@ function testSendAndReceiveMessagesWithVariableLoad() {
 }
 function testSendAndReceiveMessagesWithVariableLoadUsingWorkers() {
     int variableMessageCount = 5;
-    BasicProperties properties = {replyTo: "propertyValue1", contentType: "propertyValue2", 
-        contentEncoding: "propertyValue3", correlationId: "propertyValue4"};
+    map<string> properties = {property1: "propertyValue1", property2: "propertyValue2", 
+        property3: "propertyValue3", property4: "propertyValue4"};
     log:printInfo("Worker execution started");
     worker w1 {
         log:printInfo("Creating Asb sender connection.");
@@ -1373,7 +1373,7 @@ function testSendAndReceiveMessagesWithVariableLoadUsingWorkers() {
                     string messageRead = checkpanic messageReceived.getTextContent();
                     log:printInfo("Reading Received Message " + i.toString() + " : " + messageRead);
                     var messageProperties = messageReceived.getProperties();
-                    if(messageProperties is BasicProperties) {
+                    if(messageProperties is OptionalProperties) {
                         log:printInfo("Reading Message Properties " + i.toString() + " : " 
                             + messageProperties.toString());
                     }
