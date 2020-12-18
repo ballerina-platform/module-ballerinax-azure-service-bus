@@ -21,16 +21,15 @@ package org.ballerinalang.asb.connection;
 import com.microsoft.azure.servicebus.*;
 import com.microsoft.azure.servicebus.primitives.ConnectionStringBuilder;
 import com.microsoft.azure.servicebus.primitives.ServiceBusException;
+import io.ballerina.runtime.api.creators.ValueCreator;
+import io.ballerina.runtime.api.utils.StringUtils;
+import io.ballerina.runtime.api.values.BArray;
+import io.ballerina.runtime.api.values.BMap;
+import io.ballerina.runtime.api.values.BObject;
+import io.ballerina.runtime.api.values.BString;
+import io.ballerina.runtime.internal.types.BArrayType;
 import org.ballerinalang.asb.ASBConstants;
 import org.ballerinalang.asb.ASBUtils;
-import org.ballerinalang.jvm.api.BStringUtils;
-import org.ballerinalang.jvm.api.values.BArray;
-import org.ballerinalang.jvm.api.values.BMap;
-import org.ballerinalang.jvm.api.values.BObject;
-import org.ballerinalang.jvm.api.BValueCreator;
-import org.ballerinalang.jvm.api.values.BString;
-import org.ballerinalang.jvm.types.BArrayType;
-import org.ballerinalang.jvm.types.BMapType;
 
 import java.time.Duration;
 import java.util.*;
@@ -139,11 +138,11 @@ public class ConnectionUtils {
      * @return Converted BMap object.
      */
     public static BMap<BString, Object> toBMap(Map map) {
-        BMap<BString, Object> returnMap = BValueCreator.createMapValue();
+        BMap<BString, Object> returnMap = ValueCreator.createMapValue();
         if (map != null) {
             for (Object aKey : map.keySet().toArray()) {
-                returnMap.put(BStringUtils.fromString(aKey.toString()),
-                        BStringUtils.fromString(map.get(aKey).toString()));
+                returnMap.put(StringUtils.fromString(aKey.toString()),
+                        StringUtils.fromString(map.get(aKey).toString()));
             }
         }
         return returnMap;
@@ -278,23 +277,23 @@ public class ConnectionUtils {
 
             log.info("\tDone receiving messages from \n" + receiver.getEntityPath());
 
-            BObject messageBObject = BValueCreator.createObjectValue(ASBConstants.PACKAGE_ID_ASB,
+            BObject messageBObject = ValueCreator.createObjectValue(ASBConstants.PACKAGE_ID_ASB,
                     ASBConstants.MESSAGE_OBJECT);
-            messageBObject.set(ASBConstants.MESSAGE_CONTENT, BValueCreator.createArrayValue(receivedMessage.getBody()));
-            messageBObject.set(MESSAGE_CONTENT_TYPE, BStringUtils.fromString(receivedMessage.getContentType()));
-            messageBObject.set(BMESSAGE_ID, BStringUtils.fromString(receivedMessage.getMessageId()));
-            messageBObject.set(BTO, BStringUtils.fromString(receivedMessage.getTo()));
-            messageBObject.set(BREPLY_TO, BStringUtils.fromString(receivedMessage.getReplyTo()));
-            messageBObject.set(BREPLY_TO_SESSION_ID, BStringUtils.fromString(receivedMessage.getReplyToSessionId()));
-            messageBObject.set(BLABEL, BStringUtils.fromString(receivedMessage.getLabel()));
-            messageBObject.set(BSESSION_ID, BStringUtils.fromString(receivedMessage.getSessionId()));
-            messageBObject.set(BCORRELATION_ID, BStringUtils.fromString(receivedMessage.getCorrelationId()));
+            messageBObject.set(ASBConstants.MESSAGE_CONTENT, ValueCreator.createArrayValue(receivedMessage.getBody()));
+            messageBObject.set(MESSAGE_CONTENT_TYPE, StringUtils.fromString(receivedMessage.getContentType()));
+            messageBObject.set(BMESSAGE_ID, StringUtils.fromString(receivedMessage.getMessageId()));
+            messageBObject.set(BTO, StringUtils.fromString(receivedMessage.getTo()));
+            messageBObject.set(BREPLY_TO, StringUtils.fromString(receivedMessage.getReplyTo()));
+            messageBObject.set(BREPLY_TO_SESSION_ID, StringUtils.fromString(receivedMessage.getReplyToSessionId()));
+            messageBObject.set(BLABEL, StringUtils.fromString(receivedMessage.getLabel()));
+            messageBObject.set(BSESSION_ID, StringUtils.fromString(receivedMessage.getSessionId()));
+            messageBObject.set(BCORRELATION_ID, StringUtils.fromString(receivedMessage.getCorrelationId()));
             messageBObject.set(BTIME_TO_LIVE, receivedMessage.getTimeToLive().getSeconds());
             BMap<BString, Object> optionalProperties =
-                    BValueCreator.createRecordValue(PACKAGE_ID_ASB, OPTIONAL_PROPERTIES);
+                    ValueCreator.createRecordValue(PACKAGE_ID_ASB, OPTIONAL_PROPERTIES);
             Object[] values = new Object[1];
             values[0] = toBMap(receivedMessage.getProperties());
-            messageBObject.set(BPROPERTIES, BValueCreator.createRecordValue(optionalProperties, values));
+            messageBObject.set(BPROPERTIES, ValueCreator.createRecordValue(optionalProperties, values));
 
             return messageBObject;
         } catch (InterruptedException e) {
@@ -324,7 +323,7 @@ public class ConnectionUtils {
             BObject[] bObjectArray = new BObject[maxMessageCount];
             int i = 0;
 
-            BObject messagesBObject = BValueCreator.createObjectValue(ASBConstants.PACKAGE_ID_ASB,
+            BObject messagesBObject = ValueCreator.createObjectValue(ASBConstants.PACKAGE_ID_ASB,
                     ASBConstants.MESSAGES_OBJECT);
 
             log.info("\n\tWaiting up to 'serverWaitTime' seconds for messages from " + receiver.getEntityPath());
@@ -344,25 +343,25 @@ public class ConnectionUtils {
                 }
                 receivedMessageId = receivedMessage.getMessageId();
 
-                BObject messageBObject = BValueCreator.createObjectValue(ASBConstants.PACKAGE_ID_ASB,
+                BObject messageBObject = ValueCreator.createObjectValue(ASBConstants.PACKAGE_ID_ASB,
                         ASBConstants.MESSAGE_OBJECT);
                 messageBObject.set(ASBConstants.MESSAGE_CONTENT,
-                        BValueCreator.createArrayValue(receivedMessage.getBody()));
-                messageBObject.set(MESSAGE_CONTENT_TYPE, BStringUtils.fromString(receivedMessage.getContentType()));
-                messageBObject.set(BMESSAGE_ID, BStringUtils.fromString(receivedMessage.getMessageId()));
-                messageBObject.set(BTO, BStringUtils.fromString(receivedMessage.getTo()));
-                messageBObject.set(BREPLY_TO, BStringUtils.fromString(receivedMessage.getReplyTo()));
+                        ValueCreator.createArrayValue(receivedMessage.getBody()));
+                messageBObject.set(MESSAGE_CONTENT_TYPE, StringUtils.fromString(receivedMessage.getContentType()));
+                messageBObject.set(BMESSAGE_ID, StringUtils.fromString(receivedMessage.getMessageId()));
+                messageBObject.set(BTO, StringUtils.fromString(receivedMessage.getTo()));
+                messageBObject.set(BREPLY_TO, StringUtils.fromString(receivedMessage.getReplyTo()));
                 messageBObject.set(BREPLY_TO_SESSION_ID,
-                        BStringUtils.fromString(receivedMessage.getReplyToSessionId()));
-                messageBObject.set(BLABEL, BStringUtils.fromString(receivedMessage.getLabel()));
-                messageBObject.set(BSESSION_ID, BStringUtils.fromString(receivedMessage.getSessionId()));
-                messageBObject.set(BCORRELATION_ID, BStringUtils.fromString(receivedMessage.getCorrelationId()));
+                        StringUtils.fromString(receivedMessage.getReplyToSessionId()));
+                messageBObject.set(BLABEL, StringUtils.fromString(receivedMessage.getLabel()));
+                messageBObject.set(BSESSION_ID, StringUtils.fromString(receivedMessage.getSessionId()));
+                messageBObject.set(BCORRELATION_ID, StringUtils.fromString(receivedMessage.getCorrelationId()));
                 messageBObject.set(BTIME_TO_LIVE, receivedMessage.getTimeToLive().getSeconds());
                 BMap<BString, Object> optionalProperties =
-                        BValueCreator.createRecordValue(PACKAGE_ID_ASB, OPTIONAL_PROPERTIES);
+                        ValueCreator.createRecordValue(PACKAGE_ID_ASB, OPTIONAL_PROPERTIES);
                 Object[] values = new Object[1];
                 values[0] = toBMap(receivedMessage.getProperties());
-                messageBObject.set(BPROPERTIES, BValueCreator.createRecordValue(optionalProperties, values));
+                messageBObject.set(BPROPERTIES, ValueCreator.createRecordValue(optionalProperties, values));
                 bObjectArray[i] = messageBObject;
                 i = i + 1;
                 sourceArrayType = new BArrayType(messageBObject.getType());
@@ -370,7 +369,7 @@ public class ConnectionUtils {
             log.info("\tDone receiving messages from \n" + receiver.getEntityPath());
             if(sourceArrayType != null) {
                 messagesBObject.set(ASBConstants.MESSAGES_CONTENT,
-                        BValueCreator.createArrayValue(bObjectArray, sourceArrayType));
+                        ValueCreator.createArrayValue(bObjectArray, sourceArrayType));
                 messagesBObject.set(ASBConstants.MESSAGE_COUNT, i);
             }
             return messagesBObject;
@@ -461,7 +460,7 @@ public class ConnectionUtils {
             BObject[] bObjectArray = new BObject[maxMessageCount];
             int i = 0;
 
-            BObject messagesBObject = BValueCreator.createObjectValue(ASBConstants.PACKAGE_ID_ASB,
+            BObject messagesBObject = ValueCreator.createObjectValue(ASBConstants.PACKAGE_ID_ASB,
                     ASBConstants.MESSAGES_OBJECT);
 
             log.info("\n\tWaiting up to default server time for messages from  ...\n" + receiver.getEntityPath());
@@ -481,25 +480,25 @@ public class ConnectionUtils {
                 }
                 receivedMessageId = receivedMessage.getMessageId();
 
-                BObject messageBObject = BValueCreator.createObjectValue(ASBConstants.PACKAGE_ID_ASB,
+                BObject messageBObject = ValueCreator.createObjectValue(ASBConstants.PACKAGE_ID_ASB,
                         ASBConstants.MESSAGE_OBJECT);
                 messageBObject.set(ASBConstants.MESSAGE_CONTENT,
-                        BValueCreator.createArrayValue(receivedMessage.getBody()));
-                messageBObject.set(MESSAGE_CONTENT_TYPE, BStringUtils.fromString(receivedMessage.getContentType()));
-                messageBObject.set(BMESSAGE_ID, BStringUtils.fromString(receivedMessage.getMessageId()));
-                messageBObject.set(BTO, BStringUtils.fromString(receivedMessage.getTo()));
-                messageBObject.set(BREPLY_TO, BStringUtils.fromString(receivedMessage.getReplyTo()));
+                        ValueCreator.createArrayValue(receivedMessage.getBody()));
+                messageBObject.set(MESSAGE_CONTENT_TYPE, StringUtils.fromString(receivedMessage.getContentType()));
+                messageBObject.set(BMESSAGE_ID, StringUtils.fromString(receivedMessage.getMessageId()));
+                messageBObject.set(BTO, StringUtils.fromString(receivedMessage.getTo()));
+                messageBObject.set(BREPLY_TO, StringUtils.fromString(receivedMessage.getReplyTo()));
                 messageBObject.set(BREPLY_TO_SESSION_ID,
-                        BStringUtils.fromString(receivedMessage.getReplyToSessionId()));
-                messageBObject.set(BLABEL, BStringUtils.fromString(receivedMessage.getLabel()));
-                messageBObject.set(BSESSION_ID, BStringUtils.fromString(receivedMessage.getSessionId()));
-                messageBObject.set(BCORRELATION_ID, BStringUtils.fromString(receivedMessage.getCorrelationId()));
+                        StringUtils.fromString(receivedMessage.getReplyToSessionId()));
+                messageBObject.set(BLABEL, StringUtils.fromString(receivedMessage.getLabel()));
+                messageBObject.set(BSESSION_ID, StringUtils.fromString(receivedMessage.getSessionId()));
+                messageBObject.set(BCORRELATION_ID, StringUtils.fromString(receivedMessage.getCorrelationId()));
                 messageBObject.set(BTIME_TO_LIVE, receivedMessage.getTimeToLive().getSeconds());
                 BMap<BString, Object> optionalProperties =
-                        BValueCreator.createRecordValue(PACKAGE_ID_ASB, OPTIONAL_PROPERTIES);
+                        ValueCreator.createRecordValue(PACKAGE_ID_ASB, OPTIONAL_PROPERTIES);
                 Object[] values = new Object[1];
                 values[0] = toBMap(receivedMessage.getProperties());
-                messageBObject.set(BPROPERTIES, BValueCreator.createRecordValue(optionalProperties, values));
+                messageBObject.set(BPROPERTIES, ValueCreator.createRecordValue(optionalProperties, values));
                 bObjectArray[i] = messageBObject;
                 i = i + 1;
                 sourceArrayType = new BArrayType(messageBObject.getType());
@@ -507,7 +506,7 @@ public class ConnectionUtils {
             log.info("\tDone receiving messages from \n" + receiver.getEntityPath());
             if(sourceArrayType != null) {
                 messagesBObject.set(ASBConstants.MESSAGES_CONTENT,
-                        BValueCreator.createArrayValue(bObjectArray, sourceArrayType));
+                        ValueCreator.createArrayValue(bObjectArray, sourceArrayType));
                 messagesBObject.set(ASBConstants.MESSAGE_COUNT, i);
             }
             return messagesBObject;
@@ -710,9 +709,9 @@ public class ConnectionUtils {
 
             log.info("\tDone receiving messages from \n" + receiver.getEntityPath());
 
-            BObject messageBObject = BValueCreator.createObjectValue(ASBConstants.PACKAGE_ID_ASB,
+            BObject messageBObject = ValueCreator.createObjectValue(ASBConstants.PACKAGE_ID_ASB,
                     ASBConstants.MESSAGE_OBJECT);
-            messageBObject.set(ASBConstants.MESSAGE_CONTENT, BValueCreator.createArrayValue(receivedMessage.getBody()));
+            messageBObject.set(ASBConstants.MESSAGE_CONTENT, ValueCreator.createArrayValue(receivedMessage.getBody()));
             return messageBObject;
         } catch (InterruptedException e) {
             throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "

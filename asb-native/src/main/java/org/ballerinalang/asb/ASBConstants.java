@@ -18,12 +18,12 @@
 
 package org.ballerinalang.asb;
 
-import org.ballerinalang.jvm.api.BStringUtils;
-import org.ballerinalang.jvm.api.values.BString;
-import org.ballerinalang.jvm.types.BPackage;
+import io.ballerina.runtime.api.Module;
+import io.ballerina.runtime.api.utils.StringUtils;
+import io.ballerina.runtime.api.values.BString;
 
-import static org.ballerinalang.jvm.util.BLangConstants.ORG_NAME_SEPARATOR;
-import static org.ballerinalang.jvm.util.BLangConstants.VERSION_SEPARATOR;
+import static io.ballerina.runtime.api.constants.RuntimeConstants.ORG_NAME_SEPARATOR;
+import static io.ballerina.runtime.api.constants.RuntimeConstants.VERSION_SEPARATOR;
 
 /**
  * Asb Connector Constants.
@@ -33,7 +33,7 @@ public class ASBConstants {
     public static final String ORG_NAME = "ballerinax";
     public static final String ASB = "asb";
     public static final String ASB_VERSION = "0.1.0";
-    public static final BPackage PACKAGE_ID_ASB = new BPackage(ORG_NAME, "asb", ASB_VERSION);
+    public static final Module PACKAGE_ID_ASB = new Module(ORG_NAME, "asb", ASB_VERSION);
     public static final String PACKAGE_ASB_FQN =
             ORG_NAME + ORG_NAME_SEPARATOR + ASB + VERSION_SEPARATOR + ASB_VERSION;
 
@@ -42,17 +42,17 @@ public class ASBConstants {
 
     // Message constant fields
     public static final String MESSAGE_OBJECT = "Message";
-    public static final BString MESSAGE_CONTENT = BStringUtils.fromString("messageContent");
-    public static final BString MESSAGE_CONTENT_TYPE = BStringUtils.fromString("messageContentType");
-    public static final BString BMESSAGE_ID = BStringUtils.fromString("messageId");
-    public static final BString BTO = BStringUtils.fromString("to");
-    public static final BString BREPLY_TO = BStringUtils.fromString("replyTo");
-    public static final BString BREPLY_TO_SESSION_ID = BStringUtils.fromString("replyToSessionId");
-    public static final BString BLABEL = BStringUtils.fromString("label");
-    public static final BString BSESSION_ID = BStringUtils.fromString("sessionId");
-    public static final BString BCORRELATION_ID = BStringUtils.fromString("correlationId");
-    public static final BString BTIME_TO_LIVE = BStringUtils.fromString("timeToLive");
-    public static final BString BPROPERTIES = BStringUtils.fromString("properties");
+    public static final BString MESSAGE_CONTENT = StringUtils.fromString("messageContent");
+    public static final BString MESSAGE_CONTENT_TYPE = StringUtils.fromString("messageContentType");
+    public static final BString BMESSAGE_ID = StringUtils.fromString("messageId");
+    public static final BString BTO = StringUtils.fromString("to");
+    public static final BString BREPLY_TO = StringUtils.fromString("replyTo");
+    public static final BString BREPLY_TO_SESSION_ID = StringUtils.fromString("replyToSessionId");
+    public static final BString BLABEL = StringUtils.fromString("label");
+    public static final BString BSESSION_ID = StringUtils.fromString("sessionId");
+    public static final BString BCORRELATION_ID = StringUtils.fromString("correlationId");
+    public static final BString BTIME_TO_LIVE = StringUtils.fromString("timeToLive");
+    public static final BString BPROPERTIES = StringUtils.fromString("properties");
     public static final String OPTIONAL_PROPERTIES = "OptionalProperties";
 
     // Message content data binding errors
@@ -64,8 +64,8 @@ public class ASBConstants {
 
     // Messages constant fields
     public static final String MESSAGES_OBJECT = "Messages";
-    public static final BString MESSAGES_CONTENT = BStringUtils.fromString("messages");
-    public static final BString MESSAGE_COUNT = BStringUtils.fromString("messageCount");
+    public static final BString MESSAGES_CONTENT = StringUtils.fromString("messages");
+    public static final BString MESSAGE_COUNT = StringUtils.fromString("messageCount");
 
     // Keys of the input message optional parameters specified as a Map
     public static final String CONTENT_TYPE = "contentType";
@@ -86,12 +86,12 @@ public class ASBConstants {
     public static final String FUNC_ON_ERROR = "onError";
     public static final String DISPATCH_ERROR = "Error occurred while dispatching the message. ";
 
-    public static final BString QUEUE_NAME = BStringUtils.fromString("queueName");
-    public static final BString CONNECTION_STRING = BStringUtils.fromString("connectionString");
+    public static final BString QUEUE_NAME = StringUtils.fromString("queueName");
+    public static final BString CONNECTION_STRING = StringUtils.fromString("connectionString");
     public static final String CONNECTION_NATIVE_OBJECT = "asb_connection_object";
 
     public static final String SERVICE_CONFIG = "ServiceConfig";
-    public static final BString ALIAS_QUEUE_CONFIG = BStringUtils.fromString("queueConfig");
+    public static final BString ALIAS_QUEUE_CONFIG = StringUtils.fromString("queueConfig");
 
     public static final String UNCHECKED = "unchecked";
 }

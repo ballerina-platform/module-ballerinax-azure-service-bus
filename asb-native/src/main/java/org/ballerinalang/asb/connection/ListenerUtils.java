@@ -21,11 +21,12 @@ package org.ballerinalang.asb.connection;
 import com.microsoft.azure.servicebus.*;
 import com.microsoft.azure.servicebus.primitives.ConnectionStringBuilder;
 import com.microsoft.azure.servicebus.primitives.ServiceBusException;
+import io.ballerina.runtime.api.Environment;
+import io.ballerina.runtime.api.Runtime;
+import io.ballerina.runtime.api.values.BObject;
 import org.ballerinalang.asb.ASBConstants;
 import org.ballerinalang.asb.ASBUtils;
 import org.ballerinalang.asb.MessageDispatcher;
-import org.ballerinalang.jvm.api.BRuntime;
-import org.ballerinalang.jvm.api.values.BObject;
 
 import java.util.ArrayList;
 import java.util.logging.Logger;
@@ -39,7 +40,7 @@ import static org.ballerinalang.asb.MessageDispatcher.getQueueNameFromConfig;
 public class ListenerUtils {
     private static final Logger log = Logger.getLogger(ListenerUtils.class.getName());
 
-    private static BRuntime runtime;
+    private static Runtime runtime;
 
     private static boolean started = false;
     private static boolean serviceAttached = false;
@@ -65,8 +66,8 @@ public class ListenerUtils {
      * @param service Ballerina service instance.
      * @return An error if failed to create IMessageReceiver connection instance.
      */
-    public static Object registerListener(BObject listenerBObject, BObject service) {
-        runtime = BRuntime.getCurrentRuntime();
+    public static Object registerListener(Environment environment, BObject listenerBObject, BObject service) {
+        runtime = environment.getRuntime();
         try {
             String connectionString = getConnectionStringFromConfig(service);
             String entityPath = getQueueNameFromConfig(service);
@@ -98,8 +99,8 @@ public class ListenerUtils {
      *
      * @param listenerBObject Ballerina listener object.
      */
-    public static Object start(BObject listenerBObject) {
-        runtime = BRuntime.getCurrentRuntime();
+    public static Object start(Environment environment, BObject listenerBObject) {
+        runtime = environment.getRuntime();
         IMessageReceiver iMessageReceiver =
                 (IMessageReceiver) listenerBObject.getNativeData(ASBConstants.CONNECTION_NATIVE_OBJECT);
         @SuppressWarnings(ASBConstants.UNCHECKED)

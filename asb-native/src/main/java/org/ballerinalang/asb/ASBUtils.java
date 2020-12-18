@@ -18,9 +18,9 @@
 
 package org.ballerinalang.asb;
 
-import org.ballerinalang.jvm.api.values.BError;
-import org.ballerinalang.jvm.api.BErrorCreator;
-import org.ballerinalang.jvm.api.BStringUtils;
+import io.ballerina.runtime.api.creators.ErrorCreator;
+import io.ballerina.runtime.api.utils.StringUtils;
+import io.ballerina.runtime.api.values.BError;
 
 /**
  * Util class for Asb Error handling.
@@ -33,8 +33,8 @@ public class ASBUtils {
      * @return Resulting Ballerina Error
      */
     public static BError returnErrorValue(String errorMessage) {
-        return BErrorCreator.createDistinctError(ASBConstants.ASB_ERROR, ASBConstants.PACKAGE_ID_ASB,
-                BStringUtils.fromString(errorMessage));
+        return ErrorCreator.createDistinctError(ASBConstants.ASB_ERROR, ASBConstants.PACKAGE_ID_ASB,
+                StringUtils.fromString(errorMessage));
     }
 }
 

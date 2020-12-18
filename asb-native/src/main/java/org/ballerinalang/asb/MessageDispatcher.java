@@ -19,15 +19,18 @@
 package org.ballerinalang.asb;
 
 import com.microsoft.azure.servicebus.*;
-import org.ballerinalang.jvm.api.BStringUtils;
-import org.ballerinalang.jvm.api.BValueCreator;
-import org.ballerinalang.jvm.api.values.*;
-import org.ballerinalang.jvm.scheduling.StrandMetadata;
-import org.ballerinalang.jvm.types.AnnotatableType;
-import org.ballerinalang.jvm.types.BType;
-import org.ballerinalang.jvm.types.AttachedFunction;
-import org.ballerinalang.jvm.runtime.AsyncFunctionCallback;
-import org.ballerinalang.jvm.api.BRuntime;
+import io.ballerina.runtime.api.Runtime;
+import io.ballerina.runtime.api.async.Callback;
+import io.ballerina.runtime.api.async.StrandMetadata;
+import io.ballerina.runtime.api.creators.ValueCreator;
+import io.ballerina.runtime.api.types.AnnotatableType;
+import io.ballerina.runtime.api.types.AttachedFunctionType;
+import io.ballerina.runtime.api.types.Type;
+import io.ballerina.runtime.api.utils.StringUtils;
+import io.ballerina.runtime.api.values.BError;
+import io.ballerina.runtime.api.values.BMap;
+import io.ballerina.runtime.api.values.BObject;
+import io.ballerina.runtime.api.values.BString;
 
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
@@ -47,7 +50,7 @@ public class MessageDispatcher {
     private BObject service;
     private String queueName;
     private String connectionKey;
-    private BRuntime runtime;
+    private Runtime runtime;
     private IMessageReceiver receiver;
     private static final StrandMetadata ON_MESSAGE_METADATA = new StrandMetadata(ORG_NAME, ASB,
             ASB_VERSION, FUNC_ON_MESSAGE);
@@ -61,7 +64,7 @@ public class MessageDispatcher {
      * @param runtime Ballerina runtime instance.
      * @param iMessageReceiver Asb MessageReceiver instance.
      */
-    public MessageDispatcher(BObject service, BRuntime runtime, IMessageReceiver iMessageReceiver) {
+    public MessageDispatcher(BObject service, Runtime runtime, IMessageReceiver iMessageReceiver) {
         this.service = service;
         this.queueName = getQueueNameFromConfig(service);
         this.connectionKey = getConnectionStringFromConfig(service);
@@ -77,7 +80,7 @@ public class MessageDispatcher {
      */
     public static String getQueueNameFromConfig(BObject service) {
         BMap serviceConfig = (BMap) ((AnnotatableType) service.getType())
-                .getAnnotation(BStringUtils.fromString(ASBConstants.PACKAGE_ASB_FQN + ":"
+                .getAnnotation(StringUtils.fromString(ASBConstants.PACKAGE_ASB_FQN + ":"
                         + ASBConstants.SERVICE_CONFIG));
         @SuppressWarnings(ASBConstants.UNCHECKED)
         BMap<BString, Object> queueConfig =
@@ -93,7 +96,7 @@ public class MessageDispatcher {
      */
     public static String getConnectionStringFromConfig(BObject service) {
         BMap serviceConfig = (BMap) ((AnnotatableType) service.getType())
-                .getAnnotation(BStringUtils.fromString(ASBConstants.PACKAGE_ASB_FQN + ":"
+                .getAnnotation(StringUtils.fromString(ASBConstants.PACKAGE_ASB_FQN + ":"
                         + ASBConstants.SERVICE_CONFIG));
         @SuppressWarnings(ASBConstants.UNCHECKED)
         BMap<BString, Object> queueConfig =
@@ -160,14 +163,14 @@ public class MessageDispatcher {
      * @param message Received azure service bus message instance.
      */
     private void handleDispatch(byte[] message) {
-        AttachedFunction[] attachedFunctions = service.getType().getAttachedFunctions();
-        AttachedFunction onMessageFunction;
+        AttachedFunctionType[] attachedFunctions = service.getType().getAttachedFunctions();
+        AttachedFunctionType onMessageFunction;
         if (FUNC_ON_MESSAGE.equals(attachedFunctions[0].getName())) {
             onMessageFunction = attachedFunctions[0];
         } else {
             return;
         }
-        BType[] paramTypes = onMessageFunction.getParameterType();
+        Type[] paramTypes = onMessageFunction.getParameterTypes();
         int paramSize = paramTypes.length;
         dispatchMessage(message);
     }
@@ -179,7 +182,7 @@ public class MessageDispatcher {
      */
     private void dispatchMessage(byte[] message) {
         try {
-            AsyncFunctionCallback callback = new ASBResourceCallback();
+            Callback callback = new ASBResourceCallback();
             BObject messageBObject = getMessageBObject(message);
             executeResourceOnMessage(callback, messageBObject, true);
         } catch (BError exception) {
@@ -198,7 +201,7 @@ public class MessageDispatcher {
         BError error = ASBUtils.returnErrorValue(ASBConstants.DISPATCH_ERROR);
         BObject messageBObject = getMessageBObject(message);
         try {
-            AsyncFunctionCallback callback = new ASBResourceCallback();
+            Callback callback = new ASBResourceCallback();
             executeResourceOnError(callback, messageBObject, true, error, true);
         } catch (BError exception) {
             throw ASBUtils.returnErrorValue("Error occurred in RabbitMQ service. ");
@@ -211,22 +214,22 @@ public class MessageDispatcher {
      * @param message Received azure service bus message instance.
      */
     private BObject getMessageBObject(byte[] message)  {
-        BObject messageBObject = BValueCreator.createObjectValue(ASBConstants.PACKAGE_ID_ASB,
+        BObject messageBObject = ValueCreator.createObjectValue(ASBConstants.PACKAGE_ID_ASB,
                 ASBConstants.MESSAGE_OBJECT);
-        messageBObject.set(ASBConstants.MESSAGE_CONTENT, BValueCreator.createArrayValue(message));
+        messageBObject.set(ASBConstants.MESSAGE_CONTENT, ValueCreator.createArrayValue(message));
 
         return messageBObject;
     }
 
-    private void executeResourceOnMessage(AsyncFunctionCallback callback, Object... args) {
+    private void executeResourceOnMessage(Callback callback, Object... args) {
         executeResource(ASBConstants.FUNC_ON_MESSAGE, callback, ON_MESSAGE_METADATA, args);
     }
 
-    private void executeResourceOnError(AsyncFunctionCallback callback, Object... args) {
+    private void executeResourceOnError(Callback callback, Object... args) {
         executeResource(ASBConstants.FUNC_ON_ERROR, callback, ON_ERROR_METADATA, args);
     }
 
-    private void executeResource(String function, AsyncFunctionCallback callback, StrandMetadata metaData,
+    private void executeResource(String function, Callback callback, StrandMetadata metaData,
                                  Object... args) {
         runtime.invokeMethodAsync(service, function, null, metaData, callback, args);
     }

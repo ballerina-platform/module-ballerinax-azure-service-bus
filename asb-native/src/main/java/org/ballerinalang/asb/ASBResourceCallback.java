@@ -18,13 +18,13 @@
 
 package org.ballerinalang.asb;
 
-import org.ballerinalang.jvm.api.values.BError;
-import org.ballerinalang.jvm.runtime.AsyncFunctionCallback;
+import io.ballerina.runtime.api.async.Callback;
+import io.ballerina.runtime.api.values.BError;
 
 /**
  * Handles the Azure service bus resource callback.
  */
-public class ASBResourceCallback extends AsyncFunctionCallback {
+public class ASBResourceCallback implements Callback {
     @Override
     public void notifySuccess() {
         // do nothing
