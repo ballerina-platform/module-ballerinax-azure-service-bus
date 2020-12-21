@@ -26,7 +26,7 @@ import io.ballerina.runtime.api.values.BError;
  */
 public class ASBResourceCallback implements Callback {
     @Override
-    public void notifySuccess() {
+    public void notifySuccess(Object obj) {
         // do nothing
     }
     @Override
