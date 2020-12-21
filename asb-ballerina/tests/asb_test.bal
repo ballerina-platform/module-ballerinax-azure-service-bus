@@ -60,11 +60,11 @@ int variableMessageCount = 1000;
 # Before Suite Function
 @test:BeforeSuite
 function beforeSuiteFunc() {
-    log:printInfo("Creating a ballerina Asb Sender connection.");
+    log:print("Creating a ballerina Asb Sender connection.");
     SenderConnection? con = new ({connectionString: connectionString, entityPath: queuePath});
     senderConnection = con;
 
-    log:printInfo("Creating a ballerina Asb Receiver connection.");
+    log:print("Creating a ballerina Asb Receiver connection.");
     ReceiverConnection? rec = new ({connectionString: connectionString, entityPath: queuePath});
     receiverConnection = rec;
 }
@@ -97,14 +97,14 @@ public function testReceieverConnection() {
 
 # Test send to queue operation
 @test:Config {
-    enable: false
+    enable: true
 }
 function testSendToQueueOperation() {
-    log:printInfo("Creating Asb sender connection.");
+    log:print("Creating Asb sender connection.");
     SenderConnection? senderConnection = new ({connectionString: connectionString, entityPath: queuePath});
 
     if (senderConnection is SenderConnection) {
-        log:printInfo("Sending via Asb sender connection.");
+        log:print("Sending via Asb sender connection.");
         checkpanic senderConnection.sendMessageWithConfigurableParameters(byteContent, parameters1, properties);
         checkpanic senderConnection.sendMessageWithConfigurableParameters(byteContentFromJson, parameters2, properties);
     } else {
@@ -112,7 +112,7 @@ function testSendToQueueOperation() {
     }
 
     if (senderConnection is SenderConnection) {
-        log:printInfo("Closing Asb sender connection.");
+        log:print("Closing Asb sender connection.");
         checkpanic senderConnection.closeSenderConnection();
     }
 }
@@ -123,18 +123,18 @@ function testSendToQueueOperation() {
     enable: false
 }
 function testReceiveFromQueueOperation() {
-    log:printInfo("Creating Asb receiver connection.");
+    log:print("Creating Asb receiver connection.");
     ReceiverConnection? receiverConnection = new ({connectionString: connectionString, entityPath: queuePath});
 
     if (receiverConnection is ReceiverConnection) {
-        log:printInfo("Receiving from Asb receiver connection.");
+        log:print("Receiving from Asb receiver connection.");
         Message|Error messageReceived = receiverConnection.receiveMessage(serverWaitTime);
         Message|Error jsonMessageReceived = receiverConnection.receiveMessage(serverWaitTime);
         if (messageReceived is Message && jsonMessageReceived is Message) {
             string messageRead = checkpanic messageReceived.getTextContent();
-            log:printInfo("Reading Received Message : " + messageRead);
+            log:print("Reading Received Message : " + messageRead);
             json jsonMessageRead = checkpanic jsonMessageReceived.getJSONContent();
-            log:printInfo("Reading Received Message : " + jsonMessageRead.toString());
+            log:print("Reading Received Message : " + jsonMessageRead.toString());
         } else {
             test:assertFail("Receiving message via Asb receiver connection failed.");
         }
@@ -143,7 +143,7 @@ function testReceiveFromQueueOperation() {
     }
 
     if (receiverConnection is ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection.");
+        log:print("Closing Asb receiver connection.");
         checkpanic receiverConnection.closeReceiverConnection();
     }
 }
@@ -154,20 +154,20 @@ function testReceiveFromQueueOperation() {
     enable: false
 }
 function testReceiveMessagesFromQueueOperation() {
-    log:printInfo("Creating Asb receiver connection.");
+    log:print("Creating Asb receiver connection.");
     ReceiverConnection? receiverConnection = new ({connectionString: connectionString, entityPath: queuePath});
 
     if (receiverConnection is ReceiverConnection) {
-        log:printInfo("Receiving from Asb receiver connection.");
+        log:print("Receiving from Asb receiver connection.");
         var messageReceived = receiverConnection.receiveMessages(serverWaitTime, maxMessageCount);
         if(messageReceived is Messages) {
             int val = messageReceived.getMessageCount();
-            log:printInfo("No. of messages received : " + val.toString());
+            log:print("No. of messages received : " + val.toString());
             Message[] messages = messageReceived.getMessages();
             string messageReceived1 =  checkpanic messages[0].getTextContent();
-            log:printInfo("Message1 content : " +messageReceived1);
+            log:print("Message1 content : " +messageReceived1);
             json messageReceived2 =  checkpanic messages[1].getJSONContent();
-            log:printInfo("Message2 content : " +messageReceived2.toString());
+            log:print("Message2 content : " +messageReceived2.toString());
         } else {
             test:assertFail(msg = messageReceived.message());
         }
@@ -176,7 +176,7 @@ function testReceiveMessagesFromQueueOperation() {
     }
 
     if (receiverConnection is ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection.");
+        log:print("Closing Asb receiver connection.");
         checkpanic receiverConnection.closeReceiverConnection();
     }
 }
@@ -186,18 +186,18 @@ function testReceiveMessagesFromQueueOperation() {
     enable: false
 }
 function testSendBatchToQueueOperation() {
-    log:printInfo("Creating Asb sender connection.");
+    log:print("Creating Asb sender connection.");
     SenderConnection? senderConnection = new ({connectionString: connectionString, entityPath: queuePath});
 
     if (senderConnection is SenderConnection) {
-        log:printInfo("Sending via Asb sender connection.");
+        log:print("Sending via Asb sender connection.");
         checkpanic senderConnection.sendBatchMessage(stringArrayContent, parameters3, properties, maxMessageCount);
     } else {
         test:assertFail("Asb sender connection creation failed.");
     }
 
     if (senderConnection is SenderConnection) {
-        log:printInfo("Closing Asb sender connection.");
+        log:print("Closing Asb sender connection.");
         checkpanic senderConnection.closeSenderConnection();
     }
 }
@@ -208,22 +208,22 @@ function testSendBatchToQueueOperation() {
     enable: false
 }
 function testReceiveBatchFromQueueOperation() {
-    log:printInfo("Creating Asb receiver connection.");
+    log:print("Creating Asb receiver connection.");
     ReceiverConnection? receiverConnection = new ({connectionString: connectionString, entityPath: queuePath});
 
     if (receiverConnection is ReceiverConnection) {
-        log:printInfo("Receiving from Asb receiver connection.");
+        log:print("Receiving from Asb receiver connection.");
         var messageReceived = receiverConnection.receiveBatchMessage(maxMessageCount);
         if(messageReceived is Messages) {
             int val = messageReceived.getMessageCount();
-            log:printInfo("No. of messages received : " + val.toString());
+            log:print("No. of messages received : " + val.toString());
             Message[] messages = messageReceived.getMessages();
             string messageReceived1 =  checkpanic messages[0].getTextContent();
-            log:printInfo("Message1 content : " + messageReceived1);
+            log:print("Message1 content : " + messageReceived1);
             string messageReceived2 =  checkpanic messages[1].getTextContent();
-            log:printInfo("Message2 content : " + messageReceived2);
+            log:print("Message2 content : " + messageReceived2);
             string messageReceived3 =  checkpanic messages[2].getTextContent();
-            log:printInfo("Message3 content : " + messageReceived3);
+            log:print("Message3 content : " + messageReceived3);
         } else {
             test:assertFail("Receiving message via Asb receiver connection failed.");
         }
@@ -232,7 +232,7 @@ function testReceiveBatchFromQueueOperation() {
     }
 
     if (receiverConnection is ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection.");
+        log:print("Closing Asb receiver connection.");
         checkpanic receiverConnection.closeReceiverConnection();
     }
 }
@@ -243,22 +243,22 @@ function testReceiveBatchFromQueueOperation() {
     enable: false
 }
 function testCompleteMessagesFromQueueOperation() {
-    log:printInfo("Creating Asb receiver connection.");
+    log:print("Creating Asb receiver connection.");
     ReceiverConnection? receiverConnection = new ({connectionString: connectionString, entityPath: queuePath});
 
     if (receiverConnection is ReceiverConnection) {
-        log:printInfo("Completing messages from Asb receiver connection.");
+        log:print("Completing messages from Asb receiver connection.");
         checkpanic receiverConnection.completeMessages();
-        log:printInfo("Done completing messages using their lock tokens.");
-        log:printInfo("Completing messages from Asb receiver connection.");
+        log:print("Done completing messages using their lock tokens.");
+        log:print("Completing messages from Asb receiver connection.");
         checkpanic receiverConnection.completeMessages();
-        log:printInfo("Done completing messages using their lock tokens.");
+        log:print("Done completing messages using their lock tokens.");
     } else {
         test:assertFail("Asb receiver connection creation failed.");
     }
 
     if (receiverConnection is ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection.");
+        log:print("Closing Asb receiver connection.");
         checkpanic receiverConnection.closeReceiverConnection();
     }
 }
@@ -269,21 +269,21 @@ function testCompleteMessagesFromQueueOperation() {
     enable: false
 }
 function testCompleteOneMessageFromQueueOperation() {
-    log:printInfo("Creating Asb receiver connection.");
+    log:print("Creating Asb receiver connection.");
     ReceiverConnection? receiverConnection = new ({connectionString: connectionString, entityPath: queuePath});
 
     if (receiverConnection is ReceiverConnection) {
-        log:printInfo("Completing message from Asb receiver connection.");
+        log:print("Completing message from Asb receiver connection.");
         checkpanic receiverConnection.completeOneMessage();
         checkpanic receiverConnection.completeOneMessage();
         checkpanic receiverConnection.completeOneMessage();
-        log:printInfo("Done completing a message using its lock token.");
+        log:print("Done completing a message using its lock token.");
     } else {
         test:assertFail("Asb receiver connection creation failed.");
     }
 
     if (receiverConnection is ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection.");
+        log:print("Closing Asb receiver connection.");
         checkpanic receiverConnection.closeReceiverConnection();
     }
 }
@@ -294,22 +294,22 @@ function testCompleteOneMessageFromQueueOperation() {
     enable: false
 }
 function testAbandonMessageFromQueueOperation() {
-    log:printInfo("Creating Asb receiver connection.");
+    log:print("Creating Asb receiver connection.");
     ReceiverConnection? receiverConnection = new ({connectionString: connectionString, entityPath: queuePath});
 
     if (receiverConnection is ReceiverConnection) {
-        log:printInfo("abandoning message from Asb receiver connection.");
+        log:print("abandoning message from Asb receiver connection.");
         checkpanic receiverConnection.abandonMessage();
-        log:printInfo("Done abandoning a message using its lock token.");
-        log:printInfo("Completing messages from Asb receiver connection.");
+        log:print("Done abandoning a message using its lock token.");
+        log:print("Completing messages from Asb receiver connection.");
         checkpanic receiverConnection.completeMessages();
-        log:printInfo("Done completing messages using their lock tokens.");
+        log:print("Done completing messages using their lock tokens.");
     } else {
         test:assertFail("Asb receiver connection creation failed.");
     }
 
     if (receiverConnection is ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection.");
+        log:print("Closing Asb receiver connection.");
         checkpanic receiverConnection.closeReceiverConnection();
     }
 }
@@ -319,11 +319,11 @@ function testAbandonMessageFromQueueOperation() {
     enable: false
 }
 function testSendToTopicOperation() {
-    log:printInfo("Creating Asb sender connection.");
+    log:print("Creating Asb sender connection.");
     SenderConnection? senderConnection = new ({connectionString: connectionString, entityPath: topicPath});
 
     if (senderConnection is SenderConnection) {
-        log:printInfo("Sending via Asb sender connection.");
+        log:print("Sending via Asb sender connection.");
         checkpanic senderConnection.sendMessageWithConfigurableParameters(byteContent, parameters1, properties);
         checkpanic senderConnection.sendMessageWithConfigurableParameters(byteContentFromJson, parameters2, properties);
     } else {
@@ -331,7 +331,7 @@ function testSendToTopicOperation() {
     }
 
     if (senderConnection is SenderConnection) {
-        log:printInfo("Closing Asb sender connection.");
+        log:print("Closing Asb sender connection.");
         checkpanic senderConnection.closeSenderConnection();
     }
 }
@@ -342,20 +342,20 @@ function testSendToTopicOperation() {
     enable: false
 }
 function testReceiveFromSubscriptionOperation() {
-    log:printInfo("Creating Asb receiver connection.");
+    log:print("Creating Asb receiver connection.");
     ReceiverConnection? receiverConnection1 = new ({connectionString: connectionString, entityPath: subscriptionPath1});
     ReceiverConnection? receiverConnection2 = new ({connectionString: connectionString, entityPath: subscriptionPath2});
     ReceiverConnection? receiverConnection3 = new ({connectionString: connectionString, entityPath: subscriptionPath3});
 
     if (receiverConnection1 is ReceiverConnection) {
-        log:printInfo("Receiving from Asb receiver connection 1.");
+        log:print("Receiving from Asb receiver connection 1.");
         Message|error messageReceived = receiverConnection1.receiveMessage(serverWaitTime);
         Message|error jsonMessageReceived = receiverConnection1.receiveMessage(serverWaitTime);
         if (messageReceived is Message && jsonMessageReceived is Message) {
             string messageRead = checkpanic messageReceived.getTextContent();
-            log:printInfo("Reading Received Message : " + messageRead);
+            log:print("Reading Received Message : " + messageRead);
             json jsonMessageRead = checkpanic jsonMessageReceived.getJSONContent();
-            log:printInfo("Reading Received Message : " + jsonMessageRead.toString());
+            log:print("Reading Received Message : " + jsonMessageRead.toString());
         } else {
             test:assertFail("Receiving message via Asb receiver connection failed.");
         }
@@ -365,14 +365,14 @@ function testReceiveFromSubscriptionOperation() {
 
 
     if (receiverConnection2 is ReceiverConnection) {
-        log:printInfo("Receiving from Asb receiver connection 2.");
+        log:print("Receiving from Asb receiver connection 2.");
         Message|error messageReceived = receiverConnection2.receiveMessage(serverWaitTime);
         Message|error jsonMessageReceived = receiverConnection2.receiveMessage(serverWaitTime);
         if (messageReceived is Message && jsonMessageReceived is Message) {
             string messageRead = checkpanic messageReceived.getTextContent();
-            log:printInfo("Reading Received Message : " + messageRead);
+            log:print("Reading Received Message : " + messageRead);
             json jsonMessageRead = checkpanic jsonMessageReceived.getJSONContent();
-            log:printInfo("Reading Received Message : " + jsonMessageRead.toString());
+            log:print("Reading Received Message : " + jsonMessageRead.toString());
         } else {
             test:assertFail("Receiving message via Asb receiver connection failed.");
         }
@@ -381,14 +381,14 @@ function testReceiveFromSubscriptionOperation() {
     }
 
     if (receiverConnection3 is ReceiverConnection) {
-        log:printInfo("Receiving from Asb receiver connection 3.");
+        log:print("Receiving from Asb receiver connection 3.");
         Message|error messageReceived = receiverConnection3.receiveMessage(serverWaitTime);
         Message|error jsonMessageReceived = receiverConnection3.receiveMessage(serverWaitTime);
         if (messageReceived is Message && jsonMessageReceived is Message) {
             string messageRead = checkpanic messageReceived.getTextContent();
-            log:printInfo("Reading Received Message : " + messageRead);
+            log:print("Reading Received Message : " + messageRead);
             json jsonMessageRead = checkpanic jsonMessageReceived.getJSONContent();
-            log:printInfo("Reading Received Message : " + jsonMessageRead.toString());
+            log:print("Reading Received Message : " + jsonMessageRead.toString());
         } else {
             test:assertFail("Receiving message via Asb receiver connection failed.");
         }
@@ -397,17 +397,17 @@ function testReceiveFromSubscriptionOperation() {
     }
 
     if (receiverConnection1 is ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection 1.");
+        log:print("Closing Asb receiver connection 1.");
         checkpanic receiverConnection1.closeReceiverConnection();
     }
 
     if (receiverConnection2 is ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection 2.");
+        log:print("Closing Asb receiver connection 2.");
         checkpanic receiverConnection2.closeReceiverConnection();
     }
 
     if (receiverConnection3 is ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection 3.");
+        log:print("Closing Asb receiver connection 3.");
         checkpanic receiverConnection3.closeReceiverConnection();
     }
 }
@@ -417,18 +417,18 @@ function testReceiveFromSubscriptionOperation() {
     enable: false
 }
 function testSendBatchToTopicOperation() {
-    log:printInfo("Creating Asb sender connection.");
+    log:print("Creating Asb sender connection.");
     SenderConnection? senderConnection = new ({connectionString: connectionString, entityPath: topicPath});
 
     if (senderConnection is SenderConnection) {
-        log:printInfo("Sending via Asb sender connection.");
+        log:print("Sending via Asb sender connection.");
         checkpanic senderConnection.sendBatchMessage(stringArrayContent, parameters3, properties, maxMessageCount);
     } else {
         test:assertFail("Asb sender connection creation failed.");
     }
 
     if (senderConnection is SenderConnection) {
-        log:printInfo("Closing Asb sender connection.");
+        log:print("Closing Asb sender connection.");
         checkpanic senderConnection.closeSenderConnection();
     }
 }
@@ -439,24 +439,24 @@ function testSendBatchToTopicOperation() {
     enable: false
 }
 function testReceiveBatchFromSubscriptionOperation() {
-    log:printInfo("Creating Asb receiver connection.");
+    log:print("Creating Asb receiver connection.");
     ReceiverConnection? receiverConnection1 = new ({connectionString: connectionString, entityPath: subscriptionPath1});
     ReceiverConnection? receiverConnection2 = new ({connectionString: connectionString, entityPath: subscriptionPath2});
     ReceiverConnection? receiverConnection3 = new ({connectionString: connectionString, entityPath: subscriptionPath3});
 
     if (receiverConnection1 is ReceiverConnection) {
-        log:printInfo("Receiving from Asb receiver connection 1.");
+        log:print("Receiving from Asb receiver connection 1.");
         var messagesReceived = receiverConnection1.receiveBatchMessage(maxMessageCount);
         if(messagesReceived is Messages) {
             int val = messagesReceived.getMessageCount();
-            log:printInfo("No. of messages received : " + val.toString());
+            log:print("No. of messages received : " + val.toString());
             Message[] messages = messagesReceived.getMessages();
             string messageReceived1 =  checkpanic messages[0].getTextContent();
-            log:printInfo("Message1 content : " + messageReceived1);
+            log:print("Message1 content : " + messageReceived1);
             string messageReceived2 =  checkpanic messages[1].getTextContent();
-            log:printInfo("Message2 content : " + messageReceived2);
+            log:print("Message2 content : " + messageReceived2);
             string messageReceived3 =  checkpanic messages[2].getTextContent();
-            log:printInfo("Message3 content : " + messageReceived3);
+            log:print("Message3 content : " + messageReceived3);
         }else {
             test:assertFail("Receiving message via Asb receiver connection failed.");
         }
@@ -465,18 +465,18 @@ function testReceiveBatchFromSubscriptionOperation() {
     }
 
     if (receiverConnection2 is ReceiverConnection) {
-        log:printInfo("Receiving from Asb receiver connection 2.");
+        log:print("Receiving from Asb receiver connection 2.");
         var messagesReceived = receiverConnection2.receiveBatchMessage(maxMessageCount);
         if(messagesReceived is Messages) {
             int val = messagesReceived.getMessageCount();
-            log:printInfo("No. of messages received : " + val.toString());
+            log:print("No. of messages received : " + val.toString());
             Message[] messages = messagesReceived.getMessages();
             string messageReceived1 =  checkpanic messages[0].getTextContent();
-            log:printInfo("Message1 content : " + messageReceived1);
+            log:print("Message1 content : " + messageReceived1);
             string messageReceived2 =  checkpanic messages[1].getTextContent();
-            log:printInfo("Message2 content : " + messageReceived2);
+            log:print("Message2 content : " + messageReceived2);
             string messageReceived3 =  checkpanic messages[2].getTextContent();
-            log:printInfo("Message3 content : " + messageReceived3);
+            log:print("Message3 content : " + messageReceived3);
         } else {
             test:assertFail("Receiving message via Asb receiver connection failed.");
         }
@@ -485,18 +485,18 @@ function testReceiveBatchFromSubscriptionOperation() {
     }
 
     if (receiverConnection3 is ReceiverConnection) {
-        log:printInfo("Receiving from Asb receiver connection 3.");
+        log:print("Receiving from Asb receiver connection 3.");
         var messagesReceived = receiverConnection3.receiveBatchMessage(maxMessageCount);
         if(messagesReceived is Messages) {
             int val = messagesReceived.getMessageCount();
-            log:printInfo("No. of messages received : " + val.toString());
+            log:print("No. of messages received : " + val.toString());
             Message[] messages = messagesReceived.getMessages();
             string messageReceived1 =  checkpanic messages[0].getTextContent();
-            log:printInfo("Message1 content : " + messageReceived1);
+            log:print("Message1 content : " + messageReceived1);
             string messageReceived2 =  checkpanic messages[1].getTextContent();
-            log:printInfo("Message2 content : " + messageReceived2);
+            log:print("Message2 content : " + messageReceived2);
             string messageReceived3 =  checkpanic messages[2].getTextContent();
-            log:printInfo("Message3 content : " + messageReceived3);
+            log:print("Message3 content : " + messageReceived3);
         } else {
             test:assertFail("Receiving message via Asb receiver connection failed.");
         }
@@ -505,17 +505,17 @@ function testReceiveBatchFromSubscriptionOperation() {
     }
 
     if (receiverConnection1 is ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection 1.");
+        log:print("Closing Asb receiver connection 1.");
         checkpanic receiverConnection1.closeReceiverConnection();
     }
 
     if (receiverConnection2 is ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection 2.");
+        log:print("Closing Asb receiver connection 2.");
         checkpanic receiverConnection2.closeReceiverConnection();
     }
 
     if (receiverConnection3 is ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection 3.");
+        log:print("Closing Asb receiver connection 3.");
         checkpanic receiverConnection3.closeReceiverConnection();
     }
 }
@@ -526,56 +526,56 @@ function testReceiveBatchFromSubscriptionOperation() {
     enable: false
 }
 function testCompleteMessagesFromSubscriptionOperation() {
-    log:printInfo("Creating Asb receiver connection.");
+    log:print("Creating Asb receiver connection.");
     ReceiverConnection? receiverConnection1 = new ({connectionString: connectionString, entityPath: subscriptionPath1});
     ReceiverConnection? receiverConnection2 = new ({connectionString: connectionString, entityPath: subscriptionPath2});
     ReceiverConnection? receiverConnection3 = new ({connectionString: connectionString, entityPath: subscriptionPath3});
 
     if (receiverConnection1 is ReceiverConnection) {
-        log:printInfo("Completing messages from Asb receiver connection.");
+        log:print("Completing messages from Asb receiver connection.");
         checkpanic receiverConnection1.completeMessages();
-        log:printInfo("Done completing messages using their lock tokens.");
-        log:printInfo("Completing messages from Asb receiver connection.");
+        log:print("Done completing messages using their lock tokens.");
+        log:print("Completing messages from Asb receiver connection.");
         checkpanic receiverConnection1.completeMessages();
-        log:printInfo("Done completing messages using their lock tokens.");
+        log:print("Done completing messages using their lock tokens.");
     } else {
         test:assertFail("Asb receiver connection creation failed.");
     }
 
     if (receiverConnection2 is ReceiverConnection) {
-        log:printInfo("Completing messages from Asb receiver connection.");
+        log:print("Completing messages from Asb receiver connection.");
         checkpanic receiverConnection2.completeMessages();
-        log:printInfo("Done completing messages using their lock tokens.");
-        log:printInfo("Completing messages from Asb receiver connection.");
+        log:print("Done completing messages using their lock tokens.");
+        log:print("Completing messages from Asb receiver connection.");
         checkpanic receiverConnection2.completeMessages();
-        log:printInfo("Done completing messages using their lock tokens.");
+        log:print("Done completing messages using their lock tokens.");
     } else {
         test:assertFail("Asb receiver connection creation failed.");
     }
 
     if (receiverConnection3 is ReceiverConnection) {
-        log:printInfo("Completing messages from Asb receiver connection.");
+        log:print("Completing messages from Asb receiver connection.");
         checkpanic receiverConnection3.completeMessages();
-        log:printInfo("Done completing messages using their lock tokens.");
-        log:printInfo("Completing messages from Asb receiver connection.");
+        log:print("Done completing messages using their lock tokens.");
+        log:print("Completing messages from Asb receiver connection.");
         checkpanic receiverConnection3.completeMessages();
-        log:printInfo("Done completing messages using their lock tokens.");
+        log:print("Done completing messages using their lock tokens.");
     } else {
         test:assertFail("Asb receiver connection creation failed.");
     }
 
     if (receiverConnection1 is ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection 1.");
+        log:print("Closing Asb receiver connection 1.");
         checkpanic receiverConnection1.closeReceiverConnection();
     }
 
     if (receiverConnection2 is ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection 2.");
+        log:print("Closing Asb receiver connection 2.");
         checkpanic receiverConnection2.closeReceiverConnection();
     }
 
     if (receiverConnection3 is ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection 3.");
+        log:print("Closing Asb receiver connection 3.");
         checkpanic receiverConnection3.closeReceiverConnection();
     }
 }
@@ -586,53 +586,53 @@ function testCompleteMessagesFromSubscriptionOperation() {
     enable: false
 }
 function testCompleteOneMessageFromSubscriptionOperation() {
-    log:printInfo("Creating Asb receiver connection.");
+    log:print("Creating Asb receiver connection.");
     ReceiverConnection? receiverConnection1 = new ({connectionString: connectionString, entityPath: subscriptionPath1});
     ReceiverConnection? receiverConnection2 = new ({connectionString: connectionString, entityPath: subscriptionPath2});
     ReceiverConnection? receiverConnection3 = new ({connectionString: connectionString, entityPath: subscriptionPath3});
 
     if (receiverConnection1 is ReceiverConnection) {
-        log:printInfo("Completing message from Asb receiver connection.");
+        log:print("Completing message from Asb receiver connection.");
         checkpanic receiverConnection1.completeOneMessage();
         checkpanic receiverConnection1.completeOneMessage();
         checkpanic receiverConnection1.completeOneMessage();
-        log:printInfo("Done completing a message using its lock token.");
+        log:print("Done completing a message using its lock token.");
     } else {
         test:assertFail("Asb receiver connection creation failed.");
     }
 
     if (receiverConnection2 is ReceiverConnection) {
-        log:printInfo("Completing message from Asb receiver connection.");
+        log:print("Completing message from Asb receiver connection.");
         checkpanic receiverConnection2.completeOneMessage();
         checkpanic receiverConnection2.completeOneMessage();
         checkpanic receiverConnection2.completeOneMessage();
-        log:printInfo("Done completing a message using its lock token.");
+        log:print("Done completing a message using its lock token.");
     } else {
         test:assertFail("Asb receiver connection creation failed.");
     }
 
     if (receiverConnection3 is ReceiverConnection) {
-        log:printInfo("Completing message from Asb receiver connection.");
+        log:print("Completing message from Asb receiver connection.");
         checkpanic receiverConnection3.completeOneMessage();
         checkpanic receiverConnection3.completeOneMessage();
         checkpanic receiverConnection3.completeOneMessage();
-        log:printInfo("Done completing a message using its lock token.");
+        log:print("Done completing a message using its lock token.");
     } else {
         test:assertFail("Asb receiver connection creation failed.");
     }
 
     if (receiverConnection1 is ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection 1.");
+        log:print("Closing Asb receiver connection 1.");
         checkpanic receiverConnection1.closeReceiverConnection();
     }
 
     if (receiverConnection2 is ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection 2.");
+        log:print("Closing Asb receiver connection 2.");
         checkpanic receiverConnection2.closeReceiverConnection();
     }
 
     if (receiverConnection3 is ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection 3.");
+        log:print("Closing Asb receiver connection 3.");
         checkpanic receiverConnection3.closeReceiverConnection();
     }
 }
@@ -643,74 +643,74 @@ function testCompleteOneMessageFromSubscriptionOperation() {
     enable: false
 }
 function testAbandonMessageFromSubscriptionOperation() {
-    log:printInfo("Creating Asb receiver connection.");
+    log:print("Creating Asb receiver connection.");
     ReceiverConnection? receiverConnection1 = new ({connectionString: connectionString, entityPath: subscriptionPath1});
     ReceiverConnection? receiverConnection2 = new ({connectionString: connectionString, entityPath: subscriptionPath2});
     ReceiverConnection? receiverConnection3 = new ({connectionString: connectionString, entityPath: subscriptionPath3});
 
     if (receiverConnection1 is ReceiverConnection) {
-        log:printInfo("abandoning message from Asb receiver connection.");
+        log:print("abandoning message from Asb receiver connection.");
         checkpanic receiverConnection1.abandonMessage();
-        log:printInfo("Done abandoning a message using its lock token.");
-        log:printInfo("Completing messages from Asb receiver connection.");
+        log:print("Done abandoning a message using its lock token.");
+        log:print("Completing messages from Asb receiver connection.");
         checkpanic receiverConnection1.completeMessages();
-        log:printInfo("Done completing messages using their lock tokens.");
+        log:print("Done completing messages using their lock tokens.");
     } else {
         test:assertFail("Asb receiver connection creation failed.");
     }
 
     if (receiverConnection2 is ReceiverConnection) {
-        log:printInfo("abandoning message from Asb receiver connection.");
+        log:print("abandoning message from Asb receiver connection.");
         checkpanic receiverConnection2.abandonMessage();
-        log:printInfo("Done abandoning a message using its lock token.");
-        log:printInfo("Completing messages from Asb receiver connection.");
+        log:print("Done abandoning a message using its lock token.");
+        log:print("Completing messages from Asb receiver connection.");
         checkpanic receiverConnection2.completeMessages();
-        log:printInfo("Done completing messages using their lock tokens.");
+        log:print("Done completing messages using their lock tokens.");
     } else {
         test:assertFail("Asb receiver connection creation failed.");
     }
 
     if (receiverConnection3 is ReceiverConnection) {
-        log:printInfo("abandoning message from Asb receiver connection.");
+        log:print("abandoning message from Asb receiver connection.");
         checkpanic receiverConnection3.abandonMessage();
-        log:printInfo("Done abandoning a message using its lock token.");
-        log:printInfo("Completing messages from Asb receiver connection.");
+        log:print("Done abandoning a message using its lock token.");
+        log:print("Completing messages from Asb receiver connection.");
         checkpanic receiverConnection3.completeMessages();
-        log:printInfo("Done completing messages using their lock tokens.");
+        log:print("Done completing messages using their lock tokens.");
     } else {
         test:assertFail("Asb receiver connection creation failed.");
     }
 
     if (receiverConnection1 is ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection 1.");
+        log:print("Closing Asb receiver connection 1.");
         checkpanic receiverConnection1.closeReceiverConnection();
     }
 
     if (receiverConnection2 is ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection 2.");
+        log:print("Closing Asb receiver connection 2.");
         checkpanic receiverConnection2.closeReceiverConnection();
     }
 
     if (receiverConnection3 is ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection 3.");
+        log:print("Closing Asb receiver connection 3.");
         checkpanic receiverConnection3.closeReceiverConnection();
     }
 }
 
 # Async test service used to attached to the listener
-service asyncTestService = 
+Service asyncTestService = 
 @ServiceConfig {
     queueConfig: {
         connectionString: connectionString,
         queueName: queuePath
     }
 }
-service {
-    resource function onMessage(Message message) {
+service object{
+    remote function onMessage(Message message) {
         var messageContent = message.getTextContent();
         if (messageContent is string) {
             asyncConsumerMessage = <@untainted> messageContent;
-            log:printInfo("The message received: " + messageContent);
+            log:print("The message received: " + messageContent);
         } else {
             log:printError("Error occurred while retrieving the message content.");
         }
@@ -720,7 +720,7 @@ service {
 # Test Listener capabilities
 @test:Config {
     dependsOn: ["testSendToQueueOperation"], 
-    enable: false
+    enable: true
 }
 public function testAsyncConsumer() {
 
@@ -732,14 +732,14 @@ public function testAsyncConsumer() {
     string message = string `{"name":"apple", "color":"red", "price":5.36}`;
     Listener? channelListener = new(config);
     if (channelListener is Listener) {
-        checkpanic channelListener.__attach(asyncTestService);
-        checkpanic channelListener.__start();
-        log:printInfo("start");
+        checkpanic channelListener.attach(asyncTestService);
+        checkpanic channelListener.'start();
+        log:print("start");
         runtime:sleep(20000);
-        log:printInfo("end");
-        checkpanic channelListener.__detach(asyncTestService);
-        checkpanic channelListener.__gracefulStop();
-        checkpanic channelListener.__immediateStop();
+        log:print("end");
+        checkpanic channelListener.detach(asyncTestService);
+        checkpanic channelListener.gracefulStop();
+        checkpanic channelListener.immediateStop();
         test:assertEquals(asyncConsumerMessage, message, msg = "Message received does not match.");
     }
 }
@@ -749,11 +749,11 @@ public function testAsyncConsumer() {
     enable: false
 }
 function testSendDuplicateToQueueOperation() {
-    log:printInfo("Creating Asb sender connection.");
+    log:print("Creating Asb sender connection.");
     SenderConnection? senderConnection = new ({connectionString: connectionString, entityPath: queuePath});
 
     if (senderConnection is SenderConnection) {
-        log:printInfo("Sending via Asb sender connection.");
+        log:print("Sending via Asb sender connection.");
         checkpanic senderConnection.sendMessageWithConfigurableParameters(byteContent, parameters1, properties);
         checkpanic senderConnection.sendMessageWithConfigurableParameters(byteContent, parameters1, properties);
     } else {
@@ -761,7 +761,7 @@ function testSendDuplicateToQueueOperation() {
     }
 
     if (senderConnection is SenderConnection) {
-        log:printInfo("Closing Asb sender connection.");
+        log:print("Closing Asb sender connection.");
         checkpanic senderConnection.closeSenderConnection();
     }
 }
@@ -772,20 +772,20 @@ function testSendDuplicateToQueueOperation() {
     enable: false
 }
 function testReceiveDuplicateMessagesFromQueueOperation() {
-    log:printInfo("Creating Asb receiver connection.");
+    log:print("Creating Asb receiver connection.");
     ReceiverConnection? receiverConnection = new ({connectionString: connectionString, entityPath: queuePath});
 
     if (receiverConnection is ReceiverConnection) {
-        log:printInfo("Receiving from Asb receiver connection.");
+        log:print("Receiving from Asb receiver connection.");
         var messageReceived = receiverConnection.receiveMessages(serverWaitTime, maxMessageCount1);
         if(messageReceived is Messages) {
             int val = messageReceived.getMessageCount();
-            log:printInfo("No. of messages received : " + val.toString());
+            log:print("No. of messages received : " + val.toString());
             Message[] messages = messageReceived.getMessages();
             string messageReceived1 =  checkpanic messages[0].getTextContent();
-            log:printInfo("Message1 content : " +messageReceived1);
+            log:print("Message1 content : " +messageReceived1);
             string messageReceived2 =  checkpanic messages[1].getTextContent();
-            log:printInfo("Message2 content : " +messageReceived2.toString());
+            log:print("Message2 content : " +messageReceived2.toString());
         } else {
             test:assertEquals(messageReceived.message(), "Received a duplicate message!", 
                 msg = "Error message does not match");
@@ -795,7 +795,7 @@ function testReceiveDuplicateMessagesFromQueueOperation() {
     }
 
     if (receiverConnection is ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection.");
+        log:print("Closing Asb receiver connection.");
         checkpanic receiverConnection.closeReceiverConnection();
     }
 }
@@ -806,22 +806,22 @@ function testReceiveDuplicateMessagesFromQueueOperation() {
     enable: false
 }
 function testDeadLetterFromQueueOperation() {
-    log:printInfo("Creating Asb receiver connection.");
+    log:print("Creating Asb receiver connection.");
     ReceiverConnection? receiverConnection = new ({connectionString: connectionString, entityPath: queuePath});
 
     if (receiverConnection is ReceiverConnection) {
-        log:printInfo("Dead-Letter message from Asb receiver connection.");
+        log:print("Dead-Letter message from Asb receiver connection.");
         checkpanic receiverConnection.deadLetterMessage("deadLetterReason", "deadLetterErrorDescription");
-        log:printInfo("Done Dead-Letter a message using its lock token.");
-        log:printInfo("Completing messages from Asb receiver connection.");
+        log:print("Done Dead-Letter a message using its lock token.");
+        log:print("Completing messages from Asb receiver connection.");
         checkpanic receiverConnection.completeMessages();
-        log:printInfo("Done completing messages using their lock tokens.");
+        log:print("Done completing messages using their lock tokens.");
     } else {
         test:assertFail("Asb receiver connection creation failed.");
     }
 
     if (receiverConnection is ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection.");
+        log:print("Closing Asb receiver connection.");
         checkpanic receiverConnection.closeReceiverConnection();
     }
 }
@@ -832,56 +832,56 @@ function testDeadLetterFromQueueOperation() {
     enable: false
 }
 function testDeadLetterFromSubscriptionOperation() {
-    log:printInfo("Creating Asb receiver connection.");
+    log:print("Creating Asb receiver connection.");
     ReceiverConnection? receiverConnection1 = new ({connectionString: connectionString, entityPath: subscriptionPath1});
     ReceiverConnection? receiverConnection2 = new ({connectionString: connectionString, entityPath: subscriptionPath2});
     ReceiverConnection? receiverConnection3 = new ({connectionString: connectionString, entityPath: subscriptionPath3});
 
     if (receiverConnection1 is ReceiverConnection) {
-        log:printInfo("Dead-Letter message from Asb receiver connection.");
+        log:print("Dead-Letter message from Asb receiver connection.");
         checkpanic receiverConnection1.deadLetterMessage("deadLetterReason", "deadLetterErrorDescription");
-        log:printInfo("Done Dead-Letter a message using its lock token.");
-        log:printInfo("Completing messages from Asb receiver connection.");
+        log:print("Done Dead-Letter a message using its lock token.");
+        log:print("Completing messages from Asb receiver connection.");
         checkpanic receiverConnection1.completeMessages();
-        log:printInfo("Done completing messages using their lock tokens.");
+        log:print("Done completing messages using their lock tokens.");
     } else {
         test:assertFail("Asb receiver connection creation failed.");
     }
 
     if (receiverConnection2 is ReceiverConnection) {
-        log:printInfo("Dead-Letter message from Asb receiver connection.");
+        log:print("Dead-Letter message from Asb receiver connection.");
         checkpanic receiverConnection2.deadLetterMessage("deadLetterReason", "deadLetterErrorDescription");
-        log:printInfo("Done Dead-Letter a message using its lock token.");
-        log:printInfo("Completing messages from Asb receiver connection.");
+        log:print("Done Dead-Letter a message using its lock token.");
+        log:print("Completing messages from Asb receiver connection.");
         checkpanic receiverConnection2.completeMessages();
-        log:printInfo("Done completing messages using their lock tokens.");
+        log:print("Done completing messages using their lock tokens.");
     } else {
         test:assertFail("Asb receiver connection creation failed.");
     }
 
     if (receiverConnection3 is ReceiverConnection) {
-        log:printInfo("Dead-Letter message from Asb receiver connection.");
+        log:print("Dead-Letter message from Asb receiver connection.");
         checkpanic receiverConnection3.deadLetterMessage("deadLetterReason", "deadLetterErrorDescription");
-        log:printInfo("Done Dead-Letter a message using its lock token.");
-        log:printInfo("Completing messages from Asb receiver connection.");
+        log:print("Done Dead-Letter a message using its lock token.");
+        log:print("Completing messages from Asb receiver connection.");
         checkpanic receiverConnection3.completeMessages();
-        log:printInfo("Done completing messages using their lock tokens.");
+        log:print("Done completing messages using their lock tokens.");
     } else {
         test:assertFail("Asb receiver connection creation failed.");
     }
 
     if (receiverConnection1 is ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection 1.");
+        log:print("Closing Asb receiver connection 1.");
         checkpanic receiverConnection1.closeReceiverConnection();
     }
 
     if (receiverConnection2 is ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection 2.");
+        log:print("Closing Asb receiver connection 2.");
         checkpanic receiverConnection2.closeReceiverConnection();
     }
 
     if (receiverConnection3 is ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection 3.");
+        log:print("Closing Asb receiver connection 3.");
         checkpanic receiverConnection3.closeReceiverConnection();
     }
 }
@@ -892,22 +892,22 @@ function testDeadLetterFromSubscriptionOperation() {
     enable: false
 }
 function testDeferFromQueueOperation() {
-    log:printInfo("Creating Asb receiver connection.");
+    log:print("Creating Asb receiver connection.");
     ReceiverConnection? receiverConnection = new ({connectionString: connectionString, entityPath: queuePath});
 
     if (receiverConnection is ReceiverConnection) {
-        log:printInfo("Defer message from Asb receiver connection.");
+        log:print("Defer message from Asb receiver connection.");
         var sequenceNumber = receiverConnection.deferMessage();
-        log:printInfo("Done Deferring a message using its lock token.");
-        log:printInfo("Receiving from Asb receiver connection.");
+        log:print("Done Deferring a message using its lock token.");
+        log:print("Receiving from Asb receiver connection.");
         Message|Error jsonMessageReceived = receiverConnection.receiveMessage(serverWaitTime);
         if (jsonMessageReceived is Message) {
             json jsonMessageRead = checkpanic jsonMessageReceived.getJSONContent();
-            log:printInfo("Reading Received Message : " + jsonMessageRead.toString());
+            log:print("Reading Received Message : " + jsonMessageRead.toString());
         } else {
             test:assertFail("Receiving message via Asb receiver connection failed.");
         }
-        log:printInfo("Receiving Deferred Message from Asb receiver connection.");
+        log:print("Receiving Deferred Message from Asb receiver connection.");
         if(sequenceNumber is int) {
             if(sequenceNumber == 0) {
                 test:assertFail("No message in the queue");
@@ -915,7 +915,7 @@ function testDeferFromQueueOperation() {
             Message|Error messageReceived = receiverConnection.receiveDeferredMessage(sequenceNumber);
             if (messageReceived is Message) {
                 string messageRead = checkpanic messageReceived.getTextContent();
-                log:printInfo("Reading Received Message : " + messageRead);
+                log:print("Reading Received Message : " + messageRead);
             } else {
                 test:assertFail(msg = messageReceived.message());
             }
@@ -927,7 +927,7 @@ function testDeferFromQueueOperation() {
     }
 
     if (receiverConnection is ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection.");
+        log:print("Closing Asb receiver connection.");
         checkpanic receiverConnection.closeReceiverConnection();
     }
 }
@@ -938,24 +938,24 @@ function testDeferFromQueueOperation() {
     enable: false
 }
 function testDeferFromSubscriptionOperation() {
-    log:printInfo("Creating Asb receiver connection.");
+    log:print("Creating Asb receiver connection.");
     ReceiverConnection? receiverConnection1 = new ({connectionString: connectionString, entityPath: subscriptionPath1});
     ReceiverConnection? receiverConnection2 = new ({connectionString: connectionString, entityPath: subscriptionPath2});
     ReceiverConnection? receiverConnection3 = new ({connectionString: connectionString, entityPath: subscriptionPath3});
 
     if (receiverConnection1 is ReceiverConnection) {
-        log:printInfo("Defer message from Asb receiver connection.");
+        log:print("Defer message from Asb receiver connection.");
         var sequenceNumber = receiverConnection1.deferMessage();
-        log:printInfo("Done Deferring a message using its lock token.");
-        log:printInfo("Receiving from Asb receiver connection.");
+        log:print("Done Deferring a message using its lock token.");
+        log:print("Receiving from Asb receiver connection.");
         Message|Error jsonMessageReceived = receiverConnection1.receiveMessage(serverWaitTime);
         if (jsonMessageReceived is Message) {
             json jsonMessageRead = checkpanic jsonMessageReceived.getJSONContent();
-            log:printInfo("Reading Received Message : " + jsonMessageRead.toString());
+            log:print("Reading Received Message : " + jsonMessageRead.toString());
         } else {
             test:assertFail("Receiving message via Asb receiver connection failed.");
         }
-        log:printInfo("Receiving Deferred Message from Asb receiver connection.");
+        log:print("Receiving Deferred Message from Asb receiver connection.");
         if(sequenceNumber is int) {
             if(sequenceNumber == 0) {
                 test:assertFail("No message in the queue");
@@ -963,7 +963,7 @@ function testDeferFromSubscriptionOperation() {
             Message|Error messageReceived = receiverConnection1.receiveDeferredMessage(sequenceNumber);
             if (messageReceived is Message) {
                 string messageRead = checkpanic messageReceived.getTextContent();
-                log:printInfo("Reading Received Message : " + messageRead);
+                log:print("Reading Received Message : " + messageRead);
             } else {
                 test:assertFail(msg = messageReceived.message());
             }
@@ -975,18 +975,18 @@ function testDeferFromSubscriptionOperation() {
     }
 
     if (receiverConnection2 is ReceiverConnection) {
-        log:printInfo("Defer message from Asb receiver connection.");
+        log:print("Defer message from Asb receiver connection.");
         var sequenceNumber = receiverConnection2.deferMessage();
-        log:printInfo("Done Deferring a message using its lock token.");
-        log:printInfo("Receiving from Asb receiver connection.");
+        log:print("Done Deferring a message using its lock token.");
+        log:print("Receiving from Asb receiver connection.");
         Message|Error jsonMessageReceived = receiverConnection2.receiveMessage(serverWaitTime);
         if (jsonMessageReceived is Message) {
             json jsonMessageRead = checkpanic jsonMessageReceived.getJSONContent();
-            log:printInfo("Reading Received Message : " + jsonMessageRead.toString());
+            log:print("Reading Received Message : " + jsonMessageRead.toString());
         } else {
             test:assertFail("Receiving message via Asb receiver connection failed.");
         }
-        log:printInfo("Receiving Deferred Message from Asb receiver connection.");
+        log:print("Receiving Deferred Message from Asb receiver connection.");
         if(sequenceNumber is int) {
             if(sequenceNumber == 0) {
                 test:assertFail("No message in the queue");
@@ -994,7 +994,7 @@ function testDeferFromSubscriptionOperation() {
             Message|Error messageReceived = receiverConnection2.receiveDeferredMessage(sequenceNumber);
             if (messageReceived is Message) {
                 string messageRead = checkpanic messageReceived.getTextContent();
-                log:printInfo("Reading Received Message : " + messageRead);
+                log:print("Reading Received Message : " + messageRead);
             } else {
                 test:assertFail(msg = messageReceived.message());
             }
@@ -1006,18 +1006,18 @@ function testDeferFromSubscriptionOperation() {
     }
 
     if (receiverConnection3 is ReceiverConnection) {
-        log:printInfo("Defer message from Asb receiver connection.");
+        log:print("Defer message from Asb receiver connection.");
         var sequenceNumber = receiverConnection3.deferMessage();
-        log:printInfo("Done Deferring a message using its lock token.");
-        log:printInfo("Receiving from Asb receiver connection.");
+        log:print("Done Deferring a message using its lock token.");
+        log:print("Receiving from Asb receiver connection.");
         Message|Error jsonMessageReceived = receiverConnection3.receiveMessage(serverWaitTime);
         if (jsonMessageReceived is Message) {
             json jsonMessageRead = checkpanic jsonMessageReceived.getJSONContent();
-            log:printInfo("Reading Received Message : " + jsonMessageRead.toString());
+            log:print("Reading Received Message : " + jsonMessageRead.toString());
         } else {
             test:assertFail("Receiving message via Asb receiver connection failed.");
         }
-        log:printInfo("Receiving Deferred Message from Asb receiver connection.");
+        log:print("Receiving Deferred Message from Asb receiver connection.");
         if(sequenceNumber is int) {
             if(sequenceNumber == 0) {
                 test:assertFail("No message in the queue");
@@ -1025,7 +1025,7 @@ function testDeferFromSubscriptionOperation() {
             Message|Error messageReceived = receiverConnection3.receiveDeferredMessage(sequenceNumber);
             if (messageReceived is Message) {
                 string messageRead = checkpanic messageReceived.getTextContent();
-                log:printInfo("Reading Received Message : " + messageRead);
+                log:print("Reading Received Message : " + messageRead);
             } else {
                 test:assertFail(msg = messageReceived.message());
             }
@@ -1037,17 +1037,17 @@ function testDeferFromSubscriptionOperation() {
     }
 
     if (receiverConnection1 is ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection 1.");
+        log:print("Closing Asb receiver connection 1.");
         checkpanic receiverConnection1.closeReceiverConnection();
     }
 
     if (receiverConnection2 is ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection 2.");
+        log:print("Closing Asb receiver connection 2.");
         checkpanic receiverConnection2.closeReceiverConnection();
     }
 
     if (receiverConnection3 is ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection 3.");
+        log:print("Closing Asb receiver connection 3.");
         checkpanic receiverConnection3.closeReceiverConnection();
     }
 }
@@ -1058,22 +1058,22 @@ function testDeferFromSubscriptionOperation() {
     enable: false
 }
 function testRenewLockOnMessageFromQueueOperation() {
-    log:printInfo("Creating Asb receiver connection.");
+    log:print("Creating Asb receiver connection.");
     ReceiverConnection? receiverConnection = new ({connectionString: connectionString, entityPath: queuePath});
 
     if (receiverConnection is ReceiverConnection) {
-        log:printInfo("Renew lock on message from Asb receiver connection.");
+        log:print("Renew lock on message from Asb receiver connection.");
         checkpanic receiverConnection.renewLockOnMessage();
-        log:printInfo("Done renewing a message.");
-        log:printInfo("Completing messages from Asb receiver connection.");
+        log:print("Done renewing a message.");
+        log:print("Completing messages from Asb receiver connection.");
         checkpanic receiverConnection.completeMessages();
-        log:printInfo("Done completing messages using their lock tokens.");
+        log:print("Done completing messages using their lock tokens.");
     } else {
         test:assertFail("Asb receiver connection creation failed.");
     }
 
     if (receiverConnection is ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection.");
+        log:print("Closing Asb receiver connection.");
         checkpanic receiverConnection.closeReceiverConnection();
     }
 }
@@ -1084,56 +1084,56 @@ function testRenewLockOnMessageFromQueueOperation() {
     enable: false
 }
 function testRenewLockOnMessageFromSubscriptionOperation() {
-    log:printInfo("Creating Asb receiver connection.");
+    log:print("Creating Asb receiver connection.");
     ReceiverConnection? receiverConnection1 = new ({connectionString: connectionString, entityPath: subscriptionPath1});
     ReceiverConnection? receiverConnection2 = new ({connectionString: connectionString, entityPath: subscriptionPath2});
     ReceiverConnection? receiverConnection3 = new ({connectionString: connectionString, entityPath: subscriptionPath3});
 
     if (receiverConnection1 is ReceiverConnection) {
-        log:printInfo("Renew lock on message from Asb receiver connection 1.");
+        log:print("Renew lock on message from Asb receiver connection 1.");
         checkpanic receiverConnection1.renewLockOnMessage();
-        log:printInfo("Done renewing a message.");
-        log:printInfo("Completing messages from Asb receiver connection 1.");
+        log:print("Done renewing a message.");
+        log:print("Completing messages from Asb receiver connection 1.");
         checkpanic receiverConnection1.completeMessages();
-        log:printInfo("Done completing messages using their lock tokens.");
+        log:print("Done completing messages using their lock tokens.");
     } else {
         test:assertFail("Asb receiver connection creation failed.");
     }
 
     if (receiverConnection2 is ReceiverConnection) {
-        log:printInfo("Renew lock on message from Asb receiver connection 2.");
+        log:print("Renew lock on message from Asb receiver connection 2.");
         checkpanic receiverConnection2.renewLockOnMessage();
-        log:printInfo("Done renewing a message.");
-        log:printInfo("Completing messages from Asb receiver connection 2.");
+        log:print("Done renewing a message.");
+        log:print("Completing messages from Asb receiver connection 2.");
         checkpanic receiverConnection2.completeMessages();
-        log:printInfo("Done completing messages using their lock tokens.");
+        log:print("Done completing messages using their lock tokens.");
     } else {
         test:assertFail("Asb receiver connection creation failed.");
     }
 
     if (receiverConnection3 is ReceiverConnection) {
-        log:printInfo("Renew lock on message from Asb receiver connection 3.");
+        log:print("Renew lock on message from Asb receiver connection 3.");
         checkpanic receiverConnection3.renewLockOnMessage();
-        log:printInfo("Done renewing a message.");
-        log:printInfo("Completing messages from Asb receiver connection 3.");
+        log:print("Done renewing a message.");
+        log:print("Completing messages from Asb receiver connection 3.");
         checkpanic receiverConnection3.completeMessages();
-        log:printInfo("Done completing messages using their lock tokens.");
+        log:print("Done completing messages using their lock tokens.");
     } else {
         test:assertFail("Asb receiver connection creation failed.");
     }
 
     if (receiverConnection1 is ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection 1.");
+        log:print("Closing Asb receiver connection 1.");
         checkpanic receiverConnection1.closeReceiverConnection();
     }
 
     if (receiverConnection2 is ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection 2.");
+        log:print("Closing Asb receiver connection 2.");
         checkpanic receiverConnection2.closeReceiverConnection();
     }
 
     if (receiverConnection3 is ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection 3.");
+        log:print("Closing Asb receiver connection 3.");
         checkpanic receiverConnection3.closeReceiverConnection();
     }
 }
@@ -1143,13 +1143,13 @@ function testRenewLockOnMessageFromSubscriptionOperation() {
     enable: false
 }
 function testPrefetchCountWithPrefetchDisabled() {
-    log:printInfo("Creating Asb sender connection.");
+    log:print("Creating Asb sender connection.");
     SenderConnection? senderConnection = new ({connectionString: connectionString, entityPath: queuePath});
 
     if (senderConnection is SenderConnection) {
         int i = 1;
         while (i <= messageCount) {
-            log:printInfo("Sending message " + i.toString() + " via Asb sender connection.");
+            log:print("Sending message " + i.toString() + " via Asb sender connection.");
             checkpanic senderConnection.sendMessageWithConfigurableParameters(byteContent, parameters1, properties);
             i = i + 1;
         }
@@ -1158,15 +1158,15 @@ function testPrefetchCountWithPrefetchDisabled() {
     }
 
     if (senderConnection is SenderConnection) {
-        log:printInfo("Closing Asb sender connection.");
+        log:print("Closing Asb sender connection.");
         checkpanic senderConnection.closeSenderConnection();
     }
 
-    log:printInfo("Creating Asb receiver connection.");
+    log:print("Creating Asb receiver connection.");
     ReceiverConnection? receiverConnection = new ({connectionString: connectionString, entityPath: queuePath});
 
     if (receiverConnection is ReceiverConnection) {
-        log:printInfo("Setting the prefetch count for the Asb receiver connection as : " 
+        log:print("Setting the prefetch count for the Asb receiver connection as : " 
             + prefetchCountDisabled.toString());
         checkpanic receiverConnection.setPrefetchCount(prefetchCountDisabled);
 
@@ -1174,11 +1174,11 @@ function testPrefetchCountWithPrefetchDisabled() {
         int startTimeMills = time1.time;
         int i = 1;
         while (i <= messageCount) {
-            log:printInfo("Receiving message " + i.toString() + " from Asb receiver connection.");
+            log:print("Receiving message " + i.toString() + " from Asb receiver connection.");
             Message|Error messageReceived = receiverConnection.receiveMessage(serverWaitTime);
             if (messageReceived is Message) {
                 string messageRead = checkpanic messageReceived.getTextContent();
-                log:printInfo("Reading Received Message " + i.toString() + " : " + messageRead);
+                log:print("Reading Received Message " + i.toString() + " : " + messageRead);
             } else {
                 test:assertFail("Receiving message via Asb receiver connection failed.");
             }
@@ -1187,13 +1187,13 @@ function testPrefetchCountWithPrefetchDisabled() {
         time:Time time2 = time:currentTime();
         int endTimeMills = time2.time;
         int timeElapsed = endTimeMills - startTimeMills;
-        log:printInfo("Time elapsed : " + timeElapsed.toString() + " milliseconds");
+        log:print("Time elapsed : " + timeElapsed.toString() + " milliseconds");
     } else {
         test:assertFail("Asb receiver connection creation failed.");
     }
 
     if (receiverConnection is ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection.");
+        log:print("Closing Asb receiver connection.");
         checkpanic receiverConnection.closeReceiverConnection();
     }
 }
@@ -1203,13 +1203,13 @@ function testPrefetchCountWithPrefetchDisabled() {
     enable: false
 }
 function testPrefetchCountWithPrefetchEnabled() {
-    log:printInfo("Creating Asb sender connection.");
+    log:print("Creating Asb sender connection.");
     SenderConnection? senderConnection = new ({connectionString: connectionString, entityPath: queuePath});
 
     if (senderConnection is SenderConnection) {
         int i = 1;
         while (i <= messageCount) {
-            log:printInfo("Sending message " + i.toString() + " via Asb sender connection.");
+            log:print("Sending message " + i.toString() + " via Asb sender connection.");
             checkpanic senderConnection.sendMessageWithConfigurableParameters(byteContent, parameters1, properties);
             i = i + 1;
         }
@@ -1218,15 +1218,15 @@ function testPrefetchCountWithPrefetchEnabled() {
     }
 
     if (senderConnection is SenderConnection) {
-        log:printInfo("Closing Asb sender connection.");
+        log:print("Closing Asb sender connection.");
         checkpanic senderConnection.closeSenderConnection();
     }
 
-    log:printInfo("Creating Asb receiver connection.");
+    log:print("Creating Asb receiver connection.");
     ReceiverConnection? receiverConnection = new ({connectionString: connectionString, entityPath: queuePath});
 
     if (receiverConnection is ReceiverConnection) {
-        log:printInfo("Setting the prefetch count for the Asb receiver connection as : " 
+        log:print("Setting the prefetch count for the Asb receiver connection as : " 
             + prefetchCountEnabled.toString());
         checkpanic receiverConnection.setPrefetchCount(prefetchCountEnabled);
 
@@ -1234,11 +1234,11 @@ function testPrefetchCountWithPrefetchEnabled() {
         int startTimeMills = time1.time;
         int i = 1;
         while (i <= messageCount) {
-            log:printInfo("Receiving message " + i.toString() + " from Asb receiver connection.");
+            log:print("Receiving message " + i.toString() + " from Asb receiver connection.");
             Message|Error messageReceived = receiverConnection.receiveMessage(serverWaitTime);
             if (messageReceived is Message) {
                 string messageRead = checkpanic messageReceived.getTextContent();
-                log:printInfo("Reading Received Message " + i.toString() + " : " + messageRead);
+                log:print("Reading Received Message " + i.toString() + " : " + messageRead);
             } else {
                 test:assertFail("Receiving message via Asb receiver connection failed.");
             }
@@ -1247,13 +1247,13 @@ function testPrefetchCountWithPrefetchEnabled() {
         time:Time time2 = time:currentTime();
         int endTimeMills = time2.time;
         int timeElapsed = endTimeMills - startTimeMills;
-        log:printInfo("Time elapsed : " + timeElapsed.toString() + " milliseconds");
+        log:print("Time elapsed : " + timeElapsed.toString() + " milliseconds");
     } else {
         test:assertFail("Asb receiver connection creation failed.");
     }
 
     if (receiverConnection is ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection.");
+        log:print("Closing Asb receiver connection.");
         checkpanic receiverConnection.closeReceiverConnection();
     }
 }
@@ -1263,7 +1263,7 @@ function testPrefetchCountWithPrefetchEnabled() {
     enable: false
 }
 function testSendAndReceiveMessagesWithVariableLoad() {
-    log:printInfo("Creating Asb sender connection.");
+    log:print("Creating Asb sender connection.");
     SenderConnection? senderConnection = new ({connectionString: connectionString, entityPath: queuePath});
 
     if (senderConnection is SenderConnection) {
@@ -1271,7 +1271,7 @@ function testSendAndReceiveMessagesWithVariableLoad() {
         while (i <= variableMessageCount) {
             string stringContent = "This is My Message Body " + i.toString(); 
             byte[] byteContent = stringContent.toBytes();
-            log:printInfo("Sending message " + i.toString() + " via Asb sender connection.");
+            log:print("Sending message " + i.toString() + " via Asb sender connection.");
             checkpanic senderConnection.sendMessageWithConfigurableParameters(byteContent, parameters4, properties);
             i = i + 1;
         }
@@ -1280,15 +1280,15 @@ function testSendAndReceiveMessagesWithVariableLoad() {
     }
 
     if (senderConnection is SenderConnection) {
-        log:printInfo("Closing Asb sender connection.");
+        log:print("Closing Asb sender connection.");
         checkpanic senderConnection.closeSenderConnection();
     }
 
-    log:printInfo("Creating Asb receiver connection.");
+    log:print("Creating Asb receiver connection.");
     ReceiverConnection? receiverConnection = new ({connectionString: connectionString, entityPath: queuePath});
 
     if (receiverConnection is ReceiverConnection) {
-        log:printInfo("Setting the prefetch count for the Asb receiver connection as : " 
+        log:print("Setting the prefetch count for the Asb receiver connection as : " 
             + prefetchCountDisabled.toString());
         checkpanic receiverConnection.setPrefetchCount(prefetchCountDisabled);
 
@@ -1296,11 +1296,11 @@ function testSendAndReceiveMessagesWithVariableLoad() {
         int startTimeMills = time1.time;
         int i = 1;
         while (i <= variableMessageCount) {
-            log:printInfo("Receiving message " + i.toString() + " from Asb receiver connection.");
+            log:print("Receiving message " + i.toString() + " from Asb receiver connection.");
             Message|Error messageReceived = receiverConnection.receiveMessage(serverWaitTime);
             if (messageReceived is Message) {
                 string messageRead = checkpanic messageReceived.getTextContent();
-                log:printInfo("Reading Received Message " + i.toString() + " : " + messageRead);
+                log:print("Reading Received Message " + i.toString() + " : " + messageRead);
             } else {
                 test:assertFail("Receiving message via Asb receiver connection failed.");
             }
@@ -1309,28 +1309,28 @@ function testSendAndReceiveMessagesWithVariableLoad() {
         time:Time time2 = time:currentTime();
         int endTimeMills = time2.time;
         int timeElapsed = endTimeMills - startTimeMills;
-        log:printInfo("Time elapsed : " + timeElapsed.toString() + " milliseconds");
+        log:print("Time elapsed : " + timeElapsed.toString() + " milliseconds");
     } else {
         test:assertFail("Asb receiver connection creation failed.");
     }
 
     if (receiverConnection is ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection.");
+        log:print("Closing Asb receiver connection.");
         checkpanic receiverConnection.closeReceiverConnection();
     }
 }
 
 # Test prefetch count operation with variable loads using different workers
 @test:Config {
-    enable: true
+    enable: false
 }
 function testSendAndReceiveMessagesWithVariableLoadUsingWorkers() {
     int variableMessageCount = 5;
     map<string> properties = {property1: "propertyValue1", property2: "propertyValue2", 
         property3: "propertyValue3", property4: "propertyValue4"};
-    log:printInfo("Worker execution started");
+    log:print("Worker execution started");
     worker w1 {
-        log:printInfo("Creating Asb sender connection.");
+        log:print("Creating Asb sender connection.");
         SenderConnection? senderConnection = new ({connectionString: connectionString, entityPath: queuePath});
 
         if (senderConnection is SenderConnection) {
@@ -1339,7 +1339,7 @@ function testSendAndReceiveMessagesWithVariableLoadUsingWorkers() {
                 runtime:sleep(5000);
                 string stringContent = "This is My Message Body " + i.toString(); 
                 byte[] byteContent = stringContent.toBytes();
-                log:printInfo("Sending message " + i.toString() + " via Asb sender connection.");
+                log:print("Sending message " + i.toString() + " via Asb sender connection.");
                 checkpanic senderConnection.sendMessageWithConfigurableParameters(byteContent, parameters4, properties);
                 i = i + 1;
             }
@@ -1348,17 +1348,17 @@ function testSendAndReceiveMessagesWithVariableLoadUsingWorkers() {
         }
 
         if (senderConnection is SenderConnection) {
-            log:printInfo("Closing Asb sender connection.");
+            log:print("Closing Asb sender connection.");
             checkpanic senderConnection.closeSenderConnection();
         }
     }
 
     worker w2 {
-        log:printInfo("Creating Asb receiver connection.");
+        log:print("Creating Asb receiver connection.");
         ReceiverConnection? receiverConnection = new ({connectionString: connectionString, entityPath: queuePath});
 
         if (receiverConnection is ReceiverConnection) {
-            log:printInfo("Setting the prefetch count for the Asb receiver connection as : " 
+            log:print("Setting the prefetch count for the Asb receiver connection as : " 
                 + prefetchCountDisabled.toString());
             checkpanic receiverConnection.setPrefetchCount(prefetchCountDisabled);
 
@@ -1367,14 +1367,14 @@ function testSendAndReceiveMessagesWithVariableLoadUsingWorkers() {
             int i = 1;
             while (i <= variableMessageCount) {
                 runtime:sleep(10000);
-                log:printInfo("Receiving message " + i.toString() + " from Asb receiver connection.");
+                log:print("Receiving message " + i.toString() + " from Asb receiver connection.");
                 Message|Error messageReceived = receiverConnection.receiveMessage(serverWaitTime);
                 if (messageReceived is Message && messageReceived.getMessageContentType() == "application/text") {
                     string messageRead = checkpanic messageReceived.getTextContent();
-                    log:printInfo("Reading Received Message " + i.toString() + " : " + messageRead);
+                    log:print("Reading Received Message " + i.toString() + " : " + messageRead);
                     var messageProperties = messageReceived.getProperties();
                     if(messageProperties is OptionalProperties) {
-                        log:printInfo("Reading Message Properties " + i.toString() + " : " 
+                        log:print("Reading Message Properties " + i.toString() + " : " 
                             + messageProperties.toString());
                     }
                 } else {
@@ -1385,19 +1385,19 @@ function testSendAndReceiveMessagesWithVariableLoadUsingWorkers() {
             time:Time time2 = time:currentTime();
             int endTimeMills = time2.time;
             int timeElapsed = endTimeMills - startTimeMills;
-            log:printInfo("Time elapsed : " + timeElapsed.toString() + " milliseconds");
+            log:print("Time elapsed : " + timeElapsed.toString() + " milliseconds");
         } else {
             test:assertFail("Asb receiver connection creation failed.");
         }
 
         if (receiverConnection is ReceiverConnection) {
-            log:printInfo("Closing Asb receiver connection.");
+            log:print("Closing Asb receiver connection.");
             checkpanic receiverConnection.closeReceiverConnection();
         }
     }
 
     _ = wait {w1, w2};
-    log:printInfo("Worker execution finished");
+    log:print("Worker execution finished");
 }
 
 # After Suite Function
@@ -1405,13 +1405,13 @@ function testSendAndReceiveMessagesWithVariableLoadUsingWorkers() {
 function afterSuiteFunc() {
     SenderConnection? con = senderConnection;
     if (con is SenderConnection) {
-        log:printInfo("Closing the Sender Connection");
+        log:print("Closing the Sender Connection");
         checkpanic con.closeSenderConnection();
     }
 
     ReceiverConnection? rec = receiverConnection;
     if (rec is ReceiverConnection) {
-        log:printInfo("Closing the Receiver Connection");
+        log:print("Closing the Receiver Connection");
         checkpanic rec.closeReceiverConnection();
     }
 }

@@ -14,13 +14,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import ballerina/lang.'object as lang;
 import ballerina/java;
 
 # Ballerina Asb Message Listener.
 # Provides a listener to consume messages from the Azure Service Bus.
 public class Listener {
-    *lang:Listener;
 
     private ReceiverConnection receiverConnection;
 
@@ -38,14 +36,14 @@ public class Listener {
     # + s - Type descriptor of the service
     # + name - Name of the service
     # + return - `()` or else a `asb:Error` upon failure to register the service
-    public isolated function __attach(service s, string? name = ()) returns error? {
+    public isolated function attach(Service s, string[]|string? name = ()) returns error? {
         return registerListener(self, s);
     }
 
     # Starts consuming the messages on all the attached services.
     #
     # + return - `()` or else a `asb:Error` upon failure to start
-    public isolated function __start() returns error? {
+    public isolated function 'start() returns error? {
         return 'start(self);
     }
 
@@ -53,14 +51,14 @@ public class Listener {
     #
     # + s - Type descriptor of the service
     # + return - `()` or else  a `asb:Error` upon failure to detach the service
-    public isolated function __detach(service s) returns error? {
+    public isolated function detach(Service s) returns error? {
         return detach(self, s);
     }
 
     # Stops consuming messages through all consumer services by terminating the connection and all its channels.
     #
     # + return - `()` or else  a `asb:Error` upon failure to close the `ChannelListener`
-    public isolated function __gracefulStop() returns error? {
+    public isolated function gracefulStop() returns error? {
         return stop(self);
     }
 
@@ -68,10 +66,15 @@ public class Listener {
     # with the server.
     #
     # + return - `()` or else  a `asb:Error` upon failure to close ChannelListener.
-    public isolated function __immediateStop() returns error? {
+    public isolated function immediateStop() returns error? {
         return abortConnection(self);
     }
 }  
+
+# The ASB service type
+public type Service service object {
+    // TBD when support for optional params in remote functions is available in lang
+};
 
 isolated function externInit(Listener lis, handle asbReceiverConnection) =
 @java:Method {
@@ -79,7 +82,7 @@ isolated function externInit(Listener lis, handle asbReceiverConnection) =
     'class: "org.ballerinalang.asb.connection.ListenerUtils"
 } external;
 
-isolated function registerListener(Listener lis, service serviceType) returns Error? =
+isolated function registerListener(Listener lis, Service serviceType) returns Error? =
 @java:Method {
     'class: "org.ballerinalang.asb.connection.ListenerUtils"
 } external;
@@ -89,7 +92,7 @@ isolated function 'start(Listener lis) returns Error? =
     'class: "org.ballerinalang.asb.connection.ListenerUtils"
 } external;
 
-isolated function detach(Listener lis, service serviceType) returns Error? =
+isolated function detach(Listener lis, Service serviceType) returns Error? =
 @java:Method {
     'class: "org.ballerinalang.asb.connection.ListenerUtils"
 } external;

@@ -8,7 +8,7 @@ rather than at the namespace level (such as sending a message to a queue). This 
 # Compatibility
 |                     |    Version                  |
 |:-------------------:|:---------------------------:|
-| Ballerina Language  | Swan-Lake-Preview7          |
+| Ballerina Language  | Swan-Lake-Preview8          |
 | Service Bus API     | v1.2.8                      |
 
 # Supported Operations
