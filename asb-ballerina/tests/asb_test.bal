@@ -97,7 +97,7 @@ public function testReceieverConnection() {
 
 # Test send to queue operation
 @test:Config {
-    enable: true
+    enable: false
 }
 function testSendToQueueOperation() {
     log:print("Creating Asb sender connection.");
@@ -720,7 +720,7 @@ service object{
 # Test Listener capabilities
 @test:Config {
     dependsOn: ["testSendToQueueOperation"], 
-    enable: true
+    enable: false
 }
 public function testAsyncConsumer() {
 
@@ -1393,6 +1393,64 @@ function testSendAndReceiveMessagesWithVariableLoadUsingWorkers() {
         if (receiverConnection is ReceiverConnection) {
             log:print("Closing Asb receiver connection.");
             checkpanic receiverConnection.closeReceiverConnection();
+        }
+    }
+
+    _ = wait {w1, w2};
+    log:print("Worker execution finished");
+}
+
+# Test prefetch count operation with variable loads for listener using different workers
+@test:Config {
+    enable: true
+}
+function testListenerWithVariableLoadUsingWorkers() {
+    int variableMessageCount = 5;
+    map<string> properties = {property1: "propertyValue1", property2: "propertyValue2", 
+        property3: "propertyValue3", property4: "propertyValue4"};
+    log:print("Worker execution started");
+    worker w1 {
+        log:print("Creating Asb sender connection.");
+        SenderConnection? senderConnection = new ({connectionString: connectionString, entityPath: queuePath});
+
+        if (senderConnection is SenderConnection) {
+            int i = 1;
+            while (i <= variableMessageCount) {
+                runtime:sleep(5000);
+                string stringContent = "This is My Message Body " + i.toString(); 
+                byte[] byteContent = stringContent.toBytes();
+                log:print("Sending message " + i.toString() + " via Asb sender connection.");
+                checkpanic senderConnection.sendMessageWithConfigurableParameters(byteContent, parameters4, properties);
+                i = i + 1;
+            }
+        } else {
+            test:assertFail("Asb sender connection creation failed.");
+        }
+
+        if (senderConnection is SenderConnection) {
+            log:print("Closing Asb sender connection.");
+            checkpanic senderConnection.closeSenderConnection();
+        }
+    }
+
+    worker w2 {
+        log:print("Creating Asb listener connection.");
+    
+        ConnectionConfiguration config = {
+            connectionString: connectionString,
+            entityPath: queuePath
+        };
+
+        Listener? channelListener = new(config);
+        if (channelListener is Listener) {
+            checkpanic channelListener.attach(asyncTestService);
+            checkpanic channelListener.'start();
+            log:print("start");
+            runtime:sleep(30000);
+            log:print("end");
+            checkpanic channelListener.detach(asyncTestService);
+            checkpanic channelListener.gracefulStop();
+            checkpanic channelListener.immediateStop();
         }
     }
 
