@@ -1,0 +1,29 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - run: mvn clean package -pl asb-native
+      - name: Ballerina Build
+        uses: ballerina-platform/ballerina-action/@swan-lake-connector-release
+        with:
+          args:
+            build -c ./asb-ballerina
+        env:
+          JAVA_HOME: /usr/lib/jvm/default-jvm
+          CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
+          QUEUE_PATH: ${{ secrets.QUEUE_PATH }}
+          TOPIC_PATH: ${{ secrets.TOPIC_PATH }}
+          SUBSCRIPTION_PATH1: ${{ secrets.SUBSCRIPTION_PATH1 }}
+          SUBSCRIPTION_PATH2: ${{ secrets.SUBSCRIPTION_PATH2 }}
+          SUBSCRIPTION_PATH3: ${{ secrets.SUBSCRIPTION_PATH3 }}
