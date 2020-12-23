@@ -36,7 +36,6 @@ public class SenderConnection {
         if (x is error) {
             log:print(x.toString());
         } 
-        // Test
         self.asbSenderConnection = <handle>x;
     }
 
