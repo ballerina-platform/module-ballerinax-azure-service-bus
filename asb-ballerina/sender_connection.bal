@@ -33,11 +33,10 @@ public class SenderConnection {
         self.entityPath = connectionConfiguration.entityPath;
         var x = createSenderConnection(java:fromString(self.connectionString),
             java:fromString(self.entityPath));
-        if (x is handle) {
-            self.asbSenderConnection  = x;
-        } else {
+        if (x is error) {
             log:print(x.toString());
-        }
+        } 
+        self.asbSenderConnection = <handle>x;
     }
 
     # Creates a Asb Sender Connection using the given connection parameters.
