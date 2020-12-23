@@ -57,6 +57,18 @@ int prefetchCountEnabled = 50;
 int messageCount = 100;
 int variableMessageCount = 1000;
 
+# Before Suite Function
+@test:BeforeSuite
+function beforeSuiteFunc() {
+    log:print("Creating a ballerina Asb Sender connection.");
+    SenderConnection? con = new ({connectionString: connectionString, entityPath: queuePath});
+    senderConnection = con;
+
+    log:print("Creating a ballerina Asb Receiver connection.");
+    ReceiverConnection? rec = new ({connectionString: connectionString, entityPath: queuePath});
+    receiverConnection = rec;
+}
+
 # Test Sender Connection
 @test:Config {
     enable: false
