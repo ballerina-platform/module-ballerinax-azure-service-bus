@@ -30,8 +30,9 @@ jobs:
         uses: actions/setup-java@v1
         with:
               java-version: 11
-      
-      - run: mvn clean package -pl asb-native
+
+      - working-directory: ./asb-native
+        run: mvn clean package
         
       # Runs a set of commands using the runners shell
       - name: Ballerina Build
