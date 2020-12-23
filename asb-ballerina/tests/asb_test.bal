@@ -1322,7 +1322,7 @@ function testSendAndReceiveMessagesWithVariableLoad() {
 
 # Test prefetch count operation with variable loads using different workers
 @test:Config {
-    enable: false
+    enable: true
 }
 function testSendAndReceiveMessagesWithVariableLoadUsingWorkers() {
     int variableMessageCount = 5;
@@ -1402,7 +1402,7 @@ function testSendAndReceiveMessagesWithVariableLoadUsingWorkers() {
 
 # Test prefetch count operation with variable loads for listener using different workers
 @test:Config {
-    enable: true
+    enable: false
 }
 function testListenerWithVariableLoadUsingWorkers() {
     int variableMessageCount = 5;
