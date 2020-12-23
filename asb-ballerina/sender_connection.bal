@@ -15,6 +15,7 @@
 // under the License.
 
 import ballerina/java;
+import ballerina/log;
 
 # Represents a single network sender connection to the Asb broker.
 public class SenderConnection {
@@ -30,8 +31,13 @@ public class SenderConnection {
     public isolated function init(ConnectionConfiguration connectionConfiguration) {
         self.connectionString = connectionConfiguration.connectionString;
         self.entityPath = connectionConfiguration.entityPath;
-        self.asbSenderConnection = <handle> createSenderConnection(java:fromString(self.connectionString),
+        var x = createSenderConnection(java:fromString(self.connectionString),
             java:fromString(self.entityPath));
+        if (x is handle) {
+            self.asbSenderConnection  = x;
+        } else {
+            log:print(x.toString());
+        }
     }
 
     # Creates a Asb Sender Connection using the given connection parameters.
