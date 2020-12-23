@@ -1320,6 +1320,7 @@ function testSendAndReceiveMessagesWithVariableLoad() {
     }
 }
 
+# Test Github workflow
 # Test prefetch count operation with variable loads using different workers
 @test:Config {
     enable: true
