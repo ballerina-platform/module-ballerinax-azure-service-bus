@@ -15,7 +15,6 @@
 // under the License.
 
 import ballerina/java;
-import ballerina/runtime;
 
 # Represents a single network receiver connection to the Asb broker.
 public class ReceiverConnection {
@@ -31,10 +30,8 @@ public class ReceiverConnection {
     public isolated function init(ConnectionConfiguration connectionConfiguration) {
         self.connectionString = connectionConfiguration.connectionString;
         self.entityPath = connectionConfiguration.entityPath;
-        runtime:sleep(20000);
         self.asbReceiverConnection = <handle> createReceiverConnection(java:fromString(self.connectionString),
             java:fromString(self.entityPath));
-        runtime:sleep(20000);
     }
 
     # Creates a Asb Receiver Connection using the given connection parameters.
