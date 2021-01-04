@@ -61,7 +61,7 @@ int variableMessageCount = 1000;
 @test:BeforeSuite
 function beforeSuiteFunc() {
     log:print("Creating a ballerina Asb Sender connection.");
-    SenderConnection? con = new ({connectionString: connectionString, entityPath: queuePath});
+    SenderConnection? con = new ({connectionString: getConfigValue("CONNECTION_STRING"), entityPath: queuePath});
     senderConnection = con;
 
     log:print("Creating a ballerina Asb Receiver connection.");
