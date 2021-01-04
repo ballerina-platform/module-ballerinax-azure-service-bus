@@ -22,7 +22,7 @@ import ballerina/runtime;
 import ballerina/time;
 
 // Connection Configuration
-string connectionString = getConfigValue("CONNECTION_STRING");
+string connectionString = "Endpoint=sb://"+"roland1"+".servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=YxtBBZDRWEfjJxWFik93xti14W6rltDd4917H+/4HhE=";
 string queuePath = getConfigValue("QUEUE_PATH");
 string topicPath = getConfigValue("TOPIC_PATH");
 string subscriptionPath1 = getConfigValue("SUBSCRIPTION_PATH1");
