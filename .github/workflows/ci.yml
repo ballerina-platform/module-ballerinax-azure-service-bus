@@ -48,4 +48,3 @@ jobs:
             SUBSCRIPTION_PATH1: ${{ secrets.SUBSCRIPTION_PATH1 }}
             SUBSCRIPTION_PATH2: ${{ secrets.SUBSCRIPTION_PATH2 }}
             SUBSCRIPTION_PATH3: ${{ secrets.SUBSCRIPTION_PATH3 }}
-        # Test github workflow
