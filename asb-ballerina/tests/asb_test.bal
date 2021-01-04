@@ -22,7 +22,7 @@ import ballerina/runtime;
 import ballerina/time;
 
 // Connection Configuration
-string connectionString = getConfigValue("CONNECTION_STRING");
+string connectionString = config:getAsString("CONNECTION_STRING");
 string queuePath = getConfigValue("QUEUE_PATH");
 string topicPath = getConfigValue("TOPIC_PATH");
 string subscriptionPath1 = getConfigValue("SUBSCRIPTION_PATH1");
