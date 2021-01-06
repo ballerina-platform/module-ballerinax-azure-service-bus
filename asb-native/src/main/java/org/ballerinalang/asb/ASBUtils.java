@@ -23,7 +23,7 @@ import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BError;
 
 /**
- * Utils class for Asb Error handling.
+ * Util class for Asb Error handling.
  */
 public class ASBUtils {
     /**
