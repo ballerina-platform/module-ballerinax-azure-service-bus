@@ -21,7 +21,7 @@ import ballerina/config;
 import ballerina/runtime;
 import ballerina/time;
 
-// Connection Configurations
+// Connection Configuration
 string connectionString = config:getAsString("CONNECTION_STRING");
 string queuePath = getConfigValue("QUEUE_PATH");
 string topicPath = getConfigValue("TOPIC_PATH");
