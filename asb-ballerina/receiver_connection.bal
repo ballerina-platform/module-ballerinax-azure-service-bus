@@ -17,7 +17,7 @@
 import ballerina/java;
 
 # Represents a single network receiver connection to the Asb broker.
-public class ReceiverConnection {
+public client class ReceiverConnection {
 
     handle asbReceiverConnection;
 
@@ -57,7 +57,7 @@ public class ReceiverConnection {
     # 
     # + serverWaitTime - Specified server wait time in seconds to receive message.
     # + return - A Message object
-    public isolated function receiveMessage(int serverWaitTime) returns Message|Error {
+    isolated remote function receiveMessage(int serverWaitTime) returns Message|Error {
         return receiveMessage(self.asbReceiverConnection, serverWaitTime);
     }
 
@@ -66,7 +66,7 @@ public class ReceiverConnection {
     # + serverWaitTime - Specified server wait time in seconds to receive message.
     # + maxMessageCount - Maximum no. of messages in a batch 
     # + return - A Messages object with an array of Message objects
-    public isolated function receiveMessages(int serverWaitTime, int maxMessageCount) returns Messages|Error {
+    isolated remote function receiveMessages(int serverWaitTime, int maxMessageCount) returns Messages|Error {
         return receiveMessages(self.asbReceiverConnection, serverWaitTime, maxMessageCount);
     }
 
@@ -74,28 +74,28 @@ public class ReceiverConnection {
     # 
     # + maxMessageCount - Maximum no. of messages in a batch
     # + return - A Message object
-    public isolated function receiveBatchMessage(int maxMessageCount) returns Messages|Error {
+    isolated remote function receiveBatchMessage(int maxMessageCount) returns Messages|Error {
         return receiveBatchMessage(self.asbReceiverConnection, maxMessageCount);
     }
 
     # Complete Messages from Queue or Subscription based on messageLockToken.
     # 
     # + return - An `asb:Error` if failed to complete message or else `()`
-    public isolated function completeMessages() returns Error? {
+    isolated remote function completeMessages() returns Error? {
         return completeMessages(self.asbReceiverConnection);
     }
 
     # Complete One Message from Queue or Subscription based on messageLockToken.
     # 
     # + return - An `asb:Error` if failed to complete messages or else `()`
-    public isolated function completeOneMessage() returns Error? {
+    isolated remote function completeOneMessage() returns Error? {
         return completeOneMessage(self.asbReceiverConnection);
     }
 
     # Abandon message & make available again for processing from Queue or Subscription based on messageLockToken.
     # 
     # + return - An `asb:Error` if failed to abandon message or else `()`
-    public isolated function abandonMessage() returns Error? {
+    isolated remote function abandonMessage() returns Error? {
         return abandonMessage(self.asbReceiverConnection);
     }
 
@@ -104,7 +104,7 @@ public class ReceiverConnection {
     # + deadLetterReason - The deadletter reason.
     # + deadLetterErrorDescription - The deadletter error description.
     # + return - An `asb:Error` if failed to deadletter message or else `()`
-    public isolated function deadLetterMessage(string deadLetterReason, string deadLetterErrorDescription) 
+    isolated remote function deadLetterMessage(string deadLetterReason, string deadLetterErrorDescription) 
         returns Error? {
         return deadLetterMessage(self.asbReceiverConnection, java:fromString(deadLetterReason), 
             java:fromString(deadLetterErrorDescription));
@@ -113,7 +113,7 @@ public class ReceiverConnection {
     #  Defer the message in a Queue or Subscription based on messageLockToken.
     # 
     # + return - An `asb:Error` if failed to defer message or else sequence number
-    public isolated function deferMessage() returns int|Error {
+    isolated remote function deferMessage() returns int|Error {
         return deferMessage(self.asbReceiverConnection);
     }
 
@@ -124,14 +124,14 @@ public class ReceiverConnection {
     #                    integer assigned to a message as it is accepted and stored by the broker and functions as
     #                    its true identifier.
     # + return - An `asb:Error` if failed to receive deferred message or else `()`
-    public isolated function receiveDeferredMessage(int sequenceNumber) returns Message|Error {
+    isolated remote function receiveDeferredMessage(int sequenceNumber) returns Message|Error {
         return receiveDeferredMessage(self.asbReceiverConnection, sequenceNumber);
     }
 
     # The operation renews lock on a message in a queue or subscription based on messageLockToken.
     # 
     # + return - An `asb:Error` if failed to renew message or else `()`
-    public isolated function renewLockOnMessage() returns Error? {
+    isolated remote function renewLockOnMessage() returns Error? {
         return renewLockOnMessage(self.asbReceiverConnection);
     }
 
@@ -143,7 +143,7 @@ public class ReceiverConnection {
     # 
     # + prefetchCount - The desired prefetch count.
     # + return - An `asb:Error` if failed to renew message or else `()`
-    public isolated function setPrefetchCount(int prefetchCount) returns Error? {
+    isolated remote function setPrefetchCount(int prefetchCount) returns Error? {
         return setPrefetchCount(self.asbReceiverConnection, prefetchCount);
     }
 

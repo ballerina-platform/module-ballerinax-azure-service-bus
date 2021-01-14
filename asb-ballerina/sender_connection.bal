@@ -18,7 +18,7 @@ import ballerina/java;
 import ballerina/log;
 
 # Represents a single network sender connection to the Asb broker.
-public class SenderConnection {
+public client class SenderConnection {
 
     handle asbSenderConnection;
 
@@ -64,7 +64,7 @@ public class SenderConnection {
     # + parameters - Optional Message parameters 
     # + properties - Message properties
     # + return - An `asb:Error` if failed to send message or else `()`
-    public isolated function sendMessageWithConfigurableParameters(byte[] content, map<string> parameters,
+    isolated remote function sendMessageWithConfigurableParameters(byte[] content, map<string> parameters,
         map<string> properties) returns Error? {
         return sendMessageWithConfigurableParameters(self.asbSenderConnection, content, parameters, properties);
     }
@@ -84,7 +84,7 @@ public class SenderConnection {
     # + timeToLive - This is the duration, in ticks, that a message is valid. The duration starts from when the 
     #                message is sent to the Service Bus.
     # + return - An `asb:Error` if failed to send message or else `()`
-    public isolated function sendMessage(byte[] content, string contentType, string messageId, string to, 
+    isolated remote function sendMessage(byte[] content, string contentType, string messageId, string to, 
         string replyTo, string replyToSessionId, string label, string sessionId, string correlationId, 
         map<string> properties, int timeToLive) returns Error? {
         return sendMessage(self.asbSenderConnection, content, java:fromString(contentType), java:fromString(messageId), 
@@ -99,7 +99,7 @@ public class SenderConnection {
     # + properties - Message properties
     # + maxMessageCount - Maximum no. of messages in a batch
     # + return - An `asb:Error` if failed to send message or else `()`
-    public isolated function sendBatchMessage(string[] content, map<string> parameters, map<string> properties, 
+    isolated remote function sendBatchMessage(string[] content, map<string> parameters, map<string> properties, 
         int maxMessageCount) returns Error? {
         return sendBatchMessage(self.asbSenderConnection, content, parameters, properties, maxMessageCount);
     }
