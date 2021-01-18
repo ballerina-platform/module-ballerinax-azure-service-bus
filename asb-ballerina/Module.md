@@ -42,12 +42,11 @@ to/from the queue/topic/subscription.
 
 3. [Get the connection string](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-portal#get-the-connection-string)
 
-4. [Create a queue in the Azure portal](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-portal#create-a-queue-in-the-azure-portal)
+4. [Create a queue in the Azure portal & get Entity Path](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-portal#create-a-queue-in-the-azure-portal)
 
 
 # Sample
 First, import the `ballerinax/asb` module into the Ballerina project.
-
 ```ballerina
 import ballerinax/asb;
 ```
@@ -55,8 +54,8 @@ import ballerinax/asb;
 You can now make the connection configuration using the connection string and entity path.
 ```ballerina
 asb:ConnectionConfiguration connectionConfiguration = {
-        connectionString: "connection_string",
-        entityPath: "entity_path"
+    connectionString: config:getAsString("CONNECTION_STRING"),
+    entityPath: config:getAsString("QUEUE_PATH")
 };
 ```
 
@@ -72,38 +71,44 @@ asb:ReceiverConnection? receiverConnection = new (connectionConfiguration);
 
 You can now send a message to the configured asure service bus entity.  
 ```ballerina
-if (senderConnection is SenderConnection) {
-    checkpanic senderConnection.sendMessageWithConfigurableParameters(byteContent, parameters, properties);
+string stringContent = "This is My Message Body"; 
+byte[] byteContent = stringContent.toBytes();
+map<string> parameters = {contentType: "text/plain", messageId: "one", to: "consumer1", replyTo: "publisher1", 
+    label: "a1", sessionId: "b1", correlationId: "c1", timeToLive: "2"};
+map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
+
+if (senderConnection is asb:SenderConnection) {
+    checkpanic senderConnection->sendMessageWithConfigurableParameters(byteContent, parameters, properties);
 } else {
-    test:assertFail("Asb sender connection creation failed.");
+    log:printError("Asb sender connection creation failed.");
 }
 ```
 
 You can now receive message from the configured asure service bus entity. 
 ```ballerina
-if (receiverConnection is ReceiverConnection) {
-    asb:Message|asb:Error messageReceived = receiverConnection.receiveMessage(serverWaitTime);
-    if (messageReceived is Message) {
+if (receiverConnection is asb:ReceiverConnection) {
+    asb:Message|asb:Error messageReceived = receiverConnection->receiveMessage(serverWaitTime);
+    if (messageReceived is asb:Message) {
         string messageRead = checkpanic messageReceived.getTextContent();
-        log:printInfo("Reading Received Message : " + messageRead);
+        log:print("Reading Received Message : " + messageRead);
     } else {
-        test:assertFail("Receiving message via Asb receiver connection failed.");
+        log:printError("Receiving message via Asb receiver connection failed.");
     }
 } else {
-    test:assertFail("Asb receiver connection creation failed.");
+    log:printError("Asb receiver connection creation failed.");
 }
 ```
 
 You can now close the sender connection.
 ```ballerina
-if (receiverConnection is ReceiverConnection) {
+if (receiverConnection is asb:ReceiverConnection) {
     checkpanic receiverConnection.closeReceiverConnection();
 }
 ```
 
 You can now close the receiver connection.
 ```ballerina
-if (senderConnection is SenderConnection) {
+if (senderConnection is asb:SenderConnection) {
     checkpanic senderConnection.closeSenderConnection();
 }
 ```
