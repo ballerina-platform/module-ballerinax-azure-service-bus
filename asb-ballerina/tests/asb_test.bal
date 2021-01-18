@@ -1459,7 +1459,7 @@ function testListenerWithVariableLoadUsingWorkers() {
 }
 
 @test:Config { 
-    enable: true
+    groups: ["asb"]
 }
 function testSendAndReceiveMessageFromQueueOperation() {
     ConnectionConfiguration config = {
@@ -1509,7 +1509,7 @@ function testSendAndReceiveMessageFromQueueOperation() {
 }
 
 @test:Config { 
-    enable: true
+    groups: ["asb"]
 }
 function testSendAndReceiveMessagesFromQueueOperation() {
     ConnectionConfiguration config = {
@@ -1561,7 +1561,7 @@ function testSendAndReceiveMessagesFromQueueOperation() {
 }
 
 @test:Config { 
-    enable: true
+    groups: ["asb"]
 }
 function testSendAndReceiveBatchFromQueueOperation() {
     ConnectionConfiguration config = {
@@ -1614,7 +1614,7 @@ function testSendAndReceiveBatchFromQueueOperation() {
 }
 
 @test:Config { 
-    enable: true
+    groups: ["asb"]
 }
 function testCompleteAllMessagesFromQueueOperation() {
     ConnectionConfiguration config = {
@@ -1659,7 +1659,7 @@ function testCompleteAllMessagesFromQueueOperation() {
 }
 
 @test:Config { 
-    enable: true
+    groups: ["asb"]
 }
 function testCompleteMessageFromQueueOperation() {
     ConnectionConfiguration config = {
@@ -1703,7 +1703,7 @@ function testCompleteMessageFromQueueOperation() {
 }
 
 @test:Config { 
-    enable: true
+    groups: ["asb"]
 }
 function testAbandonMessagesFromQueueOperation() {
     ConnectionConfiguration config = {
@@ -1748,7 +1748,7 @@ function testAbandonMessagesFromQueueOperation() {
 }
 
 @test:Config { 
-    enable: true
+    groups: ["asb"]
 }
 function testSendToTopicAndReceiveFromSubscriptionOperation() {
     ConnectionConfiguration senderConfig = {
@@ -1858,7 +1858,7 @@ function testSendToTopicAndReceiveFromSubscriptionOperation() {
 }
 
 @test:Config { 
-    enable: true
+    groups: ["asb"]
 }
 function testSendBatchToTopicAndReceiveFromSubscriptionOperation() {
     ConnectionConfiguration senderConfig = {
@@ -1978,7 +1978,7 @@ function testSendBatchToTopicAndReceiveFromSubscriptionOperation() {
 }
 
 @test:Config { 
-    enable: true
+    groups: ["asb"]
 }
 function testCompleteAllMessagesFromSubscriptionOperation() {
     ConnectionConfiguration senderConfig = {
@@ -2161,7 +2161,7 @@ function testCompleteMessageFromSubscriptionOperation() {
 }
 
 @test:Config { 
-    enable: true
+    groups: ["asb"]
 }
 function testAbandonMessagesFromSubscriptionOperation() {
     ConnectionConfiguration senderConfig = {
@@ -2254,7 +2254,7 @@ function testAbandonMessagesFromSubscriptionOperation() {
 }
 
 @test:Config { 
-    enable: true
+    groups: ["asb"]
 }
 function testAsyncConsumerOperation() {
     ConnectionConfiguration config = {
@@ -2294,60 +2294,7 @@ function testAsyncConsumerOperation() {
 }
 
 @test:Config { 
-    enable: false
-}
-function testDuplicateMessagesFromQueueOperation() {
-    ConnectionConfiguration config = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("QUEUE_PATH")
-    };
-
-    log:print("Creating Asb sender connection.");
-    SenderConnection? senderConnection = new (config);
-
-    log:print("Creating Asb receiver connection.");
-    ReceiverConnection? receiverConnection = new (config);
-
-    if (senderConnection is SenderConnection) {
-        log:print("Sending via Asb sender connection.");
-        checkpanic senderConnection->sendMessageWithConfigurableParameters(byteContent, parameters1, properties);
-        checkpanic senderConnection->sendMessageWithConfigurableParameters(byteContent, parameters1, properties);
-    } else {
-        log:printError("Asb sender connection creation failed.");
-    }
-
-    if (receiverConnection is ReceiverConnection) {
-        log:print("Receiving from Asb receiver connection.");
-        var messageReceived = receiverConnection->receiveMessages(serverWaitTime, maxMessageCount1);
-        if(messageReceived is Messages) {
-            int val = messageReceived.getMessageCount();
-            log:print("No. of messages received : " + val.toString());
-            Message[] messages = messageReceived.getMessages();
-            string messageReceived1 =  checkpanic messages[0].getTextContent();
-            log:print("Message1 content : " +messageReceived1);
-            string messageReceived2 =  checkpanic messages[1].getTextContent();
-            log:print("Message2 content : " +messageReceived2.toString());
-        } else {
-            test:assertEquals(messageReceived.message(), "Received a duplicate message!", 
-                msg = "Error message does not match");
-        }
-    } else {
-        test:assertFail("Asb receiver connection creation failed.");
-    }
-
-    if (senderConnection is SenderConnection) {
-        log:print("Closing Asb sender connection.");
-        checkpanic senderConnection.closeSenderConnection();
-    }
-
-    if (receiverConnection is ReceiverConnection) {
-        log:print("Closing Asb receiver connection.");
-        checkpanic receiverConnection.closeReceiverConnection();
-    }
-}
-
-@test:Config { 
-    enable: true
+    groups: ["asb"]
 }
 function testDeadletterFromQueueOperation() {
     ConnectionConfiguration config = {
@@ -2392,7 +2339,7 @@ function testDeadletterFromQueueOperation() {
 }
 
 @test:Config { 
-    enable: true
+    groups: ["asb"]
 }
 function testDefer_FromQueueOperation() {
     ConnectionConfiguration config = {
@@ -2457,7 +2404,7 @@ function testDefer_FromQueueOperation() {
 }
 
 @test:Config { 
-    enable: true
+    groups: ["asb"]
 }
 function testRenewLockOnMessage_FromQueueOperation() {
     ConnectionConfiguration config = {
@@ -2502,7 +2449,7 @@ function testRenewLockOnMessage_FromQueueOperation() {
 }
 
 @test:Config { 
-    enable: true
+    groups: ["asb"]
 }
 function testDeadletterFromSubscriptionOperation() {
     ConnectionConfiguration senderConfig = {
@@ -2596,7 +2543,7 @@ function testDeadletterFromSubscriptionOperation() {
 }
 
 @test:Config { 
-    enable: true
+    groups: ["asb"]
 }
 function testDefer_FromSubscriptionOperation() {
     ConnectionConfiguration senderConfig = {
@@ -2750,7 +2697,7 @@ function testDefer_FromSubscriptionOperation() {
 }
 
 @test:Config { 
-    enable: true
+    groups: ["asb"]
 }
 function testRenewLockOnMessage_FromSubscriptionOperation() {
     ConnectionConfiguration senderConfig = {
@@ -2840,6 +2787,60 @@ function testRenewLockOnMessage_FromSubscriptionOperation() {
     if (receiverConnection3 is ReceiverConnection) {
         log:print("Closing Asb receiver connection 3.");
         checkpanic receiverConnection3.closeReceiverConnection();
+    }
+}
+
+@test:Config { 
+    groups: ["asb"],
+    enable: true
+}
+function testDuplicateMessagesFromQueueOperation() {
+    ConnectionConfiguration config = {
+        connectionString: config:getAsString("CONNECTION_STRING"),
+        entityPath: config:getAsString("QUEUE_PATH")
+    };
+
+    log:print("Creating Asb sender connection.");
+    SenderConnection? senderConnection = new (config);
+
+    log:print("Creating Asb receiver connection.");
+    ReceiverConnection? receiverConnection = new (config);
+
+    if (senderConnection is SenderConnection) {
+        log:print("Sending via Asb sender connection.");
+        checkpanic senderConnection->sendMessageWithConfigurableParameters(byteContent, parameters1, properties);
+        checkpanic senderConnection->sendMessageWithConfigurableParameters(byteContent, parameters1, properties);
+    } else {
+        log:printError("Asb sender connection creation failed.");
+    }
+
+    if (receiverConnection is ReceiverConnection) {
+        log:print("Receiving from Asb receiver connection.");
+        var messageReceived = receiverConnection->receiveMessages(serverWaitTime, maxMessageCount1);
+        if(messageReceived is Messages) {
+            int val = messageReceived.getMessageCount();
+            log:print("No. of messages received : " + val.toString());
+            Message[] messages = messageReceived.getMessages();
+            string messageReceived1 =  checkpanic messages[0].getTextContent();
+            log:print("Message1 content : " +messageReceived1);
+            string messageReceived2 =  checkpanic messages[1].getTextContent();
+            log:print("Message2 content : " +messageReceived2.toString());
+        } else {
+            test:assertEquals(messageReceived.message(), "Received a duplicate message!", 
+                msg = "Error message does not match");
+        }
+    } else {
+        test:assertFail("Asb receiver connection creation failed.");
+    }
+
+    if (senderConnection is SenderConnection) {
+        log:print("Closing Asb sender connection.");
+        checkpanic senderConnection.closeSenderConnection();
+    }
+
+    if (receiverConnection is ReceiverConnection) {
+        log:print("Closing Asb receiver connection.");
+        checkpanic receiverConnection.closeReceiverConnection();
     }
 }
 
