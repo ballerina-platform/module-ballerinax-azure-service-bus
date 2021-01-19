@@ -14,6 +14,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
+import ballerina/java;
+
+final handle JAVA_NULL = java:createNull();
+
 # Configurations used to create a `asb:Connection`.
 #
 # + connectionString - Service bus connection string with Shared Access Signatures

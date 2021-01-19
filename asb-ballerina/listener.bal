@@ -27,7 +27,7 @@ public class Listener {
     #
     # + connectionOrConnectionConfig - A `asb:Connection` object or the connection configurations.
     public isolated function init(ConnectionConfiguration connectionConfig) {
-        self.receiverConnection = new (connectionConfig);
+        self.receiverConnection = checkpanic new (connectionConfig);
         externInit(self, self.receiverConnection.getAsbReceiverConnection());
     }
 

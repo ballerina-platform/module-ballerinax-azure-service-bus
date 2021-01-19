@@ -59,11 +59,13 @@ public class ConnectionUtils {
                     new ConnectionStringBuilder(connectionString, entityPath));
             return sender;
         } catch (InterruptedException e) {
-            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
+            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting: "
                     + e.getMessage());
         } catch (ServiceBusException e) {
-            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
+            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting: "
                     + e.getMessage());
+        } catch (Exception e) {
+            throw ASBUtils.returnErrorValue("Sender Connection Creation Failed: " + e.getMessage());
         }
     }
 
@@ -94,11 +96,13 @@ public class ConnectionUtils {
                     new ConnectionStringBuilder(connectionString, entityPath), ReceiveMode.PEEKLOCK);
             return receiver;
         } catch (InterruptedException e) {
-            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
+            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting: "
                     + e.getMessage());
         } catch (ServiceBusException e) {
-            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
+            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting: "
                     + e.getMessage());
+        } catch (Exception e) {
+            throw ASBUtils.returnErrorValue("Receiver Connection Creation Failed: " + e.getMessage());
         }
     }
 
@@ -165,26 +169,27 @@ public class ConnectionUtils {
      * @param properties Input Message properties
      * @param timeToLive Input Message time to live in minutes
      */
-    public static void sendMessage(IMessageSender sender, BArray content, String contentType, String messageId,
-                                   String to, String replyTo, String replyToSessionId, String label, String sessionId,
-                                   String correlationId, BMap<String, String> properties, int timeToLive)
+    public static void sendMessage(IMessageSender sender, BArray content, Object contentType, Object messageId,
+                                   Object to, Object replyTo, Object replyToSessionId, Object label, Object sessionId,
+                                   Object correlationId, BMap<String, String> properties, Object timeToLive)
             throws Exception {
         try {
             // Send messages to queue
             log.info("\tSending messages to ...\n" + sender.getEntityPath());
             IMessage message = new Message();
-            message.setMessageId(messageId);
-            message.setTimeToLive(Duration.ofMinutes(timeToLive));
+            String msgId = (messageId == null || messageId.toString() == "") ?
+                    UUID.randomUUID().toString() : messageId.toString();
+            message.setMessageId(msgId);
+            message.setTimeToLive(Duration.ofMinutes((long) timeToLive));
             byte[] byteArray = content.getBytes();
             message.setBody(byteArray);
-            message.setContentType(contentType);
-            message.setMessageId(messageId);
-            message.setTo(to);
-            message.setReplyTo(replyTo);
-            message.setReplyToSessionId(replyToSessionId);
-            message.setLabel(label);
-            message.setSessionId(sessionId);
-            message.setCorrelationId(correlationId);
+            message.setContentType(valueToEmptyOrToString(contentType));
+            message.setTo(valueToEmptyOrToString(to));
+            message.setReplyTo(valueToEmptyOrToString(replyTo));
+            message.setReplyToSessionId(valueToEmptyOrToString(replyToSessionId));
+            message.setLabel(valueToEmptyOrToString(label));
+            message.setSessionId(valueToEmptyOrToString(sessionId));
+            message.setCorrelationId(valueToEmptyOrToString(correlationId));
             Map<String,String> map = toStringMap(properties);
             message.setProperties(map);
 
@@ -393,7 +398,7 @@ public class ConnectionUtils {
      * @param maxMessageCount Maximum no. of messages in a batch
      */
     public static void sendBatchMessage(IMessageSender sender, BArray content, BMap<String, String> parameters,
-                                        BMap<String, String> properties, int maxMessageCount) throws Exception {
+                                        BMap<String, String> properties, Object maxMessageCount) throws Exception {
         Map<String,String> map = toStringMap(parameters);
 
         String contentType = valueToStringOrEmpty(map, CONTENT_TYPE);
@@ -409,7 +414,7 @@ public class ConnectionUtils {
         try {
             List<IMessage> messages = new ArrayList<>();
 
-            for(int i = 0; i < maxMessageCount; i++) {
+            for(int i = 0; i < (long) maxMessageCount; i++) {
                 IMessage message = new Message();
                 messageId = map.get(MESSAGE_ID) != null ? map.get(MESSAGE_ID) : UUID.randomUUID().toString();
                 message.setMessageId(messageId);
@@ -780,6 +785,16 @@ public class ConnectionUtils {
     private static String valueToStringOrEmpty(Map<String, ?> map, String key) {
         Object value = map.get(key);
         return value == null ? "" : value.toString();
+    }
+
+    /**
+     * Get the value as string or as empty based on the object value.
+     *
+     * @param value Input value.
+     * @return value as a string or empty.
+     */
+    private static String valueToEmptyOrToString(Object value) {
+        return (value == null) ? "" : value.toString();
     }
 
     public ConnectionUtils() {

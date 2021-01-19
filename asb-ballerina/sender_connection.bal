@@ -15,47 +15,60 @@
 // under the License.
 
 import ballerina/java;
-import ballerina/log;
 
 # Represents a single network sender connection to the Asb broker.
 public client class SenderConnection {
 
-    handle asbSenderConnection;
+    handle asbSenderConnection = JAVA_NULL;
 
     private string connectionString;
     private string entityPath;
 
     # Initiates an Asb Sender Connection using the given connection configuration.
     # 
-    # + connectionConfiguration - Configurations used to create a `asb:Connection`
-    public isolated function init(ConnectionConfiguration connectionConfiguration) {
+    # + connectionConfiguration - Configurations used to create a `asb:SenderConnection`
+    # + return - An `asb:Error` if failed to create connection or else `()`
+    public isolated function init(ConnectionConfiguration connectionConfiguration) returns Error? {
         self.connectionString = connectionConfiguration.connectionString;
         self.entityPath = connectionConfiguration.entityPath;
-        var x = createSenderConnection(java:fromString(self.connectionString),
+        var connectionResult = createSenderConnection(java:fromString(self.connectionString),
             java:fromString(self.entityPath));
-        if (x is error) {
-            log:print(x.toString());
-        } 
-        self.asbSenderConnection = <handle>x;
+        if (connectionResult is handle) {
+            self.asbSenderConnection = <handle> connectionResult;
+            return;
+        } else {
+            return connectionResult;
+        }        
     }
 
     # Creates a Asb Sender Connection using the given connection parameters.
     # 
-    # + connectionConfiguration - Configurations used to create a `asb:Connection`
+    # + connectionConfiguration - Configurations used to create a `asb:SenderConnection`
     # + return - An `asb:Error` if failed to create connection or else `()`
     public isolated function createSenderConnection(ConnectionConfiguration connectionConfiguration) 
-        returns handle|Error? {
+        returns Error? {
         self.connectionString = connectionConfiguration.connectionString;
         self.entityPath = connectionConfiguration.entityPath;
-        self.asbSenderConnection = <handle> createSenderConnection(java:fromString(self.connectionString),
+        var connectionResult = createSenderConnection(java:fromString(self.connectionString),
             java:fromString(self.entityPath));
+        if (connectionResult is handle) {
+            self.asbSenderConnection = <handle> connectionResult;
+            return;
+        } else {
+            return connectionResult;
+        }
     }
 
     # Closes the Asb Sender Connection using the given connection parameters.
     #
     # + return - An `asb:Error` if failed to close connection or else `()`
     public isolated function closeSenderConnection() returns Error? {
-        return closeSenderConnection(self.asbSenderConnection);
+        var connectionResult = closeSenderConnection(self.asbSenderConnection);
+        if (connectionResult is ()) {
+            return;
+        } else {
+            return connectionResult;
+        }
     }
 
     # Send message to queue with a content and optional parameters
@@ -64,8 +77,8 @@ public client class SenderConnection {
     # + parameters - Optional Message parameters 
     # + properties - Message properties
     # + return - An `asb:Error` if failed to send message or else `()`
-    isolated remote function sendMessageWithConfigurableParameters(byte[] content, map<string> parameters,
-        map<string> properties) returns Error? {
+    isolated remote function sendMessageWithConfigurableParameters(byte[] content = [], map<string> parameters = {},
+        map<string> properties = {}) returns Error? {
         return sendMessageWithConfigurableParameters(self.asbSenderConnection, content, parameters, properties);
     }
 
@@ -84,12 +97,13 @@ public client class SenderConnection {
     # + timeToLive - This is the duration, in ticks, that a message is valid. The duration starts from when the 
     #                message is sent to the Service Bus.
     # + return - An `asb:Error` if failed to send message or else `()`
-    isolated remote function sendMessage(byte[] content, string contentType, string messageId, string to, 
-        string replyTo, string replyToSessionId, string label, string sessionId, string correlationId, 
-        map<string> properties, int timeToLive) returns Error? {
-        return sendMessage(self.asbSenderConnection, content, java:fromString(contentType), java:fromString(messageId), 
-            java:fromString(to), java:fromString(replyTo), java:fromString(replyToSessionId), java:fromString(label), 
-            java:fromString(sessionId), java:fromString(correlationId), properties, timeToLive);
+    isolated remote function sendMessage(byte[] content = [], string? contentType = (), string? messageId = (), 
+        string? to = (), string? replyTo = (), string? replyToSessionId = (), string? label = (), 
+        string? sessionId = (), string? correlationId = (), map<string> properties = {}, int? timeToLive = 5) 
+            returns Error? {
+        // var msgId = messageId == "" ? () : messageId;
+        return sendMessage(self.asbSenderConnection, content, contentType, messageId, to, replyTo, replyToSessionId, 
+        label, sessionId, correlationId, properties, timeToLive);
     }
 
     # Send batch of messages to queue with a content and optional parameters
@@ -99,8 +113,8 @@ public client class SenderConnection {
     # + properties - Message properties
     # + maxMessageCount - Maximum no. of messages in a batch
     # + return - An `asb:Error` if failed to send message or else `()`
-    isolated remote function sendBatchMessage(string[] content, map<string> parameters, map<string> properties, 
-        int maxMessageCount) returns Error? {
+    isolated remote function sendBatchMessage(string[] content = [], map<string> parameters = {}, 
+        map<string> properties = {}, int? maxMessageCount = 1) returns Error? {
         return sendBatchMessage(self.asbSenderConnection, content, parameters, properties, maxMessageCount);
     }
 }
@@ -122,15 +136,15 @@ isolated function sendMessageWithConfigurableParameters(handle imessageSender, b
     'class: "org.ballerinalang.asb.connection.ConnectionUtils"
 } external;
 
-isolated function sendMessage(handle imessageSender, byte[] content, handle contentType, handle messageId, handle to, 
-    handle replyTo, handle replyToSessionId, handle label, handle sessionId, handle correlationId, 
-    map<string> properties, int timeToLive) returns Error? = @java:Method {
+isolated function sendMessage(handle imessageSender, byte[] content, string? contentType, string? messageId, string? to, 
+    string? replyTo, string? replyToSessionId, string? label, string? sessionId, string? correlationId, 
+    map<string> properties, int? timeToLive) returns Error? = @java:Method {
     name: "sendMessage",
     'class: "org.ballerinalang.asb.connection.ConnectionUtils"
 } external;
 
 isolated function sendBatchMessage(handle imessageSender, string[] content, map<string> parameters, 
-    map<string> properties, int maxMessageCount) returns Error? = @java:Method {
+    map<string> properties, int? maxMessageCount) returns Error? = @java:Method {
     name: "sendBatchMessage",
     'class: "org.ballerinalang.asb.connection.ConnectionUtils"
 } external;

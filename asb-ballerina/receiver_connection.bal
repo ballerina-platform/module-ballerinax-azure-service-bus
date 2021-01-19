@@ -19,38 +19,56 @@ import ballerina/java;
 # Represents a single network receiver connection to the Asb broker.
 public client class ReceiverConnection {
 
-    handle asbReceiverConnection;
+    handle asbReceiverConnection  = JAVA_NULL;
 
     private string connectionString;
     private string entityPath;
 
     # Initiates an Asb Receiver Connection using the given connection configuration.
     # 
-    # + connectionConfiguration - Configurations used to create a `asb:Connection`
-    public isolated function init(ConnectionConfiguration connectionConfiguration) {
+    # + connectionConfiguration - Configurations used to create a `asb:ReceiverConnection`
+    # + return - An `asb:Error` if failed to create connection or else `()`
+    public isolated function init(ConnectionConfiguration connectionConfiguration) returns Error? {
         self.connectionString = connectionConfiguration.connectionString;
         self.entityPath = connectionConfiguration.entityPath;
-        self.asbReceiverConnection = <handle> createReceiverConnection(java:fromString(self.connectionString),
+        var connectionResult = createReceiverConnection(java:fromString(self.connectionString),
             java:fromString(self.entityPath));
+        if (connectionResult is handle) {
+            self.asbReceiverConnection = <handle> connectionResult;
+            return;
+        } else {
+            return connectionResult;
+        }    
     }
 
     # Creates a Asb Receiver Connection using the given connection parameters.
     # 
-    # + connectionConfiguration - Configurations used to create a `asb:Connection`
+    # + connectionConfiguration - Configurations used to create a `asb:ReceiverConnection`
     # + return - An `asb:Error` if failed to create connection or else `()`
     public isolated function createReceiverConnection(ConnectionConfiguration connectionConfiguration) 
         returns handle|Error? {
         self.connectionString = connectionConfiguration.connectionString;
         self.entityPath = connectionConfiguration.entityPath;
-        self.asbReceiverConnection = <handle> createReceiverConnection(java:fromString(self.connectionString),
+        var connectionResult = createReceiverConnection(java:fromString(self.connectionString),
             java:fromString(self.entityPath));
+        if (connectionResult is handle) {
+            self.asbReceiverConnection = <handle> connectionResult;
+            return;
+        } else {
+            return connectionResult;
+        }
     }
 
     # Closes the Asb Receiver Connection using the given connection parameters.
     #
     # + return - An `asb:Error` if failed to close connection or else `()`
     public isolated function closeReceiverConnection() returns Error? {
-        return closeReceiverConnection(self.asbReceiverConnection);
+        var connectionResult = closeReceiverConnection(self.asbReceiverConnection);
+        if (connectionResult is ()) {
+            return;
+        } else {
+            return connectionResult;
+        }
     }
 
     # Receive Message from queue.
