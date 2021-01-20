@@ -130,8 +130,8 @@ function testReceiveFromQueueOperation() {
 
     if (receiverConnection is ReceiverConnection) {
         log:print("Receiving from Asb receiver connection.");
-        Message|Error messageReceived = receiverConnection->receiveMessage(serverWaitTime);
-        Message|Error jsonMessageReceived = receiverConnection->receiveMessage(serverWaitTime);
+        Message|Error? messageReceived = receiverConnection->receiveMessage(serverWaitTime);
+        Message|Error? jsonMessageReceived = receiverConnection->receiveMessage(serverWaitTime);
         if (messageReceived is Message && jsonMessageReceived is Message) {
             string messageRead = checkpanic messageReceived.getTextContent();
             log:print("Reading Received Message : " + messageRead);
@@ -351,8 +351,8 @@ function testReceiveFromSubscriptionOperation() {
 
     if (receiverConnection1 is ReceiverConnection) {
         log:print("Receiving from Asb receiver connection 1.");
-        Message|error messageReceived = receiverConnection1->receiveMessage(serverWaitTime);
-        Message|error jsonMessageReceived = receiverConnection1->receiveMessage(serverWaitTime);
+        Message|Error? messageReceived = receiverConnection1->receiveMessage(serverWaitTime);
+        Message|Error? jsonMessageReceived = receiverConnection1->receiveMessage(serverWaitTime);
         if (messageReceived is Message && jsonMessageReceived is Message) {
             string messageRead = checkpanic messageReceived.getTextContent();
             log:print("Reading Received Message : " + messageRead);
@@ -368,8 +368,8 @@ function testReceiveFromSubscriptionOperation() {
 
     if (receiverConnection2 is ReceiverConnection) {
         log:print("Receiving from Asb receiver connection 2.");
-        Message|error messageReceived = receiverConnection2->receiveMessage(serverWaitTime);
-        Message|error jsonMessageReceived = receiverConnection2->receiveMessage(serverWaitTime);
+        Message|Error? messageReceived = receiverConnection2->receiveMessage(serverWaitTime);
+        Message|Error? jsonMessageReceived = receiverConnection2->receiveMessage(serverWaitTime);
         if (messageReceived is Message && jsonMessageReceived is Message) {
             string messageRead = checkpanic messageReceived.getTextContent();
             log:print("Reading Received Message : " + messageRead);
@@ -384,8 +384,8 @@ function testReceiveFromSubscriptionOperation() {
 
     if (receiverConnection3 is ReceiverConnection) {
         log:print("Receiving from Asb receiver connection 3.");
-        Message|error messageReceived = receiverConnection3->receiveMessage(serverWaitTime);
-        Message|error jsonMessageReceived = receiverConnection3->receiveMessage(serverWaitTime);
+        Message|Error? messageReceived = receiverConnection3->receiveMessage(serverWaitTime);
+        Message|Error? jsonMessageReceived = receiverConnection3->receiveMessage(serverWaitTime);
         if (messageReceived is Message && jsonMessageReceived is Message) {
             string messageRead = checkpanic messageReceived.getTextContent();
             log:print("Reading Received Message : " + messageRead);
@@ -902,7 +902,7 @@ function testDeferFromQueueOperation() {
         var sequenceNumber = receiverConnection->deferMessage();
         log:print("Done Deferring a message using its lock token.");
         log:print("Receiving from Asb receiver connection.");
-        Message|Error jsonMessageReceived = receiverConnection->receiveMessage(serverWaitTime);
+        Message|Error? jsonMessageReceived = receiverConnection->receiveMessage(serverWaitTime);
         if (jsonMessageReceived is Message) {
             json jsonMessageRead = checkpanic jsonMessageReceived.getJSONContent();
             log:print("Reading Received Message : " + jsonMessageRead.toString());
@@ -914,10 +914,12 @@ function testDeferFromQueueOperation() {
             if(sequenceNumber == 0) {
                 test:assertFail("No message in the queue");
             }
-            Message|Error messageReceived = receiverConnection->receiveDeferredMessage(sequenceNumber);
+            Message|Error? messageReceived = receiverConnection->receiveDeferredMessage(sequenceNumber);
             if (messageReceived is Message) {
                 string messageRead = checkpanic messageReceived.getTextContent();
                 log:print("Reading Received Message : " + messageRead);
+            } else if (messageReceived is ()) {
+                test:assertFail("No deferred message received with given sequence number");
             } else {
                 test:assertFail(msg = messageReceived.message());
             }
@@ -950,7 +952,7 @@ function testDeferFromSubscriptionOperation() {
         var sequenceNumber = receiverConnection1->deferMessage();
         log:print("Done Deferring a message using its lock token.");
         log:print("Receiving from Asb receiver connection.");
-        Message|Error jsonMessageReceived = receiverConnection1->receiveMessage(serverWaitTime);
+        Message|Error? jsonMessageReceived = receiverConnection1->receiveMessage(serverWaitTime);
         if (jsonMessageReceived is Message) {
             json jsonMessageRead = checkpanic jsonMessageReceived.getJSONContent();
             log:print("Reading Received Message : " + jsonMessageRead.toString());
@@ -962,10 +964,12 @@ function testDeferFromSubscriptionOperation() {
             if(sequenceNumber == 0) {
                 test:assertFail("No message in the queue");
             }
-            Message|Error messageReceived = receiverConnection1->receiveDeferredMessage(sequenceNumber);
+            Message|Error? messageReceived = receiverConnection1->receiveDeferredMessage(sequenceNumber);
             if (messageReceived is Message) {
                 string messageRead = checkpanic messageReceived.getTextContent();
                 log:print("Reading Received Message : " + messageRead);
+            } else if (messageReceived is ()) {
+                test:assertFail("No deferred message received with given sequence number");
             } else {
                 test:assertFail(msg = messageReceived.message());
             }
@@ -981,7 +985,7 @@ function testDeferFromSubscriptionOperation() {
         var sequenceNumber = receiverConnection2->deferMessage();
         log:print("Done Deferring a message using its lock token.");
         log:print("Receiving from Asb receiver connection.");
-        Message|Error jsonMessageReceived = receiverConnection2->receiveMessage(serverWaitTime);
+        Message|Error? jsonMessageReceived = receiverConnection2->receiveMessage(serverWaitTime);
         if (jsonMessageReceived is Message) {
             json jsonMessageRead = checkpanic jsonMessageReceived.getJSONContent();
             log:print("Reading Received Message : " + jsonMessageRead.toString());
@@ -993,10 +997,12 @@ function testDeferFromSubscriptionOperation() {
             if(sequenceNumber == 0) {
                 test:assertFail("No message in the queue");
             }
-            Message|Error messageReceived = receiverConnection2->receiveDeferredMessage(sequenceNumber);
+            Message|Error? messageReceived = receiverConnection2->receiveDeferredMessage(sequenceNumber);
             if (messageReceived is Message) {
                 string messageRead = checkpanic messageReceived.getTextContent();
                 log:print("Reading Received Message : " + messageRead);
+            } else if (messageReceived is ()) {
+                test:assertFail("No deferred message received with given sequence number");
             } else {
                 test:assertFail(msg = messageReceived.message());
             }
@@ -1012,7 +1018,7 @@ function testDeferFromSubscriptionOperation() {
         var sequenceNumber = receiverConnection3->deferMessage();
         log:print("Done Deferring a message using its lock token.");
         log:print("Receiving from Asb receiver connection.");
-        Message|Error jsonMessageReceived = receiverConnection3->receiveMessage(serverWaitTime);
+        Message|Error? jsonMessageReceived = receiverConnection3->receiveMessage(serverWaitTime);
         if (jsonMessageReceived is Message) {
             json jsonMessageRead = checkpanic jsonMessageReceived.getJSONContent();
             log:print("Reading Received Message : " + jsonMessageRead.toString());
@@ -1024,10 +1030,12 @@ function testDeferFromSubscriptionOperation() {
             if(sequenceNumber == 0) {
                 test:assertFail("No message in the queue");
             }
-            Message|Error messageReceived = receiverConnection3->receiveDeferredMessage(sequenceNumber);
+            Message|Error? messageReceived = receiverConnection3->receiveDeferredMessage(sequenceNumber);
             if (messageReceived is Message) {
                 string messageRead = checkpanic messageReceived.getTextContent();
                 log:print("Reading Received Message : " + messageRead);
+            } else if (messageReceived is ()) {
+                test:assertFail("No deferred message received with given sequence number");
             } else {
                 test:assertFail(msg = messageReceived.message());
             }
@@ -1177,7 +1185,7 @@ function testPrefetchCountWithPrefetchDisabled() {
         int i = 1;
         while (i <= messageCount) {
             log:print("Receiving message " + i.toString() + " from Asb receiver connection.");
-            Message|Error messageReceived = receiverConnection->receiveMessage(serverWaitTime);
+            Message|Error? messageReceived = receiverConnection->receiveMessage(serverWaitTime);
             if (messageReceived is Message) {
                 string messageRead = checkpanic messageReceived.getTextContent();
                 log:print("Reading Received Message " + i.toString() + " : " + messageRead);
@@ -1237,7 +1245,7 @@ function testPrefetchCountWithPrefetchEnabled() {
         int i = 1;
         while (i <= messageCount) {
             log:print("Receiving message " + i.toString() + " from Asb receiver connection.");
-            Message|Error messageReceived = receiverConnection->receiveMessage(serverWaitTime);
+            Message|Error? messageReceived = receiverConnection->receiveMessage(serverWaitTime);
             if (messageReceived is Message) {
                 string messageRead = checkpanic messageReceived.getTextContent();
                 log:print("Reading Received Message " + i.toString() + " : " + messageRead);
@@ -1299,7 +1307,7 @@ function testSendAndReceiveMessagesWithVariableLoad() {
         int i = 1;
         while (i <= variableMessageCount) {
             log:print("Receiving message " + i.toString() + " from Asb receiver connection.");
-            Message|Error messageReceived = receiverConnection->receiveMessage(serverWaitTime);
+            Message|Error? messageReceived = receiverConnection->receiveMessage(serverWaitTime);
             if (messageReceived is Message) {
                 string messageRead = checkpanic messageReceived.getTextContent();
                 log:print("Reading Received Message " + i.toString() + " : " + messageRead);
@@ -1370,7 +1378,7 @@ function testSendAndReceiveMessagesWithVariableLoadUsingWorkers() {
             while (i <= variableMessageCount) {
                 runtime:sleep(10000);
                 log:print("Receiving message " + i.toString() + " from Asb receiver connection.");
-                Message|Error messageReceived = receiverConnection->receiveMessage(serverWaitTime);
+                Message|Error? messageReceived = receiverConnection->receiveMessage(serverWaitTime);
                 if (messageReceived is Message && messageReceived.getMessageContentType() == "application/text") {
                     string messageRead = checkpanic messageReceived.getTextContent();
                     log:print("Reading Received Message " + i.toString() + " : " + messageRead);
@@ -1486,8 +1494,8 @@ function testSendAndReceiveMessageFromQueueOperation() {
 
     if (receiverConnection is ReceiverConnection) {
         log:print("Receiving from Asb receiver connection.");
-        Message|Error messageReceived = receiverConnection->receiveMessage(serverWaitTime);
-        Message|Error jsonMessageReceived = receiverConnection->receiveMessage(serverWaitTime);
+        Message|Error? messageReceived = receiverConnection->receiveMessage(serverWaitTime);
+        Message|Error? jsonMessageReceived = receiverConnection->receiveMessage(serverWaitTime);
         if (messageReceived is Message && jsonMessageReceived is Message) {
             string messageRead = checkpanic messageReceived.getTextContent();
             log:print("Reading Received Message : " + messageRead);
@@ -1798,8 +1806,8 @@ function testSendToTopicAndReceiveFromSubscriptionOperation() {
 
     if (receiverConnection1 is ReceiverConnection) {
         log:print("Receiving from Asb receiver connection 1.");
-        Message|error messageReceived = receiverConnection1->receiveMessage(serverWaitTime);
-        Message|error jsonMessageReceived = receiverConnection1->receiveMessage(serverWaitTime);
+        Message|Error? messageReceived = receiverConnection1->receiveMessage(serverWaitTime);
+        Message|Error? jsonMessageReceived = receiverConnection1->receiveMessage(serverWaitTime);
         if (messageReceived is Message && jsonMessageReceived is Message) {
             string messageRead = checkpanic messageReceived.getTextContent();
             log:print("Reading Received Message : " + messageRead);
@@ -1815,8 +1823,8 @@ function testSendToTopicAndReceiveFromSubscriptionOperation() {
 
     if (receiverConnection2 is ReceiverConnection) {
         log:print("Receiving from Asb receiver connection 2.");
-        Message|error messageReceived = receiverConnection2->receiveMessage(serverWaitTime);
-        Message|error jsonMessageReceived = receiverConnection2->receiveMessage(serverWaitTime);
+        Message|Error? messageReceived = receiverConnection2->receiveMessage(serverWaitTime);
+        Message|Error? jsonMessageReceived = receiverConnection2->receiveMessage(serverWaitTime);
         if (messageReceived is Message && jsonMessageReceived is Message) {
             string messageRead = checkpanic messageReceived.getTextContent();
             log:print("Reading Received Message : " + messageRead);
@@ -1831,8 +1839,8 @@ function testSendToTopicAndReceiveFromSubscriptionOperation() {
 
     if (receiverConnection3 is ReceiverConnection) {
         log:print("Receiving from Asb receiver connection 3.");
-        Message|error messageReceived = receiverConnection3->receiveMessage(serverWaitTime);
-        Message|error jsonMessageReceived = receiverConnection3->receiveMessage(serverWaitTime);
+        Message|Error? messageReceived = receiverConnection3->receiveMessage(serverWaitTime);
+        Message|Error? jsonMessageReceived = receiverConnection3->receiveMessage(serverWaitTime);
         if (messageReceived is Message && jsonMessageReceived is Message) {
             string messageRead = checkpanic messageReceived.getTextContent();
             log:print("Reading Received Message : " + messageRead);
@@ -2382,7 +2390,7 @@ function testDefer_FromQueueOperation() {
         var sequenceNumber = receiverConnection->deferMessage();
         log:print("Done Deferring a message using its lock token.");
         log:print("Receiving from Asb receiver connection.");
-        Message|Error jsonMessageReceived = receiverConnection->receiveMessage(serverWaitTime);
+        Message|Error? jsonMessageReceived = receiverConnection->receiveMessage(serverWaitTime);
         if (jsonMessageReceived is Message) {
             json jsonMessageRead = checkpanic jsonMessageReceived.getJSONContent();
             log:print("Reading Received Message : " + jsonMessageRead.toString());
@@ -2394,10 +2402,12 @@ function testDefer_FromQueueOperation() {
             if(sequenceNumber == 0) {
                 test:assertFail("No message in the queue");
             }
-            Message|Error messageReceived = receiverConnection->receiveDeferredMessage(sequenceNumber);
+            Message|Error? messageReceived = receiverConnection->receiveDeferredMessage(sequenceNumber);
             if (messageReceived is Message) {
                 string messageRead = checkpanic messageReceived.getTextContent();
                 log:print("Reading Received Message : " + messageRead);
+            } else if (messageReceived is ()) {
+                test:assertFail("No deferred message received with given sequence number");
             } else {
                 test:assertFail(msg = messageReceived.message());
             }
@@ -2606,7 +2616,7 @@ function testDefer_FromSubscriptionOperation() {
         var sequenceNumber = receiverConnection1->deferMessage();
         log:print("Done Deferring a message using its lock token.");
         log:print("Receiving from Asb receiver connection.");
-        Message|Error jsonMessageReceived = receiverConnection1->receiveMessage(serverWaitTime);
+        Message|Error? jsonMessageReceived = receiverConnection1->receiveMessage(serverWaitTime);
         if (jsonMessageReceived is Message) {
             json jsonMessageRead = checkpanic jsonMessageReceived.getJSONContent();
             log:print("Reading Received Message : " + jsonMessageRead.toString());
@@ -2618,10 +2628,12 @@ function testDefer_FromSubscriptionOperation() {
             if(sequenceNumber == 0) {
                 log:printError("No message in the queue");
             }
-            Message|Error messageReceived = receiverConnection1->receiveDeferredMessage(sequenceNumber);
+            Message|Error? messageReceived = receiverConnection1->receiveDeferredMessage(sequenceNumber);
             if (messageReceived is Message) {
                 string messageRead = checkpanic messageReceived.getTextContent();
                 log:print("Reading Received Message : " + messageRead);
+            } else if (messageReceived is ()) {
+                test:assertFail("No deferred message received with given sequence number");
             } else {
                 test:assertFail(msg = messageReceived.message());
             }
@@ -2637,7 +2649,7 @@ function testDefer_FromSubscriptionOperation() {
         var sequenceNumber = receiverConnection2->deferMessage();
         log:print("Done Deferring a message using its lock token.");
         log:print("Receiving from Asb receiver connection.");
-        Message|Error jsonMessageReceived = receiverConnection2->receiveMessage(serverWaitTime);
+        Message|Error? jsonMessageReceived = receiverConnection2->receiveMessage(serverWaitTime);
         if (jsonMessageReceived is Message) {
             json jsonMessageRead = checkpanic jsonMessageReceived.getJSONContent();
             log:print("Reading Received Message : " + jsonMessageRead.toString());
@@ -2649,10 +2661,12 @@ function testDefer_FromSubscriptionOperation() {
             if(sequenceNumber == 0) {
                 test:assertFail("No message in the queue");
             }
-            Message|Error messageReceived = receiverConnection2->receiveDeferredMessage(sequenceNumber);
+            Message|Error? messageReceived = receiverConnection2->receiveDeferredMessage(sequenceNumber);
             if (messageReceived is Message) {
                 string messageRead = checkpanic messageReceived.getTextContent();
                 log:print("Reading Received Message : " + messageRead);
+            } else if (messageReceived is ()) {
+                test:assertFail("No deferred message received with given sequence number");
             } else {
                 test:assertFail(msg = messageReceived.message());
             }
@@ -2668,7 +2682,7 @@ function testDefer_FromSubscriptionOperation() {
         var sequenceNumber = receiverConnection3->deferMessage();
         log:print("Done Deferring a message using its lock token.");
         log:print("Receiving from Asb receiver connection.");
-        Message|Error jsonMessageReceived = receiverConnection3->receiveMessage(serverWaitTime);
+        Message|Error? jsonMessageReceived = receiverConnection3->receiveMessage(serverWaitTime);
         if (jsonMessageReceived is Message) {
             json jsonMessageRead = checkpanic jsonMessageReceived.getJSONContent();
             log:print("Reading Received Message : " + jsonMessageRead.toString());
@@ -2680,10 +2694,12 @@ function testDefer_FromSubscriptionOperation() {
             if(sequenceNumber == 0) {
                 test:assertFail("No message in the queue");
             }
-            Message|Error messageReceived = receiverConnection3->receiveDeferredMessage(sequenceNumber);
+            Message|Error? messageReceived = receiverConnection3->receiveDeferredMessage(sequenceNumber);
             if (messageReceived is Message) {
                 string messageRead = checkpanic messageReceived.getTextContent();
                 log:print("Reading Received Message : " + messageRead);
+            } else if (messageReceived is ()) {
+                test:assertFail("No deferred message received with given sequence number");
             } else {
                 test:assertFail(msg = messageReceived.message());
             }

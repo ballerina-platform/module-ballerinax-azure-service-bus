@@ -61,12 +61,12 @@ asb:ConnectionConfiguration connectionConfiguration = {
 
 You can now make a sender connection using the connection configuration.
 ```ballerina
-asb:SenderConnection? senderConnection = new (connectionConfiguration);
+asb:SenderConnection? senderConnection = checkpanic new (connectionConfiguration);
 ```
 
 You can now make a receiver connection using the connection configuration.
 ```ballerina
-asb:ReceiverConnection? receiverConnection = new (connectionConfiguration);
+asb:ReceiverConnection? receiverConnection = checkpanic new (connectionConfiguration);
 ```
 
 You can now send a message to the configured asure service bus entity.  

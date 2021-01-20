@@ -75,7 +75,7 @@ public client class ReceiverConnection {
     # 
     # + serverWaitTime - Specified server wait time in seconds to receive message.
     # + return - A Message object
-    isolated remote function receiveMessage(int serverWaitTime) returns Message|Error {
+    isolated remote function receiveMessage(int? serverWaitTime = 5) returns Message|Error? {
         return receiveMessage(self.asbReceiverConnection, serverWaitTime);
     }
 
@@ -84,7 +84,7 @@ public client class ReceiverConnection {
     # + serverWaitTime - Specified server wait time in seconds to receive message.
     # + maxMessageCount - Maximum no. of messages in a batch 
     # + return - A Messages object with an array of Message objects
-    isolated remote function receiveMessages(int serverWaitTime, int maxMessageCount) returns Messages|Error {
+    isolated remote function receiveMessages(int? serverWaitTime = 5, int? maxMessageCount = 1) returns Messages|Error {
         return receiveMessages(self.asbReceiverConnection, serverWaitTime, maxMessageCount);
     }
 
@@ -92,7 +92,7 @@ public client class ReceiverConnection {
     # 
     # + maxMessageCount - Maximum no. of messages in a batch
     # + return - A Message object
-    isolated remote function receiveBatchMessage(int maxMessageCount) returns Messages|Error {
+    isolated remote function receiveBatchMessage(int? maxMessageCount = 1) returns Messages|Error {
         return receiveBatchMessage(self.asbReceiverConnection, maxMessageCount);
     }
 
@@ -122,10 +122,9 @@ public client class ReceiverConnection {
     # + deadLetterReason - The deadletter reason.
     # + deadLetterErrorDescription - The deadletter error description.
     # + return - An `asb:Error` if failed to deadletter message or else `()`
-    isolated remote function deadLetterMessage(string deadLetterReason, string deadLetterErrorDescription) 
+    isolated remote function deadLetterMessage(string? deadLetterReason = (), string? deadLetterErrorDescription = ()) 
         returns Error? {
-        return deadLetterMessage(self.asbReceiverConnection, java:fromString(deadLetterReason), 
-            java:fromString(deadLetterErrorDescription));
+        return deadLetterMessage(self.asbReceiverConnection, deadLetterReason, deadLetterErrorDescription);
     }
 
     #  Defer the message in a Queue or Subscription based on messageLockToken.
@@ -142,7 +141,7 @@ public client class ReceiverConnection {
     #                    integer assigned to a message as it is accepted and stored by the broker and functions as
     #                    its true identifier.
     # + return - An `asb:Error` if failed to receive deferred message or else `()`
-    isolated remote function receiveDeferredMessage(int sequenceNumber) returns Message|Error {
+    isolated remote function receiveDeferredMessage(int sequenceNumber) returns Message|Error? {
         return receiveDeferredMessage(self.asbReceiverConnection, sequenceNumber);
     }
 
@@ -184,18 +183,18 @@ isolated function closeReceiverConnection(handle imessageSender) returns Error? 
     'class: "org.ballerinalang.asb.connection.ConnectionUtils"
 } external;
 
-isolated function receiveMessage(handle imessageReceiver, int serverWaitTime) returns Message|Error = @java:Method {
+isolated function receiveMessage(handle imessageReceiver, int? serverWaitTime) returns Message|Error? = @java:Method {
     name: "receiveMessage",
     'class: "org.ballerinalang.asb.connection.ConnectionUtils"
 } external;
 
-isolated function receiveMessages(handle imessageReceiver, int serverWaitTime, int maxMessageCount) 
+isolated function receiveMessages(handle imessageReceiver, int? serverWaitTime, int? maxMessageCount) 
     returns Messages|Error = @java:Method {
     name: "receiveMessages",
     'class: "org.ballerinalang.asb.connection.ConnectionUtils"
 } external;
 
-isolated function receiveBatchMessage(handle imessageReceiver, int maxMessageCount) 
+isolated function receiveBatchMessage(handle imessageReceiver, int? maxMessageCount) 
     returns Messages|Error = @java:Method {
     name: "receiveBatchMessage",
     'class: "org.ballerinalang.asb.connection.ConnectionUtils"
@@ -216,8 +215,8 @@ isolated function abandonMessage(handle imessageReceiver) returns Error? = @java
     'class: "org.ballerinalang.asb.connection.ConnectionUtils"
 } external;
 
-isolated function deadLetterMessage(handle imessageReceiver, handle deadLetterReason, handle deadLetterErrorDescription) 
-    returns Error? = @java:Method {
+isolated function deadLetterMessage(handle imessageReceiver, string? deadLetterReason, 
+    string? deadLetterErrorDescription) returns Error? = @java:Method {
     name: "deadLetterMessage",
     'class: "org.ballerinalang.asb.connection.ConnectionUtils"
 } external;
@@ -228,7 +227,7 @@ isolated function deferMessage(handle imessageReceiver) returns int|Error = @jav
 } external;
 
 isolated function receiveDeferredMessage(handle imessageReceiver, int sequenceNumber) 
-    returns Message|Error = @java:Method {
+    returns Message|Error? = @java:Method {
     name: "receiveDeferredMessage",
     'class: "org.ballerinalang.asb.connection.ConnectionUtils"
 } external;

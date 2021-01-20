@@ -266,11 +266,11 @@ public class ConnectionUtils {
      * @param serverWaitTime Specified server wait time in seconds to receive message.
      * @return Message Object of the received message.
      */
-    public static Object receiveMessage(IMessageReceiver receiver, int serverWaitTime) throws Exception {
+    public static Object receiveMessage(IMessageReceiver receiver, Object serverWaitTime) throws Exception {
         try {
             log.info("\n\tWaiting up to 'serverWaitTime' seconds for messages from\n" + receiver.getEntityPath());
 
-            IMessage receivedMessage = receiver.receive(Duration.ofSeconds(serverWaitTime));
+            IMessage receivedMessage = receiver.receive(Duration.ofSeconds((long) serverWaitTime));
 
             if (receivedMessage == null) {
                 return null;
@@ -319,13 +319,13 @@ public class ConnectionUtils {
      * @param maxMessageCount Maximum no. of messages in a batch
      * @return Message Object of the received message.
      */
-    public static Object receiveMessages(IMessageReceiver receiver, int serverWaitTime, int maxMessageCount)
+    public static Object receiveMessages(IMessageReceiver receiver, Object serverWaitTime, Object maxMessageCount)
             throws Exception {
         try {
             // receive messages from queue or subscription
             String receivedMessageId = "";
             BArrayType sourceArrayType = null;
-            BObject[] bObjectArray = new BObject[maxMessageCount];
+            BObject[] bObjectArray = new BObject[Long.valueOf(maxMessageCount.toString()).intValue()];
             int i = 0;
 
             BObject messagesBObject = ValueCreator.createObjectValue(ASBConstants.PACKAGE_ID_ASB,
@@ -333,9 +333,9 @@ public class ConnectionUtils {
 
             log.info("\n\tWaiting up to 'serverWaitTime' seconds for messages from " + receiver.getEntityPath());
             while (true) {
-                IMessage receivedMessage = receiver.receive(Duration.ofSeconds(serverWaitTime));
+                IMessage receivedMessage = receiver.receive(Duration.ofSeconds((long) serverWaitTime));
 
-                if (receivedMessage == null || i == maxMessageCount) {
+                if (receivedMessage == null || i == (long) maxMessageCount) {
                     break;
                 }
                 log.info("\t<= Received a message with messageId \n" + receivedMessage.getMessageId());
@@ -384,6 +384,8 @@ public class ConnectionUtils {
         } catch (ServiceBusException e) {
             throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
                     + e.getMessage());
+        } catch (Exception e) {
+            throw ASBUtils.returnErrorValue("Receiving Messages Failed: " + e.getMessage());
         }
     }
 
@@ -457,19 +459,19 @@ public class ConnectionUtils {
      * @param maxMessageCount Maximum no. of messages in a batch
      * @return Message Object of the received message.
      */
-    public static Object receiveBatchMessage(IMessageReceiver receiver, int maxMessageCount) throws Exception {
+    public static Object receiveBatchMessage(IMessageReceiver receiver, Object maxMessageCount) throws Exception {
         try {
             // receive messages from queue or subscription
             String receivedMessageId = "";
             BArrayType sourceArrayType = null;
-            BObject[] bObjectArray = new BObject[maxMessageCount];
+            BObject[] bObjectArray = new BObject[Long.valueOf(maxMessageCount.toString()).intValue()];
             int i = 0;
 
             BObject messagesBObject = ValueCreator.createObjectValue(ASBConstants.PACKAGE_ID_ASB,
                     ASBConstants.MESSAGES_OBJECT);
 
             log.info("\n\tWaiting up to default server time for messages from  ...\n" + receiver.getEntityPath());
-            for(int j=0; j < maxMessageCount; j++) {
+            for(int j=0; j < (long) maxMessageCount; j++) {
                 IMessage receivedMessage = receiver.receive();
 
                 if (receivedMessage == null) {
@@ -630,8 +632,8 @@ public class ConnectionUtils {
      * @param deadLetterReason The dead letter reason.
      * @param deadLetterErrorDescription The dead letter error description.
      */
-    public static void deadLetterMessage(IMessageReceiver receiver, String deadLetterReason,
-                                         String deadLetterErrorDescription) throws Exception {
+    public static void deadLetterMessage(IMessageReceiver receiver, Object deadLetterReason,
+                                         Object deadLetterErrorDescription) throws Exception {
         try {
             log.info("\n\tWaiting up to default server wait time for messages from  ...\n" +
                     receiver.getEntityPath());
@@ -640,7 +642,8 @@ public class ConnectionUtils {
             if (receivedMessage != null) {
                 log.info("\t<= Received a message with messageId \n" + receivedMessage.getMessageId());
                 log.info("\t<= Dead-Letter a message with messageLockToken \n" + receivedMessage.getLockToken());
-                receiver.deadLetter(receivedMessage.getLockToken(), deadLetterReason, deadLetterErrorDescription);
+                receiver.deadLetter(receivedMessage.getLockToken(), valueToEmptyOrToString(deadLetterReason),
+                        valueToEmptyOrToString(deadLetterErrorDescription));
 
                 log.info("\tDone dead-lettering a message using its lock token from \n" +
                         receiver.getEntityPath());
