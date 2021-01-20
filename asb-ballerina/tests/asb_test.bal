@@ -732,7 +732,7 @@ public function testAsyncConsumer() {
     };
 
     string message = string `{"name":"apple", "color":"red", "price":5.36}`;
-    Listener? channelListener = new(config);
+    Listener? channelListener = new();
     if (channelListener is Listener) {
         checkpanic channelListener.attach(asyncTestService);
         checkpanic channelListener.'start();
@@ -1451,7 +1451,7 @@ function testListenerWithVariableLoadUsingWorkers() {
             entityPath: queuePath
         };
 
-        Listener? channelListener = new(config);
+        Listener? channelListener = new();
         if (channelListener is Listener) {
             checkpanic channelListener.attach(asyncTestService);
             checkpanic channelListener.'start();
@@ -2296,7 +2296,7 @@ function testAsyncConsumerOperation() {
     }
 
     string message = string `{"name":"apple", "color":"red", "price":5.36}`;
-    Listener? channelListener = new(config);
+    Listener? channelListener = new();
     if (channelListener is Listener) {
         checkpanic channelListener.attach(asyncTestService);
         checkpanic channelListener.'start();

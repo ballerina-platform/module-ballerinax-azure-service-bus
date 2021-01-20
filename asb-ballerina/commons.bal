@@ -16,7 +16,15 @@
 
 import ballerina/java;
 
+// Constants
+
 final handle JAVA_NULL = java:createNull();
+
+const int DEFAULT_TIME_TO_LIVE = 5;
+const int DEFAULT_MAX_MESSAGE_COUNT = 1;
+const int DEFAULT_SERVER_WAIT_TIME = 5;
+
+// Sender & Receiver Client API Record Types.
 
 # Configurations used to create a `asb:Connection`.
 #
@@ -38,3 +46,29 @@ public type ConnectionConfiguration record {|
 public type OptionalProperties record {|
     map<anydata> properties;
 |};
+
+// Listener API Record Types and Annotations.
+
+# Configurations used to create a `asb:Connection`.
+#
+# + connectionString - Service bus connection string with Shared Access Signatures
+#                      ConnectionString format: 
+#                      Endpoint=sb://namespace_DNS_Name;EntityPath=EVENT_HUB_NAME;
+#                      SharedAccessKeyName=SHARED_ACCESS_KEY_NAME;SharedAccessKey=SHARED_ACCESS_KEY or  
+#                      Endpoint=sb://namespace_DNS_Name;EntityPath=EVENT_HUB_NAME;
+#                      SharedAccessSignatureToken=SHARED_ACCESS_SIGNATURE_TOKEN
+# + queueName - Entitypath to the message broker resource
+public type QueueConfiguration record {|
+    string connectionString;
+    string queueName;
+|};
+
+# Service configurations used to create a `asb:Connection`.
+# 
+# + queueConfig - Configurations used to create a `asb:Connection`
+public type asbServiceConfig record {|
+    QueueConfiguration queueConfig;
+|};
+
+# The annotation, which is used to configure the subscription.
+public annotation asbServiceConfig ServiceConfig on service;

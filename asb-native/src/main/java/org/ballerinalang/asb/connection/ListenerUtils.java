@@ -51,12 +51,10 @@ public class ListenerUtils {
      * Initialize the ballerina listener object.
      *
      * @param listenerBObject Ballerina listener object.
-     * @param iMessageReceiver Asb MessageReceiver instance.
      */
-    public static void init(BObject listenerBObject, IMessageReceiver iMessageReceiver) {
+    public static void init(BObject listenerBObject) {
         listenerBObject.addNativeData(ASBConstants.CONSUMER_SERVICES, services);
         listenerBObject.addNativeData(ASBConstants.STARTED_SERVICES, startedServices);
-//        listenerBObject.addNativeData(AsbConstants.CONNECTION_NATIVE_OBJECT, iMessageReceiver);
     }
 
     /**

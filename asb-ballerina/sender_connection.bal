@@ -99,11 +99,10 @@ public client class SenderConnection {
     # + return - An `asb:Error` if failed to send message or else `()`
     isolated remote function sendMessage(byte[] content = [], string? contentType = (), string? messageId = (), 
         string? to = (), string? replyTo = (), string? replyToSessionId = (), string? label = (), 
-        string? sessionId = (), string? correlationId = (), map<string> properties = {}, int? timeToLive = 5) 
-            returns Error? {
-        // var msgId = messageId == "" ? () : messageId;
+        string? sessionId = (), string? correlationId = (), map<string> properties = {}, 
+            int? timeToLive = DEFAULT_TIME_TO_LIVE) returns Error? {
         return sendMessage(self.asbSenderConnection, content, contentType, messageId, to, replyTo, replyToSessionId, 
-        label, sessionId, correlationId, properties, timeToLive);
+            label, sessionId, correlationId, properties, timeToLive);
     }
 
     # Send batch of messages to queue with a content and optional parameters
@@ -114,7 +113,7 @@ public client class SenderConnection {
     # + maxMessageCount - Maximum no. of messages in a batch
     # + return - An `asb:Error` if failed to send message or else `()`
     isolated remote function sendBatchMessage(string[] content = [], map<string> parameters = {}, 
-        map<string> properties = {}, int? maxMessageCount = 1) returns Error? {
+        map<string> properties = {}, int? maxMessageCount = DEFAULT_MAX_MESSAGE_COUNT) returns Error? {
         return sendBatchMessage(self.asbSenderConnection, content, parameters, properties, maxMessageCount);
     }
 }

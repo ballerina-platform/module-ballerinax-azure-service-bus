@@ -20,15 +20,10 @@ import ballerina/java;
 # Provides a listener to consume messages from the Azure Service Bus.
 public class Listener {
 
-    private ReceiverConnection receiverConnection;
-
-    # Initializes a Listener object with the given `asb:Connection` object or connection configurations.
-    # Creates a `asb:Connection` object if only the connection configuration is given. 
-    #
-    # + connectionOrConnectionConfig - A `asb:Connection` object or the connection configurations.
-    public isolated function init(ConnectionConfiguration connectionConfig) {
-        self.receiverConnection = checkpanic new (connectionConfig);
-        externInit(self, self.receiverConnection.getAsbReceiverConnection());
+    # Initializes a Listener object. 
+    # 
+    public isolated function init() {
+        externInit(self);
     }
 
     # Attaches the service to the `asb:Listener` endpoint.
@@ -76,7 +71,7 @@ public type Service service object {
     // TBD when support for optional params in remote functions is available in lang
 };
 
-isolated function externInit(Listener lis, handle asbReceiverConnection) =
+isolated function externInit(Listener lis) =
 @java:Method {
     name: "init",
     'class: "org.ballerinalang.asb.connection.ListenerUtils"
@@ -106,27 +101,3 @@ isolated function abortConnection(Listener lis) returns Error? =
 @java:Method {
     'class: "org.ballerinalang.asb.connection.ListenerUtils"
 } external;
-
-# Configurations used to create a `asb:Connection`.
-#
-# + connectionString - Service bus connection string with Shared Access Signatures
-#                      ConnectionString format: 
-#                      Endpoint=sb://namespace_DNS_Name;EntityPath=EVENT_HUB_NAME;
-#                      SharedAccessKeyName=SHARED_ACCESS_KEY_NAME;SharedAccessKey=SHARED_ACCESS_KEY or  
-#                      Endpoint=sb://namespace_DNS_Name;EntityPath=EVENT_HUB_NAME;
-#                      SharedAccessSignatureToken=SHARED_ACCESS_SIGNATURE_TOKEN
-# + queueName - Entitypath to the message broker resource
-public type QueueConfiguration record {|
-    string connectionString;
-    string queueName;
-|};
-
-# Service configurations used to create a `asb:Connection`.
-# 
-# + queueConfig - Configurations used to create a `asb:Connection`
-public type asbServiceConfig record {|
-    QueueConfiguration queueConfig;
-|};
-
-# The annotation, which is used to configure the subscription.
-public annotation asbServiceConfig ServiceConfig on service;

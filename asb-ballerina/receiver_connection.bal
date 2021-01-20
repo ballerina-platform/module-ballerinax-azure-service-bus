@@ -75,7 +75,7 @@ public client class ReceiverConnection {
     # 
     # + serverWaitTime - Specified server wait time in seconds to receive message.
     # + return - A Message object
-    isolated remote function receiveMessage(int? serverWaitTime = 5) returns Message|Error? {
+    isolated remote function receiveMessage(int? serverWaitTime = DEFAULT_SERVER_WAIT_TIME) returns Message|Error? {
         return receiveMessage(self.asbReceiverConnection, serverWaitTime);
     }
 
@@ -84,7 +84,8 @@ public client class ReceiverConnection {
     # + serverWaitTime - Specified server wait time in seconds to receive message.
     # + maxMessageCount - Maximum no. of messages in a batch 
     # + return - A Messages object with an array of Message objects
-    isolated remote function receiveMessages(int? serverWaitTime = 5, int? maxMessageCount = 1) returns Messages|Error {
+    isolated remote function receiveMessages(int? serverWaitTime = DEFAULT_SERVER_WAIT_TIME, 
+        int? maxMessageCount = DEFAULT_MAX_MESSAGE_COUNT) returns Messages|Error {
         return receiveMessages(self.asbReceiverConnection, serverWaitTime, maxMessageCount);
     }
 
@@ -92,7 +93,8 @@ public client class ReceiverConnection {
     # 
     # + maxMessageCount - Maximum no. of messages in a batch
     # + return - A Message object
-    isolated remote function receiveBatchMessage(int? maxMessageCount = 1) returns Messages|Error {
+    isolated remote function receiveBatchMessage(int? maxMessageCount = DEFAULT_MAX_MESSAGE_COUNT) 
+            returns Messages|Error {
         return receiveBatchMessage(self.asbReceiverConnection, maxMessageCount);
     }
 
