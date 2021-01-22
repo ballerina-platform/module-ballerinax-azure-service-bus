@@ -18,5 +18,5 @@ script:
   - sudo apt-get install -f
   - export JAVA_OPTS="-DBALLERINA_DEV_COMPILE_BALLERINA_ORG=true"
   - ballerina --version
-  - mvn clean package -pl asb-native
+  - cd asb-native && mvn clean package && cd ..
   - ballerina build --skip-tests ./asb-ballerina
