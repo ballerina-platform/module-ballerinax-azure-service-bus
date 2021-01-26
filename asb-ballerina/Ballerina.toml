@@ -1,0 +1,14 @@
+[package]
+org = "ballerinax"
+name = "asb"
+version = "0.1.0"
+
+[build-options]
+observabilityIncluded = true
+
+[[platform.java11.dependency]]
+path = "../asb-native/target/asb-native-1.0.0-jar-with-dependencies.jar"
+groupId = "org.ballerinalang"
+artifactId = "asb-native"
+module = "asb-native" 
+version = "1.0.0"

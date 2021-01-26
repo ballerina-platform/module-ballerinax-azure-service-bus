@@ -1,0 +1,54 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Deployment
+
+# Controls when the action will run.
+# Triggers the workflow on release.
+on:
+  release:
+    types:  [published]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # Set up Java Environment
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+      - working-directory: ./asb-native
+        run: mvn clean package
+
+      # Build Ballerina Project
+      - name: Ballerina Build
+        uses: ballerina-platform/ballerina-action/@swan-lake-connector-release
+        with:
+          args:
+            build -c --skip-tests
+        env:
+          JAVA_HOME: /usr/lib/jvm/default-jvm
+          CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
+          QUEUE_PATH: ${{ secrets.QUEUE_PATH }}
+          TOPIC_PATH: ${{ secrets.TOPIC_PATH }}
+          SUBSCRIPTION_PATH1: ${{ secrets.SUBSCRIPTION_PATH1 }}
+          SUBSCRIPTION_PATH2: ${{ secrets.SUBSCRIPTION_PATH2 }}
+          SUBSCRIPTION_PATH3: ${{ secrets.SUBSCRIPTION_PATH3 }}
+
+      # Push to Ballerina Central
+      - name: Ballerina Push
+        uses: ballerina-platform/ballerina-action/@swan-lake-connector-release
+        with:
+          args:
+            push
+        env:
+          BALLERINA_CENTRAL_ACCESS_TOKEN: ${{ secrets.BALLERINA_CENTRAL_ACCESS_TOKEN }}
