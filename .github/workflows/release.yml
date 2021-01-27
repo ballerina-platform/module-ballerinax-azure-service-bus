@@ -34,7 +34,7 @@ jobs:
         uses: ballerina-platform/ballerina-action/@swan-lake-connector-release
         with:
           args:
-            build -c --skip-tests
+            build -c --skip-tests ./asb-ballerina
         env:
           JAVA_HOME: /usr/lib/jvm/default-jvm
           CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
