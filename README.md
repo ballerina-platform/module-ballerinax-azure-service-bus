@@ -2232,12 +2232,6 @@ Execute the commands below to build from the source after installing Ballerina S
     ballerina build --skip-tests
 ```
 
-## Issues and Projects
-
-Issues and Projects tabs are disabled for this repository as this is part of the Ballerina Standard Library. To report bugs, request new features, start new discussions, view project boards, etc. please visit Ballerina Standard Library [parent repository](https://github.com/ballerina-platform/ballerina-standard-library).
-
-This repository only contains the source code for the module.
-
 ## Contributing to Ballerina
 
 As an open source project, Ballerina welcomes contributions from the community.
