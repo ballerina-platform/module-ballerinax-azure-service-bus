@@ -1530,6 +1530,7 @@ function testSendAndReceiveMessageFromQueueOperation() {
 
 @test:Config { 
     groups: ["asb"],
+    dependsOn: [testSendAndReceiveMessageFromQueueOperation],
     enable: true
 }
 function testSendAndReceiveMessagesFromQueueOperation() {
@@ -1585,6 +1586,7 @@ function testSendAndReceiveMessagesFromQueueOperation() {
 
 @test:Config { 
     groups: ["asb"],
+    dependsOn: [testSendAndReceiveMessagesFromQueueOperation],
     enable: true
 }
 function testSendAndReceiveBatchFromQueueOperation() {
@@ -1641,6 +1643,7 @@ function testSendAndReceiveBatchFromQueueOperation() {
 
 @test:Config { 
     groups: ["asb"],
+    dependsOn: [testSendAndReceiveBatchFromQueueOperation],
     enable: true
 }
 function testCompleteAllMessagesFromQueueOperation() {
@@ -1689,6 +1692,7 @@ function testCompleteAllMessagesFromQueueOperation() {
 
 @test:Config { 
     groups: ["asb"],
+    dependsOn: [testCompleteAllMessagesFromQueueOperation],
     enable: true
 }
 function testCompleteMessageFromQueueOperation() {
@@ -1736,6 +1740,7 @@ function testCompleteMessageFromQueueOperation() {
 
 @test:Config { 
     groups: ["asb"],
+    dependsOn: [testCompleteMessageFromQueueOperation],
     enable: true
 }
 function testAbandonMessagesFromQueueOperation() {
@@ -1784,6 +1789,7 @@ function testAbandonMessagesFromQueueOperation() {
 
 @test:Config { 
     groups: ["asb"],
+    dependsOn: [testAbandonMessagesFromQueueOperation],
     enable: true
 }
 function testSendToTopicAndReceiveFromSubscriptionOperation() {
@@ -1903,6 +1909,7 @@ function testSendToTopicAndReceiveFromSubscriptionOperation() {
 
 @test:Config { 
     groups: ["asb"],
+    dependsOn: [testSendToTopicAndReceiveFromSubscriptionOperation],
     enable: true
 }
 function testSendBatchToTopicAndReceiveFromSubscriptionOperation() {
@@ -2032,6 +2039,7 @@ function testSendBatchToTopicAndReceiveFromSubscriptionOperation() {
 
 @test:Config { 
     groups: ["asb"],
+    dependsOn: [testSendBatchToTopicAndReceiveFromSubscriptionOperation],
     enable: true
 }
 function testCompleteAllMessagesFromSubscriptionOperation() {
@@ -2134,6 +2142,7 @@ function testCompleteAllMessagesFromSubscriptionOperation() {
 
 @test:Config { 
     groups: ["asb"],
+    dependsOn: [testCompleteAllMessagesFromSubscriptionOperation],
     enable: true
 }
 function testCompleteMessageFromSubscriptionOperation() {
@@ -2233,6 +2242,7 @@ function testCompleteMessageFromSubscriptionOperation() {
 
 @test:Config { 
     groups: ["asb"],
+    dependsOn: [testCompleteMessageFromSubscriptionOperation],
     enable: true
 }
 function testAbandonMessagesFromSubscriptionOperation() {
@@ -2335,6 +2345,7 @@ function testAbandonMessagesFromSubscriptionOperation() {
 
 @test:Config { 
     groups: ["asb"],
+    dependsOn: [testAbandonMessagesFromSubscriptionOperation],
     enable: true
 }
 function testAsyncConsumerOperation() {
@@ -2378,6 +2389,7 @@ function testAsyncConsumerOperation() {
 
 @test:Config { 
     groups: ["asb"],
+    dependsOn: [testAsyncConsumerOperation],
     enable: true
 }
 function testDeadletterFromQueueOperation() {
@@ -2426,6 +2438,7 @@ function testDeadletterFromQueueOperation() {
 
 @test:Config { 
     groups: ["asb"],
+    dependsOn: [testDeadletterFromQueueOperation],
     enable: true
 }
 function testDefer_FromQueueOperation() {
@@ -2496,6 +2509,7 @@ function testDefer_FromQueueOperation() {
 
 @test:Config { 
     groups: ["asb"],
+    dependsOn: [testDefer_FromQueueOperation],
     enable: true
 }
 function testRenewLockOnMessage_FromQueueOperation() {
@@ -2544,6 +2558,7 @@ function testRenewLockOnMessage_FromQueueOperation() {
 
 @test:Config { 
     groups: ["asb"],
+    dependsOn: [testRenewLockOnMessage_FromQueueOperation],
     enable: true
 }
 function testDeadletterFromSubscriptionOperation() {
@@ -2647,6 +2662,7 @@ function testDeadletterFromSubscriptionOperation() {
 
 @test:Config { 
     groups: ["asb"],
+    dependsOn: [testDeadletterFromSubscriptionOperation],
     enable: true
 }
 function testDefer_FromSubscriptionOperation() {
@@ -2816,6 +2832,7 @@ function testDefer_FromSubscriptionOperation() {
 
 @test:Config { 
     groups: ["asb"],
+    dependsOn: [testDefer_FromSubscriptionOperation],
     enable: true
 }
 function testRenewLockOnMessage_FromSubscriptionOperation() {
@@ -2919,6 +2936,7 @@ function testRenewLockOnMessage_FromSubscriptionOperation() {
 
 @test:Config { 
     groups: ["asb"],
+    dependsOn: [testRenewLockOnMessage_FromSubscriptionOperation],
     enable: true
 }
 function testDuplicateMessagesFromQueueOperation() {
