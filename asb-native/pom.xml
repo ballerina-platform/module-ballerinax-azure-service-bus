@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+  ~ Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
   ~
   ~ WSO2 Inc. licenses this file to you under the Apache License,
   ~ Version 2.0 (the "License"); you may not use this file except
@@ -56,14 +56,12 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <descriptors>
+                        <descriptor>assembly.xml</descriptor>
+                    </descriptors>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
-                    <archive>
-                        <manifest>
-                            <mainClass>com.ballerinax.samples.servicebus</mainClass>
-                        </manifest>
-                    </archive>
                 </configuration>
             </plugin>
         </plugins>
@@ -83,22 +81,22 @@
         <dependency>
             <groupId>org.ballerinalang</groupId>
             <artifactId>ballerina-runtime</artifactId>
-            <version>2.0.0-Preview8</version>
-            <scope>compile</scope>
+            <version>2.0.0-alpha2</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.ballerinalang</groupId>
             <artifactId>ballerina-lang</artifactId>
-            <version>2.0.0-Preview8</version>
-            <scope>compile</scope>
+            <version>2.0.0-alpha2</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
     <repositories>
         <repository>
-            <id>wso2-nexus</id>
-            <name>WSO2 internal Repository</name>
-            <url>http://maven.wso2.org/nexus/content/groups/wso2-public/</url>
+            <id>github.releases</id>
+            <name>GitHub ballerina-platform Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/ballerina-platform/ballerina-lang</url>
             <releases>
                 <enabled>true</enabled>
                 <updatePolicy>daily</updatePolicy>

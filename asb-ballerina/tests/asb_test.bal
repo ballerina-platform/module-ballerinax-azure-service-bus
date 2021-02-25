@@ -16,18 +16,25 @@
 
 import ballerina/test;
 import ballerina/log;
-import ballerina/system;
-import ballerina/config;
-import ballerina/runtime;
+import ballerina/os;
+import ballerina/lang.runtime;
 import ballerina/time;
 
-// Connection Configurations
-string connectionString = config:getAsString("CONNECTION_STRING");
-string queuePath = getConfigValue("QUEUE_PATH");
-string topicPath = getConfigValue("TOPIC_PATH");
-string subscriptionPath1 = getConfigValue("SUBSCRIPTION_PATH1");
-string subscriptionPath2 = getConfigValue("SUBSCRIPTION_PATH2");
-string subscriptionPath3 = getConfigValue("SUBSCRIPTION_PATH3");
+// // Connection Configurations for Local Test
+// configurable string connectionString = ?;
+// configurable string queuePath = ?;
+// configurable string topicPath = ?;
+// configurable string subscriptionPath1 = ?;
+// configurable string subscriptionPath2 = ?;
+// configurable string subscriptionPath3 = ?;
+
+// Connection Configurations for Github Workflow
+string connectionString = os:getEnv("CONNECTION_STRING");
+string queuePath = os:getEnv("QUEUE_PATH");
+string topicPath = os:getEnv("TOPIC_PATH");
+string subscriptionPath1 = os:getEnv("SUBSCRIPTION_PATH1");
+string subscriptionPath2 = os:getEnv("SUBSCRIPTION_PATH2");
+string subscriptionPath3 = os:getEnv("SUBSCRIPTION_PATH3");
 
 SenderConnection? senderConnection = ();
 ReceiverConnection? receiverConnection = ();
@@ -121,7 +128,7 @@ function testSendToQueueOperation() {
 
 # Test receive one message from queue operation
 @test:Config {
-    dependsOn: ["testSendToQueueOperation"], 
+    dependsOn: [testSendToQueueOperation], 
     enable: false
 }
 function testReceiveFromQueueOperation() {
@@ -152,7 +159,7 @@ function testReceiveFromQueueOperation() {
 
 # Test receive messages from queue operation
 @test:Config {
-    dependsOn: ["testSendToQueueOperation"], 
+    dependsOn: [testSendToQueueOperation], 
     enable: false
 }
 function testReceiveMessagesFromQueueOperation() {
@@ -206,7 +213,7 @@ function testSendBatchToQueueOperation() {
 
 # Test receive batch from queue operation
 @test:Config {
-    dependsOn: ["testSendBatchToQueueOperation"], 
+    dependsOn: [testSendBatchToQueueOperation], 
     enable: false
 }
 function testReceiveBatchFromQueueOperation() {
@@ -241,7 +248,7 @@ function testReceiveBatchFromQueueOperation() {
 
 # Test complete Messages from queue operation
 @test:Config {
-    dependsOn: ["testSendToQueueOperation"], 
+    dependsOn: [testSendToQueueOperation], 
     enable: false
 }
 function testCompleteMessagesFromQueueOperation() {
@@ -267,7 +274,7 @@ function testCompleteMessagesFromQueueOperation() {
 
 # Test complete single messages from queue operation
 @test:Config {
-    dependsOn: ["testSendToQueueOperation"], 
+    dependsOn: [testSendToQueueOperation], 
     enable: false
 }
 function testCompleteOneMessageFromQueueOperation() {
@@ -292,7 +299,7 @@ function testCompleteOneMessageFromQueueOperation() {
 
 # Test abandon Message from queue operation
 @test:Config {
-    dependsOn: ["testSendToQueueOperation"], 
+    dependsOn: [testSendToQueueOperation], 
     enable: false
 }
 function testAbandonMessageFromQueueOperation() {
@@ -340,7 +347,7 @@ function testSendToTopicOperation() {
 
 # Test receive from subscription operation
 @test:Config {
-    dependsOn: ["testSendToTopicOperation"], 
+    dependsOn: [testSendToTopicOperation], 
     enable: false
 }
 function testReceiveFromSubscriptionOperation() {
@@ -437,7 +444,7 @@ function testSendBatchToTopicOperation() {
 
 # Test receive batch from subscription operation
 @test:Config {
-    dependsOn: ["testSendBatchToTopicOperation"], 
+    dependsOn: [testSendBatchToTopicOperation], 
     enable: false
 }
 function testReceiveBatchFromSubscriptionOperation() {
@@ -524,7 +531,7 @@ function testReceiveBatchFromSubscriptionOperation() {
 
 # Test complete Messages from subscription operation
 @test:Config { 
-    dependsOn: ["testSendToTopicOperation"], 
+    dependsOn: [testSendToTopicOperation], 
     enable: false
 }
 function testCompleteMessagesFromSubscriptionOperation() {
@@ -584,7 +591,7 @@ function testCompleteMessagesFromSubscriptionOperation() {
 
 # Test complete single messages from subscription operation
 @test:Config {
-    dependsOn: ["testSendToTopicOperation"], 
+    dependsOn: [testSendToTopicOperation], 
     enable: false
 }
 function testCompleteOneMessageFromSubscriptionOperation() {
@@ -641,7 +648,7 @@ function testCompleteOneMessageFromSubscriptionOperation() {
 
 # Test abandon Message from subscription operation
 @test:Config {
-    dependsOn: ["testSendToTopicOperation"], 
+    dependsOn: [testSendToTopicOperation], 
     enable: false
 }
 function testAbandonMessageFromSubscriptionOperation() {
@@ -721,7 +728,7 @@ service object{
 
 # Test Listener capabilities
 @test:Config {
-    dependsOn: ["testSendToQueueOperation"], 
+    dependsOn: [testSendToQueueOperation], 
     enable: false
 }
 public function testAsyncConsumer() {
@@ -737,7 +744,7 @@ public function testAsyncConsumer() {
         checkpanic channelListener.attach(asyncTestService);
         checkpanic channelListener.'start();
         log:print("start");
-        runtime:sleep(20000);
+        runtime:sleep(20);
         log:print("end");
         checkpanic channelListener.detach(asyncTestService);
         checkpanic channelListener.gracefulStop();
@@ -770,7 +777,7 @@ function testSendDuplicateToQueueOperation() {
 
 # Test receive duplicate messages from queue operation
 @test:Config {
-    dependsOn: ["testSendDuplicateToQueueOperation"], 
+    dependsOn: [testSendDuplicateToQueueOperation], 
     enable: false
 }
 function testReceiveDuplicateMessagesFromQueueOperation() {
@@ -804,7 +811,7 @@ function testReceiveDuplicateMessagesFromQueueOperation() {
 
 # Test Dead-Letter Message from queue operation
 @test:Config {
-    dependsOn: ["testSendToQueueOperation"], 
+    dependsOn: [testSendToQueueOperation], 
     enable: false
 }
 function testDeadLetterFromQueueOperation() {
@@ -830,7 +837,7 @@ function testDeadLetterFromQueueOperation() {
 
 # Test Dead-Letter Message from subscription operation
 @test:Config {
-    dependsOn: ["testSendToTopicOperation"], 
+    dependsOn: [testSendToTopicOperation], 
     enable: false
 }
 function testDeadLetterFromSubscriptionOperation() {
@@ -890,7 +897,7 @@ function testDeadLetterFromSubscriptionOperation() {
 
 # Test Defer Message from queue operation
 @test:Config {
-    dependsOn: ["testSendToQueueOperation"], 
+    dependsOn: [testSendToQueueOperation], 
     enable: false
 }
 function testDeferFromQueueOperation() {
@@ -938,7 +945,7 @@ function testDeferFromQueueOperation() {
 
 # Test Defer Message from subscription operation
 @test:Config {
-    dependsOn: ["testSendToTopicOperation"], 
+    dependsOn: [testSendToTopicOperation], 
     enable: false
 }
 function testDeferFromSubscriptionOperation() {
@@ -1064,7 +1071,7 @@ function testDeferFromSubscriptionOperation() {
 
 # Test Renew Lock on Message from queue operation
 @test:Config {
-    dependsOn: ["testSendToQueueOperation"], 
+    dependsOn: [testSendToQueueOperation], 
     enable: false
 }
 function testRenewLockOnMessageFromQueueOperation() {
@@ -1090,7 +1097,7 @@ function testRenewLockOnMessageFromQueueOperation() {
 
 # Test Renew Lock on Message from subscription operation
 @test:Config {
-    dependsOn: ["testSendToTopicOperation"], 
+    dependsOn: [testSendToTopicOperation], 
     enable: false
 }
 function testRenewLockOnMessageFromSubscriptionOperation() {
@@ -1346,7 +1353,7 @@ function testSendAndReceiveMessagesWithVariableLoadUsingWorkers() {
         if (senderConnection is SenderConnection) {
             int i = 1;
             while (i <= variableMessageCount) {
-                runtime:sleep(5000);
+                runtime:sleep(5);
                 string stringContent = "This is My Message Body " + i.toString(); 
                 byte[] byteContent = stringContent.toBytes();
                 log:print("Sending message " + i.toString() + " via Asb sender connection.");
@@ -1376,7 +1383,7 @@ function testSendAndReceiveMessagesWithVariableLoadUsingWorkers() {
             int startTimeMills = time1.time;
             int i = 1;
             while (i <= variableMessageCount) {
-                runtime:sleep(10000);
+                runtime:sleep(10);
                 log:print("Receiving message " + i.toString() + " from Asb receiver connection.");
                 Message|Error? messageReceived = receiverConnection->receiveMessage(serverWaitTime);
                 if (messageReceived is Message && messageReceived.getMessageContentType() == "application/text") {
@@ -1426,7 +1433,7 @@ function testListenerWithVariableLoadUsingWorkers() {
         if (senderConnection is SenderConnection) {
             int i = 1;
             while (i <= variableMessageCount) {
-                runtime:sleep(5000);
+                runtime:sleep(5);
                 string stringContent = "This is My Message Body " + i.toString(); 
                 byte[] byteContent = stringContent.toBytes();
                 log:print("Sending message " + i.toString() + " via Asb sender connection.");
@@ -1456,7 +1463,7 @@ function testListenerWithVariableLoadUsingWorkers() {
             checkpanic channelListener.attach(asyncTestService);
             checkpanic channelListener.'start();
             log:print("start");
-            runtime:sleep(30000);
+            runtime:sleep(30);
             log:print("end");
             checkpanic channelListener.detach(asyncTestService);
             checkpanic channelListener.gracefulStop();
@@ -1474,8 +1481,10 @@ function testListenerWithVariableLoadUsingWorkers() {
 }
 function testSendAndReceiveMessageFromQueueOperation() {
     ConnectionConfiguration config = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("QUEUE_PATH")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("QUEUE_PATH")
+        // connectionString: connectionString,
+        // entityPath: queuePath
     };
 
     log:print("Creating Asb sender connection.");
@@ -1525,8 +1534,10 @@ function testSendAndReceiveMessageFromQueueOperation() {
 }
 function testSendAndReceiveMessagesFromQueueOperation() {
     ConnectionConfiguration config = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("QUEUE_PATH")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("QUEUE_PATH")
+        // connectionString: connectionString,
+        // entityPath: queuePath
     };
 
     log:print("Creating Asb sender connection.");
@@ -1578,8 +1589,10 @@ function testSendAndReceiveMessagesFromQueueOperation() {
 }
 function testSendAndReceiveBatchFromQueueOperation() {
     ConnectionConfiguration config = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("QUEUE_PATH")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("QUEUE_PATH")
+        // connectionString: connectionString,
+        // entityPath: queuePath
     };
 
     log:print("Creating Asb sender connection.");
@@ -1632,8 +1645,10 @@ function testSendAndReceiveBatchFromQueueOperation() {
 }
 function testCompleteAllMessagesFromQueueOperation() {
     ConnectionConfiguration config = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("QUEUE_PATH")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("QUEUE_PATH")
+        // connectionString: connectionString,
+        // entityPath: queuePath
     };
 
     log:print("Creating Asb sender connection.");
@@ -1678,8 +1693,10 @@ function testCompleteAllMessagesFromQueueOperation() {
 }
 function testCompleteMessageFromQueueOperation() {
     ConnectionConfiguration config = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("QUEUE_PATH")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("QUEUE_PATH")
+        // connectionString: connectionString,
+        // entityPath: queuePath
     };
 
     log:print("Creating Asb sender connection.");
@@ -1723,8 +1740,10 @@ function testCompleteMessageFromQueueOperation() {
 }
 function testAbandonMessagesFromQueueOperation() {
     ConnectionConfiguration config = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("QUEUE_PATH")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("QUEUE_PATH")
+        // connectionString: connectionString,
+        // entityPath: queuePath
     };
 
     log:print("Creating Asb sender connection.");
@@ -1769,23 +1788,31 @@ function testAbandonMessagesFromQueueOperation() {
 }
 function testSendToTopicAndReceiveFromSubscriptionOperation() {
     ConnectionConfiguration senderConfig = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("TOPIC_PATH")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("TOPIC_PATH")
+        // connectionString: connectionString,
+        // entityPath: topicPath
     };
 
     ConnectionConfiguration receiverConfig1 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH1")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("SUBSCRIPTION_PATH1")
+        // connectionString: connectionString,
+        // entityPath: subscriptionPath1
     };
 
     ConnectionConfiguration receiverConfig2 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH2")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("SUBSCRIPTION_PATH2")
+        // connectionString: connectionString,
+        // entityPath: subscriptionPath2
     };
 
     ConnectionConfiguration receiverConfig3 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH3")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("SUBSCRIPTION_PATH3")
+        // connectionString: connectionString,
+        // entityPath: subscriptionPath3
     };
 
     log:print("Creating Asb sender connection.");
@@ -1880,23 +1907,31 @@ function testSendToTopicAndReceiveFromSubscriptionOperation() {
 }
 function testSendBatchToTopicAndReceiveFromSubscriptionOperation() {
     ConnectionConfiguration senderConfig = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("TOPIC_PATH")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("TOPIC_PATH")
+        // connectionString: connectionString,
+        // entityPath: topicPath
     };
 
     ConnectionConfiguration receiverConfig1 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH1")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("SUBSCRIPTION_PATH1")
+        // connectionString: connectionString,
+        // entityPath: subscriptionPath1
     };
 
     ConnectionConfiguration receiverConfig2 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH2")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("SUBSCRIPTION_PATH2")
+        // connectionString: connectionString,
+        // entityPath: subscriptionPath2
     };
 
     ConnectionConfiguration receiverConfig3 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH3")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("SUBSCRIPTION_PATH3")
+        // connectionString: connectionString,
+        // entityPath: subscriptionPath3
     };
 
     log:print("Creating Asb sender connection.");
@@ -2001,23 +2036,31 @@ function testSendBatchToTopicAndReceiveFromSubscriptionOperation() {
 }
 function testCompleteAllMessagesFromSubscriptionOperation() {
     ConnectionConfiguration senderConfig = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("TOPIC_PATH")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("TOPIC_PATH")
+        // connectionString: connectionString,
+        // entityPath: topicPath
     };
 
     ConnectionConfiguration receiverConfig1 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH1")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("SUBSCRIPTION_PATH1")
+        // connectionString: connectionString,
+        // entityPath: subscriptionPath1
     };
 
     ConnectionConfiguration receiverConfig2 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH2")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("SUBSCRIPTION_PATH2")
+        // connectionString: connectionString,
+        // entityPath: subscriptionPath2
     };
 
     ConnectionConfiguration receiverConfig3 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH3")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("SUBSCRIPTION_PATH3")
+        // connectionString: connectionString,
+        // entityPath: subscriptionPath3
     };
 
     log:print("Creating Asb sender connection.");
@@ -2094,24 +2137,32 @@ function testCompleteAllMessagesFromSubscriptionOperation() {
     enable: true
 }
 function testCompleteMessageFromSubscriptionOperation() {
-     ConnectionConfiguration senderConfig = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("TOPIC_PATH")
+    ConnectionConfiguration senderConfig = {
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("TOPIC_PATH")
+        // connectionString: connectionString,
+        // entityPath: topicPath
     };
 
     ConnectionConfiguration receiverConfig1 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH1")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("SUBSCRIPTION_PATH1")
+        // connectionString: connectionString,
+        // entityPath: subscriptionPath1
     };
 
     ConnectionConfiguration receiverConfig2 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH2")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("SUBSCRIPTION_PATH2")
+        // connectionString: connectionString,
+        // entityPath: subscriptionPath2
     };
 
     ConnectionConfiguration receiverConfig3 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH3")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("SUBSCRIPTION_PATH3")
+        // connectionString: connectionString,
+        // entityPath: subscriptionPath3
     };
 
     log:print("Creating Asb sender connection.");
@@ -2185,24 +2236,32 @@ function testCompleteMessageFromSubscriptionOperation() {
     enable: true
 }
 function testAbandonMessagesFromSubscriptionOperation() {
-    ConnectionConfiguration senderConfig = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("TOPIC_PATH")
+   ConnectionConfiguration senderConfig = {
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("TOPIC_PATH")
+        // connectionString: connectionString,
+        // entityPath: topicPath
     };
 
     ConnectionConfiguration receiverConfig1 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH1")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("SUBSCRIPTION_PATH1")
+        // connectionString: connectionString,
+        // entityPath: subscriptionPath1
     };
 
     ConnectionConfiguration receiverConfig2 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH2")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("SUBSCRIPTION_PATH2")
+        // connectionString: connectionString,
+        // entityPath: subscriptionPath2
     };
 
     ConnectionConfiguration receiverConfig3 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH3")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("SUBSCRIPTION_PATH3")
+        // connectionString: connectionString,
+        // entityPath: subscriptionPath3
     };
 
     log:print("Creating Asb sender connection.");
@@ -2280,8 +2339,10 @@ function testAbandonMessagesFromSubscriptionOperation() {
 }
 function testAsyncConsumerOperation() {
     ConnectionConfiguration config = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("QUEUE_PATH")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("QUEUE_PATH")
+        // connectionString: connectionString,
+        // entityPath: queuePath
     };
 
     log:print("Creating Asb sender connection.");
@@ -2301,7 +2362,7 @@ function testAsyncConsumerOperation() {
         checkpanic channelListener.attach(asyncTestService);
         checkpanic channelListener.'start();
         log:print("start");
-        runtime:sleep(20000);
+        runtime:sleep(20);
         log:print("end");
         checkpanic channelListener.detach(asyncTestService);
         checkpanic channelListener.gracefulStop();
@@ -2321,8 +2382,10 @@ function testAsyncConsumerOperation() {
 }
 function testDeadletterFromQueueOperation() {
     ConnectionConfiguration config = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("QUEUE_PATH")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("QUEUE_PATH")
+        // connectionString: connectionString,
+        // entityPath: queuePath
     };
 
     log:print("Creating Asb sender connection.");
@@ -2367,8 +2430,10 @@ function testDeadletterFromQueueOperation() {
 }
 function testDefer_FromQueueOperation() {
     ConnectionConfiguration config = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("QUEUE_PATH")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("QUEUE_PATH")
+        // connectionString: connectionString,
+        // entityPath: queuePath
     };
 
     log:print("Creating Asb sender connection.");
@@ -2435,8 +2500,10 @@ function testDefer_FromQueueOperation() {
 }
 function testRenewLockOnMessage_FromQueueOperation() {
     ConnectionConfiguration config = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("QUEUE_PATH")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("QUEUE_PATH")
+        // connectionString: connectionString,
+        // entityPath: queuePath
     };
 
     log:print("Creating Asb sender connection.");
@@ -2481,23 +2548,31 @@ function testRenewLockOnMessage_FromQueueOperation() {
 }
 function testDeadletterFromSubscriptionOperation() {
     ConnectionConfiguration senderConfig = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("TOPIC_PATH")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("TOPIC_PATH")
+        // connectionString: connectionString,
+        // entityPath: topicPath
     };
 
     ConnectionConfiguration receiverConfig1 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH1")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("SUBSCRIPTION_PATH1")
+        // connectionString: connectionString,
+        // entityPath: subscriptionPath1
     };
 
     ConnectionConfiguration receiverConfig2 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH2")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("SUBSCRIPTION_PATH2")
+        // connectionString: connectionString,
+        // entityPath: subscriptionPath2
     };
 
     ConnectionConfiguration receiverConfig3 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH3")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("SUBSCRIPTION_PATH3")
+        // connectionString: connectionString,
+        // entityPath: subscriptionPath3
     };
 
     log:print("Creating Asb sender connection.");
@@ -2576,23 +2651,31 @@ function testDeadletterFromSubscriptionOperation() {
 }
 function testDefer_FromSubscriptionOperation() {
     ConnectionConfiguration senderConfig = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("TOPIC_PATH")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("TOPIC_PATH")
+        // connectionString: connectionString,
+        // entityPath: topicPath
     };
 
     ConnectionConfiguration receiverConfig1 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH1")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("SUBSCRIPTION_PATH1")
+        // connectionString: connectionString,
+        // entityPath: subscriptionPath1
     };
 
     ConnectionConfiguration receiverConfig2 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH2")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("SUBSCRIPTION_PATH2")
+        // connectionString: connectionString,
+        // entityPath: subscriptionPath2
     };
 
     ConnectionConfiguration receiverConfig3 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH3")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("SUBSCRIPTION_PATH3")
+        // connectionString: connectionString,
+        // entityPath: subscriptionPath3
     };
 
     log:print("Creating Asb sender connection.");
@@ -2737,23 +2820,31 @@ function testDefer_FromSubscriptionOperation() {
 }
 function testRenewLockOnMessage_FromSubscriptionOperation() {
     ConnectionConfiguration senderConfig = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("TOPIC_PATH")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("TOPIC_PATH")
+        // connectionString: connectionString,
+        // entityPath: topicPath
     };
 
     ConnectionConfiguration receiverConfig1 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH1")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("SUBSCRIPTION_PATH1")
+        // connectionString: connectionString,
+        // entityPath: subscriptionPath1
     };
 
     ConnectionConfiguration receiverConfig2 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH2")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("SUBSCRIPTION_PATH2")
+        // connectionString: connectionString,
+        // entityPath: subscriptionPath2
     };
 
     ConnectionConfiguration receiverConfig3 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH3")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("SUBSCRIPTION_PATH3")
+        // connectionString: connectionString,
+        // entityPath: subscriptionPath3
     };
 
     log:print("Creating Asb sender connection.");
@@ -2832,8 +2923,10 @@ function testRenewLockOnMessage_FromSubscriptionOperation() {
 }
 function testDuplicateMessagesFromQueueOperation() {
     ConnectionConfiguration config = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("QUEUE_PATH")
+        connectionString: os:getEnv("CONNECTION_STRING"),
+        entityPath: os:getEnv("QUEUE_PATH")
+        // connectionString: connectionString,
+        // entityPath: queuePath
     };
 
     log:print("Creating Asb sender connection.");
@@ -2896,9 +2989,9 @@ function afterSuiteFunc() {
     }
 }
 
-# Get configuration value for the given key from ballerina.conf file.
-# 
-# + return - configuration value of the given key as a string
-isolated function getConfigValue(string key) returns string {
-    return (system:getEnv(key) != "") ? system:getEnv(key) : config:getAsString(key);
-}
+// # Get configuration value for the given key from ballerina.conf file.
+// # 
+// # + return - configuration value of the given key as a string
+// isolated function getConfigValue(string key) returns string {
+//     return (os:getEnv(key) != "") ? os:getEnv(key) : config:getAsString(key);
+// }

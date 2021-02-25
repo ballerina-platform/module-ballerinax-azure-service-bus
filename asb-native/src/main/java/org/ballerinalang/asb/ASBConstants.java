@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -32,7 +32,7 @@ public class ASBConstants {
     // Asb package name constant fields
     public static final String ORG_NAME = "ballerinax";
     public static final String ASB = "asb";
-    public static final String ASB_VERSION = "0.1.0";
+    public static final String ASB_VERSION = "0.1.1";
     public static final Module PACKAGE_ID_ASB = new Module(ORG_NAME, "asb", ASB_VERSION);
     public static final String PACKAGE_ASB_FQN =
             ORG_NAME + ORG_NAME_SEPARATOR + ASB + VERSION_SEPARATOR + ASB_VERSION;

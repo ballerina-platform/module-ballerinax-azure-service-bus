@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -24,7 +24,7 @@ import io.ballerina.runtime.api.async.Callback;
 import io.ballerina.runtime.api.async.StrandMetadata;
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.AnnotatableType;
-import io.ballerina.runtime.api.types.MemberFunctionType;
+import io.ballerina.runtime.api.types.MethodType;
 import io.ballerina.runtime.api.types.Type;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BError;
@@ -163,8 +163,8 @@ public class MessageDispatcher {
      * @param message Received azure service bus message instance.
      */
     private void handleDispatch(byte[] message) {
-        MemberFunctionType[] attachedFunctions = service.getType().getAttachedFunctions();
-        MemberFunctionType onMessageFunction;
+        MethodType[] attachedFunctions = service.getType().getMethods();
+        MethodType onMessageFunction;
         if (FUNC_ON_MESSAGE.equals(attachedFunctions[0].getName())) {
             onMessageFunction = attachedFunctions[0];
         } else {
