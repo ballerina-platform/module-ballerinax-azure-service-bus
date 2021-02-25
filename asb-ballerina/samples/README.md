@@ -28,8 +28,8 @@ public function main() {
     int serverWaitTime = 5;
 
     asb:ConnectionConfiguration config = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("QUEUE_PATH")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <QUEUE_PATH>
     };
 
     log:print("Creating Asb sender connection.");
@@ -99,8 +99,8 @@ public function main() {
     int serverWaitTime = 5;
 
     asb:ConnectionConfiguration config = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("QUEUE_PATH")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <QUEUE_PATH>
     };
 
     log:print("Creating Asb sender connection.");
@@ -171,8 +171,8 @@ public function main() {
     int serverWaitTime = 5;
 
     asb:ConnectionConfiguration config = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("QUEUE_PATH")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <QUEUE_PATH>
     };
 
     log:print("Creating Asb sender connection.");
@@ -248,23 +248,23 @@ public function main() {
     int serverWaitTime = 5;
 
     asb:ConnectionConfiguration senderConfig = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("TOPIC_PATH")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <TOPIC_PATH>
     };
 
     asb:ConnectionConfiguration receiverConfig1 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH1")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH1>
     };
 
     asb:ConnectionConfiguration receiverConfig2 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH2")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH2>
     };
 
     asb:ConnectionConfiguration receiverConfig3 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH3")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH3>
     };
 
     log:print("Creating Asb sender connection.");
@@ -377,23 +377,23 @@ public function main() {
     int maxMessageCount = 3;
 
     asb:ConnectionConfiguration senderConfig = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("TOPIC_PATH")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <TOPIC_PATH>
     };
 
     asb:ConnectionConfiguration receiverConfig1 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH1")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH1>
     };
 
     asb:ConnectionConfiguration receiverConfig2 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH2")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH2>
     };
 
     asb:ConnectionConfiguration receiverConfig3 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH3")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH3>
     };
 
     log:print("Creating Asb sender connection.");
@@ -520,8 +520,8 @@ public function main() {
     map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
 
     asb:ConnectionConfiguration config = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("QUEUE_PATH")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <QUEUE_PATH>
     };
 
     log:print("Creating Asb sender connection.");
@@ -588,8 +588,8 @@ public function main() {
     map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
 
     asb:ConnectionConfiguration config = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("QUEUE_PATH")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <QUEUE_PATH>
     };
 
     log:print("Creating Asb sender connection.");
@@ -651,23 +651,23 @@ public function main() {
     int maxMessageCount = 3;
 
     asb:ConnectionConfiguration senderConfig = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("TOPIC_PATH")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <TOPIC_PATH>
     };
 
     asb:ConnectionConfiguration receiverConfig1 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH1")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH1>
     };
 
     asb:ConnectionConfiguration receiverConfig2 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH2")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH2>
     };
 
     asb:ConnectionConfiguration receiverConfig3 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH3")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH3>
     };
 
     log:print("Creating Asb sender connection.");
@@ -763,23 +763,23 @@ public function main() {
     int maxMessageCount = 3;
 
     asb:ConnectionConfiguration senderConfig = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("TOPIC_PATH")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <TOPIC_PATH>
     };
 
     asb:ConnectionConfiguration receiverConfig1 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH1")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH1>
     };
 
     asb:ConnectionConfiguration receiverConfig2 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH2")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH2>
     };
 
     asb:ConnectionConfiguration receiverConfig3 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH3")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH3>
     };
 
     log:print("Creating Asb sender connection.");
@@ -876,8 +876,8 @@ public function main() {
     map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
 
     asb:ConnectionConfiguration config = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("QUEUE_PATH")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <QUEUE_PATH>
     };
 
     log:print("Creating Asb sender connection.");
@@ -940,23 +940,23 @@ public function main() {
     int maxMessageCount = 3;
 
     asb:ConnectionConfiguration senderConfig = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("TOPIC_PATH")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <TOPIC_PATH>
     };
 
     asb:ConnectionConfiguration receiverConfig1 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH1")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH1>
     };
 
     asb:ConnectionConfiguration receiverConfig2 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH2")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH2>
     };
 
     asb:ConnectionConfiguration receiverConfig3 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH3")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH3>
     };
 
     log:print("Creating Asb sender connection.");
@@ -1058,8 +1058,8 @@ public function main() {
     map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
 
     asb:ConnectionConfiguration config = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("QUEUE_PATH")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <QUEUE_PATH>
     };
 
     log:print("Creating Asb sender connection.");
@@ -1076,8 +1076,8 @@ public function main() {
     asb:Service asyncTestService =
     @asb:ServiceConfig {
         queueConfig: {
-            connectionString: config:getAsString("CONNECTION_STRING"),
-            queueName: config:getAsString("QUEUE_PATH")
+            connectionString: <CONNECTION_STRING>,
+            queueName: <QUEUE_PATH>
         }
     }
     service object {
@@ -1096,7 +1096,7 @@ public function main() {
         checkpanic channelListener.attach(asyncTestService);
         checkpanic channelListener.'start();
         log:print("start listening");
-        runtime:sleep(20000);
+        runtime:sleep(20);
         log:print("end listening");
         checkpanic channelListener.detach(asyncTestService);
         checkpanic channelListener.gracefulStop();
@@ -1135,8 +1135,8 @@ public function main() {
     int serverWaitTime = 5;
 
     asb:ConnectionConfiguration config = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("QUEUE_PATH")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <QUEUE_PATH>
     };
 
     log:print("Creating Asb sender connection.");
@@ -1210,8 +1210,8 @@ public function main() {
     map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
 
     asb:ConnectionConfiguration config = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("QUEUE_PATH")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <QUEUE_PATH>
     };
 
     log:print("Creating Asb sender connection.");
@@ -1278,23 +1278,23 @@ public function main() {
     map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
 
     asb:ConnectionConfiguration senderConfig = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("TOPIC_PATH")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <TOPIC_PATH>
     };
 
     asb:ConnectionConfiguration receiverConfig1 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH1")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH1>
     };
 
     asb:ConnectionConfiguration receiverConfig2 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH2")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH2>
     };
 
     asb:ConnectionConfiguration receiverConfig3 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH3")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH3>
     };
 
     log:print("Creating Asb sender connection.");
@@ -1396,8 +1396,8 @@ public function main() {
     int serverWaitTime = 5;
 
     asb:ConnectionConfiguration config = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("QUEUE_PATH")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <QUEUE_PATH>
     };
 
     log:print("Creating Asb sender connection.");
@@ -1487,23 +1487,23 @@ public function main() {
     int serverWaitTime = 5;
 
     asb:ConnectionConfiguration senderConfig = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("TOPIC_PATH")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <TOPIC_PATH>
     };
 
     asb:ConnectionConfiguration receiverConfig1 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH1")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH1>
     };
 
     asb:ConnectionConfiguration receiverConfig2 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH2")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH2>
     };
 
     asb:ConnectionConfiguration receiverConfig3 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH3")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH3>
     };
 
     log:print("Creating Asb sender connection.");
@@ -1670,8 +1670,8 @@ public function main() {
     map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
 
     asb:ConnectionConfiguration config = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("QUEUE_PATH")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <QUEUE_PATH>
     };
 
     log:print("Creating Asb sender connection.");
@@ -1738,23 +1738,23 @@ public function main() {
     map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
 
     asb:ConnectionConfiguration senderConfig = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("TOPIC_PATH")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <TOPIC_PATH>
     };
 
     asb:ConnectionConfiguration receiverConfig1 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH1")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH1>
     };
 
     asb:ConnectionConfiguration receiverConfig2 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH2")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH2>
     };
 
     asb:ConnectionConfiguration receiverConfig3 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH3")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH3>
     };
 
     log:print("Creating Asb sender connection.");

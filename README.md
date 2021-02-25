@@ -83,8 +83,8 @@ basic operations. These APIs use Shared Access Signature(SAS) authentication and
 * Java 11 Installed
   Java Development Kit (JDK) with version 11 is required.
 
-* Ballerina SLP8 Installed
-  Ballerina Swan Lake Preview Version 8 is required.
+* Ballerina SLAlpha2 Installed
+  Ballerina Swan Lake Alpha 2 is required.
 
 * Shared Access Signature (SAS) Authentication Credentials
     * Connection String
@@ -129,7 +129,7 @@ to/from the queue/topic/subscription.
 ## Supported Versions
 |                     |    Version                  |
 |:-------------------:|:---------------------------:|
-| Ballerina Language  | Swan-Lake-Preview8          |
+| Ballerina Language  | Swan-Lake-Alpha2            |
 | Service Bus API     | v1.2.8                      |
 
 # Quickstart(s)
@@ -166,8 +166,8 @@ First, import the ballerinax/asb module into the Ballerina project.
 You can now make the connection configuration using the connection string and entity path.
 ```ballerina
     asb:ConnectionConfiguration config = {
-       connectionString: config:getAsString("CONNECTION_STRING"),
-       entityPath: config:getAsString("QUEUE_PATH")
+       connectionString: <CONNECTION_STRING>,
+       entityPath: <QUEUE_PATH>
     };
 ```
 
@@ -275,8 +275,8 @@ First, import the ballerinax/asb module into the Ballerina project.
 You can now make the connection configuration using the connection string and entity path.
 ```ballerina
     asb:ConnectionConfiguration config = {
-       connectionString: config:getAsString("CONNECTION_STRING"),
-       entityPath: config:getAsString("QUEUE_PATH")
+       connectionString: <CONNECTION_STRING>,
+       entityPath: <QUEUE_PATH>
     };
 ```
 
@@ -320,8 +320,8 @@ the service logic to execute when a message is received inside the onMessage rem
     asb:Service asyncTestService =
     @asb:ServiceConfig {
         queueConfig: {
-            connectionString: config:getAsString("CONNECTION_STRING"),
-            queueName: config:getAsString("QUEUE_PATH")
+            connectionString: <CONNECTION_STRING>,
+            queueName: <QUEUE_PATH>
         }
     }
     service object {
@@ -349,7 +349,7 @@ the connection with the Azure Service Bus.
         checkpanic channelListener.attach(asyncTestService);
         checkpanic channelListener.'start();
         log:print("start listening");
-        runtime:sleep(20000);
+        runtime:sleep(20);
         log:print("end listening");
         checkpanic channelListener.detach(asyncTestService);
         checkpanic channelListener.gracefulStop();
@@ -396,8 +396,8 @@ public function main() {
     int serverWaitTime = 5;
 
     asb:ConnectionConfiguration config = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("QUEUE_PATH")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <QUEUE_PATH>
     };
 
     log:print("Creating Asb sender connection.");
@@ -467,8 +467,8 @@ public function main() {
     int serverWaitTime = 5;
 
     asb:ConnectionConfiguration config = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("QUEUE_PATH")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <QUEUE_PATH>
     };
 
     log:print("Creating Asb sender connection.");
@@ -539,8 +539,8 @@ public function main() {
     int serverWaitTime = 5;
 
     asb:ConnectionConfiguration config = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("QUEUE_PATH")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <QUEUE_PATH>
     };
 
     log:print("Creating Asb sender connection.");
@@ -616,23 +616,23 @@ public function main() {
     int serverWaitTime = 5;
 
     asb:ConnectionConfiguration senderConfig = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("TOPIC_PATH")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <TOPIC_PATH>
     };
 
     asb:ConnectionConfiguration receiverConfig1 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH1")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH1>
     };
 
     asb:ConnectionConfiguration receiverConfig2 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH2")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH2>
     };
 
     asb:ConnectionConfiguration receiverConfig3 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH3")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH2>
     };
 
     log:print("Creating Asb sender connection.");
@@ -745,23 +745,23 @@ public function main() {
     int maxMessageCount = 3;
 
     asb:ConnectionConfiguration senderConfig = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("TOPIC_PATH")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <TOPIC_PATH>
     };
 
     asb:ConnectionConfiguration receiverConfig1 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH1")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH1>
     };
 
     asb:ConnectionConfiguration receiverConfig2 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH2")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH2>
     };
 
     asb:ConnectionConfiguration receiverConfig3 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH3")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH2>
     };
 
     log:print("Creating Asb sender connection.");
@@ -888,8 +888,8 @@ public function main() {
     map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
 
     asb:ConnectionConfiguration config = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("QUEUE_PATH")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <QUEUE_PATH>
     };
 
     log:print("Creating Asb sender connection.");
@@ -956,8 +956,8 @@ public function main() {
     map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
 
     asb:ConnectionConfiguration config = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("QUEUE_PATH")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <QUEUE_PATH>
     };
 
     log:print("Creating Asb sender connection.");
@@ -1019,23 +1019,23 @@ public function main() {
     int maxMessageCount = 3;
 
     asb:ConnectionConfiguration senderConfig = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("TOPIC_PATH")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <TOPIC_PATH>
     };
 
     asb:ConnectionConfiguration receiverConfig1 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH1")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH1>
     };
 
     asb:ConnectionConfiguration receiverConfig2 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH2")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH2>
     };
 
     asb:ConnectionConfiguration receiverConfig3 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH3")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH2>
     };
 
     log:print("Creating Asb sender connection.");
@@ -1131,23 +1131,23 @@ public function main() {
     int maxMessageCount = 3;
 
     asb:ConnectionConfiguration senderConfig = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("TOPIC_PATH")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <TOPIC_PATH>
     };
 
     asb:ConnectionConfiguration receiverConfig1 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH1")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH1>
     };
 
     asb:ConnectionConfiguration receiverConfig2 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH2")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH2>
     };
 
     asb:ConnectionConfiguration receiverConfig3 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH3")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH2>
     };
 
     log:print("Creating Asb sender connection.");
@@ -1244,8 +1244,8 @@ public function main() {
     map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
 
     asb:ConnectionConfiguration config = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("QUEUE_PATH")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <QUEUE_PATH>
     };
 
     log:print("Creating Asb sender connection.");
@@ -1308,23 +1308,23 @@ public function main() {
     int maxMessageCount = 3;
 
     asb:ConnectionConfiguration senderConfig = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("TOPIC_PATH")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <TOPIC_PATH>
     };
 
     asb:ConnectionConfiguration receiverConfig1 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH1")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH1>
     };
 
     asb:ConnectionConfiguration receiverConfig2 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH2")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH2>
     };
 
     asb:ConnectionConfiguration receiverConfig3 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH3")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH2>
     };
 
     log:print("Creating Asb sender connection.");
@@ -1408,9 +1408,8 @@ Sample is available at:
 https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/main/asb-ballerina/samples/async_consumer.bal
 
 ```ballerina
-import ballerina/config;
 import ballerina/log;
-import ballerina/runtime;
+import ballerina/lang.runtime;
 import ballerinax/asb;
 
 public function main() {
@@ -1426,8 +1425,8 @@ public function main() {
     map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
 
     asb:ConnectionConfiguration config = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("QUEUE_PATH")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <QUEUE_PATH>
     };
 
     log:print("Creating Asb sender connection.");
@@ -1444,8 +1443,8 @@ public function main() {
     asb:Service asyncTestService =
     @asb:ServiceConfig {
         queueConfig: {
-            connectionString: config:getAsString("CONNECTION_STRING"),
-            queueName: config:getAsString("QUEUE_PATH")
+            connectionString: <CONNECTION_STRING>,
+            queueName: <QUEUE_PATH>
         }
     }
     service object {
@@ -1464,7 +1463,7 @@ public function main() {
         checkpanic channelListener.attach(asyncTestService);
         checkpanic channelListener.'start();
         log:print("start listening");
-        runtime:sleep(20000);
+        runtime:sleep(20);
         log:print("end listening");
         checkpanic channelListener.detach(asyncTestService);
         checkpanic channelListener.gracefulStop();
@@ -1503,8 +1502,8 @@ public function main() {
     int serverWaitTime = 5;
 
     asb:ConnectionConfiguration config = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("QUEUE_PATH")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <QUEUE_PATH>
     };
 
     log:print("Creating Asb sender connection.");
@@ -1578,8 +1577,8 @@ public function main() {
     map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
 
     asb:ConnectionConfiguration config = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("QUEUE_PATH")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <QUEUE_PATH>
     };
 
     log:print("Creating Asb sender connection.");
@@ -1646,23 +1645,23 @@ public function main() {
     map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
 
     asb:ConnectionConfiguration senderConfig = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("TOPIC_PATH")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <TOPIC_PATH>
     };
 
     asb:ConnectionConfiguration receiverConfig1 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH1")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH1>
     };
 
     asb:ConnectionConfiguration receiverConfig2 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH2")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH2>
     };
 
     asb:ConnectionConfiguration receiverConfig3 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH3")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH2>
     };
 
     log:print("Creating Asb sender connection.");
@@ -1764,8 +1763,8 @@ public function main() {
     int serverWaitTime = 5;
 
     asb:ConnectionConfiguration config = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("QUEUE_PATH")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <QUEUE_PATH>
     };
 
     log:print("Creating Asb sender connection.");
@@ -1855,23 +1854,23 @@ public function main() {
     int serverWaitTime = 5;
 
     asb:ConnectionConfiguration senderConfig = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("TOPIC_PATH")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <TOPIC_PATH>
     };
 
     asb:ConnectionConfiguration receiverConfig1 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH1")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH1>
     };
 
     asb:ConnectionConfiguration receiverConfig2 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH2")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH2>
     };
 
     asb:ConnectionConfiguration receiverConfig3 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH3")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH2>
     };
 
     log:print("Creating Asb sender connection.");
@@ -2038,8 +2037,8 @@ public function main() {
     map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
 
     asb:ConnectionConfiguration config = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("QUEUE_PATH")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <QUEUE_PATH>
     };
 
     log:print("Creating Asb sender connection.");
@@ -2106,23 +2105,23 @@ public function main() {
     map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
 
     asb:ConnectionConfiguration senderConfig = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("TOPIC_PATH")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <TOPIC_PATH>
     };
 
     asb:ConnectionConfiguration receiverConfig1 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH1")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH1>
     };
 
     asb:ConnectionConfiguration receiverConfig2 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH2")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH2>
     };
 
     asb:ConnectionConfiguration receiverConfig3 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH3")
+        connectionString: <CONNECTION_STRING>,
+        entityPath: <SUBSCRIPTION_PATH2>
     };
 
     log:print("Creating Asb sender connection.");
@@ -2208,7 +2207,7 @@ public function main() {
 
       > **Note:** Set the JAVA_HOME environment variable to the path name of the directory into which you installed JDK.
 
-2. Download and install [Ballerina SLP8](https://ballerina.io/).
+2. Download and install [Ballerina SLAlpha2](https://ballerina.io/).
 
 ### Building the Source
 

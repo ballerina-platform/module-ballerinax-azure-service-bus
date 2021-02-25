@@ -14,9 +14,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import ballerina/config;
 import ballerina/log;
 import ballerinax/asb;
+
+// Connection Configurations
+configurable string connectionString = ?;
+configurable string topicPath = ?;
+configurable string subscriptionPath1 = ?;
+configurable string subscriptionPath2 = ?;
+configurable string subscriptionPath3 = ?;
 
 public function main() {
 
@@ -31,23 +37,23 @@ public function main() {
     map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
 
     asb:ConnectionConfiguration senderConfig = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("TOPIC_PATH")
+        connectionString: connectionString,
+        entityPath: topicPath
     };
 
     asb:ConnectionConfiguration receiverConfig1 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH1")
+        connectionString: connectionString,
+        entityPath: subscriptionPath1
     };
 
     asb:ConnectionConfiguration receiverConfig2 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH2")
+        connectionString: connectionString,
+        entityPath: subscriptionPath2
     };
 
     asb:ConnectionConfiguration receiverConfig3 = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("SUBSCRIPTION_PATH3")
+        connectionString: connectionString,
+        entityPath: subscriptionPath3
     };
 
     log:print("Creating Asb sender connection.");
