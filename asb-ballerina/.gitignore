@@ -3,3 +3,4 @@ javalibs
 ballerina.conf
 Ballerina.lock
 modules
+Config.toml

@@ -1,7 +1,11 @@
 [package]
 org = "ballerinax"
 name = "asb"
-version = "0.1.0"
+version = "0.1.1"
+license= ["Apache-2.0"]
+authors = ["Ballerina"]
+keywords = ["Azure","ServiceBus"]
+repository = "https://github.com/ballerina-platform/module-ballerinax-azure-service-bus"
 
 [build-options]
 observabilityIncluded = true

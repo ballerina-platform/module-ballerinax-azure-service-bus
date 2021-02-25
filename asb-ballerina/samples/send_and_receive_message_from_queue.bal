@@ -14,9 +14,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import ballerina/config;
 import ballerina/log;
 import ballerinax/asb;
+
+// Connection Configurations
+configurable string connectionString = ?;
+configurable string queuePath = ?;
 
 public function main() {
 
@@ -32,8 +35,8 @@ public function main() {
     int serverWaitTime = 5;
 
     asb:ConnectionConfiguration config = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("QUEUE_PATH")
+        connectionString: connectionString,
+        entityPath: queuePath
     };
 
     log:print("Creating Asb sender connection.");
@@ -52,8 +55,8 @@ public function main() {
 
     if (receiverConnection is asb:ReceiverConnection) {
         log:print("Receiving from Asb receiver connection.");
-        asb:Message|asb:Error? messageReceived = receiverConnection->receiveMessage(serverWaitTime);
-        asb:Message|asb:Error? jsonMessageReceived = receiverConnection->receiveMessage(serverWaitTime);
+        asb:Message|asb:Error? messageReceived = checkpanic receiverConnection->receiveMessage(serverWaitTime);
+        asb:Message|asb:Error? jsonMessageReceived = checkpanic receiverConnection->receiveMessage(serverWaitTime);
         if (messageReceived is asb:Message && jsonMessageReceived is asb:Message) {
             string messageRead = checkpanic messageReceived.getTextContent();
             log:print("Reading Received Message : " + messageRead);

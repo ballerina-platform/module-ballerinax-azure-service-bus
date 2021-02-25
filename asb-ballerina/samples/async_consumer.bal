@@ -14,10 +14,13 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import ballerina/config;
 import ballerina/log;
-import ballerina/runtime;
+import ballerina/lang.runtime;
 import ballerinax/asb;
+
+// Connection Configurations
+configurable string connectionString = ?;
+configurable string queuePath = ?;
 
 public function main() {
 
@@ -32,8 +35,8 @@ public function main() {
     map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
 
     asb:ConnectionConfiguration config = {
-        connectionString: config:getAsString("CONNECTION_STRING"),
-        entityPath: config:getAsString("QUEUE_PATH")
+        connectionString: connectionString,
+        entityPath: queuePath
     };
 
     log:print("Creating Asb sender connection.");
@@ -50,8 +53,8 @@ public function main() {
     asb:Service asyncTestService =
     @asb:ServiceConfig {
         queueConfig: {
-            connectionString: config:getAsString("CONNECTION_STRING"),
-            queueName: config:getAsString("QUEUE_PATH")
+            connectionString: connectionString,
+            queueName: queuePath
         }
     }
     service object {
@@ -70,7 +73,7 @@ public function main() {
         checkpanic channelListener.attach(asyncTestService);
         checkpanic channelListener.'start();
         log:print("start listening");
-        runtime:sleep(20000);
+        runtime:sleep(20);
         log:print("end listening");
         checkpanic channelListener.detach(asyncTestService);
         checkpanic channelListener.gracefulStop();
