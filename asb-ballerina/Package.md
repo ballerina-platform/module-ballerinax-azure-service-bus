@@ -653,4 +653,4 @@ public function main() {
 ```
 
 More Samples are available at: 
-https://github.com/RolandHewage/module-ballerinax-azure-service-bus/tree/main/asb-ballerina/samples
+https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/tree/main/asb-ballerina/samples
