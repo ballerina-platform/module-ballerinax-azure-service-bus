@@ -90,10 +90,13 @@ public client class SenderConnection {
     @display {
         label: "Send Message with Configurable Parameters"
     }
-    isolated remote function sendMessageWithConfigurableParameters(@display{label: "Message Content"} byte[] content = [], 
-                                                                   @display{label: "Message Parameters (optional)"} map<string> parameters = {},
-                                                                   @display{label: "Message Properties (optional)"} map<string> properties = {}) 
-                                                                   returns @display{label: "Result"} Error? {
+    isolated remote function sendMessageWithConfigurableParameters(@display{label: "Message Content"} 
+                                                                byte[] content = [], 
+                                                                @display{label: "Message Parameters (optional)"} 
+                                                                map<string> parameters = {},
+                                                                @display{label: "Message Properties (optional)"} 
+                                                                map<string> properties = {}) 
+                                                                returns @display{label: "Result"} Error? {
         return sendMessageWithConfigurableParameters(self.asbSenderConnection, content, parameters, properties);
     }
 
@@ -116,17 +119,21 @@ public client class SenderConnection {
         label: "Send Message"
     }
     isolated remote function sendMessage(@display{label: "Message Content"} byte[] content = [], 
-                                         @display{label: "Content type (optional)"} string? contentType = (), 
-                                         @display{label: "Message ID (optional)"} string? messageId = (), 
-                                         @display{label: "Send to address (optional)"} string? to = (), 
-                                         @display{label: "Address of the queue to reply to (optional)"} string? replyTo = (), 
-                                         @display{label: "Identifier of the session to reply to (optional)"} string? replyToSessionId = (), 
-                                         @display{label: "Application specific label (optional)"} string? label = (), 
-                                         @display{label: "Identifier of the session (optional)"} string? sessionId = (), 
-                                         @display{label: "Identifier of the correlation (optional)"} string? correlationId = (), 
-                                         @display{label: "Message Properties (optional)"} map<string> properties = {}, 
-                                         @display{label: "Time to live (optional)"} int? timeToLive = DEFAULT_TIME_TO_LIVE) 
-                                         returns @display{label: "Result"} Error? {
+                                        @display{label: "Content type (optional)"} string? contentType = (), 
+                                        @display{label: "Message ID (optional)"} string? messageId = (), 
+                                        @display{label: "Send to address (optional)"} string? to = (), 
+                                        @display{label: "Address of the queue to reply to (optional)"} 
+                                        string? replyTo = (), 
+                                        @display{label: "Identifier of the session to reply to (optional)"} 
+                                        string? replyToSessionId = (), 
+                                        @display{label: "Application specific label (optional)"} string? label = (), 
+                                        @display{label: "Identifier of the session (optional)"} string? sessionId = (), 
+                                        @display{label: "Identifier of the correlation (optional)"} 
+                                        string? correlationId = (), 
+                                        @display{label: "Message Properties (optional)"} map<string> properties = {}, 
+                                        @display{label: "Time to live (optional)"} 
+                                        int? timeToLive = DEFAULT_TIME_TO_LIVE) 
+                                        returns @display{label: "Result"} Error? {
         return sendMessage(self.asbSenderConnection, content, contentType, messageId, to, replyTo, replyToSessionId, 
             label, sessionId, correlationId, properties, timeToLive);
     }
@@ -142,10 +149,11 @@ public client class SenderConnection {
         label: "Send Batch of Messages"
     }
     isolated remote function sendBatchMessage(@display{label: "Message Content"} string[] content = [], 
-                                              @display{label: "Message Parameters (optional)"} map<string> parameters = {}, 
-                                              @display{label: "Message Properties (optional)"} map<string> properties = {}, 
-                                              @display{label: "Maximum number of messages in a batch (optional)"} int? maxMessageCount = DEFAULT_MAX_MESSAGE_COUNT) 
-                                              returns @display{label: "Result"} Error? {
+                                            @display{label: "Message Parameters (optional)"} map<string> parameters = {}, 
+                                            @display{label: "Message Properties (optional)"} map<string> properties = {}, 
+                                            @display{label: "Maximum number of messages in a batch (optional)"} 
+                                            int? maxMessageCount = DEFAULT_MAX_MESSAGE_COUNT) 
+                                            returns @display{label: "Result"} Error? {
         return sendBatchMessage(self.asbSenderConnection, content, parameters, properties, maxMessageCount);
     }
 }

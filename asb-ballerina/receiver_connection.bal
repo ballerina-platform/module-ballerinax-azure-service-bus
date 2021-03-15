@@ -52,8 +52,8 @@ public client class ReceiverConnection {
         label: "Create Receiver Client Connection"
     }
     public isolated function createReceiverConnection(@display{label: "Receiver Client Connection Configuration"} 
-                                                      ConnectionConfiguration connectionConfiguration) 
-                                                      returns @display{label: "Result"} Error? {
+                                                    ConnectionConfiguration connectionConfiguration) 
+                                                    returns @display{label: "Result"} Error? {
         self.connectionString = connectionConfiguration.connectionString;
         self.entityPath = connectionConfiguration.entityPath;
         var connectionResult = createReceiverConnection(java:fromString(self.connectionString),
@@ -103,10 +103,10 @@ public client class ReceiverConnection {
         label: "Receive Messages"
     }
     isolated remote function receiveMessages(@display{label: "Server wait time in seconds to receive message (optional)"} 
-                                             int? serverWaitTime = DEFAULT_SERVER_WAIT_TIME, 
-                                             @display{label: "Maximum number of messages in a batch (optional)"} 
-                                             int? maxMessageCount = DEFAULT_MAX_MESSAGE_COUNT) 
-                                             returns @display{label: "Messages"} Messages|Error {
+                                            int? serverWaitTime = DEFAULT_SERVER_WAIT_TIME, 
+                                            @display{label: "Maximum number of messages in a batch (optional)"} 
+                                            int? maxMessageCount = DEFAULT_MAX_MESSAGE_COUNT) 
+                                            returns @display{label: "Messages"} Messages|Error {
         return receiveMessages(self.asbReceiverConnection, serverWaitTime, maxMessageCount);
     }
 
@@ -118,8 +118,8 @@ public client class ReceiverConnection {
         label: "Receive Batch of Messages"
     }
     isolated remote function receiveBatchMessage(@display{label: "Server wait time in seconds to receive message (optional)"} 
-                                                 int? maxMessageCount = DEFAULT_MAX_MESSAGE_COUNT) 
-                                                 returns @display{label: "Messages"} Messages|Error {
+                                                int? maxMessageCount = DEFAULT_MAX_MESSAGE_COUNT) 
+                                                returns @display{label: "Messages"} Messages|Error {
         return receiveBatchMessage(self.asbReceiverConnection, maxMessageCount);
     }
 
@@ -161,9 +161,11 @@ public client class ReceiverConnection {
     @display {
         label: "Dead Letter Message"
     }
-    isolated remote function deadLetterMessage(@display{label: "Dead letter reason (optional)"} string? deadLetterReason = (), 
-                                               @display{label: "Dead letter description (optional)"} string? deadLetterErrorDescription = ()) 
-                                               returns @display{label: "Result"} Error? {
+    isolated remote function deadLetterMessage(@display{label: "Dead letter reason (optional)"} 
+                                            string? deadLetterReason = (), 
+                                            @display{label: "Dead letter description (optional)"} 
+                                            string? deadLetterErrorDescription = ()) 
+                                            returns @display{label: "Result"} Error? {
         return deadLetterMessage(self.asbReceiverConnection, deadLetterReason, deadLetterErrorDescription);
     }
 
@@ -187,7 +189,8 @@ public client class ReceiverConnection {
     @display {
         label: "Receive Deferred Message"
     }
-    isolated remote function receiveDeferredMessage(@display{label: "Sequence Number of the deferred message"} int sequenceNumber) 
+    isolated remote function receiveDeferredMessage(@display{label: "Sequence Number of the deferred message"} 
+                                                    int sequenceNumber) 
                                                     returns @display{label: "Deferred Message"} Message|Error? {
         return receiveDeferredMessage(self.asbReceiverConnection, sequenceNumber);
     }
