@@ -17,9 +17,7 @@
 import ballerina/jballerina.java as java;
 
 # Represents a single network sender connection to the Asb broker.
-@display {
-    label: "Azure Service Bus Sender Client"
-}
+@display {label: "Azure Service Bus Sender Client"}
 public client class SenderConnection {
 
     handle asbSenderConnection = JAVA_NULL;
@@ -48,12 +46,10 @@ public client class SenderConnection {
     # 
     # + connectionConfiguration - Configurations used to create a `asb:SenderConnection`
     # + return - An `asb:Error` if failed to create connection or else `()`
-    @display {
-        label: "Create Sender Client Connection"
-    }
-    public isolated function createSenderConnection(@display{label: "Sender Client Connection Configuration"} 
+    @display {label: "Create Sender Client Connection"}
+    public isolated function createSenderConnection(@display {label: "Sender Client Connection Configuration"} 
                                                     ConnectionConfiguration connectionConfiguration) 
-                                                    returns @display{label: "Result"} Error? {
+                                                    returns @display {label: "Result"} Error? {
         self.connectionString = connectionConfiguration.connectionString;
         self.entityPath = connectionConfiguration.entityPath;
         var connectionResult = createSenderConnection(java:fromString(self.connectionString),
@@ -69,10 +65,8 @@ public client class SenderConnection {
     # Closes the Asb Sender Connection using the given connection parameters.
     #
     # + return - An `asb:Error` if failed to close connection or else `()`
-    @display {
-        label: "Close Sender Client Connection"
-    }
-    public isolated function closeSenderConnection() returns @display{label: "Result"} Error? {
+    @display {label: "Close Sender Client Connection"}
+    public isolated function closeSenderConnection() returns @display {label: "Result"} Error? {
         var connectionResult = closeSenderConnection(self.asbSenderConnection);
         if (connectionResult is ()) {
             return;
@@ -87,16 +81,14 @@ public client class SenderConnection {
     # + parameters - Optional Message parameters 
     # + properties - Message properties
     # + return - An `asb:Error` if failed to send message or else `()`
-    @display {
-        label: "Send Message with Configurable Parameters"
-    }
-    isolated remote function sendMessageWithConfigurableParameters(@display{label: "Message Content"} 
-                                                                byte[] content = [], 
-                                                                @display{label: "Message Parameters (optional)"} 
-                                                                map<string> parameters = {},
-                                                                @display{label: "Message Properties (optional)"} 
-                                                                map<string> properties = {}) 
-                                                                returns @display{label: "Result"} Error? {
+    @display {label: "Send Message with Configurable Parameters"}
+    isolated remote function sendMessageWithConfigurableParameters(@display {label: "Message Content"} 
+                                                                   byte[] content = [], 
+                                                                   @display {label: "Message Parameters (optional)"} 
+                                                                   map<string> parameters = {},
+                                                                   @display {label: "Message Properties (optional)"} 
+                                                                   map<string> properties = {}) 
+                                                                   returns @display {label: "Result"} Error? {
         return sendMessageWithConfigurableParameters(self.asbSenderConnection, content, parameters, properties);
     }
 
@@ -115,25 +107,23 @@ public client class SenderConnection {
     # + timeToLive - This is the duration, in ticks, that a message is valid. The duration starts from when the 
     #                message is sent to the Service Bus.
     # + return - An `asb:Error` if failed to send message or else `()`
-    @display {
-        label: "Send Message"
-    }
-    isolated remote function sendMessage(@display{label: "Message Content"} byte[] content = [], 
-                                        @display{label: "Content type (optional)"} string? contentType = (), 
-                                        @display{label: "Message ID (optional)"} string? messageId = (), 
-                                        @display{label: "Send to address (optional)"} string? to = (), 
-                                        @display{label: "Address of the queue to reply to (optional)"} 
-                                        string? replyTo = (), 
-                                        @display{label: "Identifier of the session to reply to (optional)"} 
-                                        string? replyToSessionId = (), 
-                                        @display{label: "Application specific label (optional)"} string? label = (), 
-                                        @display{label: "Identifier of the session (optional)"} string? sessionId = (), 
-                                        @display{label: "Identifier of the correlation (optional)"} 
-                                        string? correlationId = (), 
-                                        @display{label: "Message Properties (optional)"} map<string> properties = {}, 
-                                        @display{label: "Time to live (optional)"} 
-                                        int? timeToLive = DEFAULT_TIME_TO_LIVE) 
-                                        returns @display{label: "Result"} Error? {
+    @display {label: "Send Message"}
+    isolated remote function sendMessage(@display {label: "Message Content"} byte[] content = [], 
+                                         @display {label: "Content type (optional)"} string? contentType = (), 
+                                         @display {label: "Message ID (optional)"} string? messageId = (), 
+                                         @display {label: "Send to address (optional)"} string? to = (), 
+                                         @display {label: "Address of the queue to reply to (optional)"} 
+                                         string? replyTo = (), 
+                                         @display {label: "Identifier of the session to reply to (optional)"} 
+                                         string? replyToSessionId = (), 
+                                         @display {label: "Application specific label (optional)"} string? label = (), 
+                                         @display {label: "Identifier of the session (optional)"} string? sessionId = (), 
+                                         @display {label: "Identifier of the correlation (optional)"} 
+                                         string? correlationId = (), 
+                                         @display {label: "Message Properties (optional)"} map<string> properties = {}, 
+                                         @display {label: "Time to live (optional)"} 
+                                         int? timeToLive = DEFAULT_TIME_TO_LIVE) 
+                                         returns @display {label: "Result"} Error? {
         return sendMessage(self.asbSenderConnection, content, contentType, messageId, to, replyTo, replyToSessionId, 
             label, sessionId, correlationId, properties, timeToLive);
     }
@@ -145,15 +135,13 @@ public client class SenderConnection {
     # + properties - Message properties
     # + maxMessageCount - Maximum no. of messages in a batch
     # + return - An `asb:Error` if failed to send message or else `()`
-    @display {
-        label: "Send Batch of Messages"
-    }
-    isolated remote function sendBatchMessage(@display{label: "Message Content"} string[] content = [], 
-                                            @display{label: "Message Parameters (optional)"} map<string> parameters = {}, 
-                                            @display{label: "Message Properties (optional)"} map<string> properties = {}, 
-                                            @display{label: "Maximum number of messages in a batch (optional)"} 
-                                            int? maxMessageCount = DEFAULT_MAX_MESSAGE_COUNT) 
-                                            returns @display{label: "Result"} Error? {
+    @display {label: "Send Batch of Messages"}
+    isolated remote function sendBatchMessage(@display {label: "Message Content"} string[] content = [], 
+                                              @display {label: "Message Parameters (optional)"} map<string> parameters = {}, 
+                                              @display {label: "Message Properties (optional)"} map<string> properties = {}, 
+                                              @display {label: "Maximum number of messages in a batch (optional)"} 
+                                              int? maxMessageCount = DEFAULT_MAX_MESSAGE_COUNT) 
+                                              returns @display {label: "Result"} Error? {
         return sendBatchMessage(self.asbSenderConnection, content, parameters, properties, maxMessageCount);
     }
 }
