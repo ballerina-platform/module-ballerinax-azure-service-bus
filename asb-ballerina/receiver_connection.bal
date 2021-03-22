@@ -17,7 +17,7 @@
 import ballerina/jballerina.java as java;
 
 # Represents a single network receiver connection to the Asb broker.
-@display {label: "Azure Service Bus Receiver Client"}
+@display {label: "Azure Service Bus Receiver Client", iconPath: "AzureServiceBusLogo.png"}
 public client class ReceiverConnection {
 
     handle asbReceiverConnection  = JAVA_NULL;
