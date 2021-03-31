@@ -4,3 +4,5 @@ ballerina.conf
 Ballerina.lock
 modules
 Config.toml
+**/resources
+Dependencies.toml

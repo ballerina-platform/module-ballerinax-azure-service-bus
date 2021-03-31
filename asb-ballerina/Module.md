@@ -13,7 +13,7 @@ basic operations. These APIs use SAS authentication and this module supports SAS
 # Compatibility
 |                     |    Version                  |
 |:-------------------:|:---------------------------:|
-| Ballerina Language  | Swan-Lake-Alpha2            |
+| Ballerina Language  | Swan-Lake-Alpha3            |
 | Service Bus API     | v1.2.8                      |
 
 # Supported Operations
@@ -56,8 +56,8 @@ immediate stop listening.
 * Java 11 Installed
   Java Development Kit (JDK) with version 11 is required.
 
-* Ballerina SLAlpha2 Installed
-  Ballerina Swan Lake Alpha 2 is required.
+* Ballerina SLAlpha3 Installed
+  Ballerina Swan Lake Alpha 3 is required.
 
 * Shared Access Signature (SAS) Authentication Credentials
     * Connection String
@@ -148,7 +148,7 @@ You can now send a message to the configured azure service bus entity with messa
 properties. Here we have shown how to send a text message and a json message parsed to the byte array format.
 ```ballerina
     if (senderConnection is asb:SenderConnection) {
-       log:print("Sending via Asb sender connection.");
+       log:printInfo("Sending via Asb sender connection.");
        Checkpanic senderConnection->sendMessageWithConfigurableParameters(byteContent, parameters1, properties);
        checkpanic senderConnection->sendMessageWithConfigurableParameters(byteContentFromJson, parameters2, properties);
     } else {
@@ -160,14 +160,14 @@ properties. Here we have shown how to send a text message and a json message par
 You can now receive a message from the configured azure service bus entity.
 ```ballerina
     if (receiverConnection is asb:ReceiverConnection) {
-       log:print("Receiving from Asb receiver connection.");
+       log:printInfo("Receiving from Asb receiver connection.");
        asb:Message|asb:Error? messageReceived = receiverConnection->receiveMessage(serverWaitTime);
        asb:Message|asb:Error? jsonMessageReceived = receiverConnection->receiveMessage(serverWaitTime);
        if (messageReceived is asb:Message && jsonMessageReceived is asb:Message) {
            string messageRead = checkpanic messageReceived.getTextContent();
-           log:print("Reading Received Message : " + messageRead);
+           log:printInfo("Reading Received Message : " + messageRead);
            json jsonMessageRead = checkpanic jsonMessageReceived.getJSONContent();
-           log:print("Reading Received Message : " + jsonMessageRead.toString());
+           log:printInfo("Reading Received Message : " + jsonMessageRead.toString());
        }
     }
 ```
@@ -176,7 +176,7 @@ You can now receive a message from the configured azure service bus entity.
 You can now close the sender connection.
 ```ballerina
     if (senderConnection is asb:SenderConnection) {
-       log:print("Closing Asb sender connection.");
+       log:printInfo("Closing Asb sender connection.");
        checkpanic senderConnection.closeSenderConnection();
     }
 ```
@@ -185,7 +185,7 @@ You can now close the sender connection.
 You can now close the receiver connection.
 ```ballerina
     if (receiverConnection is asb:ReceiverConnection) {
-       log:print("Closing Asb receiver connection.");
+       log:printInfo("Closing Asb receiver connection.");
        checkpanic receiverConnection.closeReceiverConnection();
     }
 ```
@@ -234,7 +234,7 @@ You can now send a message to the configured azure service bus entity with messa
 properties. Here we have shown how to send a text message and a json message parsed to the byte array format.
 ```ballerina
     if (senderConnection is asb:SenderConnection) {
-       log:print("Sending via Asb sender connection.");
+       log:printInfo("Sending via Asb sender connection.");
        Checkpanic senderConnection->sendMessageWithConfigurableParameters(byteContent, parameters1, properties);
        checkpanic senderConnection->sendMessageWithConfigurableParameters(byteContentFromJson, parameters2, properties);
     } else {
@@ -258,7 +258,7 @@ the service logic to execute when a message is received inside the onMessage rem
         remote function onMessage(asb:Message message) {
             var messageContent = message.getTextContent();
             if (messageContent is string) {
-                log:print("The message received: " + messageContent);
+                log:printInfo("The message received: " + messageContent);
             } else {
                 log:printError("Error occurred while retrieving the message content.");
             }
@@ -278,9 +278,9 @@ the connection with the Azure Service Bus.
     if (channelListener is asb:Listener) {
         checkpanic channelListener.attach(asyncTestService);
         checkpanic channelListener.'start();
-        log:print("start listening");
+        log:printInfo("start listening");
         runtime:sleep(20);
-        log:print("end listening");
+        log:printInfo("end listening");
         checkpanic channelListener.detach(asyncTestService);
         checkpanic channelListener.gracefulStop();
         checkpanic channelListener.immediateStop();
@@ -291,7 +291,7 @@ the connection with the Azure Service Bus.
 You can now close the sender connection.
 ```ballerina
     if (senderConnection is asb:SenderConnection) {
-       log:print("Closing Asb sender connection.");
+       log:printInfo("Closing Asb sender connection.");
        checkpanic senderConnection.closeSenderConnection();
     }
 ```
@@ -330,14 +330,14 @@ public function main() {
         entityPath: <QUEUE_PATH>
     };
 
-    log:print("Creating Asb sender connection.");
+    log:printInfo("Creating Asb sender connection.");
     asb:SenderConnection? senderConnection = checkpanic new (config);
 
-    log:print("Creating Asb receiver connection.");
+    log:printInfo("Creating Asb receiver connection.");
     asb:ReceiverConnection? receiverConnection = checkpanic new (config);
 
     if (senderConnection is asb:SenderConnection) {
-        log:print("Sending via Asb sender connection.");
+        log:printInfo("Sending via Asb sender connection.");
         checkpanic senderConnection->sendMessageWithConfigurableParameters(byteContent, parameters1, properties);
         checkpanic senderConnection->sendMessageWithConfigurableParameters(byteContentFromJson, parameters2, properties);
     } else {
@@ -345,24 +345,24 @@ public function main() {
     }
 
     if (receiverConnection is asb:ReceiverConnection) {
-        log:print("Receiving from Asb receiver connection.");
+        log:printInfo("Receiving from Asb receiver connection.");
         asb:Message|asb:Error? messageReceived = receiverConnection->receiveMessage(serverWaitTime);
         asb:Message|asb:Error? jsonMessageReceived = receiverConnection->receiveMessage(serverWaitTime);
         if (messageReceived is asb:Message && jsonMessageReceived is asb:Message) {
             string messageRead = checkpanic messageReceived.getTextContent();
-            log:print("Reading Received Message : " + messageRead);
+            log:printInfo("Reading Received Message : " + messageRead);
             json jsonMessageRead = checkpanic jsonMessageReceived.getJSONContent();
-            log:print("Reading Received Message : " + jsonMessageRead.toString());
+            log:printInfo("Reading Received Message : " + jsonMessageRead.toString());
         } 
     }
 
     if (senderConnection is asb:SenderConnection) {
-        log:print("Closing Asb sender connection.");
+        log:printInfo("Closing Asb sender connection.");
         checkpanic senderConnection.closeSenderConnection();
     }
 
     if (receiverConnection is asb:ReceiverConnection) {
-        log:print("Closing Asb receiver connection.");
+        log:printInfo("Closing Asb receiver connection.");
         checkpanic receiverConnection.closeReceiverConnection();
     }
 }    
@@ -401,14 +401,14 @@ public function main() {
         entityPath: <QUEUE_PATH>
     };
 
-    log:print("Creating Asb sender connection.");
+    log:printInfo("Creating Asb sender connection.");
     asb:SenderConnection? senderConnection = checkpanic new (config);
 
-    log:print("Creating Asb receiver connection.");
+    log:printInfo("Creating Asb receiver connection.");
     asb:ReceiverConnection? receiverConnection = checkpanic new (config);
 
     if (senderConnection is asb:SenderConnection) {
-        log:print("Sending via Asb sender connection.");
+        log:printInfo("Sending via Asb sender connection.");
         checkpanic senderConnection->sendMessageWithConfigurableParameters(byteContent, parameters1, properties);
         checkpanic senderConnection->sendMessageWithConfigurableParameters(byteContentFromJson, parameters2, properties);
     } else {
@@ -416,16 +416,16 @@ public function main() {
     }
 
     if (receiverConnection is asb:ReceiverConnection) {
-        log:print("Receiving from Asb receiver connection.");
+        log:printInfo("Receiving from Asb receiver connection.");
         var messageReceived = receiverConnection->receiveMessages(serverWaitTime, maxMessageCount);
         if(messageReceived is asb:Messages) {
             int val = messageReceived.getMessageCount();
-            log:print("No. of messages received : " + val.toString());
+            log:printInfo("No. of messages received : " + val.toString());
             asb:Message[] messages = messageReceived.getMessages();
             string messageReceived1 =  checkpanic messages[0].getTextContent();
-            log:print("Message1 content : " +messageReceived1);
+            log:printInfo("Message1 content : " +messageReceived1);
             json messageReceived2 =  checkpanic messages[1].getJSONContent();
-            log:print("Message2 content : " +messageReceived2.toString());
+            log:printInfo("Message2 content : " +messageReceived2.toString());
         } else {
             log:printError(messageReceived.message());
         }
@@ -434,12 +434,12 @@ public function main() {
     }
 
     if (senderConnection is asb:SenderConnection) {
-        log:print("Closing Asb sender connection.");
+        log:printInfo("Closing Asb sender connection.");
         checkpanic senderConnection.closeSenderConnection();
     }
 
     if (receiverConnection is asb:ReceiverConnection) {
-        log:print("Closing Asb receiver connection.");
+        log:printInfo("Closing Asb receiver connection.");
         checkpanic receiverConnection.closeReceiverConnection();
     }
 }  
@@ -473,32 +473,32 @@ public function main() {
         entityPath: <QUEUE_PATH>
     };
 
-    log:print("Creating Asb sender connection.");
+    log:printInfo("Creating Asb sender connection.");
     asb:SenderConnection? senderConnection = checkpanic new (config);
 
-    log:print("Creating Asb receiver connection.");
+    log:printInfo("Creating Asb receiver connection.");
     asb:ReceiverConnection? receiverConnection = checkpanic new (config);
 
     if (senderConnection is asb:SenderConnection) {
-        log:print("Sending via Asb sender connection.");
+        log:printInfo("Sending via Asb sender connection.");
         checkpanic senderConnection->sendBatchMessage(stringArrayContent, parameters, properties, maxMessageCount);
     } else {
         log:printError("Asb sender connection creation failed.");
     }
 
     if (receiverConnection is asb:ReceiverConnection) {
-        log:print("Receiving from Asb receiver connection.");
+        log:printInfo("Receiving from Asb receiver connection.");
         var messageReceived = receiverConnection->receiveBatchMessage(maxMessageCount);
         if(messageReceived is asb:Messages) {
             int val = messageReceived.getMessageCount();
-            log:print("No. of messages received : " + val.toString());
+            log:printInfo("No. of messages received : " + val.toString());
             asb:Message[] messages = messageReceived.getMessages();
             string messageReceived1 =  checkpanic messages[0].getTextContent();
-            log:print("Message1 content : " + messageReceived1);
+            log:printInfo("Message1 content : " + messageReceived1);
             string messageReceived2 =  checkpanic messages[1].getTextContent();
-            log:print("Message2 content : " + messageReceived2);
+            log:printInfo("Message2 content : " + messageReceived2);
             string messageReceived3 =  checkpanic messages[2].getTextContent();
-            log:print("Message3 content : " + messageReceived3);
+            log:printInfo("Message3 content : " + messageReceived3);
         } else {
             log:printError("Receiving message via Asb receiver connection failed.");
         }
@@ -507,12 +507,12 @@ public function main() {
     }
 
     if (senderConnection is asb:SenderConnection) {
-        log:print("Closing Asb sender connection.");
+        log:printInfo("Closing Asb sender connection.");
         checkpanic senderConnection.closeSenderConnection();
     }
 
     if (receiverConnection is asb:ReceiverConnection) {
-        log:print("Closing Asb receiver connection.");
+        log:printInfo("Closing Asb receiver connection.");
         checkpanic receiverConnection.closeReceiverConnection();
     }
 }    
@@ -565,16 +565,16 @@ public function main() {
         entityPath: <SUBSCRIPTION_PATH3>
     };
 
-    log:print("Creating Asb sender connection.");
+    log:printInfo("Creating Asb sender connection.");
     asb:SenderConnection? senderConnection = checkpanic new (senderConfig);
 
-    log:print("Creating Asb receiver connection.");
+    log:printInfo("Creating Asb receiver connection.");
     asb:ReceiverConnection? receiverConnection1 = checkpanic new (receiverConfig1);
     asb:ReceiverConnection? receiverConnection2 = checkpanic new (receiverConfig2);
     asb:ReceiverConnection? receiverConnection3 = checkpanic new (receiverConfig3);
 
     if (senderConnection is asb:SenderConnection) {
-        log:print("Sending via Asb sender connection.");
+        log:printInfo("Sending via Asb sender connection.");
         checkpanic senderConnection->sendMessageWithConfigurableParameters(byteContent, parameters1, properties);
         checkpanic senderConnection->sendMessageWithConfigurableParameters(byteContentFromJson, parameters2, properties);
     } else {
@@ -582,14 +582,14 @@ public function main() {
     }
 
     if (receiverConnection1 is asb:ReceiverConnection) {
-        log:print("Receiving from Asb receiver connection 1.");
+        log:printInfo("Receiving from Asb receiver connection 1.");
         asb:Message|asb:Error? messageReceived = receiverConnection1->receiveMessage(serverWaitTime);
         asb:Message|asb:Error? jsonMessageReceived = receiverConnection1->receiveMessage(serverWaitTime);
         if (messageReceived is asb:Message && jsonMessageReceived is asb:Message) {
             string messageRead = checkpanic messageReceived.getTextContent();
-            log:print("Reading Received Message : " + messageRead);
+            log:printInfo("Reading Received Message : " + messageRead);
             json jsonMessageRead = checkpanic jsonMessageReceived.getJSONContent();
-            log:print("Reading Received Message : " + jsonMessageRead.toString());
+            log:printInfo("Reading Received Message : " + jsonMessageRead.toString());
         } else {
             log:printError("Receiving message via Asb receiver connection failed.");
         }
@@ -599,14 +599,14 @@ public function main() {
 
 
     if (receiverConnection2 is asb:ReceiverConnection) {
-        log:print("Receiving from Asb receiver connection 2.");
+        log:printInfo("Receiving from Asb receiver connection 2.");
         asb:Message|asb:Error? messageReceived = receiverConnection2->receiveMessage(serverWaitTime);
         asb:Message|asb:Error? jsonMessageReceived = receiverConnection2->receiveMessage(serverWaitTime);
         if (messageReceived is asb:Message && jsonMessageReceived is asb:Message) {
             string messageRead = checkpanic messageReceived.getTextContent();
-            log:print("Reading Received Message : " + messageRead);
+            log:printInfo("Reading Received Message : " + messageRead);
             json jsonMessageRead = checkpanic jsonMessageReceived.getJSONContent();
-            log:print("Reading Received Message : " + jsonMessageRead.toString());
+            log:printInfo("Reading Received Message : " + jsonMessageRead.toString());
         } else {
             log:printError("Receiving message via Asb receiver connection failed.");
         }
@@ -615,14 +615,14 @@ public function main() {
     }
 
     if (receiverConnection3 is asb:ReceiverConnection) {
-        log:print("Receiving from Asb receiver connection 3.");
+        log:printInfo("Receiving from Asb receiver connection 3.");
         asb:Message|asb:Error? messageReceived = receiverConnection3->receiveMessage(serverWaitTime);
         asb:Message|asb:Error? jsonMessageReceived = receiverConnection3->receiveMessage(serverWaitTime);
         if (messageReceived is asb:Message && jsonMessageReceived is asb:Message) {
             string messageRead = checkpanic messageReceived.getTextContent();
-            log:print("Reading Received Message : " + messageRead);
+            log:printInfo("Reading Received Message : " + messageRead);
             json jsonMessageRead = checkpanic jsonMessageReceived.getJSONContent();
-            log:print("Reading Received Message : " + jsonMessageRead.toString());
+            log:printInfo("Reading Received Message : " + jsonMessageRead.toString());
         } else {
             log:printError("Receiving message via Asb receiver connection failed.");
         }
@@ -631,22 +631,22 @@ public function main() {
     }
 
     if (senderConnection is asb:SenderConnection) {
-        log:print("Closing Asb sender connection.");
+        log:printInfo("Closing Asb sender connection.");
         checkpanic senderConnection.closeSenderConnection();
     }
 
     if (receiverConnection1 is asb:ReceiverConnection) {
-        log:print("Closing Asb receiver connection 1.");
+        log:printInfo("Closing Asb receiver connection 1.");
         checkpanic receiverConnection1.closeReceiverConnection();
     }
 
     if (receiverConnection2 is asb:ReceiverConnection) {
-        log:print("Closing Asb receiver connection 2.");
+        log:printInfo("Closing Asb receiver connection 2.");
         checkpanic receiverConnection2.closeReceiverConnection();
     }
 
     if (receiverConnection3 is asb:ReceiverConnection) {
-        log:print("Closing Asb receiver connection 3.");
+        log:printInfo("Closing Asb receiver connection 3.");
         checkpanic receiverConnection3.closeReceiverConnection();
     }
 }    
