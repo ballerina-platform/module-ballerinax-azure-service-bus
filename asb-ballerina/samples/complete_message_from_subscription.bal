@@ -52,68 +52,68 @@ public function main() {
         entityPath: subscriptionPath3
     };
 
-    log:print("Creating Asb sender connection.");
+    log:printInfo("Creating Asb sender connection.");
     asb:SenderConnection? senderConnection = checkpanic new (senderConfig);
 
-    log:print("Creating Asb receiver connection.");
+    log:printInfo("Creating Asb receiver connection.");
     asb:ReceiverConnection? receiverConnection1 = checkpanic new (receiverConfig1);
     asb:ReceiverConnection? receiverConnection2 = checkpanic new (receiverConfig2);
     asb:ReceiverConnection? receiverConnection3 = checkpanic new (receiverConfig3);
 
     if (senderConnection is asb:SenderConnection) {
-        log:print("Sending via Asb sender connection.");
+        log:printInfo("Sending via Asb sender connection.");
         checkpanic senderConnection->sendBatchMessage(stringArrayContent, parameters, properties, maxMessageCount);
     } else {
         log:printError("Asb sender connection creation failed.");
     }
 
     if (receiverConnection1 is asb:ReceiverConnection) {
-        log:print("Completing message from Asb receiver connection 1.");
+        log:printInfo("Completing message from Asb receiver connection 1.");
         checkpanic receiverConnection1->completeOneMessage();
         checkpanic receiverConnection1->completeOneMessage();
         checkpanic receiverConnection1->completeOneMessage();
-        log:print("Done completing a message using its lock token.");
+        log:printInfo("Done completing a message using its lock token.");
     } else {
         log:printError("Asb receiver connection creation failed.");
     }
 
     if (receiverConnection2 is asb:ReceiverConnection) {
-        log:print("Completing message from Asb receiver connection 2.");
+        log:printInfo("Completing message from Asb receiver connection 2.");
         checkpanic receiverConnection2->completeOneMessage();
         checkpanic receiverConnection2->completeOneMessage();
         checkpanic receiverConnection2->completeOneMessage();
-        log:print("Done completing a message using its lock token.");
+        log:printInfo("Done completing a message using its lock token.");
     } else {
         log:printError("Asb receiver connection creation failed.");
     }
 
     if (receiverConnection3 is asb:ReceiverConnection) {
-        log:print("Completing message from Asb receiver connection 3.");
+        log:printInfo("Completing message from Asb receiver connection 3.");
         checkpanic receiverConnection3->completeOneMessage();
         checkpanic receiverConnection3->completeOneMessage();
         checkpanic receiverConnection3->completeOneMessage();
-        log:print("Done completing a message using its lock token.");
+        log:printInfo("Done completing a message using its lock token.");
     } else {
         log:printError("Asb receiver connection creation failed.");
     }
 
     if (senderConnection is asb:SenderConnection) {
-        log:print("Closing Asb sender connection.");
+        log:printInfo("Closing Asb sender connection.");
         checkpanic senderConnection.closeSenderConnection();
     }
 
     if (receiverConnection1 is asb:ReceiverConnection) {
-        log:print("Closing Asb receiver connection 1.");
+        log:printInfo("Closing Asb receiver connection 1.");
         checkpanic receiverConnection1.closeReceiverConnection();
     }
 
     if (receiverConnection2 is asb:ReceiverConnection) {
-        log:print("Closing Asb receiver connection 2.");
+        log:printInfo("Closing Asb receiver connection 2.");
         checkpanic receiverConnection2.closeReceiverConnection();
     }
 
     if (receiverConnection3 is asb:ReceiverConnection) {
-        log:print("Closing Asb receiver connection 3.");
+        log:printInfo("Closing Asb receiver connection 3.");
         checkpanic receiverConnection3.closeReceiverConnection();
     }
 }    

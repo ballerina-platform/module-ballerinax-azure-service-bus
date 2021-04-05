@@ -39,11 +39,11 @@ public function main() {
         entityPath: queuePath
     };
 
-    log:print("Creating Asb sender connection.");
+    log:printInfo("Creating Asb sender connection.");
     asb:SenderConnection? senderConnection = checkpanic new (config);
 
     if (senderConnection is asb:SenderConnection) {
-        log:print("Sending via Asb sender connection.");
+        log:printInfo("Sending via Asb sender connection.");
         checkpanic senderConnection->sendMessageWithConfigurableParameters(byteContent, parameters1, properties);
         checkpanic senderConnection->sendMessageWithConfigurableParameters(byteContentFromJson, parameters2, properties);
     } else {
@@ -61,7 +61,7 @@ public function main() {
         remote function onMessage(asb:Message message) {
             var messageContent = message.getTextContent();
             if (messageContent is string) {
-                log:print("The message received: " + messageContent);
+                log:printInfo("The message received: " + messageContent);
             } else {
                 log:printError("Error occurred while retrieving the message content.");
             }
@@ -72,16 +72,16 @@ public function main() {
     if (channelListener is asb:Listener) {
         checkpanic channelListener.attach(asyncTestService);
         checkpanic channelListener.'start();
-        log:print("start listening");
+        log:printInfo("start listening");
         runtime:sleep(20);
-        log:print("end listening");
+        log:printInfo("end listening");
         checkpanic channelListener.detach(asyncTestService);
         checkpanic channelListener.gracefulStop();
         checkpanic channelListener.immediateStop();
     }
 
     if (senderConnection is asb:SenderConnection) {
-        log:print("Closing Asb sender connection.");
+        log:printInfo("Closing Asb sender connection.");
         checkpanic senderConnection.closeSenderConnection();
     }
 }    

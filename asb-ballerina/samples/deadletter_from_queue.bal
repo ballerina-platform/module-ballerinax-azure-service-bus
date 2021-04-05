@@ -38,14 +38,14 @@ public function main() {
         entityPath: queuePath
     };
 
-    log:print("Creating Asb sender connection.");
+    log:printInfo("Creating Asb sender connection.");
     asb:SenderConnection? senderConnection = checkpanic new (config);
 
-    log:print("Creating Asb receiver connection.");
+    log:printInfo("Creating Asb receiver connection.");
     asb:ReceiverConnection? receiverConnection = checkpanic new (config);
 
     if (senderConnection is asb:SenderConnection) {
-        log:print("Sending via Asb sender connection.");
+        log:printInfo("Sending via Asb sender connection.");
         checkpanic senderConnection->sendMessageWithConfigurableParameters(byteContent, parameters1, properties);
         checkpanic senderConnection->sendMessageWithConfigurableParameters(byteContentFromJson, parameters2, properties);
     } else {
@@ -53,23 +53,23 @@ public function main() {
     }
 
     if (receiverConnection is asb:ReceiverConnection) {
-        log:print("Dead-Letter message from Asb receiver connection.");
+        log:printInfo("Dead-Letter message from Asb receiver connection.");
         checkpanic receiverConnection->deadLetterMessage("deadLetterReason", "deadLetterErrorDescription");
-        log:print("Done Dead-Letter a message using its lock token.");
-        log:print("Completing messages from Asb receiver connection.");
+        log:printInfo("Done Dead-Letter a message using its lock token.");
+        log:printInfo("Completing messages from Asb receiver connection.");
         checkpanic receiverConnection->completeMessages();
-        log:print("Done completing messages using their lock tokens.");
+        log:printInfo("Done completing messages using their lock tokens.");
     } else {
         log:printError("Asb receiver connection creation failed.");
     }
 
     if (senderConnection is asb:SenderConnection) {
-        log:print("Closing Asb sender connection.");
+        log:printInfo("Closing Asb sender connection.");
         checkpanic senderConnection.closeSenderConnection();
     }
 
     if (receiverConnection is asb:ReceiverConnection) {
-        log:print("Closing Asb receiver connection.");
+        log:printInfo("Closing Asb receiver connection.");
         checkpanic receiverConnection.closeReceiverConnection();
     }
 }    
