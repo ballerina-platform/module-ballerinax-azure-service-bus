@@ -20,21 +20,21 @@ import ballerina/os;
 import ballerina/lang.runtime;
 import ballerina/time;
 
-// // Connection Configurations for Local Test
-// configurable string connectionString = ?;
-// configurable string queuePath = ?;
-// configurable string topicPath = ?;
-// configurable string subscriptionPath1 = ?;
-// configurable string subscriptionPath2 = ?;
-// configurable string subscriptionPath3 = ?;
+// Connection Configurations for Local Test
+configurable string connectionString = os:getEnv("CONNECTION_STRING");
+configurable string queuePath = os:getEnv("QUEUE_PATH");
+configurable string topicPath = os:getEnv("TOPIC_PATH");
+configurable string subscriptionPath1 = os:getEnv("SUBSCRIPTION_PATH1");
+configurable string subscriptionPath2 = os:getEnv("SUBSCRIPTION_PATH2");
+configurable string subscriptionPath3 = os:getEnv("SUBSCRIPTION_PATH3");
 
-// Connection Configurations for Github Workflow
-string connectionString = os:getEnv("CONNECTION_STRING");
-string queuePath = os:getEnv("QUEUE_PATH");
-string topicPath = os:getEnv("TOPIC_PATH");
-string subscriptionPath1 = os:getEnv("SUBSCRIPTION_PATH1");
-string subscriptionPath2 = os:getEnv("SUBSCRIPTION_PATH2");
-string subscriptionPath3 = os:getEnv("SUBSCRIPTION_PATH3");
+// // Connection Configurations for Github Workflow
+// string connectionString = connectionString;
+// string queuePath = queuePath;
+// string topicPath = topicPath;
+// string subscriptionPath1 = subscriptionPath1;
+// string subscriptionPath2 = subscriptionPath2;
+// string subscriptionPath3 = subscriptionPath3;
 
 SenderConnection? senderConnection = ();
 ReceiverConnection? receiverConnection = ();
