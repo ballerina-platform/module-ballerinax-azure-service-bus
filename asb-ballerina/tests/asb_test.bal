@@ -1465,8 +1465,6 @@ function testListenerWithVariableLoadUsingWorkers() {
 }
 function testSendAndReceiveMessageFromQueueOperation() {
     ConnectionConfiguration config = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("QUEUE_PATH")
         connectionString: connectionString,
         entityPath: queuePath
     };
@@ -1519,8 +1517,6 @@ function testSendAndReceiveMessageFromQueueOperation() {
 }
 function testSendAndReceiveMessagesFromQueueOperation() {
     ConnectionConfiguration config = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("QUEUE_PATH")
         connectionString: connectionString,
         entityPath: queuePath
     };
@@ -1575,8 +1571,6 @@ function testSendAndReceiveMessagesFromQueueOperation() {
 }
 function testSendAndReceiveBatchFromQueueOperation() {
     ConnectionConfiguration config = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("QUEUE_PATH")
         connectionString: connectionString,
         entityPath: queuePath
     };
@@ -1632,8 +1626,6 @@ function testSendAndReceiveBatchFromQueueOperation() {
 }
 function testCompleteAllMessagesFromQueueOperation() {
     ConnectionConfiguration config = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("QUEUE_PATH")
         connectionString: connectionString,
         entityPath: queuePath
     };
@@ -1681,8 +1673,6 @@ function testCompleteAllMessagesFromQueueOperation() {
 }
 function testCompleteMessageFromQueueOperation() {
     ConnectionConfiguration config = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("QUEUE_PATH")
         connectionString: connectionString,
         entityPath: queuePath
     };
@@ -1729,8 +1719,6 @@ function testCompleteMessageFromQueueOperation() {
 }
 function testAbandonMessagesFromQueueOperation() {
     ConnectionConfiguration config = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("QUEUE_PATH")
         connectionString: connectionString,
         entityPath: queuePath
     };
@@ -1778,29 +1766,21 @@ function testAbandonMessagesFromQueueOperation() {
 }
 function testSendToTopicAndReceiveFromSubscriptionOperation() {
     ConnectionConfiguration senderConfig = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("TOPIC_PATH")
         connectionString: connectionString,
         entityPath: topicPath
     };
 
     ConnectionConfiguration receiverConfig1 = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("SUBSCRIPTION_PATH1")
         connectionString: connectionString,
         entityPath: subscriptionPath1
     };
 
     ConnectionConfiguration receiverConfig2 = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("SUBSCRIPTION_PATH2")
         connectionString: connectionString,
         entityPath: subscriptionPath2
     };
 
     ConnectionConfiguration receiverConfig3 = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("SUBSCRIPTION_PATH3")
         connectionString: connectionString,
         entityPath: subscriptionPath3
     };
@@ -1898,29 +1878,21 @@ function testSendToTopicAndReceiveFromSubscriptionOperation() {
 }
 function testSendBatchToTopicAndReceiveFromSubscriptionOperation() {
     ConnectionConfiguration senderConfig = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("TOPIC_PATH")
         connectionString: connectionString,
         entityPath: topicPath
     };
 
     ConnectionConfiguration receiverConfig1 = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("SUBSCRIPTION_PATH1")
         connectionString: connectionString,
         entityPath: subscriptionPath1
     };
 
     ConnectionConfiguration receiverConfig2 = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("SUBSCRIPTION_PATH2")
         connectionString: connectionString,
         entityPath: subscriptionPath2
     };
 
     ConnectionConfiguration receiverConfig3 = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("SUBSCRIPTION_PATH3")
         connectionString: connectionString,
         entityPath: subscriptionPath3
     };
@@ -2028,29 +2000,21 @@ function testSendBatchToTopicAndReceiveFromSubscriptionOperation() {
 }
 function testCompleteAllMessagesFromSubscriptionOperation() {
     ConnectionConfiguration senderConfig = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("TOPIC_PATH")
         connectionString: connectionString,
         entityPath: topicPath
     };
 
     ConnectionConfiguration receiverConfig1 = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("SUBSCRIPTION_PATH1")
         connectionString: connectionString,
         entityPath: subscriptionPath1
     };
 
     ConnectionConfiguration receiverConfig2 = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("SUBSCRIPTION_PATH2")
         connectionString: connectionString,
         entityPath: subscriptionPath2
     };
 
     ConnectionConfiguration receiverConfig3 = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("SUBSCRIPTION_PATH3")
         connectionString: connectionString,
         entityPath: subscriptionPath3
     };
@@ -2131,29 +2095,21 @@ function testCompleteAllMessagesFromSubscriptionOperation() {
 }
 function testCompleteMessageFromSubscriptionOperation() {
     ConnectionConfiguration senderConfig = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("TOPIC_PATH")
         connectionString: connectionString,
         entityPath: topicPath
     };
 
     ConnectionConfiguration receiverConfig1 = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("SUBSCRIPTION_PATH1")
         connectionString: connectionString,
         entityPath: subscriptionPath1
     };
 
     ConnectionConfiguration receiverConfig2 = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("SUBSCRIPTION_PATH2")
         connectionString: connectionString,
         entityPath: subscriptionPath2
     };
 
     ConnectionConfiguration receiverConfig3 = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("SUBSCRIPTION_PATH3")
         connectionString: connectionString,
         entityPath: subscriptionPath3
     };
@@ -2231,29 +2187,21 @@ function testCompleteMessageFromSubscriptionOperation() {
 }
 function testAbandonMessagesFromSubscriptionOperation() {
    ConnectionConfiguration senderConfig = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("TOPIC_PATH")
         connectionString: connectionString,
         entityPath: topicPath
     };
 
     ConnectionConfiguration receiverConfig1 = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("SUBSCRIPTION_PATH1")
         connectionString: connectionString,
         entityPath: subscriptionPath1
     };
 
     ConnectionConfiguration receiverConfig2 = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("SUBSCRIPTION_PATH2")
         connectionString: connectionString,
         entityPath: subscriptionPath2
     };
 
     ConnectionConfiguration receiverConfig3 = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("SUBSCRIPTION_PATH3")
         connectionString: connectionString,
         entityPath: subscriptionPath3
     };
@@ -2334,8 +2282,6 @@ function testAbandonMessagesFromSubscriptionOperation() {
 }
 function testAsyncConsumerOperation() {
     ConnectionConfiguration config = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("QUEUE_PATH")
         connectionString: connectionString,
         entityPath: queuePath
     };
@@ -2378,8 +2324,6 @@ function testAsyncConsumerOperation() {
 }
 function testDeadletterFromQueueOperation() {
     ConnectionConfiguration config = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("QUEUE_PATH")
         connectionString: connectionString,
         entityPath: queuePath
     };
@@ -2427,8 +2371,6 @@ function testDeadletterFromQueueOperation() {
 }
 function testDefer_FromQueueOperation() {
     ConnectionConfiguration config = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("QUEUE_PATH")
         connectionString: connectionString,
         entityPath: queuePath
     };
@@ -2498,8 +2440,6 @@ function testDefer_FromQueueOperation() {
 }
 function testRenewLockOnMessage_FromQueueOperation() {
     ConnectionConfiguration config = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("QUEUE_PATH")
         connectionString: connectionString,
         entityPath: queuePath
     };
@@ -2547,29 +2487,21 @@ function testRenewLockOnMessage_FromQueueOperation() {
 }
 function testDeadletterFromSubscriptionOperation() {
     ConnectionConfiguration senderConfig = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("TOPIC_PATH")
         connectionString: connectionString,
         entityPath: topicPath
     };
 
     ConnectionConfiguration receiverConfig1 = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("SUBSCRIPTION_PATH1")
         connectionString: connectionString,
         entityPath: subscriptionPath1
     };
 
     ConnectionConfiguration receiverConfig2 = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("SUBSCRIPTION_PATH2")
         connectionString: connectionString,
         entityPath: subscriptionPath2
     };
 
     ConnectionConfiguration receiverConfig3 = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("SUBSCRIPTION_PATH3")
         connectionString: connectionString,
         entityPath: subscriptionPath3
     };
@@ -2651,29 +2583,21 @@ function testDeadletterFromSubscriptionOperation() {
 }
 function testDefer_FromSubscriptionOperation() {
     ConnectionConfiguration senderConfig = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("TOPIC_PATH")
         connectionString: connectionString,
         entityPath: topicPath
     };
 
     ConnectionConfiguration receiverConfig1 = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("SUBSCRIPTION_PATH1")
         connectionString: connectionString,
         entityPath: subscriptionPath1
     };
 
     ConnectionConfiguration receiverConfig2 = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("SUBSCRIPTION_PATH2")
         connectionString: connectionString,
         entityPath: subscriptionPath2
     };
 
     ConnectionConfiguration receiverConfig3 = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("SUBSCRIPTION_PATH3")
         connectionString: connectionString,
         entityPath: subscriptionPath3
     };
@@ -2821,29 +2745,21 @@ function testDefer_FromSubscriptionOperation() {
 }
 function testRenewLockOnMessage_FromSubscriptionOperation() {
     ConnectionConfiguration senderConfig = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("TOPIC_PATH")
         connectionString: connectionString,
         entityPath: topicPath
     };
 
     ConnectionConfiguration receiverConfig1 = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("SUBSCRIPTION_PATH1")
         connectionString: connectionString,
         entityPath: subscriptionPath1
     };
 
     ConnectionConfiguration receiverConfig2 = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("SUBSCRIPTION_PATH2")
         connectionString: connectionString,
         entityPath: subscriptionPath2
     };
 
     ConnectionConfiguration receiverConfig3 = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("SUBSCRIPTION_PATH3")
         connectionString: connectionString,
         entityPath: subscriptionPath3
     };
@@ -2925,8 +2841,6 @@ function testRenewLockOnMessage_FromSubscriptionOperation() {
 }
 function testDuplicateMessagesFromQueueOperation() {
     ConnectionConfiguration config = {
-        // connectionString: os:getEnv("CONNECTION_STRING"),
-        // entityPath: os:getEnv("QUEUE_PATH")
         connectionString: connectionString,
         entityPath: queuePath
     };

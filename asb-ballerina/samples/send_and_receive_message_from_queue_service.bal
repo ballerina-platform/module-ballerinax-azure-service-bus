@@ -33,16 +33,14 @@ service /asb on new http:Listener(9090) {
         byte[] byteContentFromJson = jsonContent.toJsonString().toBytes();
         map<string> parameters1 = {contentType: "application/json", messageId: "one"};
         map<string> parameters2 = {contentType: "application/json", messageId: "two", to: "sanju", replyTo: "carol", 
-        label: "a1", sessionId: "b1", correlationId: "c1", timeToLive: "2"};
-        map<string> parameters = {contentType: "application/json", messageId: "one", to: "sanju", replyTo: "carol", 
-        label: "a1", sessionId: "b1", correlationId: "c1", timeToLive: "2"};
+            label: "a1", sessionId: "b1", correlationId: "c1", timeToLive: "2"};
         map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
         int serverWaitTime = 5;
 
         asb:ConnectionConfiguration config = {
-        connectionString: connectionString,
-        entityPath: queuePath
-    };
+            connectionString: connectionString,
+            entityPath: queuePath
+        };
 
         log:printInfo("Creating Asb sender connection.");
         asb:SenderConnection? senderConnection = checkpanic new (config);
