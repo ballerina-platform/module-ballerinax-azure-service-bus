@@ -83,8 +83,8 @@ basic operations. These APIs use Shared Access Signature(SAS) authentication and
 * Java 11 Installed
   Java Development Kit (JDK) with version 11 is required.
 
-* Ballerina SLAlpha4-SNAPSHOT Installed
-  Ballerina Swan Lake Alpha 4 SNAPSHOT is required.
+* Ballerina SLAlpha4 Installed
+  Ballerina Swan Lake Alpha 4 is required.
 
 * Shared Access Signature (SAS) Authentication Credentials
     * Connection String
@@ -129,7 +129,7 @@ to/from the queue/topic/subscription.
 ## Supported Versions
 |                     |    Version                  |
 |:-------------------:|:---------------------------:|
-| Ballerina Language  | Swan-Lake-Alpha4-SNAPSHOT   |
+| Ballerina Language  | Swan-Lake-Alpha4            |
 | Service Bus API     | v1.2.8                      |
 
 # Quickstart(s)
