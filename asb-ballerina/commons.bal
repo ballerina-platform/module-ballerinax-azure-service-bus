@@ -20,13 +20,27 @@ import ballerina/jballerina.java as java;
 
 final handle JAVA_NULL = java:createNull();
 
-const int DEFAULT_TIME_TO_LIVE = 5;
-const int DEFAULT_MAX_MESSAGE_COUNT = 1;
-const int DEFAULT_SERVER_WAIT_TIME = 5;
+// Default values
+public const int DEFAULT_TIME_TO_LIVE = 300; // In seconds
+public const int DEFAULT_MAX_MESSAGE_COUNT = 1;
+public const int DEFAULT_SERVER_WAIT_TIME = 300; // In seconds
+public const string DEFAULT_MESSAGE_LOCK_TOKEN = "00000000-0000-0000-0000-000000000000";
 
-// Sender & Receiver Client API Record Types.
+// Message content types
+public const string TEXT = "text/plain";
+public const string JSON = "application/json";
+public const string XML = "application/xml";
+public const string BYTE_ARRAY = "application/octet-stream";
 
-# Configurations used to create a `asb:Connection`.
+// Message receive modes
+public enum receiveModes {
+    PEEKLOCK,
+    RECEIVEANDDELETE
+}
+
+// Azure Service Bus Client API Record Types.
+
+# Configurations used to create an `asb:Connection`.
 #
 # + connectionString - Service bus connection string with Shared Access Signatures
 #                      ConnectionString format: 
@@ -34,17 +48,8 @@ const int DEFAULT_SERVER_WAIT_TIME = 5;
 #                      SharedAccessKeyName=SHARED_ACCESS_KEY_NAME;SharedAccessKey=SHARED_ACCESS_KEY or  
 #                      Endpoint=sb://namespace_DNS_Name;EntityPath=EVENT_HUB_NAME;
 #                      SharedAccessSignatureToken=SHARED_ACCESS_SIGNATURE_TOKEN
-# + entityPath - Entitypath to the message broker resource
-public type ConnectionConfiguration record {|
+public type AsbConnectionConfiguration record {|
     string connectionString;
-    string entityPath;
-|};
-
-# Optional application specific properties of the message.
-#
-# + properties - Key-value pairs for each brokered property
-public type OptionalProperties record {|
-    map<anydata> properties;
 |};
 
 // Listener API Record Types and Annotations.
@@ -57,17 +62,17 @@ public type OptionalProperties record {|
 #                      SharedAccessKeyName=SHARED_ACCESS_KEY_NAME;SharedAccessKey=SHARED_ACCESS_KEY or  
 #                      Endpoint=sb://namespace_DNS_Name;EntityPath=EVENT_HUB_NAME;
 #                      SharedAccessSignatureToken=SHARED_ACCESS_SIGNATURE_TOKEN
-# + queueName - Entitypath to the message broker resource
-public type QueueConfiguration record {|
+# + entityPath - Entitypath to the message broker resource
+public type EntityConfiguration record {|
     string connectionString;
-    string queueName;
+    string entityPath;
 |};
 
 # Service configurations used to create a `asb:Connection`.
 # 
-# + queueConfig - Configurations used to create a `asb:Connection`
+# + entityConfig - Configurations used to create a `asb:Connection`
 public type asbServiceConfig record {|
-    QueueConfiguration queueConfig;
+    EntityConfiguration entityConfig;
 |};
 
 # The annotation, which is used to configure the subscription.

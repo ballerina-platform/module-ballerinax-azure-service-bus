@@ -26,12 +26,15 @@ import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.AnnotatableType;
 import io.ballerina.runtime.api.types.MethodType;
 import io.ballerina.runtime.api.types.Type;
+import io.ballerina.runtime.api.utils.JsonUtils;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
 
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -39,6 +42,7 @@ import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
 import static org.ballerinalang.asb.ASBConstants.*;
+import static org.ballerinalang.asb.connection.ConnectionUtils.toBMap;
 import static org.ballerinalang.asb.connection.ListenerUtils.isServiceAttached;
 
 /**
@@ -143,7 +147,7 @@ public class MessageDispatcher {
                     log.info("Receive from entity returned no messages.");
                     pumpMessage(receiver, executorService);
                 } else {
-                    handleDispatch(message.getBody());
+                    handleDispatch(message);
                     try {
                         receiver.complete(message.getLockToken());
                     } catch (Exception e) {
@@ -162,7 +166,7 @@ public class MessageDispatcher {
      *
      * @param message Received azure service bus message instance.
      */
-    private void handleDispatch(byte[] message) {
+    private void handleDispatch(IMessage message) {
         MethodType[] attachedFunctions = service.getType().getMethods();
         MethodType onMessageFunction;
         if (FUNC_ON_MESSAGE.equals(attachedFunctions[0].getName())) {
@@ -180,10 +184,10 @@ public class MessageDispatcher {
      *
      * @param message Received azure service bus message instance.
      */
-    private void dispatchMessage(byte[] message) {
+    private void dispatchMessage(IMessage message) {
         try {
             Callback callback = new ASBResourceCallback();
-            BObject messageBObject = getMessageBObject(message);
+            BMap<BString, Object> messageBObject = getMessageRecord(message);
             executeResourceOnMessage(callback, messageBObject, true);
         } catch (BError exception) {
             ASBUtils.returnErrorValue("Error occur while dispatching the message to the service " +
@@ -197,28 +201,45 @@ public class MessageDispatcher {
      *
      * @param message Received azure service bus message instance.
      */
-    private void handleError(byte[] message) {
+    private void handleError(IMessage message) {
         BError error = ASBUtils.returnErrorValue(ASBConstants.DISPATCH_ERROR);
-        BObject messageBObject = getMessageBObject(message);
+        BMap<BString, Object> messageBObject = getMessageRecord(message);
         try {
             Callback callback = new ASBResourceCallback();
             executeResourceOnError(callback, messageBObject, true, error, true);
         } catch (BError exception) {
-            throw ASBUtils.returnErrorValue("Error occurred in RabbitMQ service. ");
+            throw ASBUtils.returnErrorValue("Error occurred in ASB service. ");
         }
     }
 
     /**
-     * Get the ballerina Message object from the azure service bus message object.
+     * Get the ballerina Message record from the azure service bus message object.
      *
      * @param message Received azure service bus message instance.
      */
-    private BObject getMessageBObject(byte[] message)  {
-        BObject messageBObject = ValueCreator.createObjectValue(ASBConstants.PACKAGE_ID_ASB,
-                ASBConstants.MESSAGE_OBJECT);
-        messageBObject.set(ASBConstants.MESSAGE_CONTENT, ValueCreator.createArrayValue(message));
-
-        return messageBObject;
+    private BMap<BString, Object> getMessageRecord(IMessage message)  {
+        Object[] values = new Object[14];
+        values[0] = ValueCreator.createArrayValue(message.getBody());
+        values[1] = StringUtils.fromString(message.getContentType());
+        values[2] = StringUtils.fromString(message.getMessageId());
+        values[3] = StringUtils.fromString(message.getTo());
+        values[4] = StringUtils.fromString(message.getReplyTo());
+        values[5] = StringUtils.fromString(message.getReplyToSessionId());
+        values[6] = StringUtils.fromString(message.getLabel());
+        values[7] = StringUtils.fromString(message.getSessionId());
+        values[8] = StringUtils.fromString(message.getCorrelationId());
+        values[9] = StringUtils.fromString(message.getPartitionKey());
+        values[10] = message.getTimeToLive().getSeconds();
+        values[11] = message.getSequenceNumber();
+        values[12] = StringUtils.fromString(message.getLockToken().toString());
+        BMap<BString, Object> applicationProperties =
+                ValueCreator.createRecordValue(PACKAGE_ID_ASB, APPLICATION_PROPERTIES);
+        Object[] propValues = new Object[1];
+        propValues[0] = toBMap(message.getProperties());
+        values[13] = ValueCreator.createRecordValue(applicationProperties, propValues);
+        BMap<BString, Object> messageRecord =
+                ValueCreator.createRecordValue(PACKAGE_ID_ASB, MESSAGE_RECORD);
+        return ValueCreator.createRecordValue(messageRecord, values);
     }
 
     private void executeResourceOnMessage(Callback callback, Object... args) {

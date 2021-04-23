@@ -14,22 +14,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
-# Provides the functionality to handle the messages received by the consumer services.
-public class Messages {
-    private int messageCount = -1;
-    private Message[] messages = [];
-
-    # Retrieves the Array of Asb message objects.
-    # 
-    # + return - Array of Message objects
-    public isolated function getMessages() returns Message[] {
-        return self.messages;
-    }
-
-    # Retrieves the count of Message objects.
-    # 
-    # + return - Count of Message objects
-    public isolated function getMessageCount() returns int {
-        return self.messageCount;
-    }
-}
+# Azure service bus message batch representation.
+#
+# + messageCount - Number of messages in a batch  
+# + messages - Array of Azure service bus message representation
+public type MessageBatch record {|
+    int messageCount = -1;
+    Message[] messages = [];
+|};
