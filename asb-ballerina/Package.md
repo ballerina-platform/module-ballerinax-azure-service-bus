@@ -14,7 +14,7 @@ basic operations. These APIs use SAS authentication and this module supports SAS
 |                     |    Version                  |
 |:-------------------:|:---------------------------:|
 | Ballerina Language  | Swan-Lake-Alpha4            |
-| Service Bus API     | v1.2.8                      |
+| Service Bus API     | v3.5.1                      |
 
 # Supported Operations
 
@@ -110,85 +110,89 @@ First, import the ballerinax/asb module into the Ballerina project.
 ```
 
 ### Step 2: Initialize the Azure Service Bus Client Configuration
-You can now make the connection configuration using the connection string and entity path.
+You can now make the connection configuration using the connection string.
 ```ballerina
-    asb:ConnectionConfiguration config = {
-       connectionString: <CONNECTION_STRING>,
-       entityPath: <QUEUE_PATH>
+    asb:AsbConnectionConfiguration config = {
+       connectionString: <CONNECTION_STRING>
     };
 ```
 
-### Step 3: Create a Sender Connection using the connection configuration
-You can now make a sender connection using the connection configuration.
+### Step 3: Create an Azure Service Bus Client using the connection configuration
+You can now make an Azure service bus client using the connection configuration.
 ```ballerina
-    asb:SenderConnection? senderConnection = checkpanic new (config);
+    asb:AsbClient asbClient = new (config);
 ```
 
-### Step 4 : Create a Receiver Connection using the connection configuration
-You can now make a receiver connection using the connection configuration.
+### Step 4: Create a Queue Sender using the Azure service bus client
+You can now make a sender connection using the Azure service bus client. Provide the `queueName` as a parameter.
 ```ballerina
-    asb:ReceiverConnection? receiverConnection = checkpanic new (config);
+    checkpanic asbClient->createQueueSender(queueName);
 ```
 
-### Step 5: Initialize the Input Values
-Initialize the message to be sent with optional parameters and properties.
+### Step 5 : Create a Queue Receiver using the Azure service bus client
+You can now make a receiver connection using the connection configuration. Provide the `queueName` as a parameter. 
+Optionally you can provide the receive mode which is PEEKLOCK by default.
 ```ballerina
-    string stringContent = "This is My Message Body";
+    checkpanic asbClient->createQueueReceiver(queueName, asb:RECEIVEANDDELETE);
+```
+
+### Step 6: Initialize the Input Values
+Initialize the message to be sent with message body, optional parameters and properties.
+```ballerina
+    // Input values
+    string stringContent = "This is My Message Body"; 
     byte[] byteContent = stringContent.toBytes();
-    json jsonContent = {name: "apple", color: "red", price: 5.36};
-    byte[] byteContentFromJson = jsonContent.toJsonString().toBytes();
-    map<string> parameters1 = {contentType: "text/plain", messageId: "one"};
-    map<string> parameters2 = {contentType: "application/json", messageId: "two", to: "user1", replyTo: "user2",
-       label: "a1", sessionId: "b1", correlationId: "c1", timeToLive: "2"};
     map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
+    int timeToLive = 60; // In seconds
+    int serverWaitTime = 60; // In seconds
+
+    asb:ApplicationProperties applicationProperties = {
+        properties: {a: "propertyValue1", b: "propertyValue2"}
+    };
+
+    asb:Message message1 = {
+        body: byteContent,
+        contentType: asb:TEXT,
+        timeToLive: timeToLive,
+        applicationProperties: applicationProperties
+    };
 ```
 
-### Step 6: Send a Message to Azure Service Bus
-You can now send a message to the configured azure service bus entity with message content, optional parameters and 
-properties. Here we have shown how to send a text message and a json message parsed to the byte array format.
+### Step 7: Send a Message to Azure Service Bus
+You can now send a message to the configured azure service bus entity with message body, optional parameters and 
+properties. Here we have shown how to send a text message parsed to the byte array format.
 ```ballerina
-    if (senderConnection is asb:SenderConnection) {
-       log:printInfo("Sending via Asb sender connection.");
-       Checkpanic senderConnection->sendMessageWithConfigurableParameters(byteContent, parameters1, properties);
-       checkpanic senderConnection->sendMessageWithConfigurableParameters(byteContentFromJson, parameters2, properties);
-    } else {
-       log:printError("Asb sender connection creation failed.");
-    }
+    checkpanic asbClient->send(message1);
 ```
 
-### Step 7: Receive a Message from Azure Service Bus
+### Step 8: Receive a Message from Azure Service Bus
 You can now receive a message from the configured azure service bus entity.
 ```ballerina
-    if (receiverConnection is asb:ReceiverConnection) {
-       log:printInfo("Receiving from Asb receiver connection.");
-       asb:Message|asb:Error? messageReceived = receiverConnection->receiveMessage(serverWaitTime);
-       asb:Message|asb:Error? jsonMessageReceived = receiverConnection->receiveMessage(serverWaitTime);
-       if (messageReceived is asb:Message && jsonMessageReceived is asb:Message) {
-           string messageRead = checkpanic messageReceived.getTextContent();
-           log:printInfo("Reading Received Message : " + messageRead);
-           json jsonMessageRead = checkpanic jsonMessageReceived.getJSONContent();
-           log:printInfo("Reading Received Message : " + jsonMessageRead.toString());
-       }
+    asb:Message|asb:Error? messageReceived = asbClient->receive(serverWaitTime);
+
+    if (messageReceived is asb:Message) {
+        log:printInfo("Reading Received Message : " + messageReceived.toString());
+    } else if (messageReceived is ()) {
+        log:printError("No message in the queue.");
+    } else {
+        log:printError("Receiving message via Asb receiver connection failed.");
     }
 ```
 
-### Step 8: Close Sender Connection
+### Step 9: Close Sender Connection
 You can now close the sender connection.
 ```ballerina
-    if (senderConnection is asb:SenderConnection) {
-       log:printInfo("Closing Asb sender connection.");
-       checkpanic senderConnection.closeSenderConnection();
-    }
+    checkpanic asbClient->closeSender();
 ```
 
-### Step 9: Close Receiver Connection
+### Step 10: Close Receiver Connection
 You can now close the receiver connection.
 ```ballerina
-    if (receiverConnection is asb:ReceiverConnection) {
-       log:printInfo("Closing Asb receiver connection.");
-       checkpanic receiverConnection.closeReceiverConnection();
-    }
+    checkpanic asbClient->closeReceiver();
 ```
+
+Sample is available at:
+https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/main/asb-ballerina/samples/send_and_receive_message_from_queue.bal
 
 ## Send and Listen to Messages from the Azure Service Bus Queue
 
@@ -202,71 +206,75 @@ First, import the ballerinax/asb module into the Ballerina project.
 ```
 
 ### Step 2: Initialize the Azure Service Bus Client Configuration
-You can now make the connection configuration using the connection string and entity path.
+You can now make the connection configuration using the connection string.
 ```ballerina
     asb:ConnectionConfiguration config = {
-       connectionString: <CONNECTION_STRING>,
-       entityPath: <QUEUE_PATH>
+       connectionString: <CONNECTION_STRING>
     };
 ```
 
-### Step 3: Create a Sender Connection using the connection configuration
-You can now make a sender connection using the connection configuration.
+### Step 3: Create an Azure Service Bus Client using the connection configuration
+You can now make an Azure service bus client using the connection configuration.
 ```ballerina
-    asb:SenderConnection? senderConnection = checkpanic new (config);
+    asb:AsbClient asbClient = new (config);
 ```
 
-### Step 4: Initialize the Input Values
-Initialize the message to be sent with optional parameters and properties.
+### Step 4: Create a Queue Sender using the Azure service bus client
+You can now make a sender connection using the Azure service bus client. Provide the `queueName` as a parameter.
 ```ballerina
-    string stringContent = "This is My Message Body";
+    checkpanic asbClient->createQueueSender(queueName);
+```
+
+### Step 5: Initialize the Input Values
+Initialize the message to be sent with message body, optional parameters and properties.
+```ballerina
+    // Input values
+    string stringContent = "This is My Message Body"; 
     byte[] byteContent = stringContent.toBytes();
-    json jsonContent = {name: "apple", color: "red", price: 5.36};
-    byte[] byteContentFromJson = jsonContent.toJsonString().toBytes();
-    map<string> parameters1 = {contentType: "text/plain", messageId: "one"};
-    map<string> parameters2 = {contentType: "application/json", messageId: "two", to: "user1", replyTo: "user2",
-       label: "a1", sessionId: "b1", correlationId: "c1", timeToLive: "2"};
     map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
+    int timeToLive = 60; // In seconds
+    int serverWaitTime = 60; // In seconds
+
+    asb:ApplicationProperties applicationProperties = {
+        properties: {a: "propertyValue1", b: "propertyValue2"}
+    };
+
+    asb:Message message1 = {
+        body: byteContent,
+        contentType: asb:TEXT,
+        timeToLive: timeToLive,
+        applicationProperties: applicationProperties
+    };
 ```
 
-### Step 5: Send a Message to Azure Service Bus
-You can now send a message to the configured azure service bus entity with message content, optional parameters and
-properties. Here we have shown how to send a text message and a json message parsed to the byte array format.
+### Step 6: Send a Message to Azure Service Bus
+You can now send a message to the configured azure service bus entity with message body, optional parameters and 
+properties. Here we have shown how to send a text message parsed to the byte array format.
 ```ballerina
-    if (senderConnection is asb:SenderConnection) {
-       log:printInfo("Sending via Asb sender connection.");
-       Checkpanic senderConnection->sendMessageWithConfigurableParameters(byteContent, parameters1, properties);
-       checkpanic senderConnection->sendMessageWithConfigurableParameters(byteContentFromJson, parameters2, properties);
-    } else {
-       log:printError("Asb sender connection creation failed.");
-    }
+    checkpanic asbClient->send(message1);
 ```
 
-### Step 6: Create a service object with the service configuration and the service logic to execute based on the message received
+### Step 7: Create a service object with the service configuration and the service logic to execute based on the message received
 You can now create a service object with the service configuration specified using the @asb:ServiceConfig annotation. 
 We need to give the connection string and the entity path of the queue we are to listen messages from. Then we can give 
 the service logic to execute when a message is received inside the onMessage remote function.
 ```ballerina
     asb:Service asyncTestService =
     @asb:ServiceConfig {
-        queueConfig: {
+        entityConfig: {
             connectionString: <CONNECTION_STRING>,
-            queueName: <QUEUE_PATH>
+            entityPath: <ENTITY_PATH>
         }
     }
     service object {
         remote function onMessage(asb:Message message) {
-            var messageContent = message.getTextContent();
-            if (messageContent is string) {
-                log:printInfo("The message received: " + messageContent);
-            } else {
-                log:printError("Error occurred while retrieving the message content.");
-            }
+            log:printInfo("The message received: " + message.toString());
+            // Write your logic here
         }
     };
 ```
 
-### Step 7: Initialize the ASB Listener  and Asynchronously listen to messages from the Azure Service Bus Queue
+### Step 8: Initialize the ASB Listener  and Asynchronously listen to messages from the Azure Service Bus Queue
 You can now initialize the ASB Listener and attach the service object with the listener. Then the user can start the 
 listener and asynchronously listen to messages from the azure service bus connection and execute the service logic 
 based on the message received. Here we have sent the current worker to sleep for 20 seconds. You can detach the service 
@@ -296,359 +304,167 @@ You can now close the sender connection.
     }
 ```
 
+Sample is available at:
+https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/main/asb-ballerina/samples/async_consumer.bal
+
+
 # Samples: 
 
-1. Send and Receive Message from Queue
-This is the basic scenario of sending and receiving a message from a queue. A user must create a sender connection and 
-a receiver connection with the azure service bus to send and receive a message. The message body is passed as 
-a parameter in byte array format with optional parameters and properties to the send operation. The user can receive 
-the Message object at the other receiver end.
-
-Sample is available at:
-https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/main/asb-ballerina/samples/send_and_receive_message_from_queue.bal
-
-```ballerina
-import ballerina/config;
-import ballerina/log;
-import ballerinax/asb;
-
-public function main() {
-
-    // Input values
-    string stringContent = "This is My Message Body"; 
-    byte[] byteContent = stringContent.toBytes();
-    json jsonContent = {name: "apple", color: "red", price: 5.36};
-    byte[] byteContentFromJson = jsonContent.toJsonString().toBytes();
-    map<string> parameters1 = {contentType: "text/plain", messageId: "one"};
-    map<string> parameters2 = {contentType: "application/json", messageId: "two", to: "user1", replyTo: "user2", 
-        label: "a1", sessionId: "b1", correlationId: "c1", timeToLive: "2"};
-    map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
-    int serverWaitTime = 5;
-
-    asb:ConnectionConfiguration config = {
-        connectionString: <CONNECTION_STRING>,
-        entityPath: <QUEUE_PATH>
-    };
-
-    log:printInfo("Creating Asb sender connection.");
-    asb:SenderConnection? senderConnection = checkpanic new (config);
-
-    log:printInfo("Creating Asb receiver connection.");
-    asb:ReceiverConnection? receiverConnection = checkpanic new (config);
-
-    if (senderConnection is asb:SenderConnection) {
-        log:printInfo("Sending via Asb sender connection.");
-        checkpanic senderConnection->sendMessageWithConfigurableParameters(byteContent, parameters1, properties);
-        checkpanic senderConnection->sendMessageWithConfigurableParameters(byteContentFromJson, parameters2, properties);
-    } else {
-        log:printError("Asb sender connection creation failed.");
-    }
-
-    if (receiverConnection is asb:ReceiverConnection) {
-        log:printInfo("Receiving from Asb receiver connection.");
-        asb:Message|asb:Error? messageReceived = receiverConnection->receiveMessage(serverWaitTime);
-        asb:Message|asb:Error? jsonMessageReceived = receiverConnection->receiveMessage(serverWaitTime);
-        if (messageReceived is asb:Message && jsonMessageReceived is asb:Message) {
-            string messageRead = checkpanic messageReceived.getTextContent();
-            log:printInfo("Reading Received Message : " + messageRead);
-            json jsonMessageRead = checkpanic jsonMessageReceived.getJSONContent();
-            log:printInfo("Reading Received Message : " + jsonMessageRead.toString());
-        } 
-    }
-
-    if (senderConnection is asb:SenderConnection) {
-        log:printInfo("Closing Asb sender connection.");
-        checkpanic senderConnection.closeSenderConnection();
-    }
-
-    if (receiverConnection is asb:ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection.");
-        checkpanic receiverConnection.closeReceiverConnection();
-    }
-}    
-```
-
-2. Send and Receive Messages from Queue
-This is the basic scenario of sending and receiving one or more messages from a queue. A user must create a 
-sender connection and a receiver connection with the azure service bus to send and receive a message. The message body 
-is passed as a parameter in byte array format with optional parameters and properties to the send operation. The user 
-can receive the Message object at the other receiver end.
-
-Sample is available at:
-https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/main/asb-ballerina/samples/send_and_receive_messages_from_queue.bal
-
-```ballerina
-import ballerina/config;
-import ballerina/log;
-import ballerinax/asb;
-
-public function main() {
-
-    // Input values
-    string stringContent = "This is My Message Body"; 
-    byte[] byteContent = stringContent.toBytes();
-    json jsonContent = {name: "apple", color: "red", price: 5.36};
-    byte[] byteContentFromJson = jsonContent.toJsonString().toBytes();
-    map<string> parameters1 = {contentType: "text/plain", messageId: "one"};
-    map<string> parameters2 = {contentType: "application/json", messageId: "two", to: "user1", replyTo: "user2", 
-        label: "a1", sessionId: "b1", correlationId: "c1", timeToLive: "2"};
-    map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
-    int maxMessageCount = 3;
-    int serverWaitTime = 5;
-
-    asb:ConnectionConfiguration config = {
-        connectionString: <CONNECTION_STRING>,
-        entityPath: <QUEUE_PATH>
-    };
-
-    log:printInfo("Creating Asb sender connection.");
-    asb:SenderConnection? senderConnection = checkpanic new (config);
-
-    log:printInfo("Creating Asb receiver connection.");
-    asb:ReceiverConnection? receiverConnection = checkpanic new (config);
-
-    if (senderConnection is asb:SenderConnection) {
-        log:printInfo("Sending via Asb sender connection.");
-        checkpanic senderConnection->sendMessageWithConfigurableParameters(byteContent, parameters1, properties);
-        checkpanic senderConnection->sendMessageWithConfigurableParameters(byteContentFromJson, parameters2, properties);
-    } else {
-        log:printError("Asb sender connection creation failed.");
-    }
-
-    if (receiverConnection is asb:ReceiverConnection) {
-        log:printInfo("Receiving from Asb receiver connection.");
-        var messageReceived = receiverConnection->receiveMessages(serverWaitTime, maxMessageCount);
-        if(messageReceived is asb:Messages) {
-            int val = messageReceived.getMessageCount();
-            log:printInfo("No. of messages received : " + val.toString());
-            asb:Message[] messages = messageReceived.getMessages();
-            string messageReceived1 =  checkpanic messages[0].getTextContent();
-            log:printInfo("Message1 content : " +messageReceived1);
-            json messageReceived2 =  checkpanic messages[1].getJSONContent();
-            log:printInfo("Message2 content : " +messageReceived2.toString());
-        } else {
-            log:printError(messageReceived.message());
-        }
-    } else {
-        log:printError("Asb receiver connection creation failed.");
-    }
-
-    if (senderConnection is asb:SenderConnection) {
-        log:printInfo("Closing Asb sender connection.");
-        checkpanic senderConnection.closeSenderConnection();
-    }
-
-    if (receiverConnection is asb:ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection.");
-        checkpanic receiverConnection.closeReceiverConnection();
-    }
-}  
-```
-
-3. Send and Receive Batch from Queue
+1. Send and Receive Batch from Queue
 This is the basic scenario of sending and receiving a batch of messages from a queue. A user must create a sender 
-connection and a receiver connection with the azure service bus to send and receive a message. The message body is 
-passed as a parameter in byte array format with optional parameters and properties to the send operation. The user can 
+connection and a receiver connection with the azure service bus to send and receive a message. The message is 
+passed as a parameter with optional parameters and properties to the send operation. The user can 
 receive the array of Message objects at the other receiver end.
 
 Sample is available at:
 https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/main/asb-ballerina/samples/send_and_receive_batch_from_queue.bal
 
 ```ballerina
-import ballerina/config;
 import ballerina/log;
 import ballerinax/asb;
 
-public function main() {
-
-    // Input values
-    string[] stringArrayContent = ["apple", "mango", "lemon", "orange"];
-    map<string> parameters = {contentType: "text/plain", timeToLive: "2"};
-    map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
-    int maxMessageCount = 3;
-    int serverWaitTime = 5;
-
-    asb:ConnectionConfiguration config = {
-        connectionString: <CONNECTION_STRING>,
-        entityPath: <QUEUE_PATH>
-    };
-
-    log:printInfo("Creating Asb sender connection.");
-    asb:SenderConnection? senderConnection = checkpanic new (config);
-
-    log:printInfo("Creating Asb receiver connection.");
-    asb:ReceiverConnection? receiverConnection = checkpanic new (config);
-
-    if (senderConnection is asb:SenderConnection) {
-        log:printInfo("Sending via Asb sender connection.");
-        checkpanic senderConnection->sendBatchMessage(stringArrayContent, parameters, properties, maxMessageCount);
-    } else {
-        log:printError("Asb sender connection creation failed.");
-    }
-
-    if (receiverConnection is asb:ReceiverConnection) {
-        log:printInfo("Receiving from Asb receiver connection.");
-        var messageReceived = receiverConnection->receiveBatchMessage(maxMessageCount);
-        if(messageReceived is asb:Messages) {
-            int val = messageReceived.getMessageCount();
-            log:printInfo("No. of messages received : " + val.toString());
-            asb:Message[] messages = messageReceived.getMessages();
-            string messageReceived1 =  checkpanic messages[0].getTextContent();
-            log:printInfo("Message1 content : " + messageReceived1);
-            string messageReceived2 =  checkpanic messages[1].getTextContent();
-            log:printInfo("Message2 content : " + messageReceived2);
-            string messageReceived3 =  checkpanic messages[2].getTextContent();
-            log:printInfo("Message3 content : " + messageReceived3);
-        } else {
-            log:printError("Receiving message via Asb receiver connection failed.");
-        }
-    } else {
-        log:printError("Asb receiver connection creation failed.");
-    }
-
-    if (senderConnection is asb:SenderConnection) {
-        log:printInfo("Closing Asb sender connection.");
-        checkpanic senderConnection.closeSenderConnection();
-    }
-
-    if (receiverConnection is asb:ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection.");
-        checkpanic receiverConnection.closeReceiverConnection();
-    }
-}    
-```
-
-4. Send to Topic and Receive from Subscription
-This is the basic scenario of sending a message to a topic and receiving a message from a subscription. A user must 
-create a sender connection and a receiver connection with the azure service bus to send and receive a message. 
-The message body is passed as a parameter in byte array format with optional parameters and properties to the send 
-operation. The user can receive the Message object at the other receiver end.
-
-Sample is available at:
-https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/main/asb-ballerina/samples/send_to_topic_and_receive_from_subscription.bal
-
-```ballerina
-import ballerina/config;
-import ballerina/log;
-import ballerinax/asb;
+// Connection Configurations
+configurable string connectionString = ?;
+configurable string queuePath = ?;
 
 public function main() {
 
     // Input values
     string stringContent = "This is My Message Body"; 
     byte[] byteContent = stringContent.toBytes();
-    json jsonContent = {name: "apple", color: "red", price: 5.36};
-    byte[] byteContentFromJson = jsonContent.toJsonString().toBytes();
-    map<string> parameters1 = {contentType: "text/plain", messageId: "one"};
-    map<string> parameters2 = {contentType: "application/json", messageId: "two", to: "user1", replyTo: "user2", 
-        label: "a1", sessionId: "b1", correlationId: "c1", timeToLive: "2"};
     map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
-    int serverWaitTime = 5;
+    int timeToLive = 60; // In seconds
+    int serverWaitTime = 60; // In seconds
+    int maxMessageCount = 2;
 
-    asb:ConnectionConfiguration senderConfig = {
-        connectionString: <CONNECTION_STRING>,
-        entityPath: <TOPIC_PATH>
+    asb:ApplicationProperties applicationProperties = {
+        properties: properties
     };
 
-    asb:ConnectionConfiguration receiverConfig1 = {
-        connectionString: <CONNECTION_STRING>,
-        entityPath: <SUBSCRIPTION_PATH1>
+    asb:Message message1 = {
+        body: byteContent,
+        contentType: asb:TEXT,
+        timeToLive: timeToLive
     };
 
-    asb:ConnectionConfiguration receiverConfig2 = {
-        connectionString: <CONNECTION_STRING>,
-        entityPath: <SUBSCRIPTION_PATH2>
+    asb:Message message2 = {
+        body: byteContent,
+        contentType: asb:TEXT,
+        timeToLive: timeToLive
     };
 
-    asb:ConnectionConfiguration receiverConfig3 = {
-        connectionString: <CONNECTION_STRING>,
-        entityPath: <SUBSCRIPTION_PATH3>
+    asb:MessageBatch messages = {
+        messageCount: 2,
+        messages: [message1, message2]
     };
+
+    asb:AsbConnectionConfiguration config = {
+        connectionString: connectionString
+    };
+
+    asb:AsbClient asbClient = new (config);
 
     log:printInfo("Creating Asb sender connection.");
-    asb:SenderConnection? senderConnection = checkpanic new (senderConfig);
+    checkpanic asbClient->createQueueSender(queuePath);
 
     log:printInfo("Creating Asb receiver connection.");
-    asb:ReceiverConnection? receiverConnection1 = checkpanic new (receiverConfig1);
-    asb:ReceiverConnection? receiverConnection2 = checkpanic new (receiverConfig2);
-    asb:ReceiverConnection? receiverConnection3 = checkpanic new (receiverConfig3);
+    checkpanic asbClient->createQueueReceiver(queuePath, asb:RECEIVEANDDELETE);
 
-    if (senderConnection is asb:SenderConnection) {
-        log:printInfo("Sending via Asb sender connection.");
-        checkpanic senderConnection->sendMessageWithConfigurableParameters(byteContent, parameters1, properties);
-        checkpanic senderConnection->sendMessageWithConfigurableParameters(byteContentFromJson, parameters2, properties);
-    } else {
-        log:printError("Asb sender connection creation failed.");
-    }
+    log:printInfo("Sending via Asb sender connection.");
+    checkpanic asbClient->sendBatch(messages);
 
-    if (receiverConnection1 is asb:ReceiverConnection) {
-        log:printInfo("Receiving from Asb receiver connection 1.");
-        asb:Message|asb:Error? messageReceived = receiverConnection1->receiveMessage(serverWaitTime);
-        asb:Message|asb:Error? jsonMessageReceived = receiverConnection1->receiveMessage(serverWaitTime);
-        if (messageReceived is asb:Message && jsonMessageReceived is asb:Message) {
-            string messageRead = checkpanic messageReceived.getTextContent();
-            log:printInfo("Reading Received Message : " + messageRead);
-            json jsonMessageRead = checkpanic jsonMessageReceived.getJSONContent();
-            log:printInfo("Reading Received Message : " + jsonMessageRead.toString());
-        } else {
-            log:printError("Receiving message via Asb receiver connection failed.");
+    log:printInfo("Receiving from Asb receiver connection.");
+    asb:MessageBatch|asb:Error? messageReceived = asbClient->receiveBatch(maxMessageCount, serverWaitTime);
+
+    if (messageReceived is asb:MessageBatch) {
+        foreach asb:Message message in messageReceived.messages {
+            if (message.toString() != "") {
+                log:printInfo("Reading Received Message : " + message.toString());
+            }
         }
+    } else if (messageReceived is ()) {
+        log:printError("No message in the queue.");
     } else {
-        log:printError("Asb receiver connection creation failed.");
+        log:printError("Receiving message via Asb receiver connection failed.");
     }
 
+    log:printInfo("Closing Asb sender connection.");
+    checkpanic asbClient->closeSender();
 
-    if (receiverConnection2 is asb:ReceiverConnection) {
-        log:printInfo("Receiving from Asb receiver connection 2.");
-        asb:Message|asb:Error? messageReceived = receiverConnection2->receiveMessage(serverWaitTime);
-        asb:Message|asb:Error? jsonMessageReceived = receiverConnection2->receiveMessage(serverWaitTime);
-        if (messageReceived is asb:Message && jsonMessageReceived is asb:Message) {
-            string messageRead = checkpanic messageReceived.getTextContent();
-            log:printInfo("Reading Received Message : " + messageRead);
-            json jsonMessageRead = checkpanic jsonMessageReceived.getJSONContent();
-            log:printInfo("Reading Received Message : " + jsonMessageRead.toString());
-        } else {
-            log:printError("Receiving message via Asb receiver connection failed.");
-        }
+    log:printInfo("Closing Asb receiver connection.");
+    checkpanic asbClient->closeReceiver();
+}    
+```
+
+2. Send to Topic and Receive from Subscription
+This is the basic scenario of sending a message to a topic and receiving a message from a subscription. A user must 
+create a sender connection and a receiver connection with the azure service bus to send and receive a message. 
+The message is passed as a parameter with optional parameters and properties to the send 
+operation. The user can receive the Message object at the other receiver end.
+
+Sample is available at:
+https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/main/asb-ballerina/samples/send_to_topic_and_receive_from_subscription.bal
+
+```ballerina
+import ballerina/log;
+import ballerinax/asb;
+
+// Connection Configurations
+configurable string connectionString = ?;
+configurable string topicPath = ?;
+configurable string subscriptionPath1 = ?;
+
+public function main() {
+
+    // Input values
+    string stringContent = "This is My Message Body"; 
+    byte[] byteContent = stringContent.toBytes();
+    map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
+    int timeToLive = 60; // In seconds
+    int serverWaitTime = 60; // In seconds
+
+    asb:ApplicationProperties applicationProperties = {
+        properties: {a: "propertyValue1", b: "propertyValue2"}
+    };
+
+    asb:Message message1 = {
+        body: byteContent,
+        contentType: asb:TEXT,
+        timeToLive: timeToLive,
+        applicationProperties: applicationProperties
+    };
+
+    asb:AsbConnectionConfiguration config = {
+        connectionString: connectionString
+    };
+
+    asb:AsbClient asbClient = new (config);
+
+    log:printInfo("Creating Asb sender connection.");
+    checkpanic asbClient->createTopicSender(topicPath);
+
+    log:printInfo("Creating Asb receiver connection.");
+    checkpanic asbClient->createSubscriptionReceiver(subscriptionPath1, asb:RECEIVEANDDELETE);
+
+    log:printInfo("Sending via Asb sender connection.");
+    checkpanic asbClient->send(message1);
+
+    log:printInfo("Receiving from Asb receiver connection.");
+    asb:Message|asb:Error? messageReceived = asbClient->receive(serverWaitTime);
+
+    if (messageReceived is asb:Message) {
+        log:printInfo("Reading Received Message : " + messageReceived.toString());
+    } else if (messageReceived is ()) {
+        log:printError("No message in the subscription.");
     } else {
-        log:printError("Asb receiver connection creation failed.");
+        log:printError("Receiving message via Asb receiver connection failed.");
     }
 
-    if (receiverConnection3 is asb:ReceiverConnection) {
-        log:printInfo("Receiving from Asb receiver connection 3.");
-        asb:Message|asb:Error? messageReceived = receiverConnection3->receiveMessage(serverWaitTime);
-        asb:Message|asb:Error? jsonMessageReceived = receiverConnection3->receiveMessage(serverWaitTime);
-        if (messageReceived is asb:Message && jsonMessageReceived is asb:Message) {
-            string messageRead = checkpanic messageReceived.getTextContent();
-            log:printInfo("Reading Received Message : " + messageRead);
-            json jsonMessageRead = checkpanic jsonMessageReceived.getJSONContent();
-            log:printInfo("Reading Received Message : " + jsonMessageRead.toString());
-        } else {
-            log:printError("Receiving message via Asb receiver connection failed.");
-        }
-    } else {
-        log:printError("Asb receiver connection creation failed.");
-    }
+    log:printInfo("Closing Asb sender connection.");
+    checkpanic asbClient->closeSender();
 
-    if (senderConnection is asb:SenderConnection) {
-        log:printInfo("Closing Asb sender connection.");
-        checkpanic senderConnection.closeSenderConnection();
-    }
-
-    if (receiverConnection1 is asb:ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection 1.");
-        checkpanic receiverConnection1.closeReceiverConnection();
-    }
-
-    if (receiverConnection2 is asb:ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection 2.");
-        checkpanic receiverConnection2.closeReceiverConnection();
-    }
-
-    if (receiverConnection3 is asb:ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection 3.");
-        checkpanic receiverConnection3.closeReceiverConnection();
-    }
+    log:printInfo("Closing Asb receiver connection.");
+    checkpanic asbClient->closeReceiver();
 }    
 ```
 
