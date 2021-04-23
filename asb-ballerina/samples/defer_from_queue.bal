@@ -26,73 +26,55 @@ public function main() {
     // Input values
     string stringContent = "This is My Message Body"; 
     byte[] byteContent = stringContent.toBytes();
-    json jsonContent = {name: "apple", color: "red", price: 5.36};
-    byte[] byteContentFromJson = jsonContent.toJsonString().toBytes();
-    map<string> parameters1 = {contentType: "plain/text", messageId: "one"};
-    map<string> parameters2 = {contentType: "application/json", messageId: "two", to: "user1", replyTo: "user2", 
-        label: "a1", sessionId: "b1", correlationId: "c1", timeToLive: "2"};
     map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
-    int serverWaitTime = 5;
+    int timeToLive = 60; // In seconds
+    int serverWaitTime = 60; // In seconds
 
-    asb:ConnectionConfiguration config = {
-        connectionString: connectionString,
-        entityPath: queuePath
+    asb:ApplicationProperties applicationProperties = {
+        properties: {a: "propertyValue1", b: "propertyValue2"}
     };
 
+    asb:Message message1 = {
+        body: byteContent,
+        contentType: asb:TEXT,
+        timeToLive: timeToLive,
+        applicationProperties: applicationProperties
+    };
+
+    asb:AsbConnectionConfiguration config = {
+        connectionString: connectionString
+    };
+
+    asb:AsbClient asbClient = new (config);
+
     log:printInfo("Creating Asb sender connection.");
-    asb:SenderConnection? senderConnection = checkpanic new (config);
+    checkpanic asbClient->createQueueSender(queuePath);
 
     log:printInfo("Creating Asb receiver connection.");
-    asb:ReceiverConnection? receiverConnection = checkpanic new (config);
+    checkpanic asbClient->createQueueReceiver(queuePath, asb:PEEKLOCK);
 
-    if (senderConnection is asb:SenderConnection) {
-        log:printInfo("Sending via Asb sender connection.");
-        checkpanic senderConnection->sendMessageWithConfigurableParameters(byteContent, parameters1, properties);
-        checkpanic senderConnection->sendMessageWithConfigurableParameters(byteContentFromJson, parameters2, properties);
-    } else {
-        log:printError("Asb sender connection creation failed.");
-    }
+    log:printInfo("Sending via Asb sender connection.");
+    checkpanic asbClient->send(message1);
 
-    if (receiverConnection is asb:ReceiverConnection) {
-        log:printInfo("Defer message from Asb receiver connection.");
-        var sequenceNumber = receiverConnection->deferMessage();
-        log:printInfo("Done Deferring a message using its lock token.");
-        log:printInfo("Receiving from Asb receiver connection.");
-        asb:Message|asb:Error? jsonMessageReceived = receiverConnection->receiveMessage(serverWaitTime);
-        if (jsonMessageReceived is asb:Message) {
-            json jsonMessageRead = checkpanic jsonMessageReceived.getJSONContent();
-            log:printInfo("Reading Received Message : " + jsonMessageRead.toString());
-        } else {
-            log:printError("Receiving message via Asb receiver connection failed.");
+    log:printInfo("Receiving from Asb receiver connection.");
+    asb:Message|asb:Error? messageReceived = asbClient->receive(serverWaitTime);
+
+    if (messageReceived is asb:Message) {
+        int sequenceNumber = checkpanic asbClient->defer(messageReceived);
+        log:printInfo("Defer message successful");
+        asb:Message|asb:Error? messageReceivedAgain = checkpanic asbClient->receiveDeferred(sequenceNumber);
+        if (messageReceivedAgain is asb:Message) {
+            log:printInfo("Reading Deferred Message : " + messageReceivedAgain.toString());
         }
-        log:printInfo("Receiving Deferred Message from Asb receiver connection.");
-        if(sequenceNumber is int) {
-            if(sequenceNumber == 0) {
-                log:printError("No message in the queue");
-            }
-            asb:Message|asb:Error? messageReceived = receiverConnection->receiveDeferredMessage(sequenceNumber);
-            if (messageReceived is asb:Message) {
-                string messageRead = checkpanic messageReceived.getTextContent();
-                log:printInfo("Reading Received Message : " + messageRead);
-            } else if (messageReceived is ()) {
-                log:printError("No deferred message received with given sequence number");
-            } else {
-                log:printError(msg = messageReceived.message());
-            }
-        } else {
-            log:printError(msg = sequenceNumber.message());
-        }
+    } else if (messageReceived is ()) {
+        log:printError("No message in the queue.");
     } else {
-        log:printError("Asb receiver connection creation failed.");
+        log:printError("Receiving message via Asb receiver connection failed.");
     }
 
-    if (senderConnection is asb:SenderConnection) {
-        log:printInfo("Closing Asb sender connection.");
-        checkpanic senderConnection.closeSenderConnection();
-    }
+    log:printInfo("Closing Asb sender connection.");
+    checkpanic asbClient->closeSender();
 
-    if (receiverConnection is asb:ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection.");
-        checkpanic receiverConnection.closeReceiverConnection();
-    }
+    log:printInfo("Closing Asb receiver connection.");
+    checkpanic asbClient->closeReceiver();
 }    

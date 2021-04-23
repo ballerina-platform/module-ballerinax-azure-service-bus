@@ -26,50 +26,57 @@ public function main() {
     // Input values
     string stringContent = "This is My Message Body"; 
     byte[] byteContent = stringContent.toBytes();
-    json jsonContent = {name: "apple", color: "red", price: 5.36};
-    byte[] byteContentFromJson = jsonContent.toJsonString().toBytes();
-    map<string> parameters1 = {contentType: "plain/text", messageId: "one"};
-    map<string> parameters2 = {contentType: "application/json", messageId: "two", to: "sanju", replyTo: "carol", 
-        label: "a1", sessionId: "b1", correlationId: "c1", timeToLive: "2"};
     map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
+    int timeToLive = 60; // In seconds
+    int serverWaitTime = 60; // In seconds
 
-    asb:ConnectionConfiguration config = {
-        connectionString: connectionString,
-        entityPath: queuePath
+    asb:ApplicationProperties applicationProperties = {
+        properties: {a: "propertyValue1", b: "propertyValue2"}
     };
 
+    asb:Message message1 = {
+        body: byteContent,
+        contentType: asb:TEXT,
+        timeToLive: timeToLive,
+        applicationProperties: applicationProperties
+    };
+
+    asb:AsbConnectionConfiguration config = {
+        connectionString: connectionString
+    };
+
+    asb:AsbClient asbClient = new (config);
+
     log:printInfo("Creating Asb sender connection.");
-    asb:SenderConnection? senderConnection = checkpanic new (config);
+    checkpanic asbClient->createQueueSender(queuePath);
 
     log:printInfo("Creating Asb receiver connection.");
-    asb:ReceiverConnection? receiverConnection = checkpanic new (config);
+    checkpanic asbClient->createQueueReceiver(queuePath, asb:PEEKLOCK);
 
-    if (senderConnection is asb:SenderConnection) {
-        log:printInfo("Sending via Asb sender connection.");
-        checkpanic senderConnection->sendMessageWithConfigurableParameters(byteContent, parameters1, properties);
-        checkpanic senderConnection->sendMessageWithConfigurableParameters(byteContentFromJson, parameters2, properties);
+    log:printInfo("Sending via Asb sender connection.");
+    checkpanic asbClient->send(message1);
+
+    log:printInfo("Receiving from Asb receiver connection.");
+    asb:Message|asb:Error? messageReceived = asbClient->receive(serverWaitTime);
+
+    if (messageReceived is asb:Message) {
+        checkpanic asbClient->abandon(messageReceived);
+        asb:Message|asb:Error? messageReceivedAgain = asbClient->receive(serverWaitTime);
+        if (messageReceivedAgain is asb:Message) {
+            checkpanic asbClient->complete(messageReceivedAgain);
+            log:printInfo("Abandon message successful");
+        } else {
+            log:printError("Abandon message not succesful.");
+        }
+    } else if (messageReceived is ()) {
+        log:printError("No message in the queue.");
     } else {
-        log:printError("Asb sender connection creation failed.");
+        log:printError("Receiving message via Asb receiver connection failed.");
     }
 
-    if (receiverConnection is asb:ReceiverConnection) {
-        log:printInfo("abandoning message from Asb receiver connection.");
-        checkpanic receiverConnection->abandonMessage();
-        log:printInfo("Done abandoning a message using its lock token.");
-        log:printInfo("Completing messages from Asb receiver connection.");
-        checkpanic receiverConnection->completeMessages();
-        log:printInfo("Done completing messages using their lock tokens.");
-    } else {
-        log:printError("Asb receiver connection creation failed.");
-    }
+    log:printInfo("Closing Asb sender connection.");
+    checkpanic asbClient->closeSender();
 
-    if (senderConnection is asb:SenderConnection) {
-        log:printInfo("Closing Asb sender connection.");
-        checkpanic senderConnection.closeSenderConnection();
-    }
-
-    if (receiverConnection is asb:ReceiverConnection) {
-        log:printInfo("Closing Asb receiver connection.");
-        checkpanic receiverConnection.closeReceiverConnection();
-    }
+    log:printInfo("Closing Asb receiver connection.");
+    checkpanic asbClient->closeReceiver();
 }    
