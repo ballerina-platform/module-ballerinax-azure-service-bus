@@ -41,19 +41,7 @@ public class ASBConstants {
     static final String ASB_ERROR = "AsbError";
 
     // Message constant fields
-    public static final String MESSAGE_OBJECT = "Message";
-    public static final BString MESSAGE_CONTENT = StringUtils.fromString("messageContent");
-    public static final BString MESSAGE_CONTENT_TYPE = StringUtils.fromString("messageContentType");
-    public static final BString BMESSAGE_ID = StringUtils.fromString("messageId");
-    public static final BString BTO = StringUtils.fromString("to");
-    public static final BString BREPLY_TO = StringUtils.fromString("replyTo");
-    public static final BString BREPLY_TO_SESSION_ID = StringUtils.fromString("replyToSessionId");
-    public static final BString BLABEL = StringUtils.fromString("label");
-    public static final BString BSESSION_ID = StringUtils.fromString("sessionId");
-    public static final BString BCORRELATION_ID = StringUtils.fromString("correlationId");
-    public static final BString BTIME_TO_LIVE = StringUtils.fromString("timeToLive");
-    public static final BString BPROPERTIES = StringUtils.fromString("properties");
-    public static final String OPTIONAL_PROPERTIES = "OptionalProperties";
+    public static final String MESSAGE_RECORD = "Message";
     public static final String APPLICATION_PROPERTIES = "ApplicationProperties";
 
     // Message content data binding errors
@@ -63,9 +51,8 @@ public class ASBConstants {
     public static final String INT_CONTENT_ERROR = "Error while retrieving the int content of the message. ";
     public static final String FLOAT_CONTENT_ERROR = "Error while retrieving the float content of the message. ";
 
-    // Messages constant fields
+    // Batch Message constant fields
     public static final String MESSAGE_BATCH_RECORD = "MessageBatch";
-    public static final String MESSAGE_RECORD = "Message";
     public static final String MESSAGES_OBJECT = "Messages";
     public static final BString MESSAGES_CONTENT = StringUtils.fromString("messages");
     public static final BString MESSAGE_COUNT = StringUtils.fromString("messageCount");
