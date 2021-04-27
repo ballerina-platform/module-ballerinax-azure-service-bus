@@ -32,8 +32,8 @@ public class ASBConstants {
     // Asb package name constant fields
     public static final String ORG_NAME = "ballerinax";
     public static final String ASB = "asb";
-    public static final String ASB_VERSION = "0.1.1";
-    public static final Module PACKAGE_ID_ASB = new Module(ORG_NAME, "asb", ASB_VERSION);
+    public static final String ASB_VERSION = "0.1.2";
+    public static final Module PACKAGE_ID_ASB = new Module(ORG_NAME, ASB, ASB_VERSION);
     public static final String PACKAGE_ASB_FQN =
             ORG_NAME + ORG_NAME_SEPARATOR + ASB + VERSION_SEPARATOR + ASB_VERSION;
 
@@ -41,19 +41,8 @@ public class ASBConstants {
     static final String ASB_ERROR = "AsbError";
 
     // Message constant fields
-    public static final String MESSAGE_OBJECT = "Message";
-    public static final BString MESSAGE_CONTENT = StringUtils.fromString("messageContent");
-    public static final BString MESSAGE_CONTENT_TYPE = StringUtils.fromString("messageContentType");
-    public static final BString BMESSAGE_ID = StringUtils.fromString("messageId");
-    public static final BString BTO = StringUtils.fromString("to");
-    public static final BString BREPLY_TO = StringUtils.fromString("replyTo");
-    public static final BString BREPLY_TO_SESSION_ID = StringUtils.fromString("replyToSessionId");
-    public static final BString BLABEL = StringUtils.fromString("label");
-    public static final BString BSESSION_ID = StringUtils.fromString("sessionId");
-    public static final BString BCORRELATION_ID = StringUtils.fromString("correlationId");
-    public static final BString BTIME_TO_LIVE = StringUtils.fromString("timeToLive");
-    public static final BString BPROPERTIES = StringUtils.fromString("properties");
-    public static final String OPTIONAL_PROPERTIES = "OptionalProperties";
+    public static final String MESSAGE_RECORD = "Message";
+    public static final String APPLICATION_PROPERTIES = "ApplicationProperties";
 
     // Message content data binding errors
     public static final String XML_CONTENT_ERROR = "Error while retrieving the xml content of the message. ";
@@ -62,12 +51,18 @@ public class ASBConstants {
     public static final String INT_CONTENT_ERROR = "Error while retrieving the int content of the message. ";
     public static final String FLOAT_CONTENT_ERROR = "Error while retrieving the float content of the message. ";
 
-    // Messages constant fields
+    // Batch Message constant fields
+    public static final String MESSAGE_BATCH_RECORD = "MessageBatch";
     public static final String MESSAGES_OBJECT = "Messages";
     public static final BString MESSAGES_CONTENT = StringUtils.fromString("messages");
     public static final BString MESSAGE_COUNT = StringUtils.fromString("messageCount");
 
+    // Message receive modes
+    public static final String PEEKLOCK = "PEEKLOCK";
+    public static final String RECEIVEANDDELETE = "RECEIVEANDDELETE";
+
     // Keys of the input message optional parameters specified as a Map
+    public static final String BODY = "body";
     public static final String CONTENT_TYPE = "contentType";
     public static final String MESSAGE_ID = "messageId";
     public static final String TO = "to";
@@ -77,7 +72,8 @@ public class ASBConstants {
     public static final String SESSION_ID = "sessionId";
     public static final String CORRELATION_ID = "correlationId";
     public static final String TIME_TO_LIVE = "timeToLive";
-    public static final int DEFAULT_TIME_TO_LIVE = 1;
+    public static final String PARTITION_KEY = "partitionKey";
+    public static final int DEFAULT_TIME_TO_LIVE = 60; // In seconds
 
     // listener constant fields
     public static final String CONSUMER_SERVICES = "consumer_services";
@@ -86,12 +82,12 @@ public class ASBConstants {
     public static final String FUNC_ON_ERROR = "onError";
     public static final String DISPATCH_ERROR = "Error occurred while dispatching the message. ";
 
-    public static final BString QUEUE_NAME = StringUtils.fromString("queueName");
+    public static final BString QUEUE_NAME = StringUtils.fromString("entityPath");
     public static final BString CONNECTION_STRING = StringUtils.fromString("connectionString");
     public static final String CONNECTION_NATIVE_OBJECT = "asb_connection_object";
 
     public static final String SERVICE_CONFIG = "ServiceConfig";
-    public static final BString ALIAS_QUEUE_CONFIG = StringUtils.fromString("queueConfig");
+    public static final BString ALIAS_QUEUE_CONFIG = StringUtils.fromString("entityConfig");
 
     public static final String UNCHECKED = "unchecked";
 }

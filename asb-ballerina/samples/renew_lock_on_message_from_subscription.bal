@@ -21,107 +21,62 @@ import ballerinax/asb;
 configurable string connectionString = ?;
 configurable string topicPath = ?;
 configurable string subscriptionPath1 = ?;
-configurable string subscriptionPath2 = ?;
-configurable string subscriptionPath3 = ?;
 
 public function main() {
 
     // Input values
     string stringContent = "This is My Message Body"; 
     byte[] byteContent = stringContent.toBytes();
-    json jsonContent = {name: "apple", color: "red", price: 5.36};
-    byte[] byteContentFromJson = jsonContent.toJsonString().toBytes();
-    map<string> parameters1 = {contentType: "plain/text", messageId: "one"};
-    map<string> parameters2 = {contentType: "application/json", messageId: "two", to: "user1", replyTo: "user2", 
-        label: "a1", sessionId: "b1", correlationId: "c1", timeToLive: "2"};
     map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
+    int timeToLive = 60; // In seconds
+    int serverWaitTime = 60; // In seconds
 
-    asb:ConnectionConfiguration senderConfig = {
-        connectionString: connectionString,
-        entityPath: topicPath
+    asb:ApplicationProperties applicationProperties = {
+        properties: {a: "propertyValue1", b: "propertyValue2"}
     };
 
-    asb:ConnectionConfiguration receiverConfig1 = {
-        connectionString: connectionString,
-        entityPath: subscriptionPath1
+    asb:Message message1 = {
+        body: byteContent,
+        contentType: asb:TEXT,
+        timeToLive: timeToLive,
+        applicationProperties: applicationProperties
     };
 
-    asb:ConnectionConfiguration receiverConfig2 = {
-        connectionString: connectionString,
-        entityPath: subscriptionPath2
+    asb:AsbConnectionConfiguration config = {
+        connectionString: connectionString
     };
 
-    asb:ConnectionConfiguration receiverConfig3 = {
-        connectionString: connectionString,
-        entityPath: subscriptionPath3
-    };
+    asb:AsbClient asbClient = new (config);
 
-    log:print("Creating Asb sender connection.");
-    asb:SenderConnection? senderConnection = checkpanic new (senderConfig);
+    log:printInfo("Creating Asb sender connection.");
+    checkpanic asbClient->createTopicSender(topicPath);
 
-    log:print("Creating Asb receiver connection.");
-    asb:ReceiverConnection? receiverConnection1 = checkpanic new (receiverConfig1);
-    asb:ReceiverConnection? receiverConnection2 = checkpanic new (receiverConfig2);
-    asb:ReceiverConnection? receiverConnection3 = checkpanic new (receiverConfig3);
+    log:printInfo("Creating Asb receiver connection.");
+    checkpanic asbClient->createSubscriptionReceiver(subscriptionPath1, asb:PEEKLOCK);
+    
+    log:printInfo("Sending via Asb sender connection.");
+    checkpanic asbClient->send(message1);
 
-    if (senderConnection is asb:SenderConnection) {
-        log:print("Sending via Asb sender connection.");
-        checkpanic senderConnection->sendMessageWithConfigurableParameters(byteContent, parameters1, properties);
-        checkpanic senderConnection->sendMessageWithConfigurableParameters(byteContentFromJson, parameters2, properties);
+    log:printInfo("Receiving from Asb receiver connection.");
+    asb:Message|asb:Error? messageReceived = asbClient->receive(serverWaitTime);
+
+    if (messageReceived is asb:Message) {
+        checkpanic asbClient->renewLock(messageReceived);
+        asb:Message|asb:Error? messageReceivedAgain = asbClient->receive(serverWaitTime);
+        if (messageReceivedAgain is ()) {
+            log:printInfo("Renew lock message successful");
+        } else {
+            log:printError("Renew lock on message not succesful.");
+        }
+    } else if (messageReceived is ()) {
+        log:printError("No message in the queue.");
     } else {
-        log:printError("Asb sender connection creation failed.");
+        log:printError("Receiving message via Asb receiver connection failed.");
     }
 
-    if (receiverConnection1 is asb:ReceiverConnection) {
-        log:print("Renew lock on message from Asb receiver connection 1.");
-        checkpanic receiverConnection1->renewLockOnMessage();
-        log:print("Done renewing a message.");
-        log:print("Completing messages from Asb receiver connection 1.");
-        checkpanic receiverConnection1->completeMessages();
-        log:print("Done completing messages using their lock tokens.");
-    } else {
-        log:printError("Asb receiver connection creation failed.");
-    }
+    log:printInfo("Closing Asb sender connection.");
+    checkpanic asbClient->closeSender();
 
-    if (receiverConnection2 is asb:ReceiverConnection) {
-        log:print("Renew lock on message from Asb receiver connection 2.");
-        checkpanic receiverConnection2->renewLockOnMessage();
-        log:print("Done renewing a message.");
-        log:print("Completing messages from Asb receiver connection 2.");
-        checkpanic receiverConnection2->completeMessages();
-        log:print("Done completing messages using their lock tokens.");
-    } else {
-        log:printError("Asb receiver connection creation failed.");
-    }
-
-    if (receiverConnection3 is asb:ReceiverConnection) {
-        log:print("Renew lock on message from Asb receiver connection 3.");
-        checkpanic receiverConnection3->renewLockOnMessage();
-        log:print("Done renewing a message.");
-        log:print("Completing messages from Asb receiver connection 3.");
-        checkpanic receiverConnection3->completeMessages();
-        log:print("Done completing messages using their lock tokens.");
-    } else {
-        log:printError("Asb receiver connection creation failed.");
-    }
-
-    if (senderConnection is asb:SenderConnection) {
-        log:print("Closing Asb sender connection.");
-        checkpanic senderConnection.closeSenderConnection();
-    }
-
-    if (receiverConnection1 is asb:ReceiverConnection) {
-        log:print("Closing Asb receiver connection 1.");
-        checkpanic receiverConnection1.closeReceiverConnection();
-    }
-
-    if (receiverConnection2 is asb:ReceiverConnection) {
-        log:print("Closing Asb receiver connection 2.");
-        checkpanic receiverConnection2.closeReceiverConnection();
-    }
-
-    if (receiverConnection3 is asb:ReceiverConnection) {
-        log:print("Closing Asb receiver connection 3.");
-        checkpanic receiverConnection3.closeReceiverConnection();
-    }
+    log:printInfo("Closing Asb receiver connection.");
+    checkpanic asbClient->closeReceiver();
 }    

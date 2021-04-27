@@ -56,8 +56,8 @@ jobs:
                     <servers>
                       <server>
                         <id>github</id>
-                        <username>${{ secrets.USERNAME }}</username>
-                        <password>${{ secrets.PERSONAL_TOKEN }}</password>
+                        <username>${{ secrets.BALLERINA_BOT_USERNAME }}</username>
+                        <password>${{ secrets.BALLERINA_BOT_TOKEN }}</password>
                       </server>
                     </servers>
                   </settings>' > ~/.m2/settings.xml
@@ -67,7 +67,7 @@ jobs:
 
       # Build Ballerina Project
       - name: Ballerina Build
-        uses: ballerina-platform/ballerina-action/@swan-lake-connector-release
+        uses: ballerina-platform/ballerina-action/@master
         with:
           args:
             build -c --skip-tests ./asb-ballerina
@@ -82,7 +82,7 @@ jobs:
 
       # Push to Ballerina Central
       - name: Ballerina Push
-        uses: ballerina-platform/ballerina-action/@swan-lake-connector-release
+        uses: ballerina-platform/ballerina-action/@master
         with:
           args:
             push

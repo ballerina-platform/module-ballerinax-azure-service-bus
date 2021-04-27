@@ -21,129 +21,71 @@ import ballerinax/asb;
 configurable string connectionString = ?;
 configurable string topicPath = ?;
 configurable string subscriptionPath1 = ?;
-configurable string subscriptionPath2 = ?;
-configurable string subscriptionPath3 = ?;
 
 public function main() {
 
     // Input values
-    string[] stringArrayContent = ["apple", "mango", "lemon", "orange"];
-    map<string> parameters3 = {contentType: "text/plain", timeToLive: "2"};
+    string stringContent = "This is My Message Body"; 
+    byte[] byteContent = stringContent.toBytes();
     map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
-    int maxMessageCount = 3;
+    int timeToLive = 60; // In seconds
+    int serverWaitTime = 60; // In seconds
+    int maxMessageCount = 2;
 
-    asb:ConnectionConfiguration senderConfig = {
-        connectionString: connectionString,
-        entityPath: topicPath
+    asb:ApplicationProperties applicationProperties = {
+        properties: properties
     };
 
-    asb:ConnectionConfiguration receiverConfig1 = {
-        connectionString: connectionString,
-        entityPath: subscriptionPath1
+    asb:Message message1 = {
+        body: byteContent,
+        contentType: asb:TEXT,
+        timeToLive: timeToLive
     };
 
-    asb:ConnectionConfiguration receiverConfig2 = {
-        connectionString: connectionString,
-        entityPath: subscriptionPath2
+    asb:Message message2 = {
+        body: byteContent,
+        contentType: asb:TEXT,
+        timeToLive: timeToLive
     };
 
-    asb:ConnectionConfiguration receiverConfig3 = {
-        connectionString: connectionString,
-        entityPath: subscriptionPath3
+    asb:MessageBatch messages = {
+        messageCount: 2,
+        messages: [message1, message2]
     };
 
-    log:print("Creating Asb sender connection.");
-    asb:SenderConnection? senderConnection = checkpanic new (senderConfig);
+    asb:AsbConnectionConfiguration config = {
+        connectionString: connectionString
+    };
 
-    log:print("Creating Asb receiver connection.");
-    asb:ReceiverConnection? receiverConnection1 = checkpanic new (receiverConfig1);
-    asb:ReceiverConnection? receiverConnection2 = checkpanic new (receiverConfig2);
-    asb:ReceiverConnection? receiverConnection3 = checkpanic new (receiverConfig3);
+    asb:AsbClient asbClient = new (config);
 
-    if (senderConnection is asb:SenderConnection) {
-        log:print("Sending via Asb sender connection.");
-        checkpanic senderConnection->sendBatchMessage(stringArrayContent, parameters3, properties, maxMessageCount);
-    } else {
-        log:printError("Asb sender connection creation failed.");
-    }
+    log:printInfo("Creating Asb sender connection.");
+    checkpanic asbClient->createTopicSender(topicPath);
 
-    if (receiverConnection1 is asb:ReceiverConnection) {
-        log:print("Receiving from Asb receiver connection 1.");
-        var messagesReceived = receiverConnection1->receiveBatchMessage(maxMessageCount);
-        if(messagesReceived is asb:Messages) {
-            int val = messagesReceived.getMessageCount();
-            log:print("No. of messages received : " + val.toString());
-            asb:Message[] messages = messagesReceived.getMessages();
-            string messageReceived1 =  checkpanic messages[0].getTextContent();
-            log:print("Message1 content : " + messageReceived1);
-            string messageReceived2 =  checkpanic messages[1].getTextContent();
-            log:print("Message2 content : " + messageReceived2);
-            string messageReceived3 =  checkpanic messages[2].getTextContent();
-            log:print("Message3 content : " + messageReceived3);
-        }else {
-            log:printError("Receiving message via Asb receiver connection failed.");
+    log:printInfo("Creating Asb receiver connection.");
+    checkpanic asbClient->createSubscriptionReceiver(subscriptionPath1, asb:RECEIVEANDDELETE);
+
+    log:printInfo("Sending via Asb sender connection.");
+    checkpanic asbClient->sendBatch(messages);
+
+    log:printInfo("Receiving from Asb receiver connection.");
+    asb:MessageBatch|asb:Error? messageReceived = asbClient->receiveBatch(maxMessageCount, serverWaitTime);
+
+    if (messageReceived is asb:MessageBatch) {
+        foreach asb:Message message in messageReceived.messages {
+            if (message.toString() != "") {
+                log:printInfo("Reading Received Message : " + message.toString());
+            }
         }
+    } else if (messageReceived is ()) {
+        log:printError("No message in the subscription.");
     } else {
-        log:printError("Asb receiver connection creation failed.");
+        log:printError("Receiving message via Asb receiver connection failed.");
     }
 
-    if (receiverConnection2 is asb:ReceiverConnection) {
-        log:print("Receiving from Asb receiver connection 2.");
-        var messagesReceived = receiverConnection2->receiveBatchMessage(maxMessageCount);
-        if(messagesReceived is asb:Messages) {
-            int val = messagesReceived.getMessageCount();
-            log:print("No. of messages received : " + val.toString());
-            asb:Message[] messages = messagesReceived.getMessages();
-            string messageReceived1 =  checkpanic messages[0].getTextContent();
-            log:print("Message1 content : " + messageReceived1);
-            string messageReceived2 =  checkpanic messages[1].getTextContent();
-            log:print("Message2 content : " + messageReceived2);
-            string messageReceived3 =  checkpanic messages[2].getTextContent();
-            log:print("Message3 content : " + messageReceived3);
-        } else {
-            log:printError("Receiving message via Asb receiver connection failed.");
-        }
-    } else {
-        log:printError("Asb receiver connection creation failed.");
-    }
+    log:printInfo("Closing Asb sender connection.");
+    checkpanic asbClient->closeSender();
 
-    if (receiverConnection3 is asb:ReceiverConnection) {
-        log:print("Receiving from Asb receiver connection 3.");
-        var messagesReceived = receiverConnection3->receiveBatchMessage(maxMessageCount);
-        if(messagesReceived is asb:Messages) {
-            int val = messagesReceived.getMessageCount();
-            log:print("No. of messages received : " + val.toString());
-            asb:Message[] messages = messagesReceived.getMessages();
-            string messageReceived1 =  checkpanic messages[0].getTextContent();
-            log:print("Message1 content : " + messageReceived1);
-            string messageReceived2 =  checkpanic messages[1].getTextContent();
-            log:print("Message2 content : " + messageReceived2);
-            string messageReceived3 =  checkpanic messages[2].getTextContent();
-            log:print("Message3 content : " + messageReceived3);
-        } else {
-            log:printError("Receiving message via Asb receiver connection failed.");
-        }
-    } else {
-        log:printError("Asb receiver connection creation failed.");
-    }
-
-    if (senderConnection is asb:SenderConnection) {
-        log:print("Closing Asb sender connection.");
-        checkpanic senderConnection.closeSenderConnection();
-    }
-
-    if (receiverConnection1 is asb:ReceiverConnection) {
-        log:print("Closing Asb receiver connection 1.");
-        checkpanic receiverConnection1.closeReceiverConnection();
-    }
-
-    if (receiverConnection2 is asb:ReceiverConnection) {
-        log:print("Closing Asb receiver connection 2.");
-        checkpanic receiverConnection2.closeReceiverConnection();
-    }
-
-    if (receiverConnection3 is asb:ReceiverConnection) {
-        log:print("Closing Asb receiver connection 3.");
-        checkpanic receiverConnection3.closeReceiverConnection();
-    }
+    log:printInfo("Closing Asb receiver connection.");
+    checkpanic asbClient->closeReceiver();
 }    
