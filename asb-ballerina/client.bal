@@ -301,6 +301,7 @@ public client class AsbClient {
     # The operation renews lock on a message in a queue or subscription based on messageLockToken.
     # 
     # + asbReceiver - Asb Receiver
+    # + message - Message record
     # + return - An `asb:Error` if failed to renew message or else `()`
     @display {label: "Renew Lock on Message"}
     isolated remote function renewLock(@display {label: "Asb Receiver"} handle asbReceiver,
