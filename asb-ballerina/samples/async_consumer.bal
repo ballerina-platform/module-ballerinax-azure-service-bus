@@ -20,7 +20,7 @@ import ballerinax/asb;
 
 // Connection Configurations
 configurable string connectionString = ?;
-configurable string queuePath = ?;
+configurable string queueName = ?;
 
 public function main() {
 
@@ -48,16 +48,16 @@ public function main() {
     asb:AsbClient asbClient = new (config);
 
     log:printInfo("Creating Asb sender connection.");
-    checkpanic asbClient->createQueueSender(queuePath);
+    handle queueSender = checkpanic asbClient->createQueueSender(queueName);
 
     log:printInfo("Sending via Asb sender connection.");
-    checkpanic asbClient->send(message1);
+    checkpanic asbClient->send(queueSender, message1);
 
     asb:Service asyncTestService =
     @asb:ServiceConfig {
         entityConfig: {
             connectionString: connectionString,
-            entityPath: queuePath
+            entityPath: queueName
         }
     }
     service object {
@@ -80,5 +80,5 @@ public function main() {
     }
 
     log:printInfo("Closing Asb sender connection.");
-    checkpanic asbClient->closeSender();
+    checkpanic asbClient->closeSender(queueSender);
 }    
