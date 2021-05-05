@@ -31,8 +31,8 @@ import org.ballerinalang.asb.MessageDispatcher;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
-import static org.ballerinalang.asb.MessageDispatcher.getConnectionStringFromConfig;
-import static org.ballerinalang.asb.MessageDispatcher.getQueueNameFromConfig;
+import static org.ballerinalang.asb.ASBConstants.RECEIVEANDDELETE;
+import static org.ballerinalang.asb.MessageDispatcher.*;
 
 /**
  * Util class used to bridge the listener capabilities of the Asb connector's native code and the Ballerina API.
@@ -69,8 +69,15 @@ public class ListenerUtils {
         try {
             String connectionString = getConnectionStringFromConfig(service);
             String entityPath = getQueueNameFromConfig(service);
-            IMessageReceiver receiver = ClientFactory.createMessageReceiverFromConnectionStringBuilder(
-                    new ConnectionStringBuilder(connectionString, entityPath), ReceiveMode.PEEKLOCK);
+            String receiveMode = getReceiveModeFromConfig(service);
+            IMessageReceiver receiver;
+            if (receiveMode.equals(RECEIVEANDDELETE)) {
+                receiver = ClientFactory.createMessageReceiverFromConnectionStringBuilder(
+                        new ConnectionStringBuilder(connectionString, entityPath), ReceiveMode.RECEIVEANDDELETE);
+            } else {
+                receiver = ClientFactory.createMessageReceiverFromConnectionStringBuilder(
+                        new ConnectionStringBuilder(connectionString, entityPath), ReceiveMode.PEEKLOCK);
+            }
             listenerBObject.addNativeData(ASBConstants.CONNECTION_NATIVE_OBJECT, receiver);
         } catch (InterruptedException e) {
             throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
@@ -189,6 +196,20 @@ public class ListenerUtils {
             }
         }
         return null;
+    }
+
+    /**
+     * Get the receiver used by the listener.
+     *
+     * @param listenerBObject Ballerina listener object.
+     */
+    public static Object getReceiver(BObject listenerBObject) {
+        IMessageReceiver iMessageReceiver =
+                (IMessageReceiver) listenerBObject.getNativeData(ASBConstants.CONNECTION_NATIVE_OBJECT);
+        if(iMessageReceiver == null) {
+            return ASBUtils.returnErrorValue("IMessageReceiver is not properly initialised.");
+        }
+        return iMessageReceiver;
     }
 
     /**

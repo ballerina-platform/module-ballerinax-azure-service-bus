@@ -252,6 +252,7 @@ public client class AsbClient {
     # Defer the message in a Queue or Subscription based on messageLockToken.  It prevents the message from being 
     # directly received from the queue by setting it aside such that it must be received by sequence number.
     # 
+    # + message - Message record
     # + return - An `asb:Error` if failed to defer message or else sequence number
     @display {label: "Defer Message"}
     isolated remote function defer(@display {label: "Message record"} Message message) 

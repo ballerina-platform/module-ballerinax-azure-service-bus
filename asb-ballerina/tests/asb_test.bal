@@ -20,11 +20,11 @@ import ballerina/test;
 
 // Connection Configurations
 configurable string connectionString = os:getEnv("CONNECTION_STRING");
-configurable string queuePath = os:getEnv("QUEUE_PATH");
-configurable string topicPath = os:getEnv("TOPIC_PATH");
-configurable string subscriptionPath1 = os:getEnv("SUBSCRIPTION_PATH1");
-configurable string subscriptionPath2 = os:getEnv("SUBSCRIPTION_PATH2");
-configurable string subscriptionPath3 = os:getEnv("SUBSCRIPTION_PATH3");
+configurable string queueName = os:getEnv("QUEUE_NAME");
+configurable string topicName = os:getEnv("TOPIC_NAME");
+configurable string subscriptionName1 = os:getEnv("SUBSCRIPTION_NAME1");
+configurable string subscriptionName2 = os:getEnv("SUBSCRIPTION_NAME2");
+configurable string subscriptionName3 = os:getEnv("SUBSCRIPTION_NAME3");
 
 // Input values
 string stringContent = "This is My Message Body"; 
@@ -70,10 +70,10 @@ function testSendAndReceiveMessageFromQueueOperation() {
     AsbClient asbClient = new (config);
 
     log:printInfo("Creating Asb sender connection.");
-    checkpanic asbClient->createQueueSender(queuePath);
+    checkpanic asbClient->createQueueSender(queueName);
 
     log:printInfo("Creating Asb receiver connection.");
-    checkpanic asbClient->createQueueReceiver(queuePath, RECEIVEANDDELETE);
+    checkpanic asbClient->createQueueReceiver(queueName, RECEIVEANDDELETE);
 
     log:printInfo("Sending via Asb sender connection.");
     checkpanic asbClient->send(message1);
@@ -107,10 +107,10 @@ function testSendAndReceiveBatchFromQueueOperation() {
     AsbClient asbClient = new (config);
 
     log:printInfo("Creating Asb sender connection.");
-    checkpanic asbClient->createQueueSender(queuePath);
+    checkpanic asbClient->createQueueSender(queueName);
 
     log:printInfo("Creating Asb receiver connection.");
-    checkpanic asbClient->createQueueReceiver(queuePath, RECEIVEANDDELETE);
+    checkpanic asbClient->createQueueReceiver(queueName, RECEIVEANDDELETE);
 
     log:printInfo("Sending via Asb sender connection.");
     checkpanic asbClient->sendBatch(messages);
@@ -148,10 +148,10 @@ function testCompleteMessageFromQueueOperation() {
     AsbClient asbClient = new (config);
 
     log:printInfo("Creating Asb sender connection.");
-    checkpanic asbClient->createQueueSender(queuePath);
+    checkpanic asbClient->createQueueSender(queueName);
 
     log:printInfo("Creating Asb receiver connection.");
-    checkpanic asbClient->createQueueReceiver(queuePath, PEEKLOCK);
+    checkpanic asbClient->createQueueReceiver(queueName, PEEKLOCK);
 
     log:printInfo("Sending via Asb sender connection.");
     checkpanic asbClient->send(message1);
@@ -185,10 +185,10 @@ function testAbandonMessageFromQueueOperation() {
     AsbClient asbClient = new (config);
 
     log:printInfo("Creating Asb sender connection.");
-    checkpanic asbClient->createQueueSender(queuePath);
+    checkpanic asbClient->createQueueSender(queueName);
 
     log:printInfo("Creating Asb receiver connection.");
-    checkpanic asbClient->createQueueReceiver(queuePath, PEEKLOCK);
+    checkpanic asbClient->createQueueReceiver(queueName, PEEKLOCK);
 
     log:printInfo("Sending via Asb sender connection.");
     checkpanic asbClient->send(message1);
@@ -230,10 +230,10 @@ function testDeadletterMessageFromQueueOperation() {
     AsbClient asbClient = new (config);
 
     log:printInfo("Creating Asb sender connection.");
-    checkpanic asbClient->createQueueSender(queuePath);
+    checkpanic asbClient->createQueueSender(queueName);
 
     log:printInfo("Creating Asb receiver connection.");
-    checkpanic asbClient->createQueueReceiver(queuePath, PEEKLOCK);
+    checkpanic asbClient->createQueueReceiver(queueName, PEEKLOCK);
 
     log:printInfo("Sending via Asb sender connection.");
     checkpanic asbClient->send(message1);
@@ -267,10 +267,10 @@ function testDeferMessageFromQueueOperation() {
     AsbClient asbClient = new (config);
 
     log:printInfo("Creating Asb sender connection.");
-    checkpanic asbClient->createQueueSender(queuePath);
+    checkpanic asbClient->createQueueSender(queueName);
 
     log:printInfo("Creating Asb receiver connection.");
-    checkpanic asbClient->createQueueReceiver(queuePath, PEEKLOCK);
+    checkpanic asbClient->createQueueReceiver(queueName, PEEKLOCK);
 
     log:printInfo("Sending via Asb sender connection.");
     checkpanic asbClient->send(message1);
@@ -310,10 +310,10 @@ function testSendAndReceiveMessageFromSubscriptionOperation() {
     AsbClient asbClient = new (config);
 
     log:printInfo("Creating Asb sender connection.");
-    checkpanic asbClient->createTopicSender(topicPath);
+    checkpanic asbClient->createTopicSender(topicName);
 
     log:printInfo("Creating Asb receiver connection.");
-    checkpanic asbClient->createSubscriptionReceiver(subscriptionPath1, RECEIVEANDDELETE);
+    checkpanic asbClient->createSubscriptionReceiver(topicName, subscriptionName1, RECEIVEANDDELETE);
 
     log:printInfo("Sending via Asb sender connection.");
     checkpanic asbClient->send(message1);
@@ -346,10 +346,10 @@ function testSendAndReceiveBatchFromSubscriptionOperation() {
     AsbClient asbClient = new (config);
 
     log:printInfo("Creating Asb sender connection.");
-    checkpanic asbClient->createTopicSender(topicPath);
+    checkpanic asbClient->createTopicSender(topicName);
 
     log:printInfo("Creating Asb receiver connection.");
-    checkpanic asbClient->createSubscriptionReceiver(subscriptionPath1, RECEIVEANDDELETE);
+    checkpanic asbClient->createSubscriptionReceiver(topicName, subscriptionName1, RECEIVEANDDELETE);
 
     log:printInfo("Sending via Asb sender connection.");
     checkpanic asbClient->sendBatch(messages);
@@ -386,10 +386,10 @@ function testCompleteMessageFromSubscriptionOperation() {
     AsbClient asbClient = new (config);
 
     log:printInfo("Creating Asb sender connection.");
-    checkpanic asbClient->createTopicSender(topicPath);
+    checkpanic asbClient->createTopicSender(topicName);
 
     log:printInfo("Creating Asb receiver connection.");
-    checkpanic asbClient->createSubscriptionReceiver(subscriptionPath1, PEEKLOCK);
+    checkpanic asbClient->createSubscriptionReceiver(topicName, subscriptionName1, PEEKLOCK);
 
     log:printInfo("Sending via Asb sender connection.");
     checkpanic asbClient->send(message1);
@@ -423,10 +423,10 @@ function testAbandonMessageFromSubscriptionOperation() {
     AsbClient asbClient = new (config);
 
     log:printInfo("Creating Asb sender connection.");
-    checkpanic asbClient->createTopicSender(topicPath);
+    checkpanic asbClient->createTopicSender(topicName);
 
     log:printInfo("Creating Asb receiver connection.");
-    checkpanic asbClient->createSubscriptionReceiver(subscriptionPath1, PEEKLOCK);
+    checkpanic asbClient->createSubscriptionReceiver(topicName, subscriptionName1, PEEKLOCK);
 
     log:printInfo("Sending via Asb sender connection.");
     checkpanic asbClient->send(message1);
@@ -466,10 +466,10 @@ function testDeadletterMessageFromSubscriptionOperation() {
     AsbClient asbClient = new (config);
 
     log:printInfo("Creating Asb sender connection.");
-    checkpanic asbClient->createTopicSender(topicPath);
+    checkpanic asbClient->createTopicSender(topicName);
 
     log:printInfo("Creating Asb receiver connection.");
-    checkpanic asbClient->createSubscriptionReceiver(subscriptionPath1, PEEKLOCK);
+    checkpanic asbClient->createSubscriptionReceiver(topicName, subscriptionName1, PEEKLOCK);
 
     log:printInfo("Sending via Asb sender connection.");
     checkpanic asbClient->send(message1);
@@ -503,10 +503,10 @@ function testDeferMessageFromSubscriptionOperation() {
     AsbClient asbClient = new (config);
 
     log:printInfo("Creating Asb sender connection.");
-    checkpanic asbClient->createTopicSender(topicPath);
+    checkpanic asbClient->createTopicSender(topicName);
 
     log:printInfo("Creating Asb receiver connection.");
-    checkpanic asbClient->createSubscriptionReceiver(subscriptionPath1, PEEKLOCK);
+    checkpanic asbClient->createSubscriptionReceiver(topicName, subscriptionName1, PEEKLOCK);
 
     log:printInfo("Sending via Asb sender connection.");
     checkpanic asbClient->send(message1);

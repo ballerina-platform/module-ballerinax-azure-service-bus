@@ -32,7 +32,7 @@ public class ASBConstants {
     // Asb package name constant fields
     public static final String ORG_NAME = "ballerinax";
     public static final String ASB = "asb";
-    public static final String ASB_VERSION = "0.1.2";
+    public static final String ASB_VERSION = "0.1.3";
     public static final Module PACKAGE_ID_ASB = new Module(ORG_NAME, ASB, ASB_VERSION);
     public static final String PACKAGE_ASB_FQN =
             ORG_NAME + ORG_NAME_SEPARATOR + ASB + VERSION_SEPARATOR + ASB_VERSION;
@@ -84,6 +84,7 @@ public class ASBConstants {
 
     public static final BString QUEUE_NAME = StringUtils.fromString("entityPath");
     public static final BString CONNECTION_STRING = StringUtils.fromString("connectionString");
+    public static final BString RECEIVE_MODE = StringUtils.fromString("receiveMode");
     public static final String CONNECTION_NATIVE_OBJECT = "asb_connection_object";
 
     public static final String SERVICE_CONFIG = "ServiceConfig";
