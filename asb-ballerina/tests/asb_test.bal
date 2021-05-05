@@ -70,16 +70,16 @@ function testSendAndReceiveMessageFromQueueOperation() {
     AsbClient asbClient = new (config);
 
     log:printInfo("Creating Asb sender connection.");
-    checkpanic asbClient->createQueueSender(queueName);
+    handle queueSender = checkpanic asbClient->createQueueSender(queueName);
 
     log:printInfo("Creating Asb receiver connection.");
-    checkpanic asbClient->createQueueReceiver(queueName, RECEIVEANDDELETE);
+    handle queueReceiver = checkpanic asbClient->createQueueReceiver(queueName, RECEIVEANDDELETE);
 
     log:printInfo("Sending via Asb sender connection.");
-    checkpanic asbClient->send(message1);
+    checkpanic asbClient->send(queueSender, message1);
 
     log:printInfo("Receiving from Asb receiver connection.");
-    Message|Error? messageReceived = asbClient->receive(serverWaitTime);
+    Message|Error? messageReceived = asbClient->receive(queueReceiver, serverWaitTime);
 
     if (messageReceived is Message) {
         log:printInfo(messageReceived.toString());
@@ -91,10 +91,10 @@ function testSendAndReceiveMessageFromQueueOperation() {
     }
 
     log:printInfo("Closing Asb sender connection.");
-    checkpanic asbClient->closeSender();
+    checkpanic asbClient->closeSender(queueSender);
 
     log:printInfo("Closing Asb receiver connection.");
-    checkpanic asbClient->closeReceiver();
+    checkpanic asbClient->closeReceiver(queueReceiver);
 }
 
 @test:Config { 
@@ -107,16 +107,16 @@ function testSendAndReceiveBatchFromQueueOperation() {
     AsbClient asbClient = new (config);
 
     log:printInfo("Creating Asb sender connection.");
-    checkpanic asbClient->createQueueSender(queueName);
+    handle queueSender = checkpanic asbClient->createQueueSender(queueName);
 
     log:printInfo("Creating Asb receiver connection.");
-    checkpanic asbClient->createQueueReceiver(queueName, RECEIVEANDDELETE);
+    handle queueReceiver = checkpanic asbClient->createQueueReceiver(queueName, RECEIVEANDDELETE);
 
     log:printInfo("Sending via Asb sender connection.");
-    checkpanic asbClient->sendBatch(messages);
+    checkpanic asbClient->sendBatch(queueSender, messages);
 
     log:printInfo("Receiving from Asb receiver connection.");
-    MessageBatch|Error? messageReceived = asbClient->receiveBatch(maxMessageCount);
+    MessageBatch|Error? messageReceived = asbClient->receiveBatch(queueReceiver, maxMessageCount);
 
     if (messageReceived is MessageBatch) {
         log:printInfo(messageReceived.toString());
@@ -132,10 +132,10 @@ function testSendAndReceiveBatchFromQueueOperation() {
     }
 
     log:printInfo("Closing Asb sender connection.");
-    checkpanic asbClient->closeSender();
+    checkpanic asbClient->closeSender(queueSender);
 
     log:printInfo("Closing Asb receiver connection.");
-    checkpanic asbClient->closeReceiver();
+    checkpanic asbClient->closeReceiver(queueReceiver);
 }
 
 @test:Config { 
@@ -148,19 +148,19 @@ function testCompleteMessageFromQueueOperation() {
     AsbClient asbClient = new (config);
 
     log:printInfo("Creating Asb sender connection.");
-    checkpanic asbClient->createQueueSender(queueName);
+    handle queueSender = checkpanic asbClient->createQueueSender(queueName);
 
     log:printInfo("Creating Asb receiver connection.");
-    checkpanic asbClient->createQueueReceiver(queueName, PEEKLOCK);
+    handle queueReceiver = checkpanic asbClient->createQueueReceiver(queueName, PEEKLOCK);
 
     log:printInfo("Sending via Asb sender connection.");
-    checkpanic asbClient->send(message1);
+    checkpanic asbClient->send(queueSender, message1);
 
     log:printInfo("Receiving from Asb receiver connection.");
-    Message|Error? messageReceived = asbClient->receive(serverWaitTime);
+    Message|Error? messageReceived = asbClient->receive(queueReceiver, serverWaitTime);
 
     if (messageReceived is Message) {
-        var result = checkpanic asbClient->complete(messageReceived);
+        var result = checkpanic asbClient->complete(queueReceiver, messageReceived);
         test:assertEquals(result, (), msg = "Complete message not succesful.");
     } else if (messageReceived is ()) {
         test:assertFail("No message in the queue.");
@@ -169,10 +169,10 @@ function testCompleteMessageFromQueueOperation() {
     }
 
     log:printInfo("Closing Asb sender connection.");
-    checkpanic asbClient->closeSender();
+    checkpanic asbClient->closeSender(queueSender);
 
     log:printInfo("Closing Asb receiver connection.");
-    checkpanic asbClient->closeReceiver();
+    checkpanic asbClient->closeReceiver(queueReceiver);
 }
 
 @test:Config { 
@@ -185,25 +185,25 @@ function testAbandonMessageFromQueueOperation() {
     AsbClient asbClient = new (config);
 
     log:printInfo("Creating Asb sender connection.");
-    checkpanic asbClient->createQueueSender(queueName);
+    handle queueSender = checkpanic asbClient->createQueueSender(queueName);
 
     log:printInfo("Creating Asb receiver connection.");
-    checkpanic asbClient->createQueueReceiver(queueName, PEEKLOCK);
+    handle queueReceiver = checkpanic asbClient->createQueueReceiver(queueName, PEEKLOCK);
 
     log:printInfo("Sending via Asb sender connection.");
-    checkpanic asbClient->send(message1);
+    checkpanic asbClient->send(queueSender, message1);
 
     log:printInfo("Receiving from Asb receiver connection.");
-    Message|Error? messageReceived = asbClient->receive(serverWaitTime);
+    Message|Error? messageReceived = asbClient->receive(queueReceiver, serverWaitTime);
 
     if (messageReceived is Message) {
-        var result = checkpanic asbClient->abandon(messageReceived);
+        var result = checkpanic asbClient->abandon(queueReceiver, messageReceived);
         test:assertEquals(result, (), msg = "Abandon message not succesful.");
-        Message|Error? messageReceivedAgain = asbClient->receive(serverWaitTime);
+        Message|Error? messageReceivedAgain = asbClient->receive(queueReceiver, serverWaitTime);
         if (messageReceivedAgain is Message) {
             test:assertEquals(messageReceivedAgain?.messageId, messageReceived?.messageId, 
                 msg = "Abandon message not succesful.");
-            checkpanic asbClient->complete(messageReceivedAgain);
+            checkpanic asbClient->complete(queueReceiver, messageReceivedAgain);
         } else {
             test:assertFail("Abandon message not succesful.");
         }
@@ -214,10 +214,10 @@ function testAbandonMessageFromQueueOperation() {
     }
 
     log:printInfo("Closing Asb sender connection.");
-    checkpanic asbClient->closeSender();
+    checkpanic asbClient->closeSender(queueSender);
 
     log:printInfo("Closing Asb receiver connection.");
-    checkpanic asbClient->closeReceiver();
+    checkpanic asbClient->closeReceiver(queueReceiver);
 }
 
 @test:Config { 
@@ -230,19 +230,19 @@ function testDeadletterMessageFromQueueOperation() {
     AsbClient asbClient = new (config);
 
     log:printInfo("Creating Asb sender connection.");
-    checkpanic asbClient->createQueueSender(queueName);
+    handle queueSender = checkpanic asbClient->createQueueSender(queueName);
 
     log:printInfo("Creating Asb receiver connection.");
-    checkpanic asbClient->createQueueReceiver(queueName, PEEKLOCK);
+    handle queueReceiver = checkpanic asbClient->createQueueReceiver(queueName, PEEKLOCK);
 
     log:printInfo("Sending via Asb sender connection.");
-    checkpanic asbClient->send(message1);
+    checkpanic asbClient->send(queueSender, message1);
 
     log:printInfo("Receiving from Asb receiver connection.");
-    Message|Error? messageReceived = asbClient->receive(serverWaitTime);
+    Message|Error? messageReceived = asbClient->receive(queueReceiver, serverWaitTime);
 
     if (messageReceived is Message) {
-        var result = checkpanic asbClient->deadLetter(messageReceived);
+        var result = checkpanic asbClient->deadLetter(queueReceiver, messageReceived);
         test:assertEquals(result, (), msg = "Deadletter message not succesful.");
     } else if (messageReceived is ()) {
         test:assertFail("No message in the queue.");
@@ -251,10 +251,10 @@ function testDeadletterMessageFromQueueOperation() {
     }
 
     log:printInfo("Closing Asb sender connection.");
-    checkpanic asbClient->closeSender();
+    checkpanic asbClient->closeSender(queueSender);
 
     log:printInfo("Closing Asb receiver connection.");
-    checkpanic asbClient->closeReceiver();
+    checkpanic asbClient->closeReceiver(queueReceiver);
 }
 
 @test:Config { 
@@ -267,25 +267,25 @@ function testDeferMessageFromQueueOperation() {
     AsbClient asbClient = new (config);
 
     log:printInfo("Creating Asb sender connection.");
-    checkpanic asbClient->createQueueSender(queueName);
+    handle queueSender = checkpanic asbClient->createQueueSender(queueName);
 
     log:printInfo("Creating Asb receiver connection.");
-    checkpanic asbClient->createQueueReceiver(queueName, PEEKLOCK);
+    handle queueReceiver = checkpanic asbClient->createQueueReceiver(queueName, PEEKLOCK);
 
     log:printInfo("Sending via Asb sender connection.");
-    checkpanic asbClient->send(message1);
+    checkpanic asbClient->send(queueSender, message1);
 
     log:printInfo("Receiving from Asb receiver connection.");
-    Message|Error? messageReceived = asbClient->receive(serverWaitTime);
+    Message|Error? messageReceived = asbClient->receive(queueReceiver, serverWaitTime);
 
     if (messageReceived is Message) {
-        int result = checkpanic asbClient->defer(messageReceived);
+        int result = checkpanic asbClient->defer(queueReceiver, messageReceived);
         test:assertNotEquals(result, 0, msg = "Defer message not succesful.");
-        Message|Error? messageReceivedAgain = checkpanic asbClient->receiveDeferred(result);
+        Message|Error? messageReceivedAgain = checkpanic asbClient->receiveDeferred(queueReceiver, result);
         if (messageReceivedAgain is Message) {
             test:assertEquals(messageReceivedAgain?.messageId, messageReceived?.messageId, 
                 msg = "Receiving deferred message not succesful.");
-            checkpanic asbClient->complete(messageReceivedAgain);
+            checkpanic asbClient->complete(queueReceiver, messageReceivedAgain);
         }
     } else if (messageReceived is ()) {
         test:assertFail("No message in the queue.");
@@ -294,10 +294,10 @@ function testDeferMessageFromQueueOperation() {
     }
 
     log:printInfo("Closing Asb sender connection.");
-    checkpanic asbClient->closeSender();
+    checkpanic asbClient->closeSender(queueSender);
 
     log:printInfo("Closing Asb receiver connection.");
-    checkpanic asbClient->closeReceiver();
+    checkpanic asbClient->closeReceiver(queueReceiver);
 }
 
 @test:Config { 
@@ -310,16 +310,17 @@ function testSendAndReceiveMessageFromSubscriptionOperation() {
     AsbClient asbClient = new (config);
 
     log:printInfo("Creating Asb sender connection.");
-    checkpanic asbClient->createTopicSender(topicName);
+    handle topicSender = checkpanic asbClient->createTopicSender(topicName);
 
     log:printInfo("Creating Asb receiver connection.");
-    checkpanic asbClient->createSubscriptionReceiver(topicName, subscriptionName1, RECEIVEANDDELETE);
+    handle subscriptionReceiver = 
+        checkpanic asbClient->createSubscriptionReceiver(topicName, subscriptionName1, RECEIVEANDDELETE);
 
     log:printInfo("Sending via Asb sender connection.");
-    checkpanic asbClient->send(message1);
+    checkpanic asbClient->send(topicSender, message1);
 
     log:printInfo("Receiving from Asb receiver connection.");
-    Message|Error? messageReceived = asbClient->receive(serverWaitTime);
+    Message|Error? messageReceived = asbClient->receive(subscriptionReceiver, serverWaitTime);
 
     if (messageReceived is Message) {
         test:assertEquals(messageReceived.body, stringContent, msg = "Sent & recieved message not equal.");
@@ -330,10 +331,10 @@ function testSendAndReceiveMessageFromSubscriptionOperation() {
     }
 
     log:printInfo("Closing Asb sender connection.");
-    checkpanic asbClient->closeSender();
+    checkpanic asbClient->closeSender(topicSender);
 
     log:printInfo("Closing Asb receiver connection.");
-    checkpanic asbClient->closeReceiver();
+    checkpanic asbClient->closeReceiver(subscriptionReceiver);
 }
 
 @test:Config { 
@@ -346,16 +347,18 @@ function testSendAndReceiveBatchFromSubscriptionOperation() {
     AsbClient asbClient = new (config);
 
     log:printInfo("Creating Asb sender connection.");
-    checkpanic asbClient->createTopicSender(topicName);
+    handle topicSender = checkpanic asbClient->createTopicSender(topicName);
 
     log:printInfo("Creating Asb receiver connection.");
-    checkpanic asbClient->createSubscriptionReceiver(topicName, subscriptionName1, RECEIVEANDDELETE);
+    handle subscriptionReceiver = 
+        checkpanic asbClient->createSubscriptionReceiver(topicName, subscriptionName1, RECEIVEANDDELETE);
 
     log:printInfo("Sending via Asb sender connection.");
-    checkpanic asbClient->sendBatch(messages);
+    checkpanic asbClient->sendBatch(topicSender, messages);
 
     log:printInfo("Receiving from Asb receiver connection.");
-    MessageBatch|Error? messageReceived = asbClient->receiveBatch(maxMessageCount, serverWaitTime);
+    MessageBatch|Error? messageReceived = 
+        asbClient->receiveBatch(subscriptionReceiver, maxMessageCount, serverWaitTime);
 
     if (messageReceived is MessageBatch) {
         foreach Message message in messageReceived.messages {
@@ -370,10 +373,10 @@ function testSendAndReceiveBatchFromSubscriptionOperation() {
     }
 
     log:printInfo("Closing Asb sender connection.");
-    checkpanic asbClient->closeSender();
+    checkpanic asbClient->closeSender(topicSender);
 
     log:printInfo("Closing Asb receiver connection.");
-    checkpanic asbClient->closeReceiver();
+    checkpanic asbClient->closeReceiver(subscriptionReceiver);
 }
 
 @test:Config { 
@@ -386,19 +389,20 @@ function testCompleteMessageFromSubscriptionOperation() {
     AsbClient asbClient = new (config);
 
     log:printInfo("Creating Asb sender connection.");
-    checkpanic asbClient->createTopicSender(topicName);
+    handle topicSender = checkpanic asbClient->createTopicSender(topicName);
 
     log:printInfo("Creating Asb receiver connection.");
-    checkpanic asbClient->createSubscriptionReceiver(topicName, subscriptionName1, PEEKLOCK);
+    handle subscriptionReceiver = 
+        checkpanic asbClient->createSubscriptionReceiver(topicName, subscriptionName1, PEEKLOCK);
 
     log:printInfo("Sending via Asb sender connection.");
-    checkpanic asbClient->send(message1);
+    checkpanic asbClient->send(topicSender, message1);
 
     log:printInfo("Receiving from Asb receiver connection.");
-    Message|Error? messageReceived = asbClient->receive(serverWaitTime);
+    Message|Error? messageReceived = asbClient->receive(subscriptionReceiver, serverWaitTime);
 
     if (messageReceived is Message) {
-        var result = checkpanic asbClient->complete(messageReceived);
+        var result = checkpanic asbClient->complete(subscriptionReceiver, messageReceived);
         test:assertEquals(result, (), msg = "Complete message not succesful.");
     } else if (messageReceived is ()) {
         test:assertFail("No message in the subscription.");
@@ -407,10 +411,10 @@ function testCompleteMessageFromSubscriptionOperation() {
     }
 
     log:printInfo("Closing Asb sender connection.");
-    checkpanic asbClient->closeSender();
+    checkpanic asbClient->closeSender(topicSender);
 
     log:printInfo("Closing Asb receiver connection.");
-    checkpanic asbClient->closeReceiver();
+    checkpanic asbClient->closeReceiver(subscriptionReceiver);
 }
 
 @test:Config { 
@@ -423,23 +427,24 @@ function testAbandonMessageFromSubscriptionOperation() {
     AsbClient asbClient = new (config);
 
     log:printInfo("Creating Asb sender connection.");
-    checkpanic asbClient->createTopicSender(topicName);
+    handle topicSender = checkpanic asbClient->createTopicSender(topicName);
 
     log:printInfo("Creating Asb receiver connection.");
-    checkpanic asbClient->createSubscriptionReceiver(topicName, subscriptionName1, PEEKLOCK);
+    handle subscriptionReceiver = 
+        checkpanic asbClient->createSubscriptionReceiver(topicName, subscriptionName1, PEEKLOCK);
 
     log:printInfo("Sending via Asb sender connection.");
-    checkpanic asbClient->send(message1);
+    checkpanic asbClient->send(topicSender, message1);
 
     log:printInfo("Receiving from Asb receiver connection.");
-    Message|Error? messageReceived = asbClient->receive(serverWaitTime);
+    Message|Error? messageReceived = asbClient->receive(subscriptionReceiver, serverWaitTime);
 
     if (messageReceived is Message) {
-        var result = checkpanic asbClient->abandon(messageReceived);
+        var result = checkpanic asbClient->abandon(subscriptionReceiver, messageReceived);
         test:assertEquals(result, (), msg = "Abandon message not succesful.");
-        Message|Error? messageReceivedAgain = asbClient->receive(serverWaitTime);
+        Message|Error? messageReceivedAgain = asbClient->receive(subscriptionReceiver, serverWaitTime);
         if (messageReceivedAgain is Message) {
-            checkpanic asbClient->complete(messageReceivedAgain);
+            checkpanic asbClient->complete(subscriptionReceiver, messageReceivedAgain);
         } else {
             test:assertFail("Abandon message not succesful.");
         }
@@ -450,10 +455,10 @@ function testAbandonMessageFromSubscriptionOperation() {
     }
 
     log:printInfo("Closing Asb sender connection.");
-    checkpanic asbClient->closeSender();
+    checkpanic asbClient->closeSender(topicSender);
 
     log:printInfo("Closing Asb receiver connection.");
-    checkpanic asbClient->closeReceiver();
+    checkpanic asbClient->closeReceiver(subscriptionReceiver);
 }
 
 @test:Config { 
@@ -466,19 +471,20 @@ function testDeadletterMessageFromSubscriptionOperation() {
     AsbClient asbClient = new (config);
 
     log:printInfo("Creating Asb sender connection.");
-    checkpanic asbClient->createTopicSender(topicName);
+    handle topicSender = checkpanic asbClient->createTopicSender(topicName);
 
     log:printInfo("Creating Asb receiver connection.");
-    checkpanic asbClient->createSubscriptionReceiver(topicName, subscriptionName1, PEEKLOCK);
+    handle subscriptionReceiver = 
+        checkpanic asbClient->createSubscriptionReceiver(topicName, subscriptionName1, PEEKLOCK);
 
     log:printInfo("Sending via Asb sender connection.");
-    checkpanic asbClient->send(message1);
+    checkpanic asbClient->send(topicSender, message1);
 
     log:printInfo("Receiving from Asb receiver connection.");
-    Message|Error? messageReceived = asbClient->receive(serverWaitTime);
+    Message|Error? messageReceived = asbClient->receive(subscriptionReceiver, serverWaitTime);
 
     if (messageReceived is Message) {
-        var result = checkpanic asbClient->deadLetter(messageReceived);
+        var result = checkpanic asbClient->deadLetter(subscriptionReceiver, messageReceived);
         test:assertEquals(result, (), msg = "Deadletter message not succesful.");
     } else if (messageReceived is ()) {
         test:assertFail("No message in the subscription.");
@@ -487,10 +493,10 @@ function testDeadletterMessageFromSubscriptionOperation() {
     }
 
     log:printInfo("Closing Asb sender connection.");
-    checkpanic asbClient->closeSender();
+    checkpanic asbClient->closeSender(topicSender);
 
     log:printInfo("Closing Asb receiver connection.");
-    checkpanic asbClient->closeReceiver();
+    checkpanic asbClient->closeReceiver(subscriptionReceiver);
 }
 
 @test:Config { 
@@ -503,25 +509,26 @@ function testDeferMessageFromSubscriptionOperation() {
     AsbClient asbClient = new (config);
 
     log:printInfo("Creating Asb sender connection.");
-    checkpanic asbClient->createTopicSender(topicName);
+    handle topicSender = checkpanic asbClient->createTopicSender(topicName);
 
     log:printInfo("Creating Asb receiver connection.");
-    checkpanic asbClient->createSubscriptionReceiver(topicName, subscriptionName1, PEEKLOCK);
+    handle subscriptionReceiver = 
+        checkpanic asbClient->createSubscriptionReceiver(topicName, subscriptionName1, PEEKLOCK);
 
     log:printInfo("Sending via Asb sender connection.");
-    checkpanic asbClient->send(message1);
+    checkpanic asbClient->send(topicSender, message1);
 
     log:printInfo("Receiving from Asb receiver connection.");
-    Message|Error? messageReceived = asbClient->receive(serverWaitTime);
+    Message|Error? messageReceived = asbClient->receive(subscriptionReceiver, serverWaitTime);
 
     if (messageReceived is Message) {
-        int result = checkpanic asbClient->defer(messageReceived);
+        int result = checkpanic asbClient->defer(subscriptionReceiver, messageReceived);
         test:assertNotEquals(result, 0, msg = "Defer message not succesful.");
-        Message|Error? messageReceivedAgain = checkpanic asbClient->receiveDeferred(result);
+        Message|Error? messageReceivedAgain = checkpanic asbClient->receiveDeferred(subscriptionReceiver, result);
         if (messageReceivedAgain is Message) {
             test:assertEquals(messageReceivedAgain?.messageId, messageReceived?.messageId, 
                 msg = "Receiving deferred message not succesful.");
-            checkpanic asbClient->complete(messageReceivedAgain);
+            checkpanic asbClient->complete(subscriptionReceiver, messageReceivedAgain);
         }
     } else if (messageReceived is ()) {
         test:assertFail("No message in the queue.");
@@ -530,8 +537,8 @@ function testDeferMessageFromSubscriptionOperation() {
     }
 
     log:printInfo("Closing Asb sender connection.");
-    checkpanic asbClient->closeSender();
+    checkpanic asbClient->closeSender(topicSender);
 
     log:printInfo("Closing Asb receiver connection.");
-    checkpanic asbClient->closeReceiver();
+    checkpanic asbClient->closeReceiver(subscriptionReceiver);
 }
