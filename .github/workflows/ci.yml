@@ -72,8 +72,8 @@ jobs:
         env:
             JAVA_HOME: /usr/lib/jvm/default-jvm
             CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
-            QUEUE_PATH: ${{ secrets.QUEUE_PATH }}
-            TOPIC_PATH: ${{ secrets.TOPIC_PATH }}
-            SUBSCRIPTION_PATH1: ${{ secrets.SUBSCRIPTION_PATH1 }}
-            SUBSCRIPTION_PATH2: ${{ secrets.SUBSCRIPTION_PATH2 }}
-            SUBSCRIPTION_PATH3: ${{ secrets.SUBSCRIPTION_PATH3 }}
+            QUEUE_PATH: ${{ secrets.QUEUE_NAME }}
+            TOPIC_PATH: ${{ secrets.TOPIC_NAME }}
+            SUBSCRIPTION_PATH1: ${{ secrets.SUBSCRIPTION_NAME1 }}
+            SUBSCRIPTION_PATH2: ${{ secrets.SUBSCRIPTION_NAME2 }}
+            SUBSCRIPTION_PATH3: ${{ secrets.SUBSCRIPTION_NAME3 }}
