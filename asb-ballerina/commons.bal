@@ -63,9 +63,11 @@ public type AsbConnectionConfiguration record {|
 #                      Endpoint=sb://namespace_DNS_Name;EntityPath=EVENT_HUB_NAME;
 #                      SharedAccessSignatureToken=SHARED_ACCESS_SIGNATURE_TOKEN
 # + entityPath - Entitypath to the message broker resource
+# + receiveMode - Message receive modes
 public type EntityConfiguration record {|
     string connectionString;
     string entityPath;
+    string receiveMode?;
 |};
 
 # Service configurations used to create a `asb:Connection`.

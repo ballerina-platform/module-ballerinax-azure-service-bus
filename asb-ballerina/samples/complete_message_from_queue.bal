@@ -19,7 +19,7 @@ import ballerinax/asb;
 
 // Connection Configurations
 configurable string connectionString = ?;
-configurable string queuePath = ?;
+configurable string queueName = ?;
 
 public function main() {
 
@@ -48,19 +48,19 @@ public function main() {
     asb:AsbClient asbClient = new (config);
 
     log:printInfo("Creating Asb sender connection.");
-    checkpanic asbClient->createQueueSender(queuePath);
+    handle queueSender = checkpanic asbClient->createQueueSender(queueName);
 
     log:printInfo("Creating Asb receiver connection.");
-    checkpanic asbClient->createQueueReceiver(queuePath, asb:PEEKLOCK);
+    handle queueReceiver = checkpanic asbClient->createQueueReceiver(queueName, asb:PEEKLOCK);
 
     log:printInfo("Sending via Asb sender connection.");
-    checkpanic asbClient->send(message1);
+    checkpanic asbClient->send(queueSender, message1);
 
     log:printInfo("Receiving from Asb receiver connection.");
-    asb:Message|asb:Error? messageReceived = asbClient->receive(serverWaitTime);
+    asb:Message|asb:Error? messageReceived = asbClient->receive(queueReceiver, serverWaitTime);
 
     if (messageReceived is asb:Message) {
-        checkpanic asbClient->complete(messageReceived);
+        checkpanic asbClient->complete(queueReceiver, messageReceived);
         log:printInfo("Complete message successful");
     } else if (messageReceived is ()) {
         log:printError("No message in the queue.");
@@ -69,8 +69,8 @@ public function main() {
     }
 
     log:printInfo("Closing Asb sender connection.");
-    checkpanic asbClient->closeSender();
+    checkpanic asbClient->closeSender(queueSender);
 
     log:printInfo("Closing Asb receiver connection.");
-    checkpanic asbClient->closeReceiver();
+    checkpanic asbClient->closeReceiver(queueReceiver);
 }    

@@ -109,6 +109,25 @@ public class MessageDispatcher {
     }
 
     /**
+     * Get receive mode from annotation configuration attached to the service.
+     *
+     * @param service Ballerina service instance.
+     * @return Connection string from annotation configuration attached to the service.
+     */
+    public static String getReceiveModeFromConfig(BObject service) {
+        BMap serviceConfig = (BMap) ((AnnotatableType) service.getType())
+                .getAnnotation(StringUtils.fromString(ASBConstants.PACKAGE_ASB_FQN + ":"
+                        + ASBConstants.SERVICE_CONFIG));
+        @SuppressWarnings(ASBConstants.UNCHECKED)
+        BMap<BString, Object> queueConfig =
+                (BMap) serviceConfig.getMapValue(ASBConstants.ALIAS_QUEUE_CONFIG);
+        if (queueConfig.getStringValue(RECEIVE_MODE) != null) {
+            return queueConfig.getStringValue(RECEIVE_MODE).getValue();
+        }
+        return PEEKLOCK;
+    }
+
+    /**
      * Start receiving messages asynchronously and dispatch the messages to the attached service.
      *
      * @param listener Ballerina listener object.
@@ -148,11 +167,11 @@ public class MessageDispatcher {
                     pumpMessage(receiver, executorService);
                 } else {
                     handleDispatch(message);
-                    try {
-                        receiver.complete(message.getLockToken());
-                    } catch (Exception e) {
-                        return ASBUtils.returnErrorValue(e.getMessage());
-                    }
+//                    try {
+//                        receiver.complete(message.getLockToken());
+//                    } catch (Exception e) {
+//                        return ASBUtils.returnErrorValue(e.getMessage());
+//                    }
                     pumpMessage(receiver, executorService);
                     return null;
                 }

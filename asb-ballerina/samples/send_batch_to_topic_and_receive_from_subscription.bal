@@ -19,8 +19,8 @@ import ballerinax/asb;
 
 // Connection Configurations
 configurable string connectionString = ?;
-configurable string topicPath = ?;
-configurable string subscriptionPath1 = ?;
+configurable string topicName = ?;
+configurable string subscriptionName1 = ?;
 
 public function main() {
 
@@ -60,16 +60,18 @@ public function main() {
     asb:AsbClient asbClient = new (config);
 
     log:printInfo("Creating Asb sender connection.");
-    checkpanic asbClient->createTopicSender(topicPath);
+    handle topicSender = checkpanic asbClient->createTopicSender(topicName);
 
     log:printInfo("Creating Asb receiver connection.");
-    checkpanic asbClient->createSubscriptionReceiver(subscriptionPath1, asb:RECEIVEANDDELETE);
+    handle subscriptionReceiver = 
+        checkpanic asbClient->createSubscriptionReceiver(topicName, subscriptionName1, asb:RECEIVEANDDELETE);
 
     log:printInfo("Sending via Asb sender connection.");
-    checkpanic asbClient->sendBatch(messages);
+    checkpanic asbClient->sendBatch(topicSender, messages);
 
     log:printInfo("Receiving from Asb receiver connection.");
-    asb:MessageBatch|asb:Error? messageReceived = asbClient->receiveBatch(maxMessageCount, serverWaitTime);
+    asb:MessageBatch|asb:Error? messageReceived = 
+        asbClient->receiveBatch(subscriptionReceiver, maxMessageCount, serverWaitTime);
 
     if (messageReceived is asb:MessageBatch) {
         foreach asb:Message message in messageReceived.messages {
@@ -84,8 +86,8 @@ public function main() {
     }
 
     log:printInfo("Closing Asb sender connection.");
-    checkpanic asbClient->closeSender();
+    checkpanic asbClient->closeSender(topicSender);
 
     log:printInfo("Closing Asb receiver connection.");
-    checkpanic asbClient->closeReceiver();
+    checkpanic asbClient->closeReceiver(subscriptionReceiver);
 }    
