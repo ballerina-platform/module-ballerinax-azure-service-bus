@@ -1,0 +1,27 @@
+plugins {
+    id 'java'
+    id "com.github.johnrengelman.shadow" version "5.2.0"
+}
+
+group 'org.ballerinalang'
+version '1.0.3'
+
+repositories {
+    mavenCentral()
+
+    maven {
+        url = 'https://maven.pkg.github.com/ballerina-platform/ballerina-lang'
+        credentials {
+            username System.getenv("packageUser")
+            password System.getenv("packagePAT")
+        }
+    }
+}
+
+dependencies {
+    implementation group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.5.1'
+    compile group: 'org.ballerinalang', name: 'ballerina-lang', version: project.ballerinaLangVersion
+    compile (group: 'org.ballerinalang', name: 'ballerina-runtime', version: project.ballerinaLangVersion) {
+        transitive = false
+    }
+}

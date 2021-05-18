@@ -5,3 +5,6 @@ Ballerina.lock
 modules
 Config.toml
 **/resources
+
+# Ignore Gradle build output directory
+build
