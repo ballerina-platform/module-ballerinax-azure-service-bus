@@ -1549,16 +1549,10 @@ public function main() {
 
 Execute the commands below to build from the source after installing Ballerina version.
 
-1. To Build the repository:
+1. To Build & Package the Native Java Wrapper:
    Change the current directory to the root directory and execute the following command.
 ```shell script
     ./gradlew build
-```
-
-2. To Package the Native Java Wrapper:
-   Change the current directory to the root directory and execute the following command.
-```shell script
-    ./gradlew shadow
 ```
 
 3. To build the Ballerina library:

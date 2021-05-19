@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'org.ballerinalang'
-version '1.0.3'
+version '0.1.4-SNAPSHOT'
 
 repositories {
     mavenCentral()
@@ -25,3 +25,5 @@ dependencies {
         transitive = false
     }
 }
+
+build.dependsOn(shadowJar)
