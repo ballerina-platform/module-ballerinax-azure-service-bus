@@ -81,8 +81,8 @@ publishing {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/ballerina-platform/module-ballerinax-azure-service-bus")
             credentials {
-                username System.getenv("publishUser")
-                password System.getenv("publishPAT")
+                username = System.getenv("publishUser")
+                password = System.getenv("publishPAT")
             }
         }
     }
