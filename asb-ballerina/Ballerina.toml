@@ -11,8 +11,8 @@ repository = "https://github.com/ballerina-platform/module-ballerinax-azure-serv
 observabilityIncluded = true
 
 [[platform.java11.dependency]]
-path = "../asb-native/build/libs/asb-native-1.0.3-all.jar"
+path = "../asb-native/build/libs/asb-native-0.1.4-all.jar"
 groupId = "org.ballerinalang"
 artifactId = "asb-native"
 module = "asb-native" 
-version = "1.0.3"
+version = "0.1.4"

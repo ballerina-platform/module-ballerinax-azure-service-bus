@@ -1,2 +1,2 @@
 rootProject.name = 'module-ballerinax-azure-service-bus'
-include ':asb-ballerina', ':asb-native'
+include ':asb-native'
