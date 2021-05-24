@@ -32,7 +32,7 @@ public class ASBConstants {
     // Asb package name constant fields
     public static final String ORG_NAME = "ballerinax";
     public static final String ASB = "asb";
-    public static final String ASB_VERSION = "0.1.3";
+    public static final String ASB_VERSION = "0.1.4-SNAPSHOT";
     public static final Module PACKAGE_ID_ASB = new Module(ORG_NAME, ASB, ASB_VERSION);
     public static final String PACKAGE_ASB_FQN =
             ORG_NAME + ORG_NAME_SEPARATOR + ASB + VERSION_SEPARATOR + ASB_VERSION;
