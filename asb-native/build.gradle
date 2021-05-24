@@ -3,8 +3,8 @@ plugins {
     id "com.github.johnrengelman.shadow" version "5.2.0"
 }
 
-group 'org.ballerinalang'
-version '0.1.4'
+group project.group
+version project.version
 
 repositories {
     mavenCentral()
