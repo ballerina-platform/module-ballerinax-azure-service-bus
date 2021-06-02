@@ -1,7 +1,7 @@
 [package]
 org = "ballerinax"
 name = "asb"
-version = "0.1.3"
+version = "0.1.4"
 license= ["Apache-2.0"]
 authors = ["Ballerina"]
 keywords = ["Azure","ServiceBus"]
@@ -11,8 +11,8 @@ repository = "https://github.com/ballerina-platform/module-ballerinax-azure-serv
 observabilityIncluded = true
 
 [[platform.java11.dependency]]
-path = "../asb-native/target/asb-native-1.0.2-jar-with-dependencies.jar"
+path = "../asb-native/build/libs/asb-native-0.1.4-all.jar"
 groupId = "org.ballerinalang"
 artifactId = "asb-native"
 module = "asb-native" 
-version = "1.0.0"
+version = "0.1.4"

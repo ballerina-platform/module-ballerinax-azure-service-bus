@@ -1547,12 +1547,12 @@ public function main() {
 
 ### Building the Source
 
-Execute the commands below to build from the source after installing Ballerina SLP8 version.
+Execute the commands below to build from the source after installing Ballerina version.
 
-1. To Build and Package the Native Java Wrapper:
-   Change the current directory to the asb-native home directory and execute the following command.
+1. To Build & Package the Native Java Wrapper:
+   Change the current directory to the root directory and execute the following command.
 ```shell script
-    mvn clean package
+    ./gradlew build
 ```
 
 2. To build the Ballerina library:
