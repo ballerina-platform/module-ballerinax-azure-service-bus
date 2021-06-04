@@ -17,8 +17,11 @@
 # Azure service bus message batch representation.
 #
 # + messageCount - Number of messages in a batch  
-# + messages - Array of Azure service bus message representation
+# + messages - Array of Azure service bus message representation (Array of Message records)
+@display {label: "Batch Message"}
 public type MessageBatch record {|
+    @display {label: "Message Count"}
     int messageCount = -1;
+    @display {label: "Array of Messages"}
     Message[] messages = [];
 |};
