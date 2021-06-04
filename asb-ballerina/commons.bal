@@ -33,8 +33,11 @@ public const string XML = "application/xml";
 public const string BYTE_ARRAY = "application/octet-stream";
 
 // Message receive modes
+@display {label: "Receive Modes"}
 public enum receiveModes {
+    @display {label: "PEEKLOCK"}
     PEEKLOCK,
+    @display {label: "RECEIVEANDDELETE"}
     RECEIVEANDDELETE
 }
 
@@ -48,7 +51,9 @@ public enum receiveModes {
 #                      SharedAccessKeyName=SHARED_ACCESS_KEY_NAME;SharedAccessKey=SHARED_ACCESS_KEY or  
 #                      Endpoint=sb://namespace_DNS_Name;EntityPath=EVENT_HUB_NAME;
 #                      SharedAccessSignatureToken=SHARED_ACCESS_SIGNATURE_TOKEN
+@display {label: "Connection Config"}
 public type AsbConnectionConfiguration record {|
+    @display {label: "Connection String"}
     string connectionString;
 |};
 
@@ -63,16 +68,21 @@ public type AsbConnectionConfiguration record {|
 #                      Endpoint=sb://namespace_DNS_Name;EntityPath=EVENT_HUB_NAME;
 #                      SharedAccessSignatureToken=SHARED_ACCESS_SIGNATURE_TOKEN
 # + entityPath - Entitypath to the message broker resource
-# + receiveMode - Message receive modes
+# + receiveMode - Message receive modes (optional)
+@display {label: "Entity Config"}
 public type EntityConfiguration record {|
+    @display {label: "Connection String"}
     string connectionString;
+    @display {label: "Entity Path"}
     string entityPath;
+    @display {label: "Receive Mode"}
     string receiveMode?;
 |};
 
 # Service configurations used to create a `asb:Connection`.
 # 
 # + entityConfig - Configurations used to create a `asb:Connection`
+@display {label: "Connection Config"}
 public type asbServiceConfig record {|
     EntityConfiguration entityConfig;
 |};
