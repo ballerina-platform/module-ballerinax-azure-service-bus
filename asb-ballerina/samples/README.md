@@ -7,7 +7,7 @@ a receiver connection with the azure service bus to send and receive a message. 
 a parameter to the send operation. The user can receive the Message object at the other receiver end.
 
 Sample is available at:
-https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/main/asb-ballerina/samples/send_and_receive_message_from_queue.bal
+https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/slalpha5/asb-ballerina/samples/send_and_receive_message_from_queue.bal
 
 ```ballerina
 import ballerina/log;
@@ -78,7 +78,7 @@ connection and a receiver connection with the azure service bus to send and rece
 passed as a parameter to the send operation. The user can receive the batch message at the other receiver end.
 
 Sample is available at:
-https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/main/asb-ballerina/samples/send_and_receive_batch_from_queue.bal
+https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/slalpha5/asb-ballerina/samples/send_and_receive_batch_from_queue.bal
 
 ```ballerina
 import ballerina/log;
@@ -167,7 +167,7 @@ create a sender connection and a receiver connection with the azure service bus 
 The message is passed as a parameter to the send operation. The user can receive the Message at the other receiver end.
 
 Sample is available at:
-https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/main/asb-ballerina/samples/send_to_topic_and_receive_from_subscription.bal
+https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/slalpha5/asb-ballerina/samples/send_to_topic_and_receive_from_subscription.bal
 
 ```ballerina
 import ballerina/log;
@@ -241,7 +241,7 @@ receive a message. The batch message is passed as a parameter with optional para
 The user can receive the batch message at the other receiver end.
 
 Sample is available at:
-https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/main/asb-ballerina/samples/send_batch_to_topic_and_receive_from_subscription.bal
+https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/slalpha5/asb-ballerina/samples/send_batch_to_topic_and_receive_from_subscription.bal
 
 ```ballerina
 import ballerina/log;
@@ -330,7 +330,7 @@ a receiver connection with the azure service bus to send and receive a message. 
 a parameter with optional parameters and properties to the send operation. The user can complete a message from the queue.
 
 Sample is available at:
-https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/main/asb-ballerina/samples/complete_message_from_queue.bal
+https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/slalpha5/asb-ballerina/samples/complete_message_from_queue.bal
 
 ```ballerina
 import ballerina/log;
@@ -402,7 +402,7 @@ connection and a receiver connection with the azure service bus to send and rece
 passed as a parameter with optional parameters and properties to the send operation. The user can complete a messages from the subscription.
 
 Sample is available at:
-https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/main/asb-ballerina/samples/complete_message_from_subscription.bal
+https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/slalpha5/asb-ballerina/samples/complete_message_from_subscription.bal
 
 ```ballerina
 import ballerina/log;
@@ -477,7 +477,7 @@ a parameter with optional parameters and properties to the send operation. The u
 a single Messages & make available again for processing from Queue.
 
 Sample is available at:
-https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/main/asb-ballerina/samples/abandon_message_from_queue.bal
+https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/slalpha5/asb-ballerina/samples/abandon_message_from_queue.bal
 
 ```ballerina
 import ballerina/log;
@@ -556,7 +556,7 @@ passed as a parameter with optional parameters and properties to the send operat
 abandon a single Messages & make available again for processing from subscription.
 
 Sample is available at:
-https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/main/asb-ballerina/samples/abandon_message_from_subscription.bal
+https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/slalpha5/asb-ballerina/samples/abandon_message_from_subscription.bal
 
 ```ballerina
 import ballerina/log;
@@ -638,7 +638,7 @@ asynchronously listen to messages from the azure service bus connection and exec
 message received.
 
 Sample is available at:
-https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/main/asb-ballerina/samples/async_consumer.bal
+https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/slalpha5/asb-ballerina/samples/async_consumer.bal
 
 ```ballerina
 import ballerina/log;
@@ -719,7 +719,7 @@ passed as a parameter with optional parameters and properties to the send operat
 abandon a single Message & moves the message to the Dead-Letter Queue.
 
 Sample is available at:
-https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/main/asb-ballerina/samples/deadletter_from_queue.bal
+https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/slalpha5/asb-ballerina/samples/deadletter_from_queue.bal
 
 ```ballerina
 import ballerina/log;
@@ -797,7 +797,7 @@ passed as a parameter with optional parameters and properties to the send operat
 abandon a single Message & move the message to the Dead-Letter subscription.
 
 Sample is available at:
-https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/main/asb-ballerina/samples/deadletter_from_subscription.bal
+https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/slalpha5/asb-ballerina/samples/deadletter_from_subscription.bal
 
 ```ballerina
 import ballerina/log;
@@ -877,7 +877,7 @@ a parameter \with optional parameters and properties to the send operation. The 
 a single Message. Deferred messages can only be received by using sequence number and return Message record.
 
 Sample is available at:
-https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/main/asb-ballerina/samples/defer_from_queue.bal
+https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/slalpha5/asb-ballerina/samples/defer_from_queue.bal
 
 ```ballerina
 import ballerina/log;
@@ -955,7 +955,7 @@ passed as a parameter with optional parameters and properties to the send operat
 defer a single Message. Deferred messages can only be received by using sequence number and return Message record.
 
 Sample is available at:
-https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/main/asb-ballerina/samples/defer_from_subscription.bal
+https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/slalpha5/asb-ballerina/samples/defer_from_subscription.bal
 
 ```ballerina
 import ballerina/log;
@@ -1035,7 +1035,7 @@ a parameter with optional parameters and properties to the send operation.  The 
 a lock on a single Message from the queue.
 
 Sample is available at:
-https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/main/asb-ballerina/samples/renew_lock_on_message_from_queue.bal
+https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/slalpha5/asb-ballerina/samples/renew_lock_on_message_from_queue.bal
 
 ```ballerina
 import ballerina/log;
@@ -1108,7 +1108,7 @@ a parameter in byte array format with optional parameters and properties to the 
 a lock on a single Message from the subscription.
 
 Sample is available at:
-https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/main/asb-ballerina/samples/renew_lock_on_message_from_subscription.bal
+https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/slalpha5/asb-ballerina/samples/renew_lock_on_message_from_subscription.bal
 
 ```ballerina
 import ballerina/log;

@@ -271,7 +271,7 @@ public client class AsbClient {
     @display {label: "Defer Message"}
     isolated remote function defer(@display {label: "Asb Receiver"} handle asbReceiver,
                                    @display {label: "Message"} Message message) 
-                                   returns @display {label: "Deferred Message Sequence Number"} int|Error {
+                                   returns @display {label: "Deferred Msg Seq Num"} int|Error {
         _ = check defer(asbReceiver, message?.lockToken.toString());
         return <int> message?.sequenceNumber;
     }
@@ -286,7 +286,7 @@ public client class AsbClient {
     # + return - An `asb:Error` if failed to receive deferred message, a Message record if successful or else `()`
     @display {label: "Receive Deferred Message"}
     isolated remote function receiveDeferred(@display {label: "Asb Receiver"} handle asbReceiver,
-                                             @display {label: "Deferred Message Sequence Number"} 
+                                             @display {label: "Deferred Msg Seq Num"} 
                                              int sequenceNumber) 
                                              returns @display {label: "Deferred Message"}  Message|Error? {
         Message|() message = check receiveDeferred(asbReceiver, sequenceNumber);

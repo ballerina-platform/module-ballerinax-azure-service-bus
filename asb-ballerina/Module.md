@@ -192,7 +192,7 @@ You can now close the receiver connection.
 ```
 
 Sample is available at:
-https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/main/asb-ballerina/samples/send_and_receive_message_from_queue.bal
+https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/slalpha5/asb-ballerina/samples/send_and_receive_message_from_queue.bal
 
 ## Send and Listen to Messages from the Azure Service Bus Queue
 
@@ -302,19 +302,20 @@ You can now close the sender connection.
 ```
 
 Sample is available at:
-https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/main/asb-ballerina/samples/async_consumer.bal
+https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/slalpha5/asb-ballerina/samples/async_consumer.bal
 
 
 # Samples: 
 
 1. Send and Receive Batch from Queue
+
 This is the basic scenario of sending and receiving a batch of messages from a queue. A user must create a sender 
 connection and a receiver connection with the azure service bus to send and receive a message. The message is 
 passed as a parameter with optional parameters and properties to the send operation. The user can 
 receive the array of Message objects at the other receiver end.
 
 Sample is available at:
-https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/main/asb-ballerina/samples/send_and_receive_batch_from_queue.bal
+https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/slalpha5/asb-ballerina/samples/send_and_receive_batch_from_queue.bal
 
 ```ballerina
 import ballerina/log;
@@ -395,13 +396,14 @@ public function main() {
 ```
 
 2. Send to Topic and Receive from Subscription
+
 This is the basic scenario of sending a message to a topic and receiving a message from a subscription. A user must 
 create a sender connection and a receiver connection with the azure service bus to send and receive a message. 
 The message is passed as a parameter with optional parameters and properties to the send 
 operation. The user can receive the Message object at the other receiver end.
 
 Sample is available at:
-https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/main/asb-ballerina/samples/send_to_topic_and_receive_from_subscription.bal
+https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/slalpha5/asb-ballerina/samples/send_to_topic_and_receive_from_subscription.bal
 
 ```ballerina
 import ballerina/log;
@@ -468,4 +470,4 @@ public function main() {
 ```
 
 More Samples are available at: 
-https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/tree/main/asb-ballerina/samples
+https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/tree/slalpha5/asb-ballerina/samples
