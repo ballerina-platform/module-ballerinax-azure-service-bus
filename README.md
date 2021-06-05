@@ -371,6 +371,7 @@ You can now close the sender connection.
 # Samples
 
 1. Send and Receive Message from Queue
+
 This is the basic scenario of sending and receiving a message from a queue. A user must create a sender connection and 
 a receiver connection with the azure service bus to send and receive a message. The message is passed as 
 a parameter to the send operation. The user can receive the Message object at the other receiver end.
@@ -441,6 +442,7 @@ public function main() {
 ```
 
 2. Send and Receive Batch from Queue
+
 This is the basic scenario of sending and receiving a batch of messages from a queue. A user must create a sender 
 connection and a receiver connection with the azure service bus to send and receive a message. The batch message is 
 passed as a parameter to the send operation. The user can receive the batch message at the other receiver end.
@@ -529,6 +531,7 @@ public function main() {
 ```
 
 3. Send to Topic and Receive from Subscription
+
 This is the basic scenario of sending a message to a topic and receiving a message from a subscription. A user must 
 create a sender connection and a receiver connection with the azure service bus to send and receive a message. 
 The message is passed as a parameter to the send operation. The user can receive the Message at the other receiver end.
@@ -601,6 +604,7 @@ public function main() {
 ```
 
 4. Send Batch to Topic and Receive from Subscription
+
 This is the basic scenario of sending a batch of messages to a topic and receiving a batch of messages from 
 a subscription. A user must create a sender connection and a receiver connection with the azure service bus to send and 
 receive a message. The batch message is passed as a parameter with optional parameters and properties to the send operation. 
@@ -690,6 +694,7 @@ public function main() {
 ```
 
 5. Complete Message from Queue
+
 This is the basic scenario of sending and completing a message from a queue. A user must create a sender connection and 
 a receiver connection with the azure service bus to send and receive a message. The message is passed as 
 a parameter with optional parameters and properties to the send operation. The user can complete a message from the queue.
@@ -761,6 +766,7 @@ public function main() {
 ```
 
 6. Complete Message from Subscription
+
 This is the basic scenario of sending and completing a message from a subscription. A user must create a sender 
 connection and a receiver connection with the azure service bus to send and receive a message. The message is 
 passed as a parameter with optional parameters and properties to the send operation. The user can complete a messages from the subscription.
@@ -834,6 +840,7 @@ public function main() {
 ```
 
 7. Abandon Message from Queue
+
 This is the basic scenario of sending and abandoning a message from a queue. A user must create a sender connection 
 and a receiver connection with the azure service bus to send and receive a message. The message is passed as 
 a parameter with optional parameters and properties to the send operation. The user can abandon 
@@ -912,6 +919,7 @@ public function main() {
 ```
 
 8. Abandon Message from Subscription
+
 This is the basic scenario of sending and abandoning a message from a subscription. A user must create a sender 
 connection and a receiver connection with the azure service bus to send and receive a message. The message is 
 passed as a parameter with optional parameters and properties to the send operation. The user can 
@@ -992,6 +1000,7 @@ public function main() {
 ```
 
 9. Asynchronous Consumer
+
 This is the basic scenario of sending and listening to messages from a queue. A user must create a sender connection 
 and a receiver connection with the azure service bus to send and receive a message. The message body is passed as 
 a parameter in byte array format with optional parameters and properties to the send operation. The user can 
@@ -1073,6 +1082,7 @@ public function main() {
 ```
 
 10. Deadletter from Queue
+
 This is the basic scenario of sending and dead lettering a message  from a queue. A user must create a sender 
 connection and a receiver connection with the azure service bus to send and receive a message. The message is 
 passed as a parameter with optional parameters and properties to the send operation. The user can 
@@ -1150,6 +1160,7 @@ public function main() {
 ```
 
 11. Deadletter from Subscription
+
 This is the basic scenario of sending and dead lettering a message  from a subscription. A user must create a sender 
 connection and a receiver connection with the azure service bus to send and receive a message. The message body is 
 passed as a parameter with optional parameters and properties to the send operation. The user can 
@@ -1229,6 +1240,7 @@ public function main() {
 ```
 
 12. Defer from Queue
+
 This is the basic scenario of sending and deferring a message from a queue. A user must create a sender connection and 
 a receiver connection with the azure service bus to send and receive a message. The message body is passed as 
 a parameter \with optional parameters and properties to the send operation. The user can defer 
@@ -1306,6 +1318,7 @@ public function main() {
 ```
 
 13. Defer from Subscription
+
 This is the basic scenario of sending and deferring a message from a subscription. A user must create a sender 
 connection and a receiver connection with the azure service bus to send and receive a message. The message body is 
 passed as a parameter with optional parameters and properties to the send operation. The user can 
@@ -1385,6 +1398,7 @@ public function main() {
 ```
 
 14. Renew Lock on Message from Queue
+
 This is the basic scenario of renewing a lock on a message from a queue. A user must create a sender connection and 
 a receiver connection with the azure service bus to send and receive a message. The message body is passed as 
 a parameter with optional parameters and properties to the send operation.  The user can renew 
@@ -1457,6 +1471,7 @@ public function main() {
 ```
 
 15. Renew Lock on Message from Subscription
+
 This is the basic scenario of renewing a lock on a message from a subscription. A user must create a sender connection 
 and a receiver connection with the azure service bus to send and receive a message. The message body is passed as 
 a parameter in byte array format with optional parameters and properties to the send operation. The user can renew 

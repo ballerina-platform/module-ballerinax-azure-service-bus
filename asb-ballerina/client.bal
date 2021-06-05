@@ -17,14 +17,14 @@
 import ballerina/jballerina.java as java;
 
 # Represents a client to the Azure service bus message broker.
-@display {label: "Azure Service Bus Client", iconPath: "AzureServiceBusLogo.png"}
+@display {label: "Azure Service Bus", iconPath: "logo.png"}
 public client class AsbClient {
     handle asbSenderConnection = JAVA_NULL;
     handle asbReceiverConnection  = JAVA_NULL;
 
     private string connectionString;
 
-    # Initiates an Asb Client using the given connection configuration.
+    # Initiates an Asb client using the given connection configuration.
     # 
     # + connectionConfiguration - Configurations used to create a `asb:AsbClient`
     public isolated function init(AsbConnectionConfiguration connectionConfiguration) {
@@ -36,7 +36,7 @@ public client class AsbClient {
     # + queueName - Name of the queue
     # + return - An `asb:Error` if failed to create connection or else `QueueSender`
     @display {label: "Create Queue Sender"}
-    isolated remote function createQueueSender(@display {label: "Queue name"} string queueName) 
+    isolated remote function createQueueSender(@display {label: "Queue Name"} string queueName) 
                                                returns @display {label: "QueueSender"} handle|Error {
         string entityPath = queueName;
         var connectionResult = createSender(java:fromString(self.connectionString),
@@ -53,7 +53,7 @@ public client class AsbClient {
     # + topicName - Name of the topic
     # + return - An `asb:Error` if failed to create connection or else `TopicSender`
     @display {label: "Create Topic Sender"}
-    isolated remote function createTopicSender(@display {label: "Topic name"} string topicName) 
+    isolated remote function createTopicSender(@display {label: "Topic Name"} string topicName) 
                                                returns @display {label: "TopicSender"} handle|Error {
         string entityPath = topicName;
         var connectionResult = createSender(java:fromString(self.connectionString),
@@ -68,11 +68,11 @@ public client class AsbClient {
     # Creates a queue receiver connection to the given queue.
     # 
     # + queueName - Name of the queue
-    # + receiveMode - Receive mode of the receiver. It can be PEEKLOCK or RECEIVEANDDELETE. Default is PEEKLOCK.
+    # + receiveMode - Receive mode of the receiver. It can be PEEKLOCK or RECEIVEANDDELETE. Default is PEEKLOCK. (optional)
     # + return - An `asb:Error` if failed to create connection or else `QueueReceiver`
     @display {label: "Create Queue Receiver"}
-    isolated remote function createQueueReceiver(@display {label: "Queue name"} string queueName, 
-                                                 @display {label: "Receive mode (optional)"} 
+    isolated remote function createQueueReceiver(@display {label: "Queue Name"} string queueName, 
+                                                 @display {label: "Receive Mode"} 
                                                  string? receiveMode = PEEKLOCK) 
                                                  returns @display {label: "QueueReceiver"} handle|Error {
         string entityPath = queueName;
@@ -89,12 +89,12 @@ public client class AsbClient {
     # 
     # + topicName - Name of the topic
     # + subscriptionName - Name of the subscription
-    # + receiveMode - Receive mode of the receiver. It can be PEEKLOCK or RECEIVEANDDELETE. Default is PEEKLOCK.
+    # + receiveMode - Receive mode of the receiver. It can be PEEKLOCK or RECEIVEANDDELETE. Default is PEEKLOCK. (optional)
     # + return - An `asb:Error` if failed to create connection or else `SubscriptionReceiver`
     @display {label: "Create Subscription Receiver"}
-    isolated remote function createSubscriptionReceiver(@display {label: "Topic name"} string topicName, 
-                                                        @display {label: "Subscription name"} string subscriptionName, 
-                                                        @display {label: "Receive mode (optional)"} 
+    isolated remote function createSubscriptionReceiver(@display {label: "Topic Name"} string topicName, 
+                                                        @display {label: "Subscription Name"} string subscriptionName, 
+                                                        @display {label: "Receive Mode"} 
                                                         string? receiveMode = PEEKLOCK) 
                                                         returns @display {label: "SubscriptionReceiver"} handle|Error {
         string entityPath = topicName + "/subscriptions/" + subscriptionName;
@@ -125,7 +125,7 @@ public client class AsbClient {
     #
     # + asbReceiver - Asb Receiver
     # + return - An `asb:Error` if failed to close connection or else `()`
-    @display {label: "Close Receiver Client Connection"}
+    @display {label: "Close Receiver Connection"}
     isolated remote function closeReceiver(@display {label: "Asb Receiver"} handle asbReceiver) returns Error? {
         var connectionResult = closeReceiver(asbReceiver);
         if (connectionResult is ()) {
@@ -135,14 +135,14 @@ public client class AsbClient {
         }
     }
 
-    # Send message to queue or topic with a message body
+    # Send message to queue or topic with a message body.
     #
     # + asbSender - Asb Sender
-    # + message - Azure service bus message representation
+    # + message - Azure service bus message representation (Message record)
     # + return - An `asb:Error` if failed to send message or else `()`
     @display {label: "Send Message"}
     isolated remote function send(@display {label: "Asb Sender"} handle asbSender, 
-                                  @display {label: "Message record"} Message message) returns Error? {
+                                  @display {label: "Message"} Message message) returns Error? {
         if (message.body is byte[]) {
             return send(asbSender, message.body, message?.contentType, 
                 message?.messageId, message?.to, message?.replyTo, message?.replyToSessionId, message?.label, 
@@ -157,14 +157,14 @@ public client class AsbClient {
         }
     }
 
-    # Send batch of messages to queue or topic
+    # Send batch of messages to queue or topic.
     #
     # + asbSender - Asb Sender
-    # + messages - Azure service bus batch message representation
+    # + messages - Azure service bus batch message representation (MessageBatch record)
     # + return - An `asb:Error` if failed to send message or else `()`
     @display {label: "Send Batch Message"}
     isolated remote function sendBatch(@display {label: "Asb Sender"} handle asbSender,
-                                       @display {label: "Message Batch record"} MessageBatch messages) returns Error? {
+                                       @display {label: "Batch Message"} MessageBatch messages) returns Error? {
         self.modifyContentToByteArray(messages);
         return sendBatch(asbSender, messages);
     }
@@ -172,12 +172,12 @@ public client class AsbClient {
     # Receive message from queue or subscription.
     # 
     # + asbReceiver - Asb Receiver
-    # + serverWaitTime - Specified server wait time in seconds to receive message.
+    # + serverWaitTime - Specified server wait time in seconds to receive message. (optional)
     # + return - A Message record. An `asb:Error` if failed to receive message or else `()`.
     @display {label: "Receive Message"}
     isolated remote function receive(@display {label: "Asb Receiver"} handle asbReceiver, 
-                                     @display {label: "Server wait time in seconds to receive message (optional)"} 
-                                     int? serverWaitTime) returns @display {label: "Message"} Message|Error? {
+                                     @display {label: "Server Wait Time"} int? serverWaitTime) 
+                                     returns @display {label: "Message"} Message|Error? {
         Message|() message = check receive(asbReceiver, serverWaitTime);
         if (message is Message) {
             _ = check self.mapContentType(message);
@@ -190,13 +190,12 @@ public client class AsbClient {
     # 
     # + asbReceiver - Asb Receiver
     # + maxMessageCount - Maximum message count to receive in a batch
-    # + serverWaitTime - Specified server wait time in seconds to receive message. 
-    # + return - A Messages record. An `asb:Error` if failed to receive message or else `()`.
+    # + serverWaitTime - Specified server wait time in seconds to receive message. (optional)
+    # + return - A MessageBatch record. An `asb:Error` if failed to receive message or else `()`.
     @display {label: "Receive Batch Message"}
     isolated remote function receiveBatch(@display {label: "Asb Receiver"} handle asbReceiver, 
-                                          @display {label: "Maximum number of messages in a batch"} int maxMessageCount, 
-                                          @display {label: "Server wait time in seconds to receive message (optional)"} 
-                                          int? serverWaitTime = ()) 
+                                          @display {label: "Maximum Message Count"} int maxMessageCount, 
+                                          @display {label: "Server Wait Time"} int? serverWaitTime = ()) 
                                           returns @display {label: "Batch Message"} MessageBatch|Error? {
         MessageBatch|() receivedMessages = check receiveBatch(asbReceiver, maxMessageCount, 
             serverWaitTime);
@@ -217,9 +216,9 @@ public client class AsbClient {
     # + asbReceiver - Asb Receiver
     # + message - Message record
     # + return - An `asb:Error` if failed to complete message or else `()`
-    @display {label: "Complete Messages"}
+    @display {label: "Complete Message"}
     isolated remote function complete(@display {label: "Asb Receiver"} handle asbReceiver,
-                                      @display {label: "Message record"} Message message) returns Error? {
+                                      @display {label: "Message"} Message message) returns Error? {
         if (message?.lockToken.toString() != DEFAULT_MESSAGE_LOCK_TOKEN) {
             return complete(asbReceiver, message?.lockToken.toString());
         }
@@ -235,7 +234,7 @@ public client class AsbClient {
     # + return - An `asb:Error` if failed to abandon message or else `()`
     @display {label: "Abandon Message"}
     isolated remote function abandon(@display {label: "Asb Receiver"} handle asbReceiver,
-                                     @display {label: "Message record"} Message message) returns Error? {
+                                     @display {label: "Message"} Message message) returns Error? {
         if (message?.lockToken.toString() != DEFAULT_MESSAGE_LOCK_TOKEN) {
             return abandon(asbReceiver, message?.lockToken.toString());
         }
@@ -247,14 +246,14 @@ public client class AsbClient {
     # 
     # + asbReceiver - Asb Receiver
     # + message - Message record
-    # + deadLetterReason - The deadletter reason.
-    # + deadLetterErrorDescription - The deadletter error description.
+    # + deadLetterReason - The deadletter reason. (optional)
+    # + deadLetterErrorDescription - The deadletter error description. (optional)
     # + return - An `asb:Error` if failed to deadletter message or else `()`
     @display {label: "Dead Letter Message"}
     isolated remote function deadLetter(@display {label: "Asb Receiver"} handle asbReceiver,
-                                        @display {label: "Message record"} Message message, 
-                                        @display {label: "Dead letter reason (optional)"} string? deadLetterReason = (), 
-                                        @display{label: "Dead letter description (optional)"} 
+                                        @display {label: "Message"} Message message, 
+                                        @display {label: "Dead Letter Reason"} string? deadLetterReason = (), 
+                                        @display{label: "Dead Letter Description"} 
                                         string? deadLetterErrorDescription = ()) returns Error? {
         if (message?.lockToken.toString() != DEFAULT_MESSAGE_LOCK_TOKEN) {
             return deadLetter(asbReceiver, message?.lockToken.toString(), deadLetterReason, 
@@ -271,8 +270,8 @@ public client class AsbClient {
     # + return - An `asb:Error` if failed to defer message or else sequence number
     @display {label: "Defer Message"}
     isolated remote function defer(@display {label: "Asb Receiver"} handle asbReceiver,
-                                   @display {label: "Message record"} Message message) 
-                                   returns @display {label: "Sequence Number of the deferred message"} int|Error {
+                                   @display {label: "Message"} Message message) 
+                                   returns @display {label: "Deferred Msg Seq Num"} int|Error {
         _ = check defer(asbReceiver, message?.lockToken.toString());
         return <int> message?.sequenceNumber;
     }
@@ -287,9 +286,9 @@ public client class AsbClient {
     # + return - An `asb:Error` if failed to receive deferred message, a Message record if successful or else `()`
     @display {label: "Receive Deferred Message"}
     isolated remote function receiveDeferred(@display {label: "Asb Receiver"} handle asbReceiver,
-                                             @display {label: "Sequence Number of the deferred message"} 
+                                             @display {label: "Deferred Msg Seq Num"} 
                                              int sequenceNumber) 
-                                             returns @display {label: "Deferred Message record"}  Message|Error? {
+                                             returns @display {label: "Deferred Message"}  Message|Error? {
         Message|() message = check receiveDeferred(asbReceiver, sequenceNumber);
         if (message is Message) {
             _ = check self.mapContentType(message);
@@ -303,9 +302,9 @@ public client class AsbClient {
     # + asbReceiver - Asb Receiver
     # + message - Message record
     # + return - An `asb:Error` if failed to renew message or else `()`
-    @display {label: "Renew Lock on Message"}
+    @display {label: "Renew Lock On Message"}
     isolated remote function renewLock(@display {label: "Asb Receiver"} handle asbReceiver,
-                                       @display {label: "Message record"} Message message) returns Error? {
+                                       @display {label: "Message"} Message message) returns Error? {
         if (message?.lockToken.toString() != DEFAULT_MESSAGE_LOCK_TOKEN) {
             return renewLock(asbReceiver, message?.lockToken.toString());
         }
@@ -323,7 +322,7 @@ public client class AsbClient {
     # + return - An `asb:Error` if failed to renew message or else `()`
     @display {label: "Set Prefetch Count"}
     isolated remote function setPrefetchCount(@display {label: "Asb Receiver"} handle asbReceiver,
-                                              @display {label: "Prefetch count"} int prefetchCount) returns Error? {
+                                              @display {label: "Prefetch Count"} int prefetchCount) returns Error? {
         return setPrefetchCount(asbReceiver, prefetchCount);
     }
 

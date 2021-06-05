@@ -308,6 +308,7 @@ https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/m
 # Samples: 
 
 1. Send and Receive Batch from Queue
+
 This is the basic scenario of sending and receiving a batch of messages from a queue. A user must create a sender 
 connection and a receiver connection with the azure service bus to send and receive a message. The message is 
 passed as a parameter with optional parameters and properties to the send operation. The user can 
@@ -395,6 +396,7 @@ public function main() {
 ```
 
 2. Send to Topic and Receive from Subscription
+
 This is the basic scenario of sending a message to a topic and receiving a message from a subscription. A user must 
 create a sender connection and a receiver connection with the azure service bus to send and receive a message. 
 The message is passed as a parameter with optional parameters and properties to the send 
