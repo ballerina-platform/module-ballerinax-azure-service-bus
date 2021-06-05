@@ -18,38 +18,54 @@
 #
 # + body - Message body  
 # + contentType - Message content type  
-# + messageId - Message Id 
-# + to - Message to
-# + replyTo - Message reply to 
-# + replyToSessionId - Identifier of the session to reply to
-# + label - Message label 
-# + sessionId - Message session Id
-# + correlationId - Message correlationId
-# + partitionKey - Message partition key
-# + timeToLive - Message time to live in seconds 
-# + sequenceNumber - Message sequence number
-# + lockToken - Message lock token  
-# + applicationProperties - Message broker application specific properties
+# + messageId - Message Id (optional)
+# + to - Message to (optional)
+# + replyTo - Message reply to (optional)
+# + replyToSessionId - Identifier of the session to reply to (optional)
+# + label - Message label (optional)
+# + sessionId - Message session Id (optional)
+# + correlationId - Message correlationId (optional)
+# + partitionKey - Message partition key (optional)
+# + timeToLive - Message time to live in seconds (optional)
+# + sequenceNumber - Message sequence number (optional)
+# + lockToken - Message lock token (optional)
+# + applicationProperties - Message broker application specific properties (optional)
+@display {label: "Message"}
 public type Message record {|
+    @display {label: "Body"}
     string|xml|json|byte[] body;
+    @display {label: "Content Type"}
     string contentType?;
+    @display {label: "Message Id"}
     string messageId?;
+    @display {label: "To"}
     string to?;
+    @display {label: "Reply To"}
     string replyTo?;
+    @display {label: "Reply To Session Id"}
     string replyToSessionId?;
+    @display {label: "Label"}
     string label?;
+    @display {label: "Session Id"}
     string sessionId?;
+    @display {label: "Correlation Id"}
     string correlationId?;
+    @display {label: "Partition Key"}
     string partitionKey?;
+    @display {label: "Time To Live"}
     int timeToLive?;
+    @display {label: "Sequence Number"}
     readonly int sequenceNumber?;
+    @display {label: "Lock Token"}
     readonly string lockToken?;
     ApplicationProperties applicationProperties?;
 |};
 
 # Azure service bus message, application specific properties representation.
 #
-# + properties - Key-value pairs for each brokered property
+# + properties - Key-value pairs for each brokered property (optional)
+@display {label: "Application Properties"}
 public type ApplicationProperties record {|
+    @display {label: "Properties"}
     map<string> properties?;
 |};
