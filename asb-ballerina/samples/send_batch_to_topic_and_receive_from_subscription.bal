@@ -22,7 +22,7 @@ configurable string connectionString = ?;
 configurable string topicName = ?;
 configurable string subscriptionName1 = ?;
 
-public function main() {
+public function main() returns error? {
 
     // Input values
     string stringContent = "This is My Message Body"; 
@@ -60,14 +60,14 @@ public function main() {
     asb:AsbClient asbClient = new (config);
 
     log:printInfo("Creating Asb sender connection.");
-    handle topicSender = checkpanic asbClient->createTopicSender(topicName);
+    handle topicSender = check asbClient->createTopicSender(topicName);
 
     log:printInfo("Creating Asb receiver connection.");
     handle subscriptionReceiver = 
-        checkpanic asbClient->createSubscriptionReceiver(topicName, subscriptionName1, asb:RECEIVEANDDELETE);
+        check asbClient->createSubscriptionReceiver(topicName, subscriptionName1, asb:RECEIVEANDDELETE);
 
     log:printInfo("Sending via Asb sender connection.");
-    checkpanic asbClient->sendBatch(topicSender, messages);
+    check asbClient->sendBatch(topicSender, messages);
 
     log:printInfo("Receiving from Asb receiver connection.");
     asb:MessageBatch|asb:Error? messageReceived = 
@@ -86,8 +86,8 @@ public function main() {
     }
 
     log:printInfo("Closing Asb sender connection.");
-    checkpanic asbClient->closeSender(topicSender);
+    check asbClient->closeSender(topicSender);
 
     log:printInfo("Closing Asb receiver connection.");
-    checkpanic asbClient->closeReceiver(subscriptionReceiver);
+    check asbClient->closeReceiver(subscriptionReceiver);
 }    
