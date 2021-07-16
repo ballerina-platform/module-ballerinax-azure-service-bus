@@ -22,7 +22,7 @@ configurable string connectionString = ?;
 configurable string topicName = ?;
 configurable string subscriptionName1 = ?;
 
-public function main() {
+public function main() returns error? {
 
     // Input values
     string stringContent = "This is My Message Body"; 
@@ -49,23 +49,23 @@ public function main() {
     asb:AsbClient asbClient = new (config);
 
     log:printInfo("Creating Asb sender connection.");
-    handle topicSender = checkpanic asbClient->createTopicSender(topicName);
+    handle topicSender = check asbClient->createTopicSender(topicName);
 
     log:printInfo("Creating Asb receiver connection.");
     handle subscriptionReceiver = 
-        checkpanic asbClient->createSubscriptionReceiver(topicName, subscriptionName1, asb:PEEKLOCK);
+        check asbClient->createSubscriptionReceiver(topicName, subscriptionName1, asb:PEEKLOCK);
 
     log:printInfo("Sending via Asb sender connection.");
-    checkpanic asbClient->send(topicSender, message1);
+    check asbClient->send(topicSender, message1);
 
     log:printInfo("Receiving from Asb receiver connection.");
     asb:Message|asb:Error? messageReceived = asbClient->receive(subscriptionReceiver, serverWaitTime);
 
     if (messageReceived is asb:Message) {
-        int sequenceNumber = checkpanic asbClient->defer(subscriptionReceiver, messageReceived);
+        int sequenceNumber = check asbClient->defer(subscriptionReceiver, messageReceived);
         log:printInfo("Defer message successful");
         asb:Message|asb:Error? messageReceivedAgain = 
-            checkpanic asbClient->receiveDeferred(subscriptionReceiver, sequenceNumber);
+            check asbClient->receiveDeferred(subscriptionReceiver, sequenceNumber);
         if (messageReceivedAgain is asb:Message) {
             log:printInfo("Reading Deferred Message : " + messageReceivedAgain.toString());
         }
@@ -76,8 +76,8 @@ public function main() {
     }
 
     log:printInfo("Closing Asb sender connection.");
-    checkpanic asbClient->closeSender(topicSender);
+    check asbClient->closeSender(topicSender);
 
     log:printInfo("Closing Asb receiver connection.");
-    checkpanic asbClient->closeReceiver(subscriptionReceiver);
+    check asbClient->closeReceiver(subscriptionReceiver);
 }    

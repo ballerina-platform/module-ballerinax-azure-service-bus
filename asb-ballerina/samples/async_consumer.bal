@@ -22,7 +22,7 @@ import ballerinax/asb;
 configurable string connectionString = ?;
 configurable string queueName = ?;
 
-public function main() {
+public function main() returns error? {
 
     // Input values
     string stringContent = "This is My Message Body"; 
@@ -48,10 +48,10 @@ public function main() {
     asb:AsbClient asbClient = new (config);
 
     log:printInfo("Creating Asb sender connection.");
-    handle queueSender = checkpanic asbClient->createQueueSender(queueName);
+    handle queueSender = check asbClient->createQueueSender(queueName);
 
     log:printInfo("Sending via Asb sender connection.");
-    checkpanic asbClient->send(queueSender, message1);
+    check asbClient->send(queueSender, message1);
 
     asb:Service asyncTestService =
     @asb:ServiceConfig {
@@ -69,16 +69,16 @@ public function main() {
 
     asb:Listener? channelListener = new();
     if (channelListener is asb:Listener) {
-        checkpanic channelListener.attach(asyncTestService);
-        checkpanic channelListener.'start();
+        check channelListener.attach(asyncTestService);
+        check channelListener.'start();
         log:printInfo("start listening");
         runtime:sleep(20);
         log:printInfo("end listening");
-        checkpanic channelListener.detach(asyncTestService);
-        checkpanic channelListener.gracefulStop();
-        checkpanic channelListener.immediateStop();
+        check channelListener.detach(asyncTestService);
+        check channelListener.gracefulStop();
+        check channelListener.immediateStop();
     }
 
     log:printInfo("Closing Asb sender connection.");
-    checkpanic asbClient->closeSender(queueSender);
+    check asbClient->closeSender(queueSender);
 }    
