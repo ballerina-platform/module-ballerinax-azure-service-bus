@@ -6,32 +6,30 @@ topics.
 This module can be used to send and receive messages from Service Bus queues, topics and subscriptions. Service Bus [data access libraries](https://docs.microsoft.com/en-us/java/api/overview/azure/servicebus?view=azure-java-stable#libraries-for-data-access) access the Service Bus service directly, and perform various data access operations at the entity level, rather than at the namespace level (such as sending a message to a queue).
 This module also supports asynchronous message listening capabilities from the azure service bus. Service Bus provides a Microsoft supported [native Java API](https://docs.microsoft.com/en-us/java/api/overview/azure/servicebus?view=azure-java-stable) (SDK) and this module make use of this [public API](https://docs.microsoft.com/en-us/java/api/overview/azure/servicebus/client?view=azure-java-stable&preserve-view=true). This public API uses SAS authentication and this module supports SAS authentication.
 
-This module supports [Service Bus SDK 3.5.1](https://docs.microsoft.com/en-us/java/api/overview/azure/servicebus/client?view=azure-java-stable&preserve-view=true) version. The source code on GitHub is located [here](https://github.com/Azure/azure-sdk-for-java/tree/main/sdk/servicebus/microsoft-azure-servicebus). The primary wire protocol for Service Bus is Advanced Messaging Queueing Protocol (AMQP) 1.0, an open ISO/IEC standard.
+This module supports [Service Bus SDK v3.5.1](https://docs.microsoft.com/en-us/java/api/overview/azure/servicebus/client?view=azure-java-stable&preserve-view=true). The source code on GitHub is located [here](https://github.com/Azure/azure-sdk-for-java/tree/main/sdk/servicebus/microsoft-azure-servicebus). The primary wire protocol for Service Bus is Advanced Messaging Queueing Protocol (AMQP) 1.0, an open ISO/IEC standard.
 
-## Configuring Connector
+## Prerequisites
 
-### Prerequisites
-* An Azure account and subscription.
+* Create Azure account and subscription.
   If you don't have an Azure subscription, [sign up for a free Azure account](https://azure.microsoft.com/free/).
 
-* A Service Bus namespace.
+* Create Service Bus namespace.
   If you don't have [a service bus namespace](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-create-namespace-portal),
   learn how to create your Service Bus namespace.
 
-* A messaging entity, such as a queue, topic or subscription.
+* Create messaging entity, such as a queue, topic or subscription.
   If you don't have these items, learn how to
     * [Create a queue in the Azure portal](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-portal#create-a-queue-in-the-azure-portal)
     * [Create a Topic using the Azure portal](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-topics-subscriptions-portal#create-a-topic-using-the-azure-portal)
     * [Create Subscriptions to the Topic](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-topics-subscriptions-portal#create-subscriptions-to-the-topic)
 
-### Obtaining Tokens
+* Obtain tokens
 
-* Shared Access Signature (SAS) Authentication Credentials
+    Shared Access Signature (SAS) Authentication Credentials are required to communicate with the Azure Service Bus.
     * Connection String
     * Entity Path
 
-* Getting the authorization credentials
-
+    Obtain the authorization credentials:
     * For Service Bus Queues
 
         1. Make sure you have an Azure subscription. If you don't have an Azure subscription, you can create a
@@ -59,37 +57,29 @@ This module supports [Service Bus SDK 3.5.1](https://docs.microsoft.com/en-us/ja
         5. [Create a subscription in the Azure portal & get Entity Path](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-topics-subscriptions-portal#create-subscriptions-to-the-topic). 
         It’s in the format ‘topicName/subscriptions/subscriptionName’.
 
-* Provide the following configuration information in the `Config.toml` file to use the Azure Service Bus Client.
+* Configure the connector with obtained tokens
 
-```ballerina
-    connectionString = "<CONNECTION_STRING>"
-```
-
-* Provide the following configuration information in the `Config.toml` file to use the Azure Service Bus Listener.
-
-```ballerina
-    connectionString = "<CONNECTION_STRING>"
-    entityPath = "<ENTITY_PATH>"
-```
 > **NOTE:**
 When configuring the listener, the entity path for a Queue is the entity name (Eg: "myQueueName") and the entity path 
 for a subscription is in the following format `<topicName>/subscriptions/<subscriptionName>` 
 (Eg: "myTopicName/subscriptions/mySubscriptionName").
 
-## Quickstart(s)
+## Quickstart
+
+To use the Azure Service Bus connector in your Ballerina application, update the .bal file as follows:
 
 ### Send and Receive Messages from the Azure Service Bus Queue
 
 This is the simplest scenario to send and receive messages from an Azure Service Bus queue. You need to obtain 
 a connection string of the name space and an entity path name of the queue you want to send and receive messages from. 
 
-#### Step 1: Import the Azure Service Bus Ballerina Library
-First, import the ballerinax/asb module into the Ballerina project.
+#### Step 1: Import the Azure Service Bus Ballerina library
+Import the ballerinax/asb module into the Ballerina project.
 ```ballerina
     import ballerinax/asb as asb;
 ```
 
-#### Step 2: Initialize the Azure Service Bus Client Configuration
+#### Step 2: Initialize the Azure Service Bus Client configuration
 You can now make the connection configuration using the connection string.
 ```ballerina
     asb:AsbConnectionConfiguration config = {
@@ -103,13 +93,13 @@ You can now make an Azure service bus client using the connection configuration.
     asb:AsbClient asbClient = new (config);
 ```
 
-#### Step 4: Create a Queue Sender using the Azure service bus client
+#### Step 4: Create a Queue Sender using the Azure Service Bus client
 You can now make a sender connection using the Azure service bus client. Provide the `queueName` as a parameter. 
 ```ballerina
     handle queueSender = check asbClient->createQueueSender(queueName);
 ```
 
-#### Step 5 : Create a Queue Receiver using the Azure service bus client
+#### Step 5 : Create a Queue Receiver using the Azure Service Bus client
 You can now make a receiver connection using the connection configuration. Provide the `queueName` as a parameter. 
 Optionally you can provide the receive mode which is PEEKLOCK by default. You can find more information about the receive modes [here](https://docs.microsoft.com/en-us/java/api/com.microsoft.azure.servicebus.receivemode?view=azure-java-stable).
 ```ballerina
@@ -171,16 +161,13 @@ You can now close the receiver connection.
     check asbClient->closeReceiver(queueReceiver);
 ```
 
-Sample is available at:
-https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/blob/main/asb-ballerina/samples/send_and_receive_message_from_queue.bal
-
 ### Listen to Messages from the Azure Service Bus Queue
 
 This is the simplest scenario to listen to messages from an Azure Service Bus queue. You need to obtain a connection 
 string of the name space and an entity path name of the queue you want to listen messages from. 
 
 #### Step 1: Import the Azure Service Bus Ballerina Library
-First, import the ballerinax/asb module into the Ballerina project.
+Import the ballerinax/asb module into the Ballerina project.
 ```ballerina
     import ballerinax/asb as asb;
 ```
@@ -230,75 +217,75 @@ You can now create a service object with the service configuration specified usi
 > **NOTE:**
 Currently we are using the asb:Message record for both sender & receiver operations. When we use the ASB receiver connector instead of the ASB listener to receive messages we return the exact message converted (re-engineered) to the specific data type based on the content type of the message. But in the ASB listener we receive the message body as byte[] which is the standard according to the AMQP protocol. We haven't re-engineered the listener. Rather we provide the message body as a standard byte[]. So the user must do the conversion based on the content type of the message. We have provided a sample code segment above, where you can do the conversion easily.
 
-## Snippets
-Snippets of some operations.
+## Quick reference
+Code snippets of some frequently used functions: 
 
-1. Create Queue Sender
+* Create Queue Sender
 
 ```ballerina
     handle queueSender = check asbClient->createQueueSender(queueName); 
 ```
 
-2. Create Queue Receiver
+* Create Queue Receiver
 
 ```ballerina
     handle queueReceiver = check asbClient->createQueueReceiver(queueName, asb:RECEIVEANDDELETE);
 ```
 
-3. Create Topic Sender
+* Create Topic Sender
 
 ```ballerina
     handle topicSender = check asbClient->createTopicSender(topicName); 
 ```
 
-4. Create Subscription Receiver
+* Create Subscription Receiver
 
 ```ballerina
     handle subscriptionReceiver = 
         check asbClient->createSubscriptionReceiver(topicName, subscriptionName1, asb:RECEIVEANDDELETE);
 ```
 
-5. Send Message to Queue
+* Send Message to Queue
 ```ballerina
     check asbClient->send(queueSender, message);
 ```
 
-6. Receive Message from Queue
+* Receive Message from Queue
 ```ballerina
     asb:Message|asb:Error? message = asbClient->receive(queueReceiver, serverWaitTime);  
 ```
 
-7. Send Batch to Queue
+* Send Batch to Queue
 
 ```ballerina
     check asbClient->sendBatch(queueSender, messages);   
 ```
 
-8. Receive Batch from Queue
+* Receive Batch from Queue
 ```ballerina
     asb:MessageBatch|asb:Error? messageBatch = asbClient->receiveBatch(queueReceiver, maxMessageCount, serverWaitTime);    
 ```
 
-9. Send Message to Topic
+* Send Message to Topic
 ```ballerina
     check asbClient->send(topicSender, message);
 ```
 
-10. Receive Message from Subscription
+* Receive Message from Subscription
 ```ballerina
     asb:Message|asb:Error? message = asbClient->receive(subscriptionReceiver, serverWaitTime);  
 ```
 
-11. Close Sender Connection
+* Close Sender Connection
 ```ballerina
     check asbClient->closeSender(queueSender);
     check asbClient->closeSender(topicSender);
 ```
 
-12. Close Receiver Connection
+* Close Receiver Connection
 ```ballerina
     check asbClient->closeReceiver(queueReceiver);
     check asbClient->closeReceiver(subscriptionReceiver);
 ```
 
-### [You can find more samples here](https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/tree/main/asb-ballerina/samples)
+**[You can find a list of samples here](https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/tree/main/asb-ballerina/samples)**
