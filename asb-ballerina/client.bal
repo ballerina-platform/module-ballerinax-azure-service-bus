@@ -16,17 +16,19 @@
 
 import ballerina/jballerina.java as java;
 
-# Represents a client to the Azure service bus message broker.
+# Ballerina Service Bus connector provides the capability to access Azure Service Bus SDK.
+# Service Bus API provides data access to highly reliable queues and publish/subscribe topics of Azure Service Bus with deep feature capabilities.
 @display {label: "Azure Service Bus", iconPath: "logo.png"}
-public client class AsbClient {
-    handle asbSenderConnection = JAVA_NULL;
-    handle asbReceiverConnection  = JAVA_NULL;
+public isolated client class AsbClient {
 
-    private string connectionString;
+    final string connectionString;
 
-    # Initiates an Asb client using the given connection configuration.
+    # Initializes the connector. During initialization you can pass the [Shared Access Signature (SAS) authentication credentials](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-sas)
+    # Create an [Azure account](https://docs.microsoft.com/en-us/learn/modules/create-an-azure-account/) and 
+    # obtain tokens following [this guide](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-portal#get-the-connection-string). 
+    # Configure the connection string to have the [required permission](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-sas).
     # 
-    # + connectionConfiguration - Configurations used to create a `asb:AsbClient`
+    # + connectionConfiguration - Configuration for the connector
     public isolated function init(AsbConnectionConfiguration connectionConfiguration) {
         self.connectionString = connectionConfiguration.connectionString;
     }
@@ -34,7 +36,7 @@ public client class AsbClient {
     # Creates a queue sender connection to the given queue.
     # 
     # + queueName - Name of the queue
-    # + return - An `asb:Error` if failed to create connection or else `QueueSender`
+    # + return - `QueueSender` handle on success, or else an `asb:Error`
     @display {label: "Create Queue Sender"}
     isolated remote function createQueueSender(@display {label: "Queue Name"} string queueName) 
                                                returns @display {label: "QueueSender"} handle|Error {
@@ -51,7 +53,7 @@ public client class AsbClient {
     # Creates a topic sender connection to the given topic.
     # 
     # + topicName - Name of the topic
-    # + return - An `asb:Error` if failed to create connection or else `TopicSender`
+    # + return - `TopicSender` handle on success, or else an `asb:Error`
     @display {label: "Create Topic Sender"}
     isolated remote function createTopicSender(@display {label: "Topic Name"} string topicName) 
                                                returns @display {label: "TopicSender"} handle|Error {
@@ -69,7 +71,7 @@ public client class AsbClient {
     # 
     # + queueName - Name of the queue
     # + receiveMode - Receive mode of the receiver. It can be PEEKLOCK or RECEIVEANDDELETE. Default is PEEKLOCK. (optional)
-    # + return - An `asb:Error` if failed to create connection or else `QueueReceiver`
+    # + return - `QueueReceiver` handle on success, or else an `asb:Error`
     @display {label: "Create Queue Receiver"}
     isolated remote function createQueueReceiver(@display {label: "Queue Name"} string queueName, 
                                                  @display {label: "Receive Mode"} 
@@ -90,7 +92,7 @@ public client class AsbClient {
     # + topicName - Name of the topic
     # + subscriptionName - Name of the subscription
     # + receiveMode - Receive mode of the receiver. It can be PEEKLOCK or RECEIVEANDDELETE. Default is PEEKLOCK. (optional)
-    # + return - An `asb:Error` if failed to create connection or else `SubscriptionReceiver`
+    # + return - `SubscriptionReceiver` handle on success, or else an `asb:Error`
     @display {label: "Create Subscription Receiver"}
     isolated remote function createSubscriptionReceiver(@display {label: "Topic Name"} string topicName, 
                                                         @display {label: "Subscription Name"} string subscriptionName, 
@@ -107,9 +109,9 @@ public client class AsbClient {
         }
     }
 
-    # Closes the Asb sender connection.
+    # Closes the ASB sender connection.
     #
-    # + asbSender - Asb Sender
+    # + asbSender - `QueueSender` handle or `TopicSender` handle
     # + return - An `asb:Error` if failed to close connection or else `()`
     @display {label: "Close Sender Connection"}
     isolated remote function closeSender(@display {label: "Asb Sender"} handle asbSender) returns Error? {
@@ -121,9 +123,9 @@ public client class AsbClient {
         }
     }
 
-    # Closes the Asb receiver connection.
+    # Closes the ASB receiver connection.
     #
-    # + asbReceiver - Asb Receiver
+    # + asbReceiver - `QueueReceiver` handle or `SubscriptionReceiver` handle
     # + return - An `asb:Error` if failed to close connection or else `()`
     @display {label: "Close Receiver Connection"}
     isolated remote function closeReceiver(@display {label: "Asb Receiver"} handle asbReceiver) returns Error? {
@@ -137,8 +139,8 @@ public client class AsbClient {
 
     # Send message to queue or topic with a message body.
     #
-    # + asbSender - Asb Sender
-    # + message - Azure service bus message representation (Message record)
+    # + asbSender - `QueueSender` handle or `TopicSender` handle
+    # + message - Azure service bus message representation (`asb:Message` record)
     # + return - An `asb:Error` if failed to send message or else `()`
     @display {label: "Send Message"}
     isolated remote function send(@display {label: "Asb Sender"} handle asbSender, 
@@ -159,8 +161,8 @@ public client class AsbClient {
 
     # Send batch of messages to queue or topic.
     #
-    # + asbSender - Asb Sender
-    # + messages - Azure service bus batch message representation (MessageBatch record)
+    # + asbSender - `QueueSender` handle or `TopicSender` handle
+    # + messages - Azure service bus batch message representation (`asb:MessageBatch` record)
     # + return - An `asb:Error` if failed to send message or else `()`
     @display {label: "Send Batch Message"}
     isolated remote function sendBatch(@display {label: "Asb Sender"} handle asbSender,
@@ -171,9 +173,10 @@ public client class AsbClient {
 
     # Receive message from queue or subscription.
     # 
-    # + asbReceiver - Asb Receiver
-    # + serverWaitTime - Specified server wait time in seconds to receive message. (optional)
-    # + return - A Message record. An `asb:Error` if failed to receive message or else `()`.
+    # + asbReceiver - `QueueReceiver` handle or `SubscriptionReceiver` handle
+    # + serverWaitTime - Specified server wait time in seconds to receive message (optional)
+    # + return - A `asb:Message` record if message is recieved, `()` if no message is in the queue or else an `asb:Error` 
+    #            if failed to receive message
     @display {label: "Receive Message"}
     isolated remote function receive(@display {label: "Asb Receiver"} handle asbReceiver, 
                                      @display {label: "Server Wait Time"} int? serverWaitTime) 
@@ -188,10 +191,11 @@ public client class AsbClient {
 
     # Receive batch of messages from queue or subscription.
     # 
-    # + asbReceiver - Asb Receiver
+    # + asbReceiver - `QueueReceiver` handle or `SubscriptionReceiver` handle
     # + maxMessageCount - Maximum message count to receive in a batch
-    # + serverWaitTime - Specified server wait time in seconds to receive message. (optional)
-    # + return - A MessageBatch record. An `asb:Error` if failed to receive message or else `()`.
+    # + serverWaitTime - Specified server wait time in seconds to receive message (optional)
+    # + return - A `asb:MessageBatch` record if batch is recieved, `()` if no batch is in the queue or else an `asb:Error` 
+    #            if failed to receive batch
     @display {label: "Receive Batch Message"}
     isolated remote function receiveBatch(@display {label: "Asb Receiver"} handle asbReceiver, 
                                           @display {label: "Maximum Message Count"} int maxMessageCount, 
@@ -213,8 +217,8 @@ public client class AsbClient {
     # Complete message from queue or subscription based on messageLockToken. Declares the message processing to be 
     # successfully completed, removing the message from the queue.
     # 
-    # + asbReceiver - Asb Receiver
-    # + message - Message record
+    # + asbReceiver - `QueueReceiver` handle or `SubscriptionReceiver` handle
+    # + message - `asb:Message` record
     # + return - An `asb:Error` if failed to complete message or else `()`
     @display {label: "Complete Message"}
     isolated remote function complete(@display {label: "Asb Receiver"} handle asbReceiver,
@@ -229,8 +233,8 @@ public client class AsbClient {
     # the time being, returning the message immediately back to the queue to be picked up by another (or the same) 
     # receiver.
     # 
-    # + asbReceiver - Asb Receiver
-    # + message - Message record
+    # + asbReceiver - `QueueReceiver` handle or `SubscriptionReceiver` handle
+    # + message - `asb:Message` record
     # + return - An `asb:Error` if failed to abandon message or else `()`
     @display {label: "Abandon Message"}
     isolated remote function abandon(@display {label: "Asb Receiver"} handle asbReceiver,
@@ -244,10 +248,10 @@ public client class AsbClient {
     # Dead-Letter the message & moves the message to the Dead-Letter Queue based on messageLockToken. Transfer 
     # the message from the primary queue into a special "dead-letter sub-queue".
     # 
-    # + asbReceiver - Asb Receiver
-    # + message - Message record
-    # + deadLetterReason - The deadletter reason. (optional)
-    # + deadLetterErrorDescription - The deadletter error description. (optional)
+    # + asbReceiver - `QueueReceiver` handle or `SubscriptionReceiver` handle
+    # + message - `asb:Message` record
+    # + deadLetterReason - The deadletter reason (optional)
+    # + deadLetterErrorDescription - The deadletter error description (optional)
     # + return - An `asb:Error` if failed to deadletter message or else `()`
     @display {label: "Dead Letter Message"}
     isolated remote function deadLetter(@display {label: "Asb Receiver"} handle asbReceiver,
@@ -265,8 +269,8 @@ public client class AsbClient {
     # Defer the message in a Queue or Subscription based on messageLockToken.  It prevents the message from being 
     # directly received from the queue by setting it aside such that it must be received by sequence number.
     # 
-    # + asbReceiver - Asb Receiver
-    # + message - Message record
+    # + asbReceiver - `QueueReceiver` handle or `SubscriptionReceiver` handle
+    # + message - `asb:Message` record
     # + return - An `asb:Error` if failed to defer message or else sequence number
     @display {label: "Defer Message"}
     isolated remote function defer(@display {label: "Asb Receiver"} handle asbReceiver,
@@ -279,7 +283,7 @@ public client class AsbClient {
     # Receives a deferred Message. Deferred messages can only be received by using sequence number and return
     # Message object.
     # 
-    # + asbReceiver - Asb Receiver
+    # + asbReceiver - `QueueReceiver` handle or `SubscriptionReceiver` handle
     # + sequenceNumber - Unique number assigned to a message by Service Bus. The sequence number is a unique 64-bit
     #                    integer assigned to a message as it is accepted and stored by the broker and functions as
     #                    its true identifier.
@@ -299,8 +303,8 @@ public client class AsbClient {
 
     # The operation renews lock on a message in a queue or subscription based on messageLockToken.
     # 
-    # + asbReceiver - Asb Receiver
-    # + message - Message record
+    # + asbReceiver - `QueueReceiver` handle or `SubscriptionReceiver` handle
+    # + message - `asb:Message` record
     # + return - An `asb:Error` if failed to renew message or else `()`
     @display {label: "Renew Lock On Message"}
     isolated remote function renewLock(@display {label: "Asb Receiver"} handle asbReceiver,
@@ -317,8 +321,8 @@ public client class AsbClient {
     # number of messages. Setting the value to zero turns prefetch off. For both PEEKLOCK mode and
     # RECEIVEANDDELETE mode, the default value is 0.
     # 
-    # + asbReceiver - Asb Receiver
-    # + prefetchCount - The desired prefetch count.
+    # + asbReceiver - `QueueReceiver` handle or `SubscriptionReceiver` handle
+    # + prefetchCount - The desired prefetch count
     # + return - An `asb:Error` if failed to renew message or else `()`
     @display {label: "Set Prefetch Count"}
     isolated remote function setPrefetchCount(@display {label: "Asb Receiver"} handle asbReceiver,
