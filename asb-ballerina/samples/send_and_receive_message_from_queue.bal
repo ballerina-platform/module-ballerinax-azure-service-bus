@@ -21,7 +21,7 @@ import ballerinax/asb;
 configurable string connectionString = ?;
 configurable string queueName = ?;
 
-public function main() {
+public function main() returns error? {
 
     // Input values
     string stringContent = "This is My Message Body"; 
@@ -48,13 +48,13 @@ public function main() {
     asb:AsbClient asbClient = new (config);
 
     log:printInfo("Creating Asb sender connection.");
-    handle queueSender = checkpanic asbClient->createQueueSender(queueName);
+    handle queueSender = check asbClient->createQueueSender(queueName);
 
     log:printInfo("Creating Asb receiver connection.");
-    handle queueReceiver = checkpanic asbClient->createQueueReceiver(queueName, asb:RECEIVEANDDELETE);
+    handle queueReceiver = check asbClient->createQueueReceiver(queueName, asb:RECEIVEANDDELETE);
 
     log:printInfo("Sending via Asb sender connection.");
-    checkpanic asbClient->send(queueSender, message1);
+    check asbClient->send(queueSender, message1);
 
     log:printInfo("Receiving from Asb receiver connection.");
     asb:Message|asb:Error? messageReceived = asbClient->receive(queueReceiver, serverWaitTime);
@@ -68,8 +68,8 @@ public function main() {
     }
 
     log:printInfo("Closing Asb sender connection.");
-    checkpanic asbClient->closeSender(queueSender);
+    check asbClient->closeSender(queueSender);
 
     log:printInfo("Closing Asb receiver connection.");
-    checkpanic asbClient->closeReceiver(queueReceiver);
+    check asbClient->closeReceiver(queueReceiver);
 }    
