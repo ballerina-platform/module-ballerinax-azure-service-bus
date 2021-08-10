@@ -9,7 +9,7 @@ This package provides the capability to easily access Microsoft Azure Service Bu
 ### Compatibility
 |                                                         | Version               |
 |---------------------------------------------------------|-----------------------|
-| Ballerina Language                                      | Swan Lake Beta2       |
+| Ballerina Language                                      | Swan Lake Beta3       |
 | Azure Service Bus SDK                                   | 3.5.1                 |
 
 ## Report issues
