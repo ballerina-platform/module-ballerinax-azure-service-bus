@@ -33,7 +33,8 @@ public class ASBConstants {
     public static final String ORG_NAME = "ballerinax";
     public static final String ASB = "asb";
     public static final String ASB_VERSION = "0.1.4-SNAPSHOT";
-    public static final Module PACKAGE_ID_ASB = new Module(ORG_NAME, ASB, ASB_VERSION);
+    public static final String ASB_MAJOR_VERSION = ASB_VERSION.split("\\.")[0];
+    public static final Module PACKAGE_ID_ASB = new Module(ORG_NAME, ASB, ASB_MAJOR_VERSION);
     public static final String PACKAGE_ASB_FQN =
             ORG_NAME + ORG_NAME_SEPARATOR + ASB + VERSION_SEPARATOR + ASB_VERSION;
 
