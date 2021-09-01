@@ -21,6 +21,7 @@ package org.ballerinalang.asb;
 import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BError;
+import org.ballerinalang.asb.ModuleUtils;
 
 /**
  * Util class for Asb Error handling.
@@ -33,8 +34,7 @@ public class ASBUtils {
      * @return Resulting Ballerina Error
      */
     public static BError returnErrorValue(String errorMessage) {
-        return ErrorCreator.createDistinctError(ASBConstants.ASB_ERROR, ASBConstants.PACKAGE_ID_ASB,
+        return ErrorCreator.createDistinctError(ASBConstants.ASB_ERROR, ModuleUtils.getModule(),
                 StringUtils.fromString(errorMessage));
     }
 }
-

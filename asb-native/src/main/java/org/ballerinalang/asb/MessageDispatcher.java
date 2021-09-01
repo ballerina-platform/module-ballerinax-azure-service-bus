@@ -32,6 +32,7 @@ import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
+import org.ballerinalang.asb.ModuleUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
@@ -41,6 +42,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
+import static io.ballerina.runtime.api.constants.RuntimeConstants.ORG_NAME_SEPARATOR;
+import static io.ballerina.runtime.api.constants.RuntimeConstants.VERSION_SEPARATOR;
 import static org.ballerinalang.asb.ASBConstants.*;
 import static org.ballerinalang.asb.connection.ConnectionUtils.toBMap;
 import static org.ballerinalang.asb.connection.ListenerUtils.isServiceAttached;
@@ -56,10 +59,6 @@ public class MessageDispatcher {
     private String connectionKey;
     private Runtime runtime;
     private IMessageReceiver receiver;
-    private static final StrandMetadata ON_MESSAGE_METADATA = new StrandMetadata(ORG_NAME, ASB,
-            ASB_VERSION, FUNC_ON_MESSAGE);
-    private static final StrandMetadata ON_ERROR_METADATA = new StrandMetadata(ORG_NAME, ASB,
-            ASB_VERSION, FUNC_ON_ERROR);
 
     /**
      * Initialize the Message Dispatcher.
@@ -84,8 +83,9 @@ public class MessageDispatcher {
      */
     public static String getQueueNameFromConfig(BObject service) {
         BMap serviceConfig = (BMap) ((AnnotatableType) service.getType())
-                .getAnnotation(StringUtils.fromString(ASBConstants.PACKAGE_ASB_FQN + ":"
-                        + ASBConstants.SERVICE_CONFIG));
+                .getAnnotation(StringUtils.fromString(ModuleUtils.getModule().getOrg() + ORG_NAME_SEPARATOR 
+                + ModuleUtils.getModule().getName() + VERSION_SEPARATOR + ModuleUtils.getModule().getMajorVersion() 
+                + ":" + ASBConstants.SERVICE_CONFIG));
         @SuppressWarnings(ASBConstants.UNCHECKED)
         BMap<BString, Object> queueConfig =
                 (BMap) serviceConfig.getMapValue(ASBConstants.ALIAS_QUEUE_CONFIG);
@@ -100,8 +100,9 @@ public class MessageDispatcher {
      */
     public static String getConnectionStringFromConfig(BObject service) {
         BMap serviceConfig = (BMap) ((AnnotatableType) service.getType())
-                .getAnnotation(StringUtils.fromString(ASBConstants.PACKAGE_ASB_FQN + ":"
-                        + ASBConstants.SERVICE_CONFIG));
+                .getAnnotation(StringUtils.fromString(ModuleUtils.getModule().getOrg() + ORG_NAME_SEPARATOR 
+                + ModuleUtils.getModule().getName() + VERSION_SEPARATOR + ModuleUtils.getModule().getMajorVersion() 
+                + ":" + ASBConstants.SERVICE_CONFIG));
         @SuppressWarnings(ASBConstants.UNCHECKED)
         BMap<BString, Object> queueConfig =
                 (BMap) serviceConfig.getMapValue(ASBConstants.ALIAS_QUEUE_CONFIG);
@@ -116,8 +117,9 @@ public class MessageDispatcher {
      */
     public static String getReceiveModeFromConfig(BObject service) {
         BMap serviceConfig = (BMap) ((AnnotatableType) service.getType())
-                .getAnnotation(StringUtils.fromString(ASBConstants.PACKAGE_ASB_FQN + ":"
-                        + ASBConstants.SERVICE_CONFIG));
+                .getAnnotation(StringUtils.fromString(ModuleUtils.getModule().getOrg() + ORG_NAME_SEPARATOR 
+                + ModuleUtils.getModule().getName() + VERSION_SEPARATOR + ModuleUtils.getModule().getMajorVersion() 
+                + ":" + ASBConstants.SERVICE_CONFIG));
         @SuppressWarnings(ASBConstants.UNCHECKED)
         BMap<BString, Object> queueConfig =
                 (BMap) serviceConfig.getMapValue(ASBConstants.ALIAS_QUEUE_CONFIG);
@@ -252,21 +254,25 @@ public class MessageDispatcher {
         values[11] = message.getSequenceNumber();
         values[12] = StringUtils.fromString(message.getLockToken().toString());
         BMap<BString, Object> applicationProperties =
-                ValueCreator.createRecordValue(PACKAGE_ID_ASB, APPLICATION_PROPERTIES);
+                ValueCreator.createRecordValue(ModuleUtils.getModule(), APPLICATION_PROPERTIES);
         Object[] propValues = new Object[1];
         propValues[0] = toBMap(message.getProperties());
         values[13] = ValueCreator.createRecordValue(applicationProperties, propValues);
         BMap<BString, Object> messageRecord =
-                ValueCreator.createRecordValue(PACKAGE_ID_ASB, MESSAGE_RECORD);
+                ValueCreator.createRecordValue(ModuleUtils.getModule(), MESSAGE_RECORD);
         return ValueCreator.createRecordValue(messageRecord, values);
     }
 
     private void executeResourceOnMessage(Callback callback, Object... args) {
-        executeResource(ASBConstants.FUNC_ON_MESSAGE, callback, ON_MESSAGE_METADATA, args);
+        StrandMetadata metaData = new StrandMetadata(ModuleUtils.getModule().getOrg(), 
+                ModuleUtils.getModule().getName(), ModuleUtils.getModule().getMajorVersion(), FUNC_ON_MESSAGE);
+        executeResource(ASBConstants.FUNC_ON_MESSAGE, callback, metaData, args);
     }
 
     private void executeResourceOnError(Callback callback, Object... args) {
-        executeResource(ASBConstants.FUNC_ON_ERROR, callback, ON_ERROR_METADATA, args);
+        StrandMetadata metaData = new StrandMetadata(ModuleUtils.getModule().getOrg(), 
+                ModuleUtils.getModule().getName(), ModuleUtils.getModule().getMajorVersion(), FUNC_ON_ERROR);
+        executeResource(ASBConstants.FUNC_ON_ERROR, callback, metaData, args);
     }
 
     private void executeResource(String function, Callback callback, StrandMetadata metaData,
