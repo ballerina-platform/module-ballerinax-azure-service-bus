@@ -29,6 +29,7 @@ import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BString;
 import io.ballerina.runtime.internal.types.BArrayType;
 import org.ballerinalang.asb.ASBUtils;
+import org.ballerinalang.asb.ModuleUtils;
 
 import java.time.Duration;
 import java.util.*;
@@ -317,12 +318,12 @@ public class ConnectionUtils {
             values[11] = receivedMessage.getSequenceNumber();
             values[12] = StringUtils.fromString(receivedMessage.getLockToken().toString());
             BMap<BString, Object> applicationProperties =
-                    ValueCreator.createRecordValue(PACKAGE_ID_ASB, APPLICATION_PROPERTIES);
+                    ValueCreator.createRecordValue(ModuleUtils.getModule(), APPLICATION_PROPERTIES);
             Object[] propValues = new Object[1];
             propValues[0] = toBMap(receivedMessage.getProperties());
             values[13] = ValueCreator.createRecordValue(applicationProperties, propValues);
             BMap<BString, Object> messageRecord =
-                    ValueCreator.createRecordValue(PACKAGE_ID_ASB, MESSAGE_RECORD);
+                    ValueCreator.createRecordValue(ModuleUtils.getModule(), MESSAGE_RECORD);
             return ValueCreator.createRecordValue(messageRecord, values);
         } catch (InterruptedException | ServiceBusException e) {
             return ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
@@ -364,9 +365,9 @@ public class ConnectionUtils {
             }
 
             BMap<BString, Object> applicationProperties =
-                    ValueCreator.createRecordValue(PACKAGE_ID_ASB, APPLICATION_PROPERTIES);
+                    ValueCreator.createRecordValue(ModuleUtils.getModule(), APPLICATION_PROPERTIES);
             BMap<BString, Object> messageRecord =
-                    ValueCreator.createRecordValue(PACKAGE_ID_ASB, MESSAGE_RECORD);
+                    ValueCreator.createRecordValue(ModuleUtils.getModule(), MESSAGE_RECORD);
 
             for (IMessage receivedMessage : receivedMessages) {
                 Object[] values = new Object[14];
@@ -396,7 +397,7 @@ public class ConnectionUtils {
             messagesRecordValues[1] = ValueCreator.createArrayValue(messages, sourceArrayType);
 
             BMap<BString, Object> messagesRecord =
-                    ValueCreator.createRecordValue(PACKAGE_ID_ASB, MESSAGE_BATCH_RECORD);
+                    ValueCreator.createRecordValue(ModuleUtils.getModule(), MESSAGE_BATCH_RECORD);
             return ValueCreator.createRecordValue(messagesRecord, messagesRecordValues);
         } catch (InterruptedException | ServiceBusException e) {
             return ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
@@ -534,12 +535,12 @@ public class ConnectionUtils {
             values[11] = receivedMessage.getSequenceNumber();
             values[12] = StringUtils.fromString(receivedMessage.getLockToken().toString());
             BMap<BString, Object> applicationProperties =
-                    ValueCreator.createRecordValue(PACKAGE_ID_ASB, APPLICATION_PROPERTIES);
+                    ValueCreator.createRecordValue(ModuleUtils.getModule(), APPLICATION_PROPERTIES);
             Object[] propValues = new Object[1];
             propValues[0] = toBMap(receivedMessage.getProperties());
             values[13] = ValueCreator.createRecordValue(applicationProperties, propValues);
             BMap<BString, Object> messageRecord =
-                    ValueCreator.createRecordValue(PACKAGE_ID_ASB, MESSAGE_RECORD);
+                    ValueCreator.createRecordValue(ModuleUtils.getModule(), MESSAGE_RECORD);
             return ValueCreator.createRecordValue(messageRecord, values);
         } catch (InterruptedException | ServiceBusException e) {
             return ASBUtils.returnErrorValue("Current thread was interrupted while waiting "

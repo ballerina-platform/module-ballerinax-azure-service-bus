@@ -22,20 +22,10 @@ import io.ballerina.runtime.api.Module;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BString;
 
-import static io.ballerina.runtime.api.constants.RuntimeConstants.ORG_NAME_SEPARATOR;
-import static io.ballerina.runtime.api.constants.RuntimeConstants.VERSION_SEPARATOR;
-
 /**
  * Asb Connector Constants.
  */
 public class ASBConstants {
-    // Asb package name constant fields
-    public static final String ORG_NAME = "ballerinax";
-    public static final String ASB = "asb";
-    public static final String ASB_VERSION = "0.1.4-SNAPSHOT";
-    public static final Module PACKAGE_ID_ASB = new Module(ORG_NAME, ASB, ASB_VERSION);
-    public static final String PACKAGE_ASB_FQN =
-            ORG_NAME + ORG_NAME_SEPARATOR + ASB + VERSION_SEPARATOR + ASB_VERSION;
 
     // Error constant fields
     static final String ASB_ERROR = "AsbError";
