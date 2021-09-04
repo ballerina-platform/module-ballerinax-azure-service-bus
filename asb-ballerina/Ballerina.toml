@@ -4,7 +4,7 @@ name = "asb"
 version = "1.0.1"
 license= ["Apache-2.0"]
 authors = ["Ballerina"]
-keywords = ["azure","service bus","messaging","message brokers"]
+keywords = ["dev tools/message brokers", "cost/paid", "vendor/microsoft"]
 repository = "https://github.com/ballerina-platform/module-ballerinax-azure-service-bus"
 
 [build-options]

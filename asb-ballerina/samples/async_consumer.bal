@@ -45,13 +45,11 @@ public function main() returns error? {
         connectionString: connectionString
     };
 
-    asb:AsbClient asbClient = new (config);
+    log:printInfo("Initializing Asb sender client.");
+    asb:MessageSender queueSender = check new(connectionString, queueName);
 
-    log:printInfo("Creating Asb sender connection.");
-    handle queueSender = check asbClient->createQueueSender(queueName);
-
-    log:printInfo("Sending via Asb sender connection.");
-    check asbClient->send(queueSender, message1);
+    log:printInfo("Sending via Asb sender client.");
+    check queueSender->send(message1);
 
     asb:Service asyncTestService =
     @asb:ServiceConfig {
@@ -79,6 +77,6 @@ public function main() returns error? {
         check channelListener.immediateStop();
     }
 
-    log:printInfo("Closing Asb sender connection.");
-    check asbClient->closeSender(queueSender);
+    log:printInfo("Closing Asb sender client.");
+    check queueSender->close();
 }    

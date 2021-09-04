@@ -79,7 +79,7 @@ asb:AsbClient asbClient = new (config);
 
     ```ballerina
     public function main() returns error? {
-        handle queueSender = check asbClient->createQueueSender(queueName);
+        asb:MessageSender queueSender = check new(connectionString, queueName);
 
         string stringContent = "This is My Message Body"; 
         byte[] byteContent = stringContent.toBytes();
@@ -109,11 +109,11 @@ asb:AsbClient asbClient = new (config);
 
     ```ballerina
         public function main() returns error? {
-            handle queueReceiver = check asbClient->createQueueReceiver(queueName, asb:RECEIVEANDDELETE);
+            asb:MessageReceiver queueReceiver = check new(connectionString, queueName, asb:RECEIVEANDDELETE);
 
             int serverWaitTime = 60; // In seconds
 
-            asb:Message|asb:Error? messageReceived = asbClient->receive(queueReceiver, serverWaitTime);
+            asb:Message|asb:Error? messageReceived = queueReceiver->receive(serverWaitTime);
 
             if (messageReceived is asb:Message) {
                 log:printInfo("Reading Received Message : " + messageReceived.toString());

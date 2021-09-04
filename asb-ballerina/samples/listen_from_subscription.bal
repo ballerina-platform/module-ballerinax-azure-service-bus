@@ -4,7 +4,7 @@ import ballerinax/asb;
 
 // ASB configuration parameters
 configurable string connectionString = ?;
-configurable string subscriptionEntityPath = ?;
+configurable string subscriptionPath1 = ?;
 // The entityPath for a subscription is in the following format `<topicName>/subscriptions/<subscriptionName>`
 
 listener asb:Listener asbListener = new ();
@@ -12,7 +12,7 @@ listener asb:Listener asbListener = new ();
 @asb:ServiceConfig {
     entityConfig: {
         connectionString: connectionString,
-        entityPath: subscriptionEntityPath,
+        entityPath: subscriptionPath1,
         receiveMode: asb:RECEIVEANDDELETE
     }
 }

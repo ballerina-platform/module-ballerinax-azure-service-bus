@@ -20,7 +20,7 @@ import ballerinax/asb;
 // Connection Configurations
 configurable string connectionString = ?;
 configurable string topicName = ?;
-configurable string subscriptionName1 = ?;
+configurable string subscriptionPath1 = ?;
 
 public function main() returns error? {
 
@@ -46,24 +46,21 @@ public function main() returns error? {
         connectionString: connectionString
     };
 
-    asb:AsbClient asbClient = new (config);
+    log:printInfo("Initializing Asb sender client.");
+    asb:MessageSender topicSender = check new(connectionString, topicName);
 
-    log:printInfo("Creating Asb sender connection.");
-    handle topicSender = check asbClient->createTopicSender(topicName);
+    log:printInfo("Initializing Asb receiver client.");
+    asb:MessageReceiver subscriptionReceiver = check new(connectionString, subscriptionPath1, asb:PEEKLOCK);
 
-    log:printInfo("Creating Asb receiver connection.");
-    handle subscriptionReceiver = 
-        check asbClient->createSubscriptionReceiver(topicName, subscriptionName1, asb:PEEKLOCK);
+    log:printInfo("Sending via Asb sender client.");
+    check topicSender->send(message1);
 
-    log:printInfo("Sending via Asb sender connection.");
-    check asbClient->send(topicSender, message1);
-
-    log:printInfo("Receiving from Asb receiver connection.");
-    asb:Message|asb:Error? messageReceived = asbClient->receive(subscriptionReceiver, serverWaitTime);
+    log:printInfo("Receiving from Asb receiver client.");
+    asb:Message|asb:Error? messageReceived = subscriptionReceiver->receive(serverWaitTime);
 
     if (messageReceived is asb:Message) {
-        check asbClient->deadLetter(subscriptionReceiver, messageReceived);
-        asb:Message|asb:Error? messageReceivedAgain = asbClient->receive(subscriptionReceiver, serverWaitTime);
+        check subscriptionReceiver->deadLetter(messageReceived);
+        asb:Message|asb:Error? messageReceivedAgain = subscriptionReceiver->receive(serverWaitTime);
         if (messageReceivedAgain is ()) {
             log:printInfo("Deadletter message successful");
         } else {
@@ -75,9 +72,9 @@ public function main() returns error? {
         log:printError("Receiving message via Asb receiver connection failed.");
     }
 
-    log:printInfo("Closing Asb sender connection.");
-    check asbClient->closeSender(topicSender);
+    log:printInfo("Closing Asb sender client.");
+    check topicSender->close();
 
-    log:printInfo("Closing Asb receiver connection.");
-    check asbClient->closeReceiver(subscriptionReceiver);
+    log:printInfo("Closing Asb receiver client.");
+    check subscriptionReceiver->close();
 }    

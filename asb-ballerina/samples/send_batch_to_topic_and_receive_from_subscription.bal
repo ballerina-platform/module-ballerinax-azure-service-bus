@@ -20,7 +20,7 @@ import ballerinax/asb;
 // Connection Configurations
 configurable string connectionString = ?;
 configurable string topicName = ?;
-configurable string subscriptionName1 = ?;
+configurable string subscriptionPath1 = ?;
 
 public function main() returns error? {
 
@@ -57,21 +57,17 @@ public function main() returns error? {
         connectionString: connectionString
     };
 
-    asb:AsbClient asbClient = new (config);
+    log:printInfo("Initializing Asb sender client.");
+    asb:MessageSender topicSender = check new(connectionString, topicName);
 
-    log:printInfo("Creating Asb sender connection.");
-    handle topicSender = check asbClient->createTopicSender(topicName);
+    log:printInfo("Initializing Asb receiver client.");
+    asb:MessageReceiver subscriptionReceiver = check new(connectionString, subscriptionPath1, asb:RECEIVEANDDELETE);
 
-    log:printInfo("Creating Asb receiver connection.");
-    handle subscriptionReceiver = 
-        check asbClient->createSubscriptionReceiver(topicName, subscriptionName1, asb:RECEIVEANDDELETE);
+    log:printInfo("Sending via Asb sender client.");
+    check topicSender->sendBatch(messages);
 
-    log:printInfo("Sending via Asb sender connection.");
-    check asbClient->sendBatch(topicSender, messages);
-
-    log:printInfo("Receiving from Asb receiver connection.");
-    asb:MessageBatch|asb:Error? messageReceived = 
-        asbClient->receiveBatch(subscriptionReceiver, maxMessageCount, serverWaitTime);
+    log:printInfo("Receiving from Asb receiver client.");
+    asb:MessageBatch|asb:Error? messageReceived = subscriptionReceiver->receiveBatch(maxMessageCount, serverWaitTime);
 
     if (messageReceived is asb:MessageBatch) {
         foreach asb:Message message in messageReceived.messages {
@@ -85,9 +81,9 @@ public function main() returns error? {
         log:printError("Receiving message via Asb receiver connection failed.");
     }
 
-    log:printInfo("Closing Asb sender connection.");
-    check asbClient->closeSender(topicSender);
+    log:printInfo("Closing Asb sender client.");
+    check topicSender->close();
 
-    log:printInfo("Closing Asb receiver connection.");
-    check asbClient->closeReceiver(subscriptionReceiver);
+    log:printInfo("Closing Asb receiver client.");
+    check subscriptionReceiver->close();
 }    
