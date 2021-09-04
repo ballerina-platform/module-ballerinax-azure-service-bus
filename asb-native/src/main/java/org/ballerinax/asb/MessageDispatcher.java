@@ -16,9 +16,10 @@
  * under the License.
  */
 
-package org.ballerinalang.asb;
+package org.ballerinax.asb;
 
-import com.microsoft.azure.servicebus.*;
+import com.microsoft.azure.servicebus.IMessage;
+import com.microsoft.azure.servicebus.IMessageReceiver;
 import io.ballerina.runtime.api.Runtime;
 import io.ballerina.runtime.api.async.Callback;
 import io.ballerina.runtime.api.async.StrandMetadata;
@@ -26,46 +27,41 @@ import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.AnnotatableType;
 import io.ballerina.runtime.api.types.MethodType;
 import io.ballerina.runtime.api.types.Type;
-import io.ballerina.runtime.api.utils.JsonUtils;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
+import org.ballerinax.asb.util.ASBConstants;
+import org.ballerinax.asb.util.ASBUtils;
+import org.ballerinax.asb.util.ListenerUtils;
 
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
-import static org.ballerinalang.asb.ASBConstants.*;
-import static org.ballerinalang.asb.connection.ConnectionUtils.toBMap;
-import static org.ballerinalang.asb.connection.ListenerUtils.isServiceAttached;
-
 /**
  * Handles and dispatched messages with data binding.
  */
 public class MessageDispatcher {
     private static final Logger log = Logger.getLogger(MessageDispatcher.class.getName());
-
+    private static final StrandMetadata ON_MESSAGE_METADATA = new StrandMetadata(ASBConstants.ORG_NAME, ASBConstants.ASB,
+            ASBConstants.ASB_VERSION, ASBConstants.FUNC_ON_MESSAGE);
+    private static final StrandMetadata ON_ERROR_METADATA = new StrandMetadata(ASBConstants.ORG_NAME, ASBConstants.ASB,
+            ASBConstants.ASB_VERSION, ASBConstants.FUNC_ON_ERROR);
     private BObject service;
     private String queueName;
     private String connectionKey;
     private Runtime runtime;
     private IMessageReceiver receiver;
-    private static final StrandMetadata ON_MESSAGE_METADATA = new StrandMetadata(ORG_NAME, ASB,
-            ASB_VERSION, FUNC_ON_MESSAGE);
-    private static final StrandMetadata ON_ERROR_METADATA = new StrandMetadata(ORG_NAME, ASB,
-            ASB_VERSION, FUNC_ON_ERROR);
 
     /**
      * Initialize the Message Dispatcher.
      *
-     * @param service Ballerina service instance.
-     * @param runtime Ballerina runtime instance.
+     * @param service          Ballerina service instance.
+     * @param runtime          Ballerina runtime instance.
      * @param iMessageReceiver Asb MessageReceiver instance.
      */
     public MessageDispatcher(BObject service, Runtime runtime, IMessageReceiver iMessageReceiver) {
@@ -105,7 +101,7 @@ public class MessageDispatcher {
         @SuppressWarnings(ASBConstants.UNCHECKED)
         BMap<BString, Object> queueConfig =
                 (BMap) serviceConfig.getMapValue(ASBConstants.ALIAS_QUEUE_CONFIG);
-        return queueConfig.getStringValue(CONNECTION_STRING).getValue();
+        return queueConfig.getStringValue(ASBConstants.CONNECTION_STRING).getValue();
     }
 
     /**
@@ -121,10 +117,10 @@ public class MessageDispatcher {
         @SuppressWarnings(ASBConstants.UNCHECKED)
         BMap<BString, Object> queueConfig =
                 (BMap) serviceConfig.getMapValue(ASBConstants.ALIAS_QUEUE_CONFIG);
-        if (queueConfig.getStringValue(RECEIVE_MODE) != null) {
-            return queueConfig.getStringValue(RECEIVE_MODE).getValue();
+        if (queueConfig.getStringValue(ASBConstants.RECEIVE_MODE) != null) {
+            return queueConfig.getStringValue(ASBConstants.RECEIVE_MODE).getValue();
         }
-        return PEEKLOCK;
+        return ASBConstants.PEEKLOCK;
     }
 
     /**
@@ -151,11 +147,11 @@ public class MessageDispatcher {
     /**
      * Asynchronously pump messages from the Azure service bus.
      *
-     * @param receiver Ballerina listener object.
+     * @param receiver        Ballerina listener object.
      * @param executorService Thread executor for processing the messages.
      */
     public void pumpMessage(IMessageReceiver receiver, ExecutorService executorService) {
-        if(isServiceAttached()) {
+        if (ListenerUtils.isServiceAttached()) {
             CompletableFuture<IMessage> receiveMessageFuture = receiver.receiveAsync();
 
             receiveMessageFuture.handleAsync((message, receiveEx) -> {
@@ -188,7 +184,7 @@ public class MessageDispatcher {
     private void handleDispatch(IMessage message) {
         MethodType[] attachedFunctions = service.getType().getMethods();
         MethodType onMessageFunction;
-        if (FUNC_ON_MESSAGE.equals(attachedFunctions[0].getName())) {
+        if (ASBConstants.FUNC_ON_MESSAGE.equals(attachedFunctions[0].getName())) {
             onMessageFunction = attachedFunctions[0];
         } else {
             return;
@@ -236,7 +232,7 @@ public class MessageDispatcher {
      *
      * @param message Received azure service bus message instance.
      */
-    private BMap<BString, Object> getMessageRecord(IMessage message)  {
+    private BMap<BString, Object> getMessageRecord(IMessage message) {
         Object[] values = new Object[14];
         values[0] = ValueCreator.createArrayValue(message.getBody());
         values[1] = StringUtils.fromString(message.getContentType());
@@ -252,12 +248,12 @@ public class MessageDispatcher {
         values[11] = message.getSequenceNumber();
         values[12] = StringUtils.fromString(message.getLockToken().toString());
         BMap<BString, Object> applicationProperties =
-                ValueCreator.createRecordValue(PACKAGE_ID_ASB, APPLICATION_PROPERTIES);
+                ValueCreator.createRecordValue(ASBConstants.PACKAGE_ID_ASB, ASBConstants.APPLICATION_PROPERTIES);
         Object[] propValues = new Object[1];
-        propValues[0] = toBMap(message.getProperties());
+        propValues[0] = ASBUtils.toBMap(message.getProperties());
         values[13] = ValueCreator.createRecordValue(applicationProperties, propValues);
         BMap<BString, Object> messageRecord =
-                ValueCreator.createRecordValue(PACKAGE_ID_ASB, MESSAGE_RECORD);
+                ValueCreator.createRecordValue(ASBConstants.PACKAGE_ID_ASB, ASBConstants.MESSAGE_RECORD);
         return ValueCreator.createRecordValue(messageRecord, values);
     }
 

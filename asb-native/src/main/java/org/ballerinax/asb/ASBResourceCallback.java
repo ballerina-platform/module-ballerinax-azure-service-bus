@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.ballerinalang.asb;
+package org.ballerinax.asb;
 
 import io.ballerina.runtime.api.async.Callback;
 import io.ballerina.runtime.api.values.BError;
@@ -29,6 +29,7 @@ public class ASBResourceCallback implements Callback {
     public void notifySuccess(Object obj) {
         // do nothing
     }
+
     @Override
     public void notifyFailure(BError error) {
         // do nothing

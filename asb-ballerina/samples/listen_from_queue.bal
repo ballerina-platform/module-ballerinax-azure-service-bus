@@ -3,8 +3,8 @@ import ballerina/log;
 import ballerinax/asb;
 
 // ASB configuration parameters
-configurable string connectionString = ?;
-configurable string queueName = ?;
+configurable string connectionString;
+configurable string queueName;
 
 listener asb:Listener asbListener = new ();
 

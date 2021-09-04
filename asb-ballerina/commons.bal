@@ -22,7 +22,9 @@ final handle JAVA_NULL = java:createNull();
 
 // Default values
 public const int DEFAULT_TIME_TO_LIVE = 300; // In seconds
+public const int DEFAULT_POOL_SIZE= 20;
 public const int DEFAULT_MAX_MESSAGE_COUNT = 1;
+public const int DEFAULT_MAX_POOL_SIZE = 20;
 public const int DEFAULT_SERVER_WAIT_TIME = 300; // In seconds
 public const string DEFAULT_MESSAGE_LOCK_TOKEN = "00000000-0000-0000-0000-000000000000";
 
@@ -89,3 +91,57 @@ public type asbServiceConfig record {|
 
 # The annotation, which is used to configure the subscription.
 public annotation asbServiceConfig ServiceConfig on service;
+
+// # This function returns the user defined poolSize value or deafult value.
+// # 
+// # + poolSize - configured pool size value.
+// # + return - return maximum pool size that need to be configured.
+// isolated function getMaxPoolSize(int? poolSize) returns int {
+//     if (poolSize != null && poolSize is int) {
+//         return poolSize;
+//     } else {
+//         return DEFAULT_MAX_POOL_SIZE;
+//     }
+// }
+
+// # This function returns the receive mode that needs to be set.
+// # 
+// # + receiveMode - configured receive mode.
+// # + return - return receive mode that need to be configured.
+// isolated function setReceiveMode(string? receiveMode) returns string {
+//     if (receiveMode != null && receiveMode == RECEIVEANDDELETE) { //check
+//         return RECEIVEANDDELETE;
+//     } else {
+//         return PEEKLOCK;
+//     }
+// }
+
+isolated function nativeGetTextContent(byte[] messageContent) returns string|Error =
+@java:Method {
+    name: "getTextContent",
+    'class: "org.ballerinax.asb.util.ASBUtils"
+} external;
+
+isolated function nativeGetFloatContent(byte[] messageContent) returns float|Error =
+@java:Method {
+    name: "getFloatContent",
+    'class: "org.ballerinax.asb.util.ASBUtils"
+} external;
+
+isolated function nativeGetIntContent(byte[] messageContent) returns int|Error =
+@java:Method {
+    name: "getIntContent",
+    'class: "org.ballerinax.asb.util.ASBUtils"
+} external;
+
+isolated function nativeGetJSONContent(byte[] messageContent) returns json|Error =
+@java:Method {
+    name: "getJSONContent",
+    'class: "org.ballerinax.asb.util.ASBUtils"
+} external;
+
+isolated function nativeGetXMLContent(byte[] messageContent) returns xml|Error =
+@java:Method {
+    name: "getXMLContent",
+    'class: "org.ballerinax.asb.util.ASBUtils"
+} external;

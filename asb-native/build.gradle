@@ -20,6 +20,7 @@ repositories {
 
 dependencies {
     implementation group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.5.1'
+    compile group:'org.apache.commons', name:'commons-pool2', version:'2.11.1'
     compile group: 'org.ballerinalang', name: 'ballerina-lang', version: project.ballerinaLangVersion
     compile (group: 'org.ballerinalang', name: 'ballerina-runtime', version: project.ballerinaLangVersion) {
         transitive = false
