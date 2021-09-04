@@ -56,20 +56,17 @@ public function main() returns error? {
         connectionString: connectionString
     };
 
-    asb:AsbClient asbClient = new (config);
+    log:printInfo("Initializing Asb sender client.");
+    asb:MessageSender queueSender = check new (connectionString, queueName);
 
-    log:printInfo("Creating Asb sender connection.");
-    handle queueSender = check asbClient->createQueueSender(queueName);
+    log:printInfo("Initializing Asb receiver client.");
+    asb:MessageReceiver queueReceiver = check new (connectionString, queueName, asb:RECEIVEANDDELETE);
 
-    log:printInfo("Creating Asb receiver connection.");
-    handle queueReceiver = check asbClient->createQueueReceiver(queueName, asb:RECEIVEANDDELETE);
+    log:printInfo("Sending via Asb sender client.");
+    check queueSender->sendBatch(messages);
 
-    log:printInfo("Sending via Asb sender connection.");
-    check asbClient->sendBatch(queueSender, messages);
-
-    log:printInfo("Receiving from Asb receiver connection.");
-    asb:MessageBatch|asb:Error? messageReceived = 
-        asbClient->receiveBatch(queueReceiver, maxMessageCount, serverWaitTime);
+    log:printInfo("Receiving from Asb receiver client.");
+    asb:MessageBatch|asb:Error? messageReceived = queueReceiver->receiveBatch(maxMessageCount, serverWaitTime);
 
     if (messageReceived is asb:MessageBatch) {
         foreach asb:Message message in messageReceived.messages {
@@ -83,9 +80,9 @@ public function main() returns error? {
         log:printError("Receiving message via Asb receiver connection failed.");
     }
 
-    log:printInfo("Closing Asb sender connection.");
-    check asbClient->closeSender(queueSender);
+    log:printInfo("Closing Asb sender client.");
+    check queueSender->close();
 
-    log:printInfo("Closing Asb receiver connection.");
-    check asbClient->closeReceiver(queueReceiver);
+    log:printInfo("Closing Asb receiver client.");
+    check queueReceiver->close();
 }    

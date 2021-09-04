@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -16,84 +16,90 @@
  * under the License.
  */
 
-package org.ballerinalang.asb.connection;
+package org.ballerinax.asb.listener;
 
-import com.microsoft.azure.servicebus.*;
+import com.microsoft.azure.servicebus.ClientFactory;
+import com.microsoft.azure.servicebus.IMessageReceiver;
+import com.microsoft.azure.servicebus.ReceiveMode;
 import com.microsoft.azure.servicebus.primitives.ConnectionStringBuilder;
 import com.microsoft.azure.servicebus.primitives.ServiceBusException;
 import io.ballerina.runtime.api.Environment;
 import io.ballerina.runtime.api.Runtime;
 import io.ballerina.runtime.api.values.BObject;
-import org.ballerinalang.asb.ASBConstants;
-import org.ballerinalang.asb.ASBUtils;
-import org.ballerinalang.asb.MessageDispatcher;
+import org.apache.log4j.Logger;
+import org.ballerinax.asb.MessageDispatcher;
+import org.ballerinax.asb.util.ASBConstants;
+import org.ballerinax.asb.util.ASBUtils;
 
 import java.util.ArrayList;
-import java.util.logging.Logger;
 
-import static org.ballerinalang.asb.ASBConstants.RECEIVEANDDELETE;
-import static org.ballerinalang.asb.MessageDispatcher.*;
+import static org.ballerinax.asb.util.ASBConstants.ASB_CALLER;
+import static org.ballerinax.asb.util.ASBConstants.RECEIVEANDDELETE;
 
 /**
- * Util class used to bridge the listener capabilities of the Asb connector's native code and the Ballerina API.
+ * Listens to incoming messages from Azure Service Bus.
  */
-public class ListenerUtils {
-    private static final Logger log = Logger.getLogger(ListenerUtils.class.getName());
+public class MessageListener {
+    private static final Logger log = Logger.getLogger(Caller.class);
 
     private static Runtime runtime;
-
     private static boolean started = false;
     private static boolean serviceAttached = false;
     private static ArrayList<BObject> services = new ArrayList<>();
     private static ArrayList<BObject> startedServices = new ArrayList<>();
+    IMessageReceiver receiver;
+    private BObject caller;
 
     /**
-     * Initialize the ballerina listener object.
+     * Initialize Azure Service Bus listener.
      *
-     * @param listenerBObject Ballerina listener object.
+     * @param connectionString Azure service bus connection string.
+     * @param entityPath       Entity path (QueueName or SubscriptionPath).
+     * @param receiveMode      Receive Mode as PeekLock or Receive&Delete.
+     * @throws ServiceBusException  on failure initiating IMessage Receiver in Azure Service Bus instance.
+     * @throws InterruptedException on failure initiating IMessage Receiver due to thread interruption.
      */
-    public static void init(BObject listenerBObject) {
-        listenerBObject.addNativeData(ASBConstants.CONSUMER_SERVICES, services);
-        listenerBObject.addNativeData(ASBConstants.STARTED_SERVICES, startedServices);
+    public MessageListener(String connectionString, String entityPath, String receiveMode) throws ServiceBusException, InterruptedException {
+        if (receiveMode.equals(RECEIVEANDDELETE)) {
+            this.receiver = ClientFactory.createMessageReceiverFromConnectionStringBuilder(
+                    new ConnectionStringBuilder(connectionString, entityPath), ReceiveMode.RECEIVEANDDELETE);
+        } else {
+            this.receiver = ClientFactory.createMessageReceiverFromConnectionStringBuilder(
+                    new ConnectionStringBuilder(connectionString, entityPath), ReceiveMode.PEEKLOCK);
+        }
+    }
+
+    private static boolean isStarted() {
+        return started;
+    }
+
+    public static boolean isServiceAttached() {
+        return serviceAttached;
+    }
+
+    public void externalInit(Environment environment, BObject listenerBObject, BObject caller) {
+        this.caller = caller;
+        caller.addNativeData(ASB_CALLER, receiver);
     }
 
     /**
      * Attaches the service to the Asb listener endpoint.
      *
+     * @param environment     Ballerina runtime.
      * @param listenerBObject Ballerina listener object..
-     * @param service Ballerina service instance.
+     * @param service         Ballerina service instance.
      * @return An error if failed to create IMessageReceiver connection instance.
      */
-    public static Object registerListener(Environment environment, BObject listenerBObject, BObject service) {
+    public Object registerListener(Environment environment, BObject listenerBObject, BObject service) {
         runtime = environment.getRuntime();
-        try {
-            String connectionString = getConnectionStringFromConfig(service);
-            String entityPath = getQueueNameFromConfig(service);
-            String receiveMode = getReceiveModeFromConfig(service);
-            IMessageReceiver receiver;
-            if (receiveMode.equals(RECEIVEANDDELETE)) {
-                receiver = ClientFactory.createMessageReceiverFromConnectionStringBuilder(
-                        new ConnectionStringBuilder(connectionString, entityPath), ReceiveMode.RECEIVEANDDELETE);
-            } else {
-                receiver = ClientFactory.createMessageReceiverFromConnectionStringBuilder(
-                        new ConnectionStringBuilder(connectionString, entityPath), ReceiveMode.PEEKLOCK);
-            }
-            listenerBObject.addNativeData(ASBConstants.CONNECTION_NATIVE_OBJECT, receiver);
-        } catch (InterruptedException e) {
-            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
-                    + e.getMessage());
-        } catch (ServiceBusException e) {
-            throw ASBUtils.returnErrorValue("Current thread was interrupted while waiting "
-                    + e.getMessage());
-        }
-        IMessageReceiver receiveClient =
-                (IMessageReceiver) listenerBObject.getNativeData(ASBConstants.CONNECTION_NATIVE_OBJECT);
+        listenerBObject.addNativeData(ASBConstants.CONSUMER_SERVICES, services);
+        listenerBObject.addNativeData(ASBConstants.STARTED_SERVICES, startedServices);
         if (service == null) {
             return null;
         }
         if (isStarted()) {
             services = (ArrayList<BObject>) listenerBObject.getNativeData(ASBConstants.CONSUMER_SERVICES);
-            startReceivingMessages(service, listenerBObject, receiveClient);
+            startReceivingMessages(service, caller, listenerBObject, receiver);
         }
         services.add(service);
         return null;
@@ -102,12 +108,12 @@ public class ListenerUtils {
     /**
      * Starts consuming the messages on all the attached services.
      *
-     * @param listenerBObject Ballerina listener object.
+     * @param environment     Ballerina runtime.
+     * @param listenerBObject Ballerina listener object
+     * @return An error if failed to start the listener.
      */
-    public static Object start(Environment environment, BObject listenerBObject) {
+    public Object start(Environment environment, BObject listenerBObject) {
         runtime = environment.getRuntime();
-        IMessageReceiver iMessageReceiver =
-                (IMessageReceiver) listenerBObject.getNativeData(ASBConstants.CONNECTION_NATIVE_OBJECT);
         @SuppressWarnings(ASBConstants.UNCHECKED)
         ArrayList<BObject> services =
                 (ArrayList<BObject>) listenerBObject.getNativeData(ASBConstants.CONSUMER_SERVICES);
@@ -121,7 +127,7 @@ public class ListenerUtils {
             if (startedServices == null || !startedServices.contains(service)) {
                 serviceAttached = true;
                 MessageDispatcher messageDispatcher =
-                        new MessageDispatcher(service, runtime, iMessageReceiver);
+                        new MessageDispatcher(service, this.caller, runtime, receiver);
                 messageDispatcher.receiveMessages(listenerBObject);
             }
         }
@@ -133,12 +139,10 @@ public class ListenerUtils {
      * Stops consuming messages and detaches the service from the Asb Listener endpoint.
      *
      * @param listenerBObject Ballerina listener object..
-     * @param service Ballerina service instance.
+     * @param service         Ballerina service instance.
      * @return An error if failed detaching the service.
      */
-    public static Object detach(BObject listenerBObject, BObject service) {
-        IMessageReceiver iMessageReceiver =
-                (IMessageReceiver) listenerBObject.getNativeData(ASBConstants.CONNECTION_NATIVE_OBJECT);
+    public Object detach(BObject listenerBObject, BObject service) {
         @SuppressWarnings(ASBConstants.UNCHECKED)
         ArrayList<BObject> startedServices =
                 (ArrayList<BObject>) listenerBObject.getNativeData(ASBConstants.STARTED_SERVICES);
@@ -146,10 +150,10 @@ public class ListenerUtils {
         ArrayList<BObject> services =
                 (ArrayList<BObject>) listenerBObject.getNativeData(ASBConstants.CONSUMER_SERVICES);
         String queueName = (String) service.getNativeData(ASBConstants.QUEUE_NAME.getValue());
-
         serviceAttached = false;
-        log.info("Consumer service unsubscribed from the queue " + queueName);
-
+        if (log.isDebugEnabled()) {
+            log.debug("Consumer service unsubscribed from the queue " + queueName);
+        }
         listenerBObject.addNativeData(ASBConstants.CONSUMER_SERVICES, removeFromList(services, service));
         listenerBObject.addNativeData(ASBConstants.STARTED_SERVICES, removeFromList(startedServices, service));
         return null;
@@ -159,17 +163,18 @@ public class ListenerUtils {
      * Stops consuming messages through all consumer services by terminating the connection.
      *
      * @param listenerBObject Ballerina listener object.
+     * @return An error if listener fails to stop.
      */
-    public static Object stop(BObject listenerBObject) {
-        IMessageReceiver iMessageReceiver =
-                (IMessageReceiver) listenerBObject.getNativeData(ASBConstants.CONNECTION_NATIVE_OBJECT);
-        if(iMessageReceiver == null) {
+    public Object stop(BObject listenerBObject) {
+        if (receiver == null) {
             return ASBUtils.returnErrorValue("IMessageReceiver is not properly initialised.");
         } else {
             try {
                 serviceAttached = false;
-                iMessageReceiver.close();
-                log.info("Consumer service stopped");
+                receiver.close();
+                if (log.isDebugEnabled()) {
+                    log.debug("Consumer service stopped");
+                }
             } catch (ServiceBusException e) {
                 return ASBUtils.returnErrorValue("Error occurred while stopping the service");
             }
@@ -181,16 +186,17 @@ public class ListenerUtils {
      * Stops consuming messages through all the consumer services and terminates the connection with server.
      *
      * @param listenerBObject Ballerina listener object.
+     * @return An error if listener fails to abort the connection.
      */
-    public static Object abortConnection(BObject listenerBObject) {
-        IMessageReceiver iMessageReceiver =
-                (IMessageReceiver) listenerBObject.getNativeData(ASBConstants.CONNECTION_NATIVE_OBJECT);
-        if(iMessageReceiver == null) {
+    public Object abortConnection(BObject listenerBObject) {
+        if (receiver == null) {
             return ASBUtils.returnErrorValue("IMessageReceiver is not properly initialised.");
         } else {
             try {
-                iMessageReceiver.close();
-                log.info("Consumer service stopped");
+                receiver.close();
+                if (log.isDebugEnabled()) {
+                    log.debug("Consumer service aborted");
+                }
             } catch (ServiceBusException e) {
                 return ASBUtils.returnErrorValue("Error occurred while stopping the service");
             }
@@ -199,28 +205,15 @@ public class ListenerUtils {
     }
 
     /**
-     * Get the receiver used by the listener.
-     *
-     * @param listenerBObject Ballerina listener object.
-     */
-    public static Object getReceiver(BObject listenerBObject) {
-        IMessageReceiver iMessageReceiver =
-                (IMessageReceiver) listenerBObject.getNativeData(ASBConstants.CONNECTION_NATIVE_OBJECT);
-        if(iMessageReceiver == null) {
-            return ASBUtils.returnErrorValue("IMessageReceiver is not properly initialised.");
-        }
-        return iMessageReceiver;
-    }
-
-    /**
      * Starts consuming the messages by calling the message dispatcher.
      *
-     * @param service Ballerina service instance.
+     * @param service  Ballerina service instance.
      * @param listener Ballerina listener object.
+     * @return An error if listener fails to start receiving messages.
      */
-    private static void startReceivingMessages(BObject service, BObject listener, IMessageReceiver iMessageReceiver) {
+    private void startReceivingMessages(BObject service, BObject caller, BObject listener, IMessageReceiver iMessageReceiver) {
         MessageDispatcher messageDispatcher =
-                new MessageDispatcher(service, runtime, iMessageReceiver);
+                new MessageDispatcher(service, caller, runtime, iMessageReceiver);
         messageDispatcher.receiveMessages(listener);
 
     }
@@ -232,18 +225,10 @@ public class ListenerUtils {
      * @param objectValue Element to be removed
      * @return Resulting list after removing the element
      */
-    public static ArrayList<BObject> removeFromList(ArrayList<BObject> arrayList, BObject objectValue) {
+    private ArrayList<BObject> removeFromList(ArrayList<BObject> arrayList, BObject objectValue) {
         if (arrayList != null) {
             arrayList.remove(objectValue);
         }
         return arrayList;
-    }
-
-    private static boolean isStarted() {
-        return started;
-    }
-
-    public static boolean isServiceAttached() {
-        return serviceAttached;
     }
 }

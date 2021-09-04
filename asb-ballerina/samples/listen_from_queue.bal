@@ -6,21 +6,14 @@ import ballerinax/asb;
 configurable string connectionString = ?;
 configurable string queueName = ?;
 
-listener asb:Listener asbListener = new ();
+listener asb:Listener asbListener = new (connectionString, queueName, asb:PEEKLOCK);
 
-@asb:ServiceConfig {
-    entityConfig: {
-        connectionString: connectionString,
-        entityPath: queueName,
-        receiveMode: asb:RECEIVEANDDELETE
-    }
-}
 service asb:Service on asbListener {
-    remote function onMessage(asb:Message message) returns error? {
+    remote function onMessage(asb:Message message, asb:Caller caller) returns error? {
         log:printInfo("Azure service bus message as byte[] which is the standard according to the AMQP protocol" + 
             message.toString());
         string|xml|json|byte[] received = message.body;
-
+        _ = check caller.complete(message);
         match message?.contentType {
             asb:JSON => {
                 string stringMessage = check string:fromBytes(<byte[]> received);

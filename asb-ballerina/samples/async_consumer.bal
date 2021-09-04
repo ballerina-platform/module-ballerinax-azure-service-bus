@@ -19,8 +19,8 @@ import ballerina/lang.runtime;
 import ballerinax/asb;
 
 // Connection Configurations
-configurable string connectionString = ?;
-configurable string queueName = ?;
+configurable string connectionString;
+configurable string queueName;
 
 public function main() returns error? {
 
@@ -41,33 +41,21 @@ public function main() returns error? {
         applicationProperties: applicationProperties
     };
 
-    asb:AsbConnectionConfiguration config = {
-        connectionString: connectionString
-    };
+    log:printInfo("Initializing Asb sender client.");
+    asb:MessageSender queueSender = check new (connectionString, queueName);
 
-    asb:AsbClient asbClient = new (config);
-
-    log:printInfo("Creating Asb sender connection.");
-    handle queueSender = check asbClient->createQueueSender(queueName);
-
-    log:printInfo("Sending via Asb sender connection.");
-    check asbClient->send(queueSender, message1);
+    log:printInfo("Sending via Asb sender client.");
+    check queueSender->send(message1);
 
     asb:Service asyncTestService =
-    @asb:ServiceConfig {
-        entityConfig: {
-            connectionString: connectionString,
-            entityPath: queueName
-        }
-    }
     service object {
-        remote function onMessage(asb:Message message) {
+        remote function onMessage(asb:Message message, asb:Caller caller) {
             log:printInfo("The message received: " + message.toString());
             // Write your logic here
         }
     };
 
-    asb:Listener? channelListener = new();
+    asb:Listener? channelListener = check new (connectionString, queueName);
     if (channelListener is asb:Listener) {
         check channelListener.attach(asyncTestService);
         check channelListener.'start();
@@ -79,6 +67,6 @@ public function main() returns error? {
         check channelListener.immediateStop();
     }
 
-    log:printInfo("Closing Asb sender connection.");
-    check asbClient->closeSender(queueSender);
+    log:printInfo("Closing Asb sender client.");
+    check queueSender->close();
 }    

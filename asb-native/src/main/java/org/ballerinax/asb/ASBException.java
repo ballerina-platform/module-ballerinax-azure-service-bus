@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
  *
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -16,21 +16,28 @@
  * under the License.
  */
 
-package org.ballerinalang.asb;
-
-import io.ballerina.runtime.api.async.Callback;
-import io.ballerina.runtime.api.values.BError;
+package org.ballerinax.asb;
 
 /**
- * Handles the Azure service bus resource callback.
+ * Exception class for Azure Service Bus
  */
-public class ASBResourceCallback implements Callback {
-    @Override
-    public void notifySuccess(Object obj) {
-        // do nothing
+public class ASBException extends Exception {
+    /**
+     * Create an exception with given exception message
+     *
+     * @param msg an exception message
+     */
+    public ASBException(String msg) {
+        super(msg);
     }
-    @Override
-    public void notifyFailure(BError error) {
-        // do nothing
+
+    /**
+     * Create an exception with given message and wrapping the given exception object
+     *
+     * @param msg exception message
+     * @param e   exception
+     */
+    public ASBException(String msg, Exception e) {
+        super(msg, e);
     }
 }
