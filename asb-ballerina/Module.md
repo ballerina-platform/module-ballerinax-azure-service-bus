@@ -13,7 +13,7 @@ basic operations. These APIs use SAS authentication and this module supports SAS
 # Compatibility
 |                     |    Version                  |
 |:-------------------:|:---------------------------:|
-| Ballerina Language  | Swan-Lake-Alpha5            |
+| Ballerina Language  | Swan-Lake-Beta3             |
 | Service Bus API     | v3.5.1                      |
 
 # Supported Operations
@@ -56,8 +56,8 @@ immediate stop listening.
 * Java 11 Installed
   Java Development Kit (JDK) with version 11 is required.
 
-* Ballerina SLAlpha5 Installed
-  Ballerina Swan Lake Alpha 5 is required.
+* Ballerina SLBeta3  Installed
+  Ballerina Swan Lake Beta 3  is required.
 
 * Shared Access Signature (SAS) Authentication Credentials
     * Connection String
