@@ -18,13 +18,19 @@ import ballerina/log;
 import ballerina/os;
 import ballerina/test;
 
+// Constants
+const string SUBSCRIPTIONS = "/subscriptions/";
+
 // Connection Configurations
 configurable string connectionString = os:getEnv("CONNECTION_STRING");
 configurable string queueName = os:getEnv("QUEUE_NAME");
 configurable string topicName = os:getEnv("TOPIC_NAME");
-configurable string subscriptionPath1 = os:getEnv("SUBSCRIPTION_NAME1");
-configurable string subscriptionPath2 = os:getEnv("SUBSCRIPTION_NAME2");
-configurable string subscriptionPath3 = os:getEnv("SUBSCRIPTION_NAME3");
+configurable string subscriptionName1 = os:getEnv("SUBSCRIPTION_NAME1");
+configurable string subscriptionName2 = os:getEnv("SUBSCRIPTION_NAME2");
+configurable string subscriptionName3 = os:getEnv("SUBSCRIPTION_NAME3");
+string subscriptionPath1 = topicName + SUBSCRIPTIONS + subscriptionName1;
+string subscriptionPath2 = topicName + SUBSCRIPTIONS + subscriptionName2;
+string subscriptionPath3 = topicName + SUBSCRIPTIONS + subscriptionName3;
 
 // Input values
 string stringContent = "This is My Message Body"; 
