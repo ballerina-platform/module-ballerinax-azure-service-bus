@@ -16,9 +16,8 @@
  * under the License.
  */
 
-package org.ballerinalang.asb;
+package org.ballerinax.asb.util;
 
-import io.ballerina.runtime.api.Module;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BString;
 
@@ -27,30 +26,23 @@ import io.ballerina.runtime.api.values.BString;
  */
 public class ASBConstants {
 
-    // Error constant fields
-    static final String ASB_ERROR = "AsbError";
-
     // Message constant fields
     public static final String MESSAGE_RECORD = "Message";
     public static final String APPLICATION_PROPERTIES = "ApplicationProperties";
-
     // Message content data binding errors
     public static final String XML_CONTENT_ERROR = "Error while retrieving the xml content of the message. ";
     public static final String JSON_CONTENT_ERROR = "Error while retrieving the json content of the message. ";
     public static final String TEXT_CONTENT_ERROR = "Error while retrieving the string content of the message. ";
     public static final String INT_CONTENT_ERROR = "Error while retrieving the int content of the message. ";
     public static final String FLOAT_CONTENT_ERROR = "Error while retrieving the float content of the message. ";
-
     // Batch Message constant fields
     public static final String MESSAGE_BATCH_RECORD = "MessageBatch";
     public static final String MESSAGES_OBJECT = "Messages";
     public static final BString MESSAGES_CONTENT = StringUtils.fromString("messages");
     public static final BString MESSAGE_COUNT = StringUtils.fromString("messageCount");
-
     // Message receive modes
     public static final String PEEKLOCK = "PEEKLOCK";
     public static final String RECEIVEANDDELETE = "RECEIVEANDDELETE";
-
     // Keys of the input message optional parameters specified as a Map
     public static final String BODY = "body";
     public static final String CONTENT_TYPE = "contentType";
@@ -64,21 +56,20 @@ public class ASBConstants {
     public static final String TIME_TO_LIVE = "timeToLive";
     public static final String PARTITION_KEY = "partitionKey";
     public static final int DEFAULT_TIME_TO_LIVE = 60; // In seconds
-
     // listener constant fields
     public static final String CONSUMER_SERVICES = "consumer_services";
+    public static final String ASB_CALLER = "asb_caller";
     public static final String STARTED_SERVICES = "started_services";
     public static final String FUNC_ON_MESSAGE = "onMessage";
     public static final String FUNC_ON_ERROR = "onError";
     public static final String DISPATCH_ERROR = "Error occurred while dispatching the message. ";
-
     public static final BString QUEUE_NAME = StringUtils.fromString("entityPath");
     public static final BString CONNECTION_STRING = StringUtils.fromString("connectionString");
     public static final BString RECEIVE_MODE = StringUtils.fromString("receiveMode");
     public static final String CONNECTION_NATIVE_OBJECT = "asb_connection_object";
-
     public static final String SERVICE_CONFIG = "ServiceConfig";
     public static final BString ALIAS_QUEUE_CONFIG = StringUtils.fromString("entityConfig");
-
     public static final String UNCHECKED = "unchecked";
+    // Error constant fields
+    static final String ASB_ERROR = "AsbError";
 }

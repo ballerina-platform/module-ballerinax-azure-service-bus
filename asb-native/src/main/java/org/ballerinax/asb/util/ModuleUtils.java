@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.ballerinalang.asb;
+package org.ballerinax.asb.util;
 
 import io.ballerina.runtime.api.Environment;
 import io.ballerina.runtime.api.Module;
@@ -34,11 +34,11 @@ public class ModuleUtils {
     private ModuleUtils() {
     }
 
-    public static void setModule(Environment env) {
-        asbModule = env.getCurrentModule();
-    }
-
     public static Module getModule() {
         return asbModule;
+    }
+
+    public static void setModule(Environment env) {
+        asbModule = env.getCurrentModule();
     }
 }

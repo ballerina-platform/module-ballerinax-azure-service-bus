@@ -4,20 +4,13 @@ import ballerinax/asb;
 
 // ASB configuration parameters
 configurable string connectionString = ?;
-configurable string subscriptionEntityPath = ?;
+configurable string subscriptionPath1 = ?
 // The entityPath for a subscription is in the following format `<topicName>/subscriptions/<subscriptionName>`
 
-listener asb:Listener asbListener = new ();
+listener asb:Listener asbListener = new (connectionString, subscriptionPath1);
 
-@asb:ServiceConfig {
-    entityConfig: {
-        connectionString: connectionString,
-        entityPath: subscriptionEntityPath,
-        receiveMode: asb:RECEIVEANDDELETE
-    }
-}
 service asb:Service on asbListener {
-    remote function onMessage(asb:Message message) returns error? {
+    remote function onMessage(asb:Message message, asb:Caller caller) returns error? {
         log:printInfo("Azure service bus message as byte[] which is the standard according to the AMQP protocol" + 
             message.toString());
         string|xml|json|byte[] received = message.body;

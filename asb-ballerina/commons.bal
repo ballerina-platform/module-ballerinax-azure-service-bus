@@ -89,3 +89,33 @@ public type asbServiceConfig record {|
 
 # The annotation, which is used to configure the subscription.
 public annotation asbServiceConfig ServiceConfig on service;
+
+isolated function nativeGetTextContent(byte[] messageContent) returns string|Error =
+@java:Method {
+    name: "getTextContent",
+    'class: "org.ballerinax.asb.util.ASBUtils"
+} external;
+
+isolated function nativeGetFloatContent(byte[] messageContent) returns float|Error =
+@java:Method {
+    name: "getFloatContent",
+    'class: "org.ballerinax.asb.util.ASBUtils"
+} external;
+
+isolated function nativeGetIntContent(byte[] messageContent) returns int|Error =
+@java:Method {
+    name: "getIntContent",
+    'class: "org.ballerinax.asb.util.ASBUtils"
+} external;
+
+isolated function nativeGetJSONContent(byte[] messageContent) returns json|Error =
+@java:Method {
+    name: "getJSONContent",
+    'class: "org.ballerinax.asb.util.ASBUtils"
+} external;
+
+isolated function nativeGetXMLContent(byte[] messageContent) returns xml|Error =
+@java:Method {
+    name: "getXMLContent",
+    'class: "org.ballerinax.asb.util.ASBUtils"
+} external;
