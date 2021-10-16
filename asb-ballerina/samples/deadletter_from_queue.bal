@@ -21,6 +21,10 @@ import ballerinax/asb;
 configurable string connectionString = ?;
 configurable string queueName = ?;
 
+// This sample demonstrates a scneario where azure service bus connecter is used to 
+// send a message to a queue using message sender, receive that message using message receiver with PEEKLOCK mode, 
+// then move the message in a DLQ (dead letter queue)
+// After moving to DLQ, we cannot receive that message from the receiver.
 public function main() returns error? {
 
     // Input values

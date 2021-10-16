@@ -21,6 +21,11 @@ import ballerinax/asb;
 configurable string connectionString = ?;
 configurable string queueName = ?;
 
+// This sample demonstrates a scneario where azure service bus connecter is used to 
+// send a message to a queue using message sender, receive that message using message receiver with PEEKLOCK mode, 
+// abadon that message (discards the message and relinquishes the message lock ownership),
+// finally complete the processing of message using complete function of the caller. 
+// After this point, we cannot futher perform operations on message.
 public function main() returns error? {
 
     // Input values

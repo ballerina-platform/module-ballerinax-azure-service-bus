@@ -22,6 +22,11 @@ import ballerinax/asb;
 configurable string connectionString;
 configurable string queueName;
 
+// This sample demonstrates a scneario where azure service bus listener is used to 
+// asynchronously consume messages from a queue.
+// Here its a different way of using a listener. 
+// First, create a service object and attach that to the listner. 
+// Here we need to handle the listener lifecycle methods like attach, start, detach, stop.
 public function main() returns error? {
 
     // Input values

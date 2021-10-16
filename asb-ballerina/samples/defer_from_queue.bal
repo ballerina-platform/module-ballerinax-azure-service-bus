@@ -21,6 +21,10 @@ import ballerinax/asb;
 configurable string connectionString = ?;
 configurable string queueName = ?;
 
+// This sample demonstrates a scneario where azure service bus connecter is used to 
+// send a message to a queue using message sender, receive that message using message receiver with PEEKLOCK mode, 
+// then defer that message (Defered message will be not received via receive method)
+// After defering, receive the message using receiveDeferred method providing sequence number.
 public function main() returns error? {
 
     // Input values

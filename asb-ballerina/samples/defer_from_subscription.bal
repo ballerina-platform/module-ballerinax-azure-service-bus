@@ -22,6 +22,10 @@ configurable string connectionString = ?;
 configurable string topicName = ?;
 configurable string subscriptionPath1 = ?;
 
+// This sample demonstrates a scneario where azure service bus connecter is used to 
+// send a message to a topic using topic sender, receive that message using subscription receiver with PEEKLOCK mode, 
+// then defer that message (Defered message will be not received via receive method)
+// After defering, receive the message using receiveDeferred method providing sequence number.
 public function main() returns error? {
 
     // Input values

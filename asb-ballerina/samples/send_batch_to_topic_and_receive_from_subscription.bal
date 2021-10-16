@@ -22,6 +22,10 @@ configurable string connectionString = ?;
 configurable string topicName = ?;
 configurable string subscriptionPath1 = ?;
 
+// This sample demonstrates a scneario where azure service bus connecter is used to 
+// send a batch of messages to a topic using topic sender, 
+// receive batch of messsages from a subscription using subscription receiver with RECEIVEANDDELETE mode
+// (message will be deleted from the queue just after received).
 public function main() returns error? {
 
     // Input values

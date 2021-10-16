@@ -18,7 +18,7 @@ import ballerina/jballerina.java as java;
 
 # Ballerina Service Bus connector provides the capability to access Azure Service Bus SDK.
 # Service Bus API provides data access to highly reliable queues and publish/subscribe topics of Azure Service Bus with deep feature capabilities.
-@display {label: "Azure Service Bus Message Receiver", iconPath: "resources/asb.png"}
+@display {label: "Azure Service Bus Message Receiver", iconPath: "resources/asb.svg"}
 public isolated client class MessageReceiver {
 
     final string connectionString;
