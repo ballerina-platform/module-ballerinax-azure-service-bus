@@ -21,6 +21,9 @@ import ballerinax/asb;
 configurable string connectionString = ?;
 configurable string queueName = ?;
 
+// This sample demonstrates a scneario where azure service bus connecter is used to 
+// send a message to a queue using message sender, receive a messsage using message receiver with RECEIVEANDDELETE mode
+// so that the message will be deleted from the queue just after receiving.
 public function main() returns error? {
 
     // Input values

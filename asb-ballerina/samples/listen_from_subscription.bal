@@ -2,6 +2,9 @@ import ballerina/lang.value as value;
 import ballerina/log;
 import ballerinax/asb;
 
+// This sample demonstrates a scneario where azure service bus listener is used to
+// listen to a specific subscription & perform some operations on dispatched messages
+
 // ASB configuration parameters
 configurable string connectionString = ?;
 configurable string subscriptionPath1 = ?

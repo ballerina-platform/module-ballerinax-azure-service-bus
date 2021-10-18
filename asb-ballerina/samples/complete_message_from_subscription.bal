@@ -22,6 +22,10 @@ configurable string connectionString = ?;
 configurable string topicName = ?;
 configurable string subscriptionPath1 = ?;
 
+// This sample demonstrates a scneario where azure service bus connecter is used to 
+// send a message to a topic using topic sender, receive that message using subscription receiver with PEEKLOCK mode, 
+// then complete the processing of message using complete function. 
+// After this point, we cannot futher perform operations on message.
 public function main() returns error? {
 
     // Input values
