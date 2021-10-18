@@ -16,10 +16,6 @@
 
 import ballerina/jballerina.java as java;
 
-// Constants
-
-final handle JAVA_NULL = java:createNull();
-
 // Default values
 public const int DEFAULT_TIME_TO_LIVE = 300; // In seconds
 public const int DEFAULT_MAX_MESSAGE_COUNT = 1;
