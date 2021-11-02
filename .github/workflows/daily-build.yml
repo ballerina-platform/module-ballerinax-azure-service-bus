@@ -41,7 +41,16 @@ jobs:
               uses: ballerina-platform/ballerina-action/@nightly
               with:
                 args:
-                  build -c ./asb-ballerina
+                  pack ./asb-ballerina
+              env:
+                JAVA_HOME: /usr/lib/jvm/default-jvm
+            
+            # Test Ballerina Project
+            - name: Ballerina Test
+              uses: ballerina-platform/ballerina-action/@nightly
+              with:
+                args:
+                  test ./asb-ballerina
               env:
                 JAVA_HOME: /usr/lib/jvm/default-jvm
                 CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
