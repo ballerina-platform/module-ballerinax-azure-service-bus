@@ -46,14 +46,14 @@ Execute the commands below to build from the source.
    Change the current directory to the asb-ballerina home directory and execute the following command.
 
 ```shell script
-    bal build -c
+    bal pack
 ```
 
-3. To build the Ballerina package without running the tests:
+3. To run the tests after build:
    Change the current directory to the asb-ballerina home directory and execute the following command.
 
 ```shell script
-    bal build -c --skip-tests
+    bal test
 ```
 
 ## Contributing to Ballerina
