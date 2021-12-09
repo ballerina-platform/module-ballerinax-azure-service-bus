@@ -1,8 +1,12 @@
 # Compiled class file
 *.class
+**/.project
+**/.settings
+**/.classpath
 
 # Log file
 *.log
+asb-native/bin/main/log4j.properties
 
 # BlueJ files
 *.ctxt
