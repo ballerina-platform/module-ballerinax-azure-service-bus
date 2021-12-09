@@ -55,7 +55,8 @@ public isolated client class MessageReceiver {
         if message is Message {
             check self.mapContentType(message);
             return message;
-        }       
+        }  
+        return;     
     }
 
     # Receive batch of messages from queue or subscription.
@@ -155,6 +156,7 @@ public isolated client class MessageReceiver {
             check self.mapContentType(message);
             return message;
         } 
+        return;
     }
 
     # The operation renews lock on a message in a queue or subscription based on messageLockToken.
