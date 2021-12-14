@@ -9,7 +9,7 @@ dependencies-toml-version = "2"
 [[package]]
 org = "ballerina"
 name = "io"
-version = "1.0.1"
+version = "1.1.0"
 scope = "testOnly"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"},
@@ -36,7 +36,7 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "log"
-version = "2.0.1"
+version = "2.1.0"
 scope = "testOnly"
 dependencies = [
 	{org = "ballerina", name = "io"},
@@ -59,7 +59,7 @@ dependencies = [
 [[package]]
 org = "ballerina"
 name = "os"
-version = "1.0.1"
+version = "1.1.0"
 scope = "testOnly"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"}
@@ -95,7 +95,7 @@ modules = [
 [[package]]
 org = "ballerinax"
 name = "asb"
-version = "2.0.1"
+version = "2.1.0"
 dependencies = [
 	{org = "ballerina", name = "jballerina.java"},
 	{org = "ballerina", name = "log"},
