@@ -2,7 +2,7 @@
 distribution = "2201.0.0"
 org = "ballerinax"
 name = "asb"
-version = "2.2.0"
+version = "2.2.1"
 license= ["Apache-2.0"]
 authors = ["Ballerina"]
 keywords = ["IT Operations/Message Brokers", "Cost/Paid", "Vendor/Microsoft"]
@@ -13,8 +13,14 @@ repository = "https://github.com/ballerina-platform/module-ballerinax-azure-serv
 observabilityIncluded = true
 
 [[platform.java11.dependency]]
-path = "../asb-native/build/libs/asb-native-2.2.0-all.jar"
+path = "../asb-native/build/libs/asb-native-2.2.1.jar"
 groupId = "org.ballerinax"
 artifactId = "asb-native"
 module = "asb-native" 
-version = "2.2.0"
+version = "2.2.1"
+
+[[platform.java11.dependency]]
+groupId = "log4j"
+artifactId = "log4j"
+version = "1.2.17"
+
