@@ -6,6 +6,12 @@ plugins {
 group project.group
 version project.version
 
+configurations {
+    dist {
+        transitive true
+    }
+}
+
 repositories {
     mavenCentral()
 
@@ -20,10 +26,21 @@ repositories {
 
 dependencies {
     implementation group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.5.1'
+    dist group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.5.1'
     implementation group: 'log4j', name: 'log4j', version: '1.2.17'
+    dist group: 'log4j', name: 'log4j', version: '1.2.17'
     compile group: 'org.ballerinalang', name: 'ballerina-lang', version: project.ballerinaLangVersion
     compile(group: 'org.ballerinalang', name: 'ballerina-runtime', version: project.ballerinaLangVersion) {
-        transitive = false
+        transitive = true
+    }
+}
+
+jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    dependsOn configurations.dist
+    from { configurations.dist.collect { it.isDirectory() ? it : zipTree(it) } } {
+        exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA', 'io/netty/**', 'com/google/gson/**', 
+        'org/slf4j/**', 'org/apache/commons/lang3/**' 
     }
 }
 
