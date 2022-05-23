@@ -18,9 +18,3 @@ groupId = "org.ballerinax"
 artifactId = "asb-native"
 module = "asb-native" 
 version = "2.2.1"
-
-[[platform.java11.dependency]]
-groupId = "log4j"
-artifactId = "log4j"
-version = "1.2.17"
-
