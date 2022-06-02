@@ -7,7 +7,7 @@ import ballerinax/asb;
 
 // ASB configuration parameters
 configurable string connectionString = ?;
-configurable string subscriptionPath1 = ?
+configurable string subscriptionPath1 = ?;
 // The entityPath for a subscription is in the following format `<topicName>/subscriptions/<subscriptionName>`
 
 listener asb:Listener asbListener = new (connectionString, subscriptionPath1);
