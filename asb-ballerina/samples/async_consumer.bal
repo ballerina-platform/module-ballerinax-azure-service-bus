@@ -19,8 +19,8 @@ import ballerina/lang.runtime;
 import ballerinax/asb;
 
 // Connection Configurations
-configurable string connectionString;
-configurable string queueName;
+configurable string connectionString = ?;
+configurable string queueName = ?;
 
 // This sample demonstrates a scneario where azure service bus listener is used to 
 // asynchronously consume messages from a queue.
