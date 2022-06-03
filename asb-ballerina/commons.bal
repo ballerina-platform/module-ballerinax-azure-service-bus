@@ -53,39 +53,6 @@ public type AsbConnectionConfiguration record {|
     string connectionString;
 |};
 
-// Listener API Record Types and Annotations.
-
-# Configurations used to create a `asb:Connection`.
-#
-# + connectionString - Service bus connection string with Shared Access Signatures
-#                      ConnectionString format: 
-#                      Endpoint=sb://namespace_DNS_Name;EntityPath=EVENT_HUB_NAME;
-#                      SharedAccessKeyName=SHARED_ACCESS_KEY_NAME;SharedAccessKey=SHARED_ACCESS_KEY or  
-#                      Endpoint=sb://namespace_DNS_Name;EntityPath=EVENT_HUB_NAME;
-#                      SharedAccessSignatureToken=SHARED_ACCESS_SIGNATURE_TOKEN
-# + entityPath - Entitypath to the message broker resource
-# + receiveMode - Message receive modes (optional)
-@display {label: "Entity Config"}
-public type EntityConfiguration record {|
-    @display {label: "Connection String"}
-    string connectionString;
-    @display {label: "Entity Path"}
-    string entityPath;
-    @display {label: "Receive Mode"}
-    string receiveMode?;
-|};
-
-# Service configurations used to create a `asb:Connection`.
-# 
-# + entityConfig - Configurations used to create a `asb:Connection`
-@display {label: "Connection Config"}
-public type asbServiceConfig record {|
-    EntityConfiguration entityConfig;
-|};
-
-# The annotation, which is used to configure the subscription.
-public annotation asbServiceConfig ServiceConfig on service;
-
 isolated function nativeGetTextContent(byte[] messageContent) returns string|Error =
 @java:Method {
     name: "getTextContent",

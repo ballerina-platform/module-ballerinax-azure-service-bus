@@ -159,53 +159,7 @@ asb:MessageReceiver subscriptionReceiver = check new (connectionString, subscrip
             check queueReceiver->close();
         }
     ```
-
-   Following is an example on how to asynchronously listen to messages from the Azure Service Bus using the listener.
-   You need to create a new listener instance before listening. Then, you need to create a service object with the
-   service configuration specified using the `@asb:ServiceConfig` annotation and attach it to the listener. You need to
-   give the connection string and the entity path of the queue we are to listen messages from. We can optionally provide
-   the receive mode. Default mode is the PEEKLOCK mode. You can find more information about the receive modes
-   [here](https://docs.microsoft.com/en-us/java/api/com.microsoft.azure.servicebus.receivemode?view=azure-java-stable).
-   Finally, you can provide the service logic to execute when a message is received inside the onMessage remote
-   function.
-
-   Listen to Messages from the Azure Service Bus
-
-   **!!! NOTE:**
-   When configuring the listener, the entity path for a Queue is the entity name (Eg: "myQueueName") and the entity path
-   for a subscription is in the following format `<topicName>/subscriptions/<subscriptionName>`
-   (Eg: "myTopicName/subscriptions/mySubscriptionName").
-
-    ```ballerina
-    listener asb:Listener asbListener = new (connectionString, queueName, asb:PEEKLOCK);
-
-    service asb:Service on asbListener {
-        remote function onMessage(asb:Message message, asb:Caller caller) returns error? {
-            // Write your logic here
-            log:printInfo("Azure service bus message as byte[] which is the standard according to the AMQP protocol" + 
-            message.toString());
-            string|xml|json|byte[] received = message.body;
-
-            match message?.contentType {
-                asb:JSON => {
-                    string stringMessage = check string:fromBytes(<byte[]> received);
-                    json jsonMessage = check value:fromJsonString(stringMessage);
-                    log:printInfo("The message received: " + jsonMessage.toJsonString());
-                }
-                asb:XML => {
-                    string stringMessage = check 'string:fromBytes(<byte[]> received);
-                    xml xmlMessage = check 'xml:fromString(stringMessage);
-                    log:printInfo("The message received: " + xmlMessage.toString());
-                }
-                asb:TEXT => {
-                    string stringMessage = check 'string:fromBytes(<byte[]> received);
-                    log:printInfo("The message received: " + stringMessage);
-                }
-            }
-        }
-    };
-    ```
-
+    
    **!!! NOTE:**
    Currently we are using the asb:Message record for both sender & receiver operations. When we use the ASB receiver
    connector instead of the ASB listener to receive messages we return the exact message converted (re-engineered) to
