@@ -29,14 +29,9 @@ public function main() returns error? {
     // Input values
     string stringContent = "This is My Message Body"; 
     byte[] byteContent = stringContent.toBytes();
-    map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
     int timeToLive = 60; // In seconds
     int serverWaitTime = 60; // In seconds
     int maxMessageCount = 2;
-
-    asb:ApplicationProperties applicationProperties = {
-        properties: properties
-    };
 
     asb:Message message1 = {
         body: byteContent,
@@ -53,10 +48,6 @@ public function main() returns error? {
     asb:MessageBatch messages = {
         messageCount: 2,
         messages: [message1, message2]
-    };
-
-    asb:AsbConnectionConfiguration config = {
-        connectionString: connectionString
     };
 
     log:printInfo("Initializing Asb sender client.");

@@ -36,10 +36,6 @@ public function main() returns error? {
     int serverWaitTime = 60; // In seconds
     int maxMessageCount = 2;
 
-    asb:ApplicationProperties applicationProperties = {
-        properties: properties
-    };
-
     asb:Message message1 = {
         body: byteContent,
         contentType: asb:TEXT,
@@ -55,10 +51,6 @@ public function main() returns error? {
     asb:MessageBatch messages = {
         messageCount: 2,
         messages: [message1, message2]
-    };
-
-    asb:AsbConnectionConfiguration config = {
-        connectionString: connectionString
     };
 
     log:printInfo("Initializing Asb sender client.");
