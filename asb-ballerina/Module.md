@@ -86,8 +86,8 @@ import ballerinax/asb as asb;
 This can be done providing connection string with queue or topic name.
 
 ```ballerina
-asb:MessageSender queueSender = check new (connectionString, queueName);
-asb:MessageSender topicSender = check new (connectionString, TopicName);
+asb:MessageSender queueSender = check new ({connectionString, entityPath : queueName});
+asb:MessageSender topicSender = check new ({connectionString, entityPath : topicName});
 ```
 
 #### Initialize a Message Receiver client
@@ -96,8 +96,8 @@ This can be done providing connection string with queue name, topic name or subs
 optional. (Default : PEEKLOCK)
 
 ```ballerina
-asb:MessageReceiver queueReceiver = check new (connectionString, queueName);
-asb:MessageReceiver subscriptionReceiver = check new (connectionString, subscriptionPath);
+asb:MessageReceiver queueReceiver = check new ({connectionString, entityPath : queueName});
+asb:MessageReceiver subscriptionReceiver = check new ({connectionString, entityPath : subscriptionPath});
 ```
 
 ### Step 3: Invoke connector operation
@@ -110,7 +110,7 @@ asb:MessageReceiver subscriptionReceiver = check new (connectionString, subscrip
 
     ```ballerina
     public function main() returns error? {
-        asb:MessageSender queueSender = check new (connectionString, queueName);
+        asb:MessageSender queueSender = check new ({connectionString, entityPath : queueName});
 
         string stringContent = "This is My Message Body"; 
         byte[] byteContent = stringContent.toBytes();
@@ -142,7 +142,7 @@ asb:MessageReceiver subscriptionReceiver = check new (connectionString, subscrip
 
     ```ballerina
         public function main() returns error? {
-            asb:MessageReceiver queueReceiver = check new (connectionString, queueName, asb:RECEIVEANDDELETE);
+            asb:MessageReceiver queueReceiver = check new ({connectionString, entityPath : queueName}, asb:RECEIVEANDDELETE);
 
             int serverWaitTime = 60; // In seconds
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2021 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+// Copyright (c) 2022 WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
 //
 // WSO2 Inc. licenses this file to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file except
@@ -31,14 +31,11 @@ public isolated client class MessageReceiver {
     # obtain tokens following [this guide](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-portal#get-the-connection-string). 
     # Configure the connection string to have the [required permission](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-sas).
     # 
-    # + connectionString - Connection String of Azure service bus
-    # + entityPath - Name or path of the entity (e.g : Queue name, Subscription path)
-    # + receiveMode - Receive mode as PEEKLOCK or RECEIVEANDDELETE (default : PEEKLOCK)
-    public isolated function init(@display {label: "Connection String"} string connectionString, @display {label: "Entity Path"} string entityPath, 
-                                  @display {label: "Receive Mode"} string receiveMode = PEEKLOCK) returns error? {
-        self.connectionString = connectionString;
-        self.entityPath = entityPath;
-        self.receiveMode = receiveMode;
+    # + config - Connection config of ASB Receiver
+    public isolated function init(ConnectionConfig config) returns error? {
+        self.connectionString = config.connectionString;
+        self.entityPath = config.entityPath;
+        self.receiveMode = config.receiveMode;
         self.receiverHandle = check initMessageReceiver(java:fromString(self.connectionString), 
         java:fromString(self.entityPath), java:fromString(self.receiveMode));
     }
