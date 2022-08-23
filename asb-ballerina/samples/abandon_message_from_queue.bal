@@ -46,10 +46,10 @@ public function main() returns error? {
     };
 
     log:printInfo("Initializing Asb sender client.");
-    asb:MessageSender queueSender = check new (connectionString, queueName);
+    asb:MessageSender queueSender = check new ({connectionString, entityPath : queueName});
 
     log:printInfo("Initializing Asb receiver client.");
-    asb:MessageReceiver queueReceiver = check new (connectionString, queueName, asb:PEEKLOCK);
+    asb:MessageReceiver queueReceiver = check new ({connectionString, entityPath : queueName, receiveMode : PEEKLOCK});
 
     log:printInfo("Sending via Asb sender client.");
     check queueSender->send(message1);
