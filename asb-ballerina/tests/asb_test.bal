@@ -1,4 +1,4 @@
-// Copyright (c) 2022 WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
+// Copyright (c) 2021 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
 //
 // WSO2 Inc. licenses this file to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file except
@@ -75,10 +75,10 @@ function testSendAndReceiveMessageFromQueueOperation() returns error? {
     log:printInfo("[[testSendAndReceiveMessageFromQueueOperation]]");
 
     log:printInfo("Creating Asb message sender.");
-    MessageSender messageSender = check new ({connectionString, entityPath : queueName});
+    MessageSender messageSender = check new (connectionString, queueName);
 
     log:printInfo("Creating Asb message receiver.");
-    MessageReceiver messageReceiver = check new ({connectionString, entityPath : queueName});
+    MessageReceiver messageReceiver = check new (connectionString, queueName);
 
     log:printInfo("Sending via Asb sender.");
     check messageSender->send(message1);
@@ -111,10 +111,10 @@ function testSendAndReceiveBatchFromQueueOperation() returns error? {
     log:printInfo("[[testSendAndReceiveBatchFromQueueOperation]]");
 
     log:printInfo("Initializing Asb sender client.");
-    MessageSender messageSender = check new ({connectionString, entityPath : queueName});
+    MessageSender messageSender = check new (connectionString, queueName);
 
     log:printInfo("Initializing Asb receiver client.");
-    MessageReceiver messageReceiver = check new ({connectionString, entityPath : queueName, receiveMode: RECEIVEANDDELETE});
+    MessageReceiver messageReceiver = check new (connectionString, queueName, RECEIVEANDDELETE);
 
     log:printInfo("Sending via Asb sender.");
     check messageSender->sendBatch(messages);
@@ -151,10 +151,10 @@ function testCompleteMessageFromQueueOperation() returns error? {
     log:printInfo("[[testCompleteMessageFromQueueOperation]]");
 
     log:printInfo("Initializing Asb sender client.");
-    MessageSender messageSender = check new ({connectionString, entityPath : queueName});
+    MessageSender messageSender = check new (connectionString, queueName);
 
     log:printInfo("Initializing Asb receiver client.");
-    MessageReceiver messageReceiver = check new ({connectionString, entityPath : queueName, receiveMode : PEEKLOCK});
+    MessageReceiver messageReceiver = check new (connectionString, queueName, PEEKLOCK);
 
     log:printInfo("Sending via Asb sender.");
     check messageSender->send(message1);
@@ -187,10 +187,10 @@ function testAbandonMessageFromQueueOperation() returns error? {
     log:printInfo("[[testAbandonMessageFromQueueOperation]]");
 
     log:printInfo("Initializing Asb sender client.");
-    MessageSender messageSender = check new ({connectionString, entityPath : queueName});
+    MessageSender messageSender = check new (connectionString, queueName);
 
     log:printInfo("Initializing Asb receiver client.");
-    MessageReceiver messageReceiver = check new ({connectionString, entityPath : queueName, receiveMode : PEEKLOCK});
+    MessageReceiver messageReceiver = check new (connectionString, queueName, PEEKLOCK);
 
     log:printInfo("Sending via Asb sender.");
     check messageSender->send(message1);
@@ -231,10 +231,10 @@ function testDeadletterMessageFromQueueOperation() returns error? {
     log:printInfo("[[testDeadletterMessageFromQueueOperation]]");
 
     log:printInfo("Initializing Asb sender.");
-    MessageSender messageSender = check new ({connectionString, entityPath : queueName});
+    MessageSender messageSender = check new (connectionString, queueName);
 
     log:printInfo("Initializing Asb receiver.");
-    MessageReceiver messageReceiver = check new ({connectionString, entityPath : queueName, receiveMode : PEEKLOCK});
+    MessageReceiver messageReceiver = check new (connectionString, queueName, PEEKLOCK);
 
     log:printInfo("Sending via Asb sender.");
     check messageSender->send(message1);
@@ -267,10 +267,10 @@ function testDeferMessageFromQueueOperation() returns error? {
     log:printInfo("[[testDeferMessageFromQueueOperation]]");
 
     log:printInfo("Initializing Asb sender.");
-    MessageSender messageSender = check new ({connectionString, entityPath : queueName});
+    MessageSender messageSender = check new (connectionString, queueName);
 
     log:printInfo("Initializing Asb receiver.");
-    MessageReceiver messageReceiver = check new ({connectionString, entityPath : queueName, receiveMode : PEEKLOCK});
+    MessageReceiver messageReceiver = check new (connectionString, queueName, PEEKLOCK);
 
     log:printInfo("Sending via Asb sender.");
     check messageSender->send(message1);
@@ -309,10 +309,10 @@ function testSendAndReceiveMessageFromSubscriptionOperation() returns error? {
     log:printInfo("[[testSendAndReceiveMessageFromSubscriptionOperation]]");
 
     log:printInfo("Initializing Asb sender client.");
-    MessageSender topicSender = check new ({connectionString, entityPath : topicName});
+    MessageSender topicSender = check new (connectionString, topicName);
 
     log:printInfo("Initializing Asb receiver client.");
-    MessageReceiver subscriptionReceiver = check new ({connectionString, entityPath : subscriptionPath1, receiveMode : RECEIVEANDDELETE});
+    MessageReceiver subscriptionReceiver = check new (connectionString, subscriptionPath1, RECEIVEANDDELETE);
 
     log:printInfo("Sending via Asb sender client.");
     check topicSender->send(message1);
@@ -344,10 +344,10 @@ function testSendAndReceiveBatchFromSubscriptionOperation() returns error? {
     log:printInfo("[[testSendAndReceiveBatchFromSubscriptionOperation]]");
 
     log:printInfo("Initializing Asb sender client.");
-    MessageSender topicSender = check new ({connectionString, entityPath : topicName});
+    MessageSender topicSender = check new (connectionString, topicName);
 
     log:printInfo("Initializing Asb receiver client.");
-    MessageReceiver subscriptionReceiver = check new ({connectionString, entityPath : subscriptionPath1, receiveMode : RECEIVEANDDELETE});
+    MessageReceiver subscriptionReceiver = check new (connectionString, subscriptionPath1, RECEIVEANDDELETE);
 
     log:printInfo("Sending via Asb sender client.");
     check topicSender->sendBatch(messages);
@@ -383,10 +383,10 @@ function testCompleteMessageFromSubscriptionOperation() returns error? {
     log:printInfo("[[testCompleteMessageFromSubscriptionOperation]]");
 
     log:printInfo("Initializing Asb sender client.");
-    MessageSender topicSender = check new ({connectionString, entityPath : topicName});
+    MessageSender topicSender = check new (connectionString, topicName);
 
     log:printInfo("Initializing Asb receiver client.");
-    MessageReceiver subscriptionReceiver = check new ({connectionString, entityPath : subscriptionPath1, receiveMode : PEEKLOCK});
+    MessageReceiver subscriptionReceiver = check new (connectionString, subscriptionPath1, PEEKLOCK);
 
     log:printInfo("Sending via Asb sender client.");
     check topicSender->send(message1);
@@ -419,10 +419,10 @@ function testAbandonMessageFromSubscriptionOperation() returns error? {
     log:printInfo("[[testAbandonMessageFromSubscriptionOperation]]");
 
     log:printInfo("Initializing Asb sender client.");
-    MessageSender topicSender = check new ({connectionString, entityPath : topicName});
+    MessageSender topicSender = check new (connectionString, topicName);
 
     log:printInfo("Initializing Asb receiver client.");
-    MessageReceiver subscriptionReceiver = check new ({connectionString, entityPath : subscriptionPath1, receiveMode : PEEKLOCK});
+    MessageReceiver subscriptionReceiver = check new (connectionString, subscriptionPath1, PEEKLOCK);
 
     log:printInfo("Sending via Asb sender client.");
     check topicSender->send(message1);
@@ -461,10 +461,10 @@ function testDeadletterMessageFromSubscriptionOperation() returns error? {
     log:printInfo("[[testDeadletterMessageFromSubscriptionOperation]]");
 
     log:printInfo("Initializing Asb sender client.");
-    MessageSender topicSender = check new ({connectionString, entityPath : topicName});
+    MessageSender topicSender = check new (connectionString, topicName);
 
     log:printInfo("Initializing Asb receiver client.");
-    MessageReceiver subscriptionReceiver = check new ({connectionString, entityPath : subscriptionPath1, receiveMode : PEEKLOCK});
+    MessageReceiver subscriptionReceiver = check new (connectionString, subscriptionPath1, PEEKLOCK);
 
     log:printInfo("Sending via Asb sender client.");
     check topicSender->send(message1);
@@ -497,10 +497,10 @@ function testDeferMessageFromSubscriptionOperation() returns error? {
     log:printInfo("[[testDeferMessageFromSubscriptionOperation]]");
 
     log:printInfo("Initializing Asb sender client.");
-    MessageSender topicSender = check new ({connectionString, entityPath : topicName});
+    MessageSender topicSender = check new (connectionString, topicName);
 
     log:printInfo("Initializing Asb receiver client.");
-    MessageReceiver subscriptionReceiver = check new ({connectionString, entityPath : subscriptionPath1, receiveMode : PEEKLOCK});
+    MessageReceiver subscriptionReceiver = check new (connectionString, subscriptionPath1, PEEKLOCK);
 
     log:printInfo("Sending via Asb sender client.");
     check topicSender->send(message1);
