@@ -21,10 +21,7 @@
 # + receiveMode - Receive mode as PEEKLOCK or RECEIVEANDDELETE (default : PEEKLOCK)
 @display {label: "Connection Config"}
 public type ConnectionConfig record {|
-    @display {label: "Connection String"}
     string connectionString;
-    @display {label: "Entity Path"}
     string entityPath;
-    @display {label: "Receive Mode"}
     string receiveMode = PEEKLOCK;
 |};
