@@ -18,3 +18,4 @@ groupId = "org.ballerinax"
 artifactId = "asb-native"
 module = "asb-native" 
 version = "2.4.0"
+

@@ -46,10 +46,10 @@ public function main() returns error? {
     };
 
     log:printInfo("Initializing Asb sender client.");
-    asb:MessageSender topicSender = check new (connectionString, topicName);
+    asb:MessageSender topicSender = check new ({connectionString, entityPath : topicName});
 
     log:printInfo("Initializing Asb receiver client.");
-    asb:MessageReceiver subscriptionReceiver = check new (connectionString, subscriptionPath1, asb:PEEKLOCK);
+    asb:MessageReceiver subscriptionReceiver = check new ({connectionString, entityPath : subscriptionPath1, receiveMode : asb:PEEKLOCK});
 
     log:printInfo("Sending via Asb sender client.");
     check topicSender->send(message1);
