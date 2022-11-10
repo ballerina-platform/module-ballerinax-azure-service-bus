@@ -10,7 +10,7 @@ This package provides the capability to easily access Microsoft Azure Service Bu
 
 |                            | Version               |
 |----------------------------|-----------------------|
-| Ballerina Language         | Swan Lake 2201.2.1    |
+| Ballerina Language         | Swan Lake 2201.3.0    |
 | Azure Service Bus SDK      | 3.5.1                 |
 
 ## Report issues
