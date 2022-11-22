@@ -1,8 +1,8 @@
 [package]
-distribution = "2201.2.1"
+distribution = "2201.2.3"
 org = "ballerinax"
 name = "asb"
-version = "2.4.0"
+version = "2.4.1"
 license= ["Apache-2.0"]
 authors = ["Ballerina"]
 keywords = ["IT Operations/Message Brokers", "Cost/Paid", "Vendor/Microsoft"]
