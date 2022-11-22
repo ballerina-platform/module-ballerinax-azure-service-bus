@@ -35,7 +35,7 @@ public type Message record {|
     @display {label: "Body"}
     string|xml|json|byte[] body;
     @display {label: "Content Type"}
-    string contentType?;
+    string contentType = TEXT;
     @display {label: "Message Id"}
     string messageId?;
     @display {label: "To"}
