@@ -18,22 +18,15 @@ import ballerina/log;
 import ballerina/os;
 import ballerina/test;
 
-// Constants
-const string SUBSCRIPTIONS = "/subscriptions/";
-
 // Connection Configurations
 configurable string connectionString = os:getEnv("CONNECTION_STRING");
 configurable string queueName = os:getEnv("QUEUE_NAME");
 configurable string topicName = os:getEnv("TOPIC_NAME");
 configurable string subscriptionName1 = os:getEnv("SUBSCRIPTION_NAME1");
-configurable string subscriptionName2 = os:getEnv("SUBSCRIPTION_NAME2");
-configurable string subscriptionName3 = os:getEnv("SUBSCRIPTION_NAME3");
-string subscriptionPath1 = topicName + SUBSCRIPTIONS + subscriptionName1;
-string subscriptionPath2 = topicName + SUBSCRIPTIONS + subscriptionName2;
-string subscriptionPath3 = topicName + SUBSCRIPTIONS + subscriptionName3;
+string subscriptionPath1 = subscriptionName1;
 
 // Input values
-string stringContent = "This is My Message Body"; 
+string stringContent = "This is ASB connector test-Message Body"; 
 byte[] byteContent = stringContent.toBytes();
 json jsonContent = {name: "wso2", color: "orange", price: 5.36};
 byte[] byteContentFromJson = jsonContent.toJsonString().toBytes();
@@ -63,8 +56,18 @@ MessageBatch messages = {
     messages: [message1, message2]
 };
 
-AsbConnectionConfiguration config = {
-    connectionString: connectionString
+ASBServiceSenderConfig senderConfig = {
+    connectionString: connectionString,
+    entityType: QUEUE,
+    topicOrQueueName: queueName
+};
+
+ASBServiceReceiverConfig receiverConfig = {
+    connectionString: connectionString,
+    entityConfig: {
+        queueName: queueName
+    },
+    receiveMode: PEEK_LOCK
 };
 
 @test:Config { 
@@ -75,20 +78,20 @@ function testSendAndReceiveMessageFromQueueOperation() returns error? {
     log:printInfo("[[testSendAndReceiveMessageFromQueueOperation]]");
 
     log:printInfo("Creating Asb message sender.");
-    MessageSender messageSender = check new (connectionString, queueName);
+    MessageSender messageSender = check new(senderConfig);
 
     log:printInfo("Creating Asb message receiver.");
-    MessageReceiver messageReceiver = check new (connectionString, queueName);
+    MessageReceiver messageReceiver = check new (receiverConfig);
 
     log:printInfo("Sending via Asb sender.");
     check messageSender->send(message1);
 
     log:printInfo("Receiving from Asb receiver client.");
-    Message|Error? messageReceived = messageReceiver->receive(serverWaitTime);
+    Message|error? messageReceived = messageReceiver->receive(serverWaitTime);
 
     if (messageReceived is Message) {
         var result = check messageReceiver->complete(messageReceived);
-        test:assertEquals(result, (), msg = "Complete message not succesful.");
+        test:assertEquals(result, (), msg = "Complete message not successful.");
     } else if (messageReceived is ()) {
         test:assertFail("No message in the queue.");
     } else {
@@ -111,28 +114,30 @@ function testSendAndReceiveBatchFromQueueOperation() returns error? {
     log:printInfo("[[testSendAndReceiveBatchFromQueueOperation]]");
 
     log:printInfo("Initializing Asb sender client.");
-    MessageSender messageSender = check new (connectionString, queueName);
+    MessageSender messageSender = check new(senderConfig);
 
     log:printInfo("Initializing Asb receiver client.");
-    MessageReceiver messageReceiver = check new (connectionString, queueName, RECEIVEANDDELETE);
+    receiverConfig.receiveMode = RECEIVE_AND_DELETE;
+    MessageReceiver messageReceiver = check new (receiverConfig);
 
     log:printInfo("Sending via Asb sender.");
     check messageSender->sendBatch(messages);
 
     log:printInfo("Receiving from Asb receiver.");
-    MessageBatch|Error? messageReceived = messageReceiver->receiveBatch(maxMessageCount);
+    MessageBatch|error? messageReceived = messageReceiver->receiveBatch(maxMessageCount);
 
     if (messageReceived is MessageBatch) {
         log:printInfo(messageReceived.toString());
         foreach Message message in messageReceived.messages {
             if (message.toString() != "") {
-                test:assertEquals(message.body, stringContent, msg = "Sent & recieved message not equal.");
+                string msg =  check string:fromBytes(<byte[]>message.body);
+                test:assertEquals(msg, stringContent, msg = "Sent & received message are not equal.");
             }
         }
     } else if (messageReceived is ()) {
         test:assertFail("No message in the queue.");
     } else {
-        test:assertFail("Receiving message via Asb receiver connection failed.");
+        test:assertFail("Receiving message via Asb receiver connection failed." + messageReceived.toString());
     }
 
     log:printInfo("Closing Asb sender. ");
@@ -151,20 +156,23 @@ function testCompleteMessageFromQueueOperation() returns error? {
     log:printInfo("[[testCompleteMessageFromQueueOperation]]");
 
     log:printInfo("Initializing Asb sender client.");
-    MessageSender messageSender = check new (connectionString, queueName);
+    MessageSender messageSender = check new(senderConfig);
 
     log:printInfo("Initializing Asb receiver client.");
-    MessageReceiver messageReceiver = check new (connectionString, queueName, PEEKLOCK);
+    receiverConfig.receiveMode = PEEK_LOCK;
+    log:printInfo(receiverConfig.toString());
+    MessageReceiver messageReceiver = check new (receiverConfig);
 
     log:printInfo("Sending via Asb sender.");
     check messageSender->send(message1);
 
     log:printInfo("Receiving from Asb receiver client.");
-    Message|Error? messageReceived = messageReceiver->receive(serverWaitTime);
+    Message|error? messageReceived = messageReceiver->receive(serverWaitTime);
 
     if (messageReceived is Message) {
+        log:printInfo("messgae" +  messageReceived.toString());
         var result = check messageReceiver->complete(messageReceived);
-        test:assertEquals(result, (), msg = "Complete message not succesful.");
+        test:assertEquals(result, (), msg = "Complete message not successful.");
     } else if (messageReceived is ()) {
         test:assertFail("No message in the queue.");
     } else {
@@ -187,27 +195,27 @@ function testAbandonMessageFromQueueOperation() returns error? {
     log:printInfo("[[testAbandonMessageFromQueueOperation]]");
 
     log:printInfo("Initializing Asb sender client.");
-    MessageSender messageSender = check new (connectionString, queueName);
+    MessageSender messageSender = check new(senderConfig);
 
     log:printInfo("Initializing Asb receiver client.");
-    MessageReceiver messageReceiver = check new (connectionString, queueName, PEEKLOCK);
+    MessageReceiver messageReceiver = check new (receiverConfig);
 
     log:printInfo("Sending via Asb sender.");
     check messageSender->send(message1);
 
     log:printInfo("Receiving from Asb receiver.");
-    Message|Error? messageReceived = messageReceiver->receive(serverWaitTime);
+    Message|error? messageReceived = messageReceiver->receive(serverWaitTime);
 
     if (messageReceived is Message) {
         var result = check messageReceiver->abandon(messageReceived);
-        test:assertEquals(result, (), msg = "Abandon message not succesful.");
-        Message|Error? messageReceivedAgain = messageReceiver->receive(serverWaitTime);
+        test:assertEquals(result, (), msg = "Abandon message not successful.");
+        Message|error? messageReceivedAgain = messageReceiver->receive(serverWaitTime);
         if (messageReceivedAgain is Message) {
             test:assertEquals(messageReceivedAgain?.messageId, messageReceived?.messageId, 
-                msg = "Abandon message not succesful.");
+                msg = "Abandon message not successful.");
             check messageReceiver->complete(messageReceivedAgain);
         } else {
-            test:assertFail("Abandon message not succesful.");
+            test:assertFail("Abandon message not successful.");
         }
     } else if (messageReceived is ()) {
         test:assertFail("No message in the queue.");
@@ -231,20 +239,20 @@ function testDeadletterMessageFromQueueOperation() returns error? {
     log:printInfo("[[testDeadletterMessageFromQueueOperation]]");
 
     log:printInfo("Initializing Asb sender.");
-    MessageSender messageSender = check new (connectionString, queueName);
+    MessageSender messageSender = check new(senderConfig);
 
     log:printInfo("Initializing Asb receiver.");
-    MessageReceiver messageReceiver = check new (connectionString, queueName, PEEKLOCK);
+    MessageReceiver messageReceiver = check new (receiverConfig);
 
     log:printInfo("Sending via Asb sender.");
     check messageSender->send(message1);
 
     log:printInfo("Receiving from Asb receiver.");
-    Message|Error? messageReceived = messageReceiver->receive(serverWaitTime);
+    Message|error? messageReceived = messageReceiver->receive(serverWaitTime);
 
     if (messageReceived is Message) {
         var result = check messageReceiver->deadLetter(messageReceived);
-        test:assertEquals(result, (), msg = "Deadletter message not succesful.");
+        test:assertEquals(result, (), msg = "Deadletter message not successful.");
     } else if (messageReceived is ()) {
         test:assertFail("No message in the queue.");
     } else {
@@ -267,21 +275,21 @@ function testDeferMessageFromQueueOperation() returns error? {
     log:printInfo("[[testDeferMessageFromQueueOperation]]");
 
     log:printInfo("Initializing Asb sender.");
-    MessageSender messageSender = check new (connectionString, queueName);
+    MessageSender messageSender = check new(senderConfig);
 
     log:printInfo("Initializing Asb receiver.");
-    MessageReceiver messageReceiver = check new (connectionString, queueName, PEEKLOCK);
+    MessageReceiver messageReceiver = check new (receiverConfig);
 
     log:printInfo("Sending via Asb sender.");
     check messageSender->send(message1);
 
     log:printInfo("Receiving from Asb receiver.");
-    Message|Error? messageReceived = messageReceiver->receive(serverWaitTime);
+    Message|error? messageReceived = messageReceiver->receive(serverWaitTime);
 
     if (messageReceived is Message) {
         int result = check messageReceiver->defer(messageReceived);
-        test:assertNotEquals(result, 0, msg = "Defer message not succesful.");
-        Message|Error? messageReceivedAgain = check messageReceiver->receiveDeferred(result);
+        test:assertNotEquals(result, 0, msg = "Defer message not successful.");
+        Message|error? messageReceivedAgain = check messageReceiver->receiveDeferred(result);
         if (messageReceivedAgain is Message) {
             test:assertEquals(messageReceivedAgain?.messageId, messageReceived?.messageId, 
                 msg = "Receiving deferred message not succesful.");
@@ -309,19 +317,27 @@ function testSendAndReceiveMessageFromSubscriptionOperation() returns error? {
     log:printInfo("[[testSendAndReceiveMessageFromSubscriptionOperation]]");
 
     log:printInfo("Initializing Asb sender client.");
-    MessageSender topicSender = check new (connectionString, topicName);
+    senderConfig.topicOrQueueName = topicName;
+    MessageSender topicSender = check new (senderConfig);
 
     log:printInfo("Initializing Asb receiver client.");
-    MessageReceiver subscriptionReceiver = check new (connectionString, subscriptionPath1, RECEIVEANDDELETE);
+    receiverConfig.entityConfig = {
+        topicName: topicName,
+        subscriptionName: subscriptionName1
+    };
+    receiverConfig.receiveMode = RECEIVE_AND_DELETE;
+    MessageReceiver subscriptionReceiver = check new (receiverConfig);
 
     log:printInfo("Sending via Asb sender client.");
     check topicSender->send(message1);
 
     log:printInfo("Receiving from Asb receiver client.");
-    Message|Error? messageReceived = subscriptionReceiver->receive(serverWaitTime);
+    Message|error? messageReceived = subscriptionReceiver->receive(serverWaitTime);
 
     if (messageReceived is Message) {
-        test:assertEquals(messageReceived.body, stringContent, msg = "Sent & recieved message not equal.");
+        log:printInfo(messageReceived.toString());
+        string msg =  check string:fromBytes(<byte[]>messageReceived.body);
+        test:assertEquals(msg, stringContent, msg = "Sent & received message not equal.");
     } else if (messageReceived is ()) {
         test:assertFail("No message in the subscription.");
     } else {
@@ -344,21 +360,22 @@ function testSendAndReceiveBatchFromSubscriptionOperation() returns error? {
     log:printInfo("[[testSendAndReceiveBatchFromSubscriptionOperation]]");
 
     log:printInfo("Initializing Asb sender client.");
-    MessageSender topicSender = check new (connectionString, topicName);
+    MessageSender topicSender = check new (senderConfig);
 
     log:printInfo("Initializing Asb receiver client.");
-    MessageReceiver subscriptionReceiver = check new (connectionString, subscriptionPath1, RECEIVEANDDELETE);
+    MessageReceiver subscriptionReceiver = check new (receiverConfig);
 
     log:printInfo("Sending via Asb sender client.");
     check topicSender->sendBatch(messages);
 
     log:printInfo("Receiving from Asb receiver client.");
-    MessageBatch|Error? messageReceived = subscriptionReceiver->receiveBatch(maxMessageCount, serverWaitTime);
+    MessageBatch|error? messageReceived = subscriptionReceiver->receiveBatch(maxMessageCount, serverWaitTime);
 
     if (messageReceived is MessageBatch) {
         foreach Message message in messageReceived.messages {
             if (message.toString() != "") {
-                test:assertEquals(message.body, stringContent, msg = "Sent & recieved message not equal.");
+                string msg =  check string:fromBytes(<byte[]>message.body);
+                test:assertEquals(msg, stringContent, msg = "Sent & received message not equal.");
             }
         }
     } else if (messageReceived is ()) {
@@ -383,20 +400,21 @@ function testCompleteMessageFromSubscriptionOperation() returns error? {
     log:printInfo("[[testCompleteMessageFromSubscriptionOperation]]");
 
     log:printInfo("Initializing Asb sender client.");
-    MessageSender topicSender = check new (connectionString, topicName);
+    MessageSender topicSender = check new (senderConfig);
 
     log:printInfo("Initializing Asb receiver client.");
-    MessageReceiver subscriptionReceiver = check new (connectionString, subscriptionPath1, PEEKLOCK);
+    receiverConfig.receiveMode = PEEK_LOCK;
+    MessageReceiver subscriptionReceiver = check new (receiverConfig);
 
     log:printInfo("Sending via Asb sender client.");
     check topicSender->send(message1);
 
     log:printInfo("Receiving from Asb receiver client.");
-    Message|Error? messageReceived = subscriptionReceiver->receive(serverWaitTime);
+    Message|error? messageReceived = subscriptionReceiver->receive(serverWaitTime);
 
     if (messageReceived is Message) {
         var result = check subscriptionReceiver->complete(messageReceived);
-        test:assertEquals(result, (), msg = "Complete message not succesful.");
+        test:assertEquals(result, (), msg = "Complete message not successful.");
     } else if (messageReceived is ()) {
         test:assertFail("No message in the subscription.");
     } else {
@@ -419,21 +437,21 @@ function testAbandonMessageFromSubscriptionOperation() returns error? {
     log:printInfo("[[testAbandonMessageFromSubscriptionOperation]]");
 
     log:printInfo("Initializing Asb sender client.");
-    MessageSender topicSender = check new (connectionString, topicName);
+    MessageSender topicSender = check new (senderConfig);
 
     log:printInfo("Initializing Asb receiver client.");
-    MessageReceiver subscriptionReceiver = check new (connectionString, subscriptionPath1, PEEKLOCK);
+    MessageReceiver subscriptionReceiver = check new (receiverConfig);
 
     log:printInfo("Sending via Asb sender client.");
     check topicSender->send(message1);
 
     log:printInfo("Receiving from Asb receiver client.");
-    Message|Error? messageReceived = subscriptionReceiver->receive(serverWaitTime);
+    Message|error? messageReceived = subscriptionReceiver->receive(serverWaitTime);
 
     if (messageReceived is Message) {
         var result = check subscriptionReceiver->abandon(messageReceived);
-        test:assertEquals(result, (), msg = "Abandon message not succesful.");
-        Message|Error? messageReceivedAgain = subscriptionReceiver->receive(serverWaitTime);
+        test:assertEquals(result, (), msg = "Abandon message not successful.");
+        Message|error? messageReceivedAgain = subscriptionReceiver->receive(serverWaitTime);
         if (messageReceivedAgain is Message) {
             check subscriptionReceiver->complete(messageReceivedAgain);
         } else {
@@ -461,20 +479,20 @@ function testDeadletterMessageFromSubscriptionOperation() returns error? {
     log:printInfo("[[testDeadletterMessageFromSubscriptionOperation]]");
 
     log:printInfo("Initializing Asb sender client.");
-    MessageSender topicSender = check new (connectionString, topicName);
+    MessageSender topicSender = check new (senderConfig);
 
     log:printInfo("Initializing Asb receiver client.");
-    MessageReceiver subscriptionReceiver = check new (connectionString, subscriptionPath1, PEEKLOCK);
+    MessageReceiver subscriptionReceiver = check new (receiverConfig);
 
     log:printInfo("Sending via Asb sender client.");
     check topicSender->send(message1);
 
     log:printInfo("Receiving from Asb receiver client.");
-    Message|Error? messageReceived = subscriptionReceiver->receive(serverWaitTime);
+    Message|error? messageReceived = subscriptionReceiver->receive(serverWaitTime);
 
     if (messageReceived is Message) {
         var result = check subscriptionReceiver->deadLetter(messageReceived);
-        test:assertEquals(result, (), msg = "Deadletter message not succesful.");
+        test:assertEquals(result, (), msg = "Deadletter message not successful.");
     } else if (messageReceived is ()) {
         test:assertFail("No message in the subscription.");
     } else {
@@ -497,24 +515,24 @@ function testDeferMessageFromSubscriptionOperation() returns error? {
     log:printInfo("[[testDeferMessageFromSubscriptionOperation]]");
 
     log:printInfo("Initializing Asb sender client.");
-    MessageSender topicSender = check new (connectionString, topicName);
+    MessageSender topicSender = check new (senderConfig);
 
     log:printInfo("Initializing Asb receiver client.");
-    MessageReceiver subscriptionReceiver = check new (connectionString, subscriptionPath1, PEEKLOCK);
+    MessageReceiver subscriptionReceiver = check new (receiverConfig);
 
     log:printInfo("Sending via Asb sender client.");
     check topicSender->send(message1);
 
     log:printInfo("Receiving from Asb receiver client.");
-    Message|Error? messageReceived = subscriptionReceiver->receive(serverWaitTime);
+    Message|error? messageReceived = subscriptionReceiver->receive(serverWaitTime);
 
     if (messageReceived is Message) {
         int result = check subscriptionReceiver->defer(messageReceived);
-        test:assertNotEquals(result, 0, msg = "Defer message not succesful.");
-        Message|Error? messageReceivedAgain = check subscriptionReceiver->receiveDeferred(result);
+        test:assertNotEquals(result, 0, msg = "Defer message not successful.");
+        Message|error? messageReceivedAgain = check subscriptionReceiver->receiveDeferred(result);
         if (messageReceivedAgain is Message) {
             test:assertEquals(messageReceivedAgain?.messageId, messageReceived?.messageId, 
-                msg = "Receiving deferred message not succesful.");
+                msg = "Receiving deferred message not successful.");
             check subscriptionReceiver->complete(messageReceivedAgain);
         }
     } else if (messageReceived is ()) {

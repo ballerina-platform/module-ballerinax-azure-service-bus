@@ -18,9 +18,9 @@ applies [SAS authentication](https://docs.microsoft.com/en-us/azure/service-bus-
 supports SAS authentication as well.
 
 This module
-supports [Service Bus SDK 3.5.1 version](https://docs.microsoft.com/en-us/java/api/overview/azure/servicebus/client?view=azure-java-stable&preserve-view=true)
+supports [Service Bus SDK 7.13.1 version](https://learn.microsoft.com/en-us/java/api/overview/azure/service-bus?view=azure-java-stable#libraries-for-data-access)
 . The source code on GitHub is
-located [here](https://github.com/Azure/azure-sdk-for-java/tree/main/sdk/servicebus/microsoft-azure-servicebus). The
+located [here](https://github.com/Azure/azure-sdk-for-java/tree/main/sdk/servicebus/azure-messaging-servicebus). The
 primary wire protocol for Service Bus is Advanced Messaging Queueing Protocol (AMQP) 1.0, an open ISO/IEC standard.
 
 ## Prerequisites
@@ -43,7 +43,6 @@ Before using this connector in your Ballerina application, complete the followin
 
   Shared Access Signature (SAS) Authentication Credentials are required to communicate with the Azure Service Bus.
     * Connection String
-    * Entity Path
 
   Obtain the authorization credentials:
     * For Service Bus Queues
@@ -52,7 +51,7 @@ Before using this connector in your Ballerina application, complete the followin
 
         2. [Get the connection string](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-portal#get-the-connection-string)
 
-        3. [Create a queue in the Azure portal & get Entity Path](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-portal#create-a-queue-in-the-azure-portal)
+        3. [Create a queue in the Azure portal & get queue name](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-portal#create-a-queue-in-the-azure-portal)
            . It is in the format ‘queueName’.
 
     * For Service Bus Topics and Subscriptions
@@ -61,10 +60,10 @@ Before using this connector in your Ballerina application, complete the followin
 
         2. [Get the connection string](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-portal#get-the-connection-string)
 
-        3. [Create a topic in the Azure portal & get Entity Path](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-topics-subscriptions-portal#create-a-topic-using-the-azure-portal)
+        3. [Create a topic in the Azure portal & get topic name](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-topics-subscriptions-portal#create-a-topic-using-the-azure-portal)
            . It's in the format ‘topicName‘.
 
-        4. [Create a subscription in the Azure portal & get Entity Path](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-topics-subscriptions-portal#create-subscriptions-to-the-topic)
+        4. [Create a subscription in the Azure portal & get its name](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-topics-subscriptions-portal#create-subscriptions-to-the-topic)
            . It’s in the format ‘topicName/subscriptions/subscriptionName’.
 
 ## Quickstart
@@ -86,8 +85,8 @@ import ballerinax/asb as asb;
 This can be done providing connection string with queue or topic name.
 
 ```ballerina
-asb:MessageSender queueSender = check new (connectionString, queueName);
-asb:MessageSender topicSender = check new (connectionString, TopicName);
+asb:MessageSender queueSender = check new (senderConfig);
+asb:MessageSender topicSender = check new (senderConfig);
 ```
 
 #### Initialize a Message Receiver client
@@ -96,8 +95,8 @@ This can be done providing connection string with queue name, topic name or subs
 optional. (Default : PEEKLOCK)
 
 ```ballerina
-asb:MessageReceiver queueReceiver = check new (connectionString, queueName);
-asb:MessageReceiver subscriptionReceiver = check new (connectionString, subscriptionPath);
+asb:MessageReceiver queueReceiver = check new (receiverConfig);
+asb:MessageReceiver subscriptionReceiver = check new (receiverConfig);
 ```
 
 ### Step 3: Invoke connector operation
@@ -110,7 +109,7 @@ asb:MessageReceiver subscriptionReceiver = check new (connectionString, subscrip
 
     ```ballerina
     public function main() returns error? {
-        asb:MessageSender queueSender = check new (connectionString, queueName);
+        asb:MessageSender queueSender = check new (senderConfig);
 
         string stringContent = "This is My Message Body"; 
         byte[] byteContent = stringContent.toBytes();
@@ -142,7 +141,7 @@ asb:MessageReceiver subscriptionReceiver = check new (connectionString, subscrip
 
     ```ballerina
         public function main() returns error? {
-            asb:MessageReceiver queueReceiver = check new (connectionString, queueName, asb:RECEIVEANDDELETE);
+            asb:MessageReceiver queueReceiver = check new (receiverConfig);
 
             int serverWaitTime = 60; // In seconds
 
