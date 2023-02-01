@@ -16,7 +16,10 @@
 
 # Azure service bus Message representation.
 #
-# + body - Message body  
+# + body - Message body, Here the connector supports AMQP message body types - DATA and VALUE, However, DATA type message bodies
+#  will be received in Ballerina Byte[] type. VALUE message bodies can be any primitive AMQP type. therefore, the connector 
+#  supports for string, int or byte[]. Please refer Azure docs (https://learn.microsoft.com/en-us/java/api/com.azure.core.amqp.models.amqpmessagebody?view=azure-java-stable) 
+#  and AMQP docs (https://qpid.apache.org/amqp/type-reference.html#PrimitiveTypes)
 # + contentType - Message content type  
 # + messageId - Message Id (optional)
 # + to - Message to (optional)
@@ -33,7 +36,7 @@
 @display {label: "Message"}
 public type Message record {|
     @display {label: "Body"}
-    string|xml|json|byte[] body;
+    string|int|byte[] body;
     @display {label: "Content Type"}
     string contentType = TEXT;
     @display {label: "Message Id"}

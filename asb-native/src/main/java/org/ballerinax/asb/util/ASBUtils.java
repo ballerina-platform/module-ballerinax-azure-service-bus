@@ -58,7 +58,7 @@ public class ASBUtils {
      * @param value Input value.
      * @return value as a string or empty.
      */
-    public static String valueToEmptyOrToString(Object value) {
+    public static String convertString(Object value) {
         return (value == null || value.toString() == "") ? null : value.toString();
     }
 
@@ -69,7 +69,7 @@ public class ASBUtils {
      * @param key Input key.
      * @return map value as a string or empty.
      */
-    public static String valueToStringOrEmpty(Map<String, ?> map, String key) {
+    public static String convertString(Map<String, ?> map, String key) {
         Object value = map.get(key);
         return value == null ? null : value.toString();
     }

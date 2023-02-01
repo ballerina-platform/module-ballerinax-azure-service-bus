@@ -21,22 +21,23 @@ import ballerina/jballerina.java as java;
 @display {label: "Azure Service Bus Message Sender", iconPath: "icon.png"}
 public isolated client class MessageSender {
 
-    final string connectionString;
-    final string entityPath;
+    private  string connectionString;
     final handle senderHandle;
+    private string topicOrQueueName;
+    private  string entityType;
 
     # Initializes the connector. During initialization you can pass the [Shared Access Signature (SAS) authentication credentials](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-sas)
     # Create an [Azure account](https://docs.microsoft.com/en-us/learn/modules/create-an-azure-account/) and 
     # obtain tokens following [this guide](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-portal#get-the-connection-string). 
     # Configure the connection string to have the [required permission](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-sas).
     # 
-    # + connectionString - Connection String of Azure service bus
-    # + entityPath - Name or path of the entity (e.g : Queue name, Topic name)
-    public isolated function init(@display {label: "Connection String"} string connectionString, 
-                                  @display {label: "Entity Path"} string entityPath) returns error? {
-        self.connectionString = connectionString;
-        self.entityPath = entityPath;
-        self.senderHandle = check initMessageSender(java:fromString(self.connectionString), java:fromString(self.entityPath));
+    # + config - Azure service bus sender configuration
+    public isolated function init(ASBServiceSenderConfig config) returns error? {
+        self.connectionString = config.connectionString;
+        self.topicOrQueueName = config.topicOrQueueName;
+        self.entityType = config.entityType;
+        self.senderHandle = check initMessageSender(java:fromString(self.connectionString), java:fromString(self.entityType),
+        java:fromString(self.topicOrQueueName));
     }
 
     # Send message to queue or topic with a message body.
@@ -90,9 +91,9 @@ public isolated client class MessageSender {
     }
 }
 
-isolated function initMessageSender(handle connectionString, handle entityPath) returns handle|error = @java:Constructor {
+isolated function initMessageSender(handle connectionString, handle entityType, handle topicOrQueueName ) returns handle|error = @java:Constructor {
     'class: "org.ballerinax.asb.sender.MessageSender",
-    paramTypes: ["java.lang.String", "java.lang.String"]
+    paramTypes: ["java.lang.String", "java.lang.String", "java.lang.String"]
 } external;
 
 isolated function send(handle senderHandle, string|xml|json|byte[] body, string? contentType, 
@@ -109,4 +110,3 @@ isolated function sendBatch(handle senderHandle, MessageBatch messages) returns 
 isolated function closeSender(handle senderHandle) returns error? = @java:Method {
     'class: "org.ballerinax.asb.sender.MessageSender"
 } external;
-
