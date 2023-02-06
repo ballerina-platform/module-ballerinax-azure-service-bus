@@ -14,28 +14,18 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import ballerina/jballerina.java as java;
-
 // Default values
-public const int DEFAULT_TIME_TO_LIVE = 300; // In seconds
-public const int DEFAULT_MAX_MESSAGE_COUNT = 1;
-public const int DEFAULT_SERVER_WAIT_TIME = 300; // In seconds
-public const string DEFAULT_MESSAGE_LOCK_TOKEN = "00000000-0000-0000-0000-000000000000";
+public const DEFAULT_TIME_TO_LIVE = 300; // In seconds
+public const DEFAULT_MAX_MESSAGE_COUNT = 1;
+public const DEFAULT_SERVER_WAIT_TIME = 300; // In seconds
+public const DEFAULT_MESSAGE_LOCK_TOKEN = "00000000-0000-0000-0000-000000000000";
+public const EMPTY_STRING = "";
 
 // Message content types
-public const string TEXT = "text/plain";
-public const string JSON = "application/json";
-public const string XML = "application/xml";
-public const string BYTE_ARRAY = "application/octet-stream";
-
-// Message receive modes
-@display {label: "Receive Modes"}
-public enum receiveModes {
-    @display {label: "PEEKLOCK"}
-    PEEKLOCK,
-    @display {label: "RECEIVEANDDELETE"}
-    RECEIVEANDDELETE
-}
+public const TEXT = "text/plain";
+public const JSON = "application/json";
+public const XML = "application/xml";
+public const BYTE_ARRAY = "application/octet-stream";
 
 // Azure Service Bus Client API Record Types.
 
@@ -46,39 +36,95 @@ public enum receiveModes {
 #                      Endpoint=sb://namespace_DNS_Name;EntityPath=EVENT_HUB_NAME;
 #                      SharedAccessKeyName=SHARED_ACCESS_KEY_NAME;SharedAccessKey=SHARED_ACCESS_KEY or  
 #                      Endpoint=sb://namespace_DNS_Name;EntityPath=EVENT_HUB_NAME;
-#                      SharedAccessSignatureToken=SHARED_ACCESS_SIGNATURE_TOKEN
-@display {label: "Connection Config"}
-public type AsbConnectionConfiguration record {|
-    @display {label: "Connection String"}
+#                      SharedAccessSignatureToken=SHARED_ACCESS_SIGNATURE_TOKEN 
+# + entityConfig -  This field holds the configuration details of either a topic or a queue. The type of the entity is 
+#                   determined by the entityType field. The actual configuration details are stored in either a 
+#                   TopicSubsConfig or a QueueConfig record  
+# + receiveMode - This field holds the receive modes(RECEIVE_AND_DELETE/PEEK_LOCK) for the connection. The receive mode determines how messages are 
+#                 retrieved from the entity. The default value is PEEK_LOCK
+@display {label: "Receiver Connection Config"}
+public type ASBServiceReceiverConfig record {
+    @display {label: "Entity Configuration"}
+    TopicSubsConfig|QueueConfig entityConfig;
+    @display {label: "ConnectionString"}
     string connectionString;
-|};
+    @display {label: "Receive Mode"}
+    ReceiveMode receiveMode = PEEK_LOCK;
+};
 
-isolated function nativeGetTextContent(byte[] messageContent) returns string|Error =
-@java:Method {
-    name: "getTextContent",
-    'class: "org.ballerinax.asb.util.ASBUtils"
-} external;
+# This record holds the configuration details of a topic and its associated subscription in Azure Service Bus
+#
+# + topicName - A string field that holds the name of the topic  
+# + subscriptionName - A string field that holds the name of the subscription associated with the topic
+@display {label: "Topic/Subscriptions Configurations"}
+public  type TopicSubsConfig record {
+   @display {label: "Topic Name"}
+   string topicName;
+   @display {label: "Subscription Name"}
+   string subscriptionName; 
+};
 
-isolated function nativeGetFloatContent(byte[] messageContent) returns float|Error =
-@java:Method {
-    name: "getFloatContent",
-    'class: "org.ballerinax.asb.util.ASBUtils"
-} external;
+# This record holds the configuration details of a queue in Azure Service Bus
+#
+# + queueName - A string field that holds the name of the queue
+@display {label: "Queue Configurations"}
+public  type QueueConfig record {
+   @display {label: "Queue Name"}
+   string queueName;
+};
 
-isolated function nativeGetIntContent(byte[] messageContent) returns int|Error =
-@java:Method {
-    name: "getIntContent",
-    'class: "org.ballerinax.asb.util.ASBUtils"
-} external;
+# Holds the configuration details needed to create a sender connection to Azure Service Bus
+#
+# + entityType - An enumeration value of type EntityType, which specifies whether the connection is for a topic or a queue. 
+#                The valid values are TOPIC and QUEUE  
+# + topicOrQueueName - A string field that holds the name of the topic or queue
+# + connectionString - A string field that holds the Service Bus connection string with Shared Access Signatures.
+@display {label: "Sender Connection Config"}
+public type ASBServiceSenderConfig record {
+    @display {label: "EntityType"}
+    EntityType entityType;
+    @display {label: "Queue/Topic Name"}
+    string topicOrQueueName;
+    @display {label: "ConnectionString"}
+    string connectionString;
+};
 
-isolated function nativeGetJSONContent(byte[] messageContent) returns json|Error =
-@java:Method {
-    name: "getJSONContent",
-    'class: "org.ballerinax.asb.util.ASBUtils"
-} external;
+# Represents Custom configurations for the ASB connector
+#
+# + logLevel - Enables the connector debug log prints (log4j log levels), default: OFF
+public  type CustomConfiguration record {
+    @display {label: "Log Level"}
+    LogLevel logLevel = OFF; 
+};
 
-isolated function nativeGetXMLContent(byte[] messageContent) returns xml|Error =
-@java:Method {
-    name: "getXMLContent",
-    'class: "org.ballerinax.asb.util.ASBUtils"
-} external;
+//Message entity types
+public enum EntityType {
+    @display {label: "Queue"}
+    QUEUE = "queue",
+    @display {label: "Topic"}
+    TOPIC = "topic"
+}
+
+//Message receiver modes
+public enum ReceiveMode {
+    @display {label: "RECEIVE AND DELETE"}
+    RECEIVE_AND_DELETE = "RECEIVEANDDELETE",
+    @display {label: "PEEK LOCK"}
+    PEEK_LOCK = "PEEKLOCK"
+}
+
+//Log_levels
+public enum LogLevel {
+    @display {label: "DEBUG"}
+    DEBUG,
+    @display {label: "INFO"}
+    INFO,
+    @display {label: "WARNING"}
+    WARNING,
+    @display {label: "ERROR"}
+    ERROR,
+    @display {label: "FATAL"}
+    FATAL,
+    @display {label: "OFF"}
+    OFF
+}

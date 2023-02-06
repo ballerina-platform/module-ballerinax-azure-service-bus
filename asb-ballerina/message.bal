@@ -16,24 +16,34 @@
 
 # Azure service bus Message representation.
 #
-# + body - Message body  
+# + body - Message body, Here the connector supports AMQP message body types - DATA and VALUE, However, DATA type message bodies  
+# will be received in Ballerina Byte[] type. VALUE message bodies can be any primitive AMQP type. therefore, the connector  
+# supports for string, int or byte[]. Please refer Azure docs (https://learn.microsoft.com/en-us/java/api/com.azure.core.amqp.models.amqpmessagebody?view=azure-java-stable)  
+# and AMQP docs (https://qpid.apache.org/amqp/type-reference.html#PrimitiveTypes)  
 # + contentType - Message content type  
-# + messageId - Message Id (optional)
-# + to - Message to (optional)
-# + replyTo - Message reply to (optional)
-# + replyToSessionId - Identifier of the session to reply to (optional)
-# + label - Message label (optional)
-# + sessionId - Message session Id (optional)
-# + correlationId - Message correlationId (optional)
-# + partitionKey - Message partition key (optional)
-# + timeToLive - Message time to live in seconds (optional)
-# + sequenceNumber - Message sequence number (optional)
-# + lockToken - Message lock token (optional)
-# + applicationProperties - Message broker application specific properties (optional)
+# + messageId - Message Id (optional)  
+# + to - Message to (optional)  
+# + replyTo - Message reply to (optional)  
+# + replyToSessionId - Identifier of the session to reply to (optional)  
+# + label - Message label (optional)  
+# + sessionId - Message session Id (optional)  
+# + correlationId - Message correlationId (optional)  
+# + partitionKey - Message partition key (optional)  
+# + timeToLive - Message time to live in seconds (optional)  
+# + sequenceNumber - Message sequence number (optional)  
+# + lockToken - Message lock token (optional)  
+# + applicationProperties - Message broker application specific properties (optional)  
+# + deliveryCount - Number of times a message has been delivered in a queue/subscription  
+# + enqueuedTime - Timestamp indicating when a message was added to the queue/subscription 
+# + enqueuedSequenceNumber - Sequence number assigned to a message when it is added to the queue/subscription 
+# + deadLetterErrorDescription - Error description of why a message went to a dead-letter queue  
+# + deadLetterReason - Reason why a message was moved to a dead-letter queue  
+# + deadLetterSource - Original queue/subscription where the message was before being moved to the dead-letter queue 
+# + state - Current state of a message in the queue/subscription, could be "Active", "Scheduled", "Deferred", etc.
 @display {label: "Message"}
 public type Message record {|
     @display {label: "Body"}
-    string|xml|json|byte[] body;
+    string|int|byte[] body;
     @display {label: "Content Type"}
     string contentType = TEXT;
     @display {label: "Message Id"}
@@ -59,6 +69,20 @@ public type Message record {|
     @display {label: "Lock Token"}
     readonly string lockToken?;
     ApplicationProperties applicationProperties?;
+    @display {label: "Delivery Count"}
+    int deliveryCount?;
+    @display {label: "Enqueued Time"}
+    string enqueuedTime?;
+    @display {label: "Enqueued SequenceNumber"}
+    int enqueuedSequenceNumber?;
+    @display {label: "DeadLetter Error Description"}
+    string deadLetterErrorDescription?;
+    @display {label: "DeadLetter Reason"}
+    string deadLetterReason?;
+    @display {label: "DeadLetter Source"}
+    string deadLetterSource?;
+    @display {label: "Message State"}
+    string state?;
 |};
 
 # Azure service bus message, application specific properties representation.
@@ -67,5 +91,5 @@ public type Message record {|
 @display {label: "Application Properties"}
 public type ApplicationProperties record {|
     @display {label: "Properties"}
-    map<string> properties?;
+    map<any> properties?;
 |};

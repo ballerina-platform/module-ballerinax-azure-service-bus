@@ -29,7 +29,7 @@ configurable string queueName = ?;
 public function main() returns error? {
 
     // Input values
-    string stringContent = "This is My Message Body"; 
+    string stringContent = "This is My Message Body";
     byte[] byteContent = stringContent.toBytes();
     int timeToLive = 60; // In seconds
     int serverWaitTime = 60; // In seconds
@@ -45,11 +45,25 @@ public function main() returns error? {
         applicationProperties: applicationProperties
     };
 
+    asb:ASBServiceSenderConfig senderConfig = {
+        connectionString: connectionString,
+        entityType: asb:QUEUE,
+        topicOrQueueName: queueName
+    };
+
+    asb:ASBServiceReceiverConfig receiverConfig = {
+        connectionString: connectionString,
+        entityConfig: {
+            queueName: queueName
+        },
+        receiveMode: asb:PEEK_LOCK
+    };
+
     log:printInfo("Initializing Asb sender client.");
-    asb:MessageSender queueSender = check new (connectionString, queueName);
+    asb:MessageSender queueSender = check new (senderConfig);
 
     log:printInfo("Initializing Asb receiver client.");
-    asb:MessageReceiver queueReceiver = check new (connectionString, queueName, asb:PEEKLOCK);
+    asb:MessageReceiver queueReceiver = check new (receiverConfig);
 
     log:printInfo("Sending via Asb sender client.");
     check queueSender->send(message1);
@@ -77,4 +91,4 @@ public function main() returns error? {
 
     log:printInfo("Closing Asb receiver client.");
     check queueReceiver->close();
-}    
+}

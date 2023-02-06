@@ -50,17 +50,31 @@ public function main() returns error? {
         messages: [message1, message2]
     };
 
+    asb:ASBServiceSenderConfig senderConfig = {
+        connectionString: connectionString,
+        entityType: asb:QUEUE,
+        topicOrQueueName: queueName
+    };
+
+    asb:ASBServiceReceiverConfig receiverConfig = {
+        connectionString: connectionString,
+        entityConfig: {
+            queueName: queueName
+        },
+        receiveMode: asb:RECEIVE_AND_DELETE
+    };
+
     log:printInfo("Initializing Asb sender client.");
-    asb:MessageSender queueSender = check new (connectionString, queueName);
+    asb:MessageSender queueSender = check new (senderConfig);
 
     log:printInfo("Initializing Asb receiver client.");
-    asb:MessageReceiver queueReceiver = check new (connectionString, queueName, asb:RECEIVEANDDELETE);
+    asb:MessageReceiver queueReceiver = check new (receiverConfig);
 
     log:printInfo("Sending via Asb sender client.");
     check queueSender->sendBatch(messages);
 
     log:printInfo("Receiving from Asb receiver client.");
-    asb:MessageBatch|asb:Error? messageReceived = queueReceiver->receiveBatch(maxMessageCount, serverWaitTime);
+    asb:MessageBatch|error? messageReceived = queueReceiver->receiveBatch(maxMessageCount, serverWaitTime);
 
     if (messageReceived is asb:MessageBatch) {
         foreach asb:Message message in messageReceived.messages {

@@ -15,11 +15,17 @@
 // under the License.
 
 import ballerina/jballerina.java;
+import ballerina/log;
+
+configurable CustomConfiguration customConfiguration = {};
 
 function init() {
-    setModule();
+    error? module = setModule();
+    if module is error {
+        log:printError("Error in module initialization", module);
+    }
 }
 
-function setModule() = @java:Method {
+function setModule() returns error? = @java:Method {
     'class: "org.ballerinax.asb.util.ModuleUtils"
 } external;

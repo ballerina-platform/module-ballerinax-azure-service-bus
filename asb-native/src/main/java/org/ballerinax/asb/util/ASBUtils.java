@@ -18,18 +18,16 @@
 
 package org.ballerinax.asb.util;
 
+import io.ballerina.runtime.api.PredefinedTypes;
 import io.ballerina.runtime.api.creators.ErrorCreator;
+import io.ballerina.runtime.api.creators.TypeCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
-import io.ballerina.runtime.api.utils.JsonUtils;
+import io.ballerina.runtime.api.types.ErrorType;
+import io.ballerina.runtime.api.types.MapType;
 import io.ballerina.runtime.api.utils.StringUtils;
-import io.ballerina.runtime.api.utils.XmlUtils;
-import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BString;
-
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,14 +40,48 @@ public class ASBUtils {
      * @return Converted BMap object.
      */
     public static BMap<BString, Object> toBMap(Map<String, Object> map) {
-        BMap<BString, Object> returnMap = ValueCreator.createMapValue();
+        MapType mapType = TypeCreator.createMapType(PredefinedTypes.TYPE_ANY);
+        BMap<BString, Object> envMap = ValueCreator.createMapValue(mapType);
         if (map != null) {
             for (Object aKey : map.keySet().toArray()) {
-                returnMap.put(StringUtils.fromString(aKey.toString()),
-                        StringUtils.fromString(map.get(aKey).toString()));
+                Object value = map.get(aKey);
+                String classType = value.getClass().getName();
+                switch (classType) {
+                    case "java.lang.String":
+                        envMap.put(StringUtils.fromString(aKey.toString()), StringUtils.fromString(value.toString()));
+                        break;
+                    case "java.lang.Integer":
+                        envMap.put(StringUtils.fromString(aKey.toString()), (Integer) value);
+                        break;
+                    case "java.lang.Long":
+                        envMap.put(StringUtils.fromString(aKey.toString()), (Long) value);
+                        break;
+                    case "java.lang.Float":
+                        envMap.put(StringUtils.fromString(aKey.toString()), (Float) value);
+                        break;
+                    case "java.lang.Double":
+                        envMap.put(StringUtils.fromString(aKey.toString()), (Double) value);
+                        break;
+                    case "java.lang.Boolean":
+                        envMap.put(StringUtils.fromString(aKey.toString()), (Boolean) value);
+                        break;
+                    case "java.lang.Character":
+                        envMap.put(StringUtils.fromString(aKey.toString()), (Character) value);
+                        break;
+                    case "java.lang.Byte":
+                        envMap.put(StringUtils.fromString(aKey.toString()), (Byte) value);
+                        break;
+                    case "java.lang.Short":
+                        envMap.put(StringUtils.fromString(aKey.toString()), (Short) value);
+                        break;
+                    default:
+                        envMap.put(StringUtils.fromString(aKey.toString()),
+                                StringUtils.fromString(value.toString()));
+                        break;
+                }
             }
         }
-        return returnMap;
+        return envMap;
     }
 
     /**
@@ -58,7 +90,7 @@ public class ASBUtils {
      * @param value Input value.
      * @return value as a string or empty.
      */
-    public static String valueToEmptyOrToString(Object value) {
+    public static String convertString(Object value) {
         return (value == null || value.toString() == "") ? null : value.toString();
     }
 
@@ -69,7 +101,7 @@ public class ASBUtils {
      * @param key Input key.
      * @return map value as a string or empty.
      */
-    public static String valueToStringOrEmpty(Map<String, ?> map, String key) {
+    public static String convertString(Map<String, ?> map, String key) {
         Object value = map.get(key);
         return value == null ? null : value.toString();
     }
@@ -80,11 +112,47 @@ public class ASBUtils {
      * @param map Input BMap used to convert to Map.
      * @return Converted Map object.
      */
-    public static Map<String, Object> toStringMap(BMap map) {
+    public static Map<String, Object> toMap(BMap map) {
         Map<String, Object> returnMap = new HashMap<>();
+        Object value;
+        String classType;
+        String key;
         if (map != null) {
             for (Object aKey : map.getKeys()) {
-                returnMap.put(aKey.toString(), map.get(aKey).toString());
+                value = map.get(aKey);
+                classType = value.getClass().getName();
+                key = aKey.toString();
+                switch (classType) {
+                    case "BmpStringValue":
+                        returnMap.put(key, value.toString());
+                        break;
+                    case "java.lang.Long":
+                        returnMap.put(key, value);
+                        break;
+                    case "java.lang.Integer":
+                        returnMap.put(key, (Integer) value);
+                        break;
+                    case "java.lang.Float":
+                        returnMap.put(key, (Float) value);
+                        break;
+                    case "java.lang.Double":
+                        returnMap.put(key, (Double) value);
+                        break;
+                    case "java.lang.Boolean":
+                        returnMap.put(key, (Boolean) value);
+                        break;
+                    case "java.lang.Character":
+                        returnMap.put(key, (Character) value);
+                        break;
+                    case "java.lang.Byte":
+                        returnMap.put(key, (Byte) value);
+                        break;
+                    case "java.lang.Short":
+                        returnMap.put(key, (Short) value);
+                        break;
+                    default:
+                        returnMap.put(key, value.toString());
+                }
             }
         }
         return returnMap;
@@ -106,58 +174,22 @@ public class ASBUtils {
         return returnMap;
     }
 
-    public static Object getTextContent(BArray messageContent) {
-        byte[] messageCont = messageContent.getBytes();
-        try {
-            return StringUtils.fromString(new String(messageCont, StandardCharsets.UTF_8.name()));
-        } catch (UnsupportedEncodingException exception) {
-            return returnErrorValue(ASBConstants.TEXT_CONTENT_ERROR + exception.getMessage());
-        }
-    }
-
-    public static Object getFloatContent(BArray messageContent) {
-        try {
-            return Double.parseDouble(new String(messageContent.getBytes(), StandardCharsets.UTF_8.name()));
-        } catch (UnsupportedEncodingException exception) {
-            return returnErrorValue(ASBConstants.FLOAT_CONTENT_ERROR + exception.getMessage());
-        }
-    }
-
-    public static Object getIntContent(BArray messageContent) {
-        try {
-            return Integer.parseInt(new String(messageContent.getBytes(), StandardCharsets.UTF_8.name()));
-        } catch (UnsupportedEncodingException exception) {
-            return returnErrorValue(ASBConstants.INT_CONTENT_ERROR + exception.getMessage());
-        }
-    }
-
-    public static Object getJSONContent(BArray messageContent) {
-        try {
-            Object json = JsonUtils.parse(new String(messageContent.getBytes(), StandardCharsets.UTF_8.name()));
-            if (json instanceof String) {
-                return StringUtils.fromString((String) json);
-            }
-            return json;
-        } catch (UnsupportedEncodingException exception) {
-            return returnErrorValue(ASBConstants.JSON_CONTENT_ERROR + exception.getMessage());
-        }
-    }
-
-    public static Object getXMLContent(BArray messageContent) {
-        try {
-            return XmlUtils.parse(new String(messageContent.getBytes(), StandardCharsets.UTF_8.name()));
-        } catch (UnsupportedEncodingException exception) {
-            return returnErrorValue(ASBConstants.XML_CONTENT_ERROR + exception.getMessage());
-        }
-    }
-
     /**
-     * Returns a Ballerina Error with the given String message.
+     * Returns a Ballerina Error with the given String message and exception.
      *
      * @param errorMessage The error message
      * @return Resulting Ballerina Error
      */
-    public static BError returnErrorValue(String errorMessage) {
-        return ErrorCreator.createError(StringUtils.fromString(errorMessage));
+    public static BError returnErrorValue(String message, Exception error) {
+        ErrorType errorType = TypeCreator.createErrorType(error.getClass().getTypeName(), ModuleUtils.getModule());
+        String errorFromClass = error.getStackTrace()[0].getClassName();
+        String errorMessage = "An error occurred while processing your request.\n\n";
+        errorMessage += "Error Details:\n";
+        errorMessage += "Message: " + error.getMessage() + "\n";
+        errorMessage += "Cause: " + error.getCause() + "\n";
+        errorMessage += "Class: " + error.getClass() + "\n";
+        BError er = ErrorCreator.createError(StringUtils.fromString(errorMessage));
+        return ErrorCreator.createError(errorType, StringUtils.fromString(message + "error from " + errorFromClass), er,
+                null);
     }
 }

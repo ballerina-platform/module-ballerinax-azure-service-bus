@@ -41,8 +41,8 @@ public class ASBConstants {
     public static final BString MESSAGES_CONTENT = StringUtils.fromString("messages");
     public static final BString MESSAGE_COUNT = StringUtils.fromString("messageCount");
     // Message receive modes
-    public static final String PEEKLOCK = "PEEKLOCK";
-    public static final String RECEIVEANDDELETE = "RECEIVEANDDELETE";
+    public static final String PEEK_LOCK = "PEEKLOCK";
+    public static final String RECEIVE_AND_DELETE = "RECEIVEANDDELETE";
     // Keys of the input message optional parameters specified as a Map
     public static final String BODY = "body";
     public static final String CONTENT_TYPE = "contentType";
@@ -72,4 +72,5 @@ public class ASBConstants {
     public static final String UNCHECKED = "unchecked";
     // Error constant fields
     static final String ASB_ERROR = "AsbError";
+    public static final String LOG_ERROR_MSG = "Error while receiving message";
 }

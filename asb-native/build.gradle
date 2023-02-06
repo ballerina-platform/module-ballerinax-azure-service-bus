@@ -25,13 +25,13 @@ repositories {
 }
 
 dependencies {
-    implementation group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.5.1'
-    dist group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.5.1'
+    implementation 'com.azure:azure-messaging-servicebus:7.13.1'
+    dist group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.13.1'
     implementation group: 'log4j', name: 'log4j', version: '1.2.17'
     dist group: 'log4j', name: 'log4j', version: '1.2.17'
     compile group: 'org.ballerinalang', name: 'ballerina-lang', version: project.ballerinaLangVersion
     compile(group: 'org.ballerinalang', name: 'ballerina-runtime', version: project.ballerinaLangVersion) {
-        transitive = true
+        transitive = false
     }
 }
 
@@ -40,7 +40,7 @@ jar {
     dependsOn configurations.dist
     from { configurations.dist.collect { it.isDirectory() ? it : zipTree(it) } } {
         exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA', 'io/netty/**', 'com/google/gson/**', 
-        'org/slf4j/**', 'org/apache/commons/lang3/**' 
+        'org/slf4j/**', 'org/apache/commons/lang3/**', 'com/ctc/wstx/**', 'org/codehaus/**'
     }
 }
 
