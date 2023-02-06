@@ -26,6 +26,7 @@ public isolated client class MessageReceiver {
     private string subscriptionName;
     private string topicName;
     private string receiveMode;
+    private LogLevel logLevel;
     final handle receiverHandle;
 
     # Initializes the connector. During initialization you can pass the [Shared Access Signature (SAS) authentication credentials](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-sas)
@@ -49,20 +50,21 @@ public isolated client class MessageReceiver {
         }
         
         self.receiveMode = config.receiveMode;
+        self.logLevel = customConfiguration.logLevel;
         self.receiverHandle = check initMessageReceiver(java:fromString(self.connectionString), 
         java:fromString(self.queueName),java:fromString(self.topicName), java:fromString(self.subscriptionName), 
-        java:fromString(self.receiveMode));
+        java:fromString(self.receiveMode), java:fromString(self.logLevel));
     }
 
     # Receive message from queue or subscription.
     # 
     # + serverWaitTime - Specified server wait time in seconds to receive message (optional)
-    # + return - A `asb:Message` record if message is recieved, `()` if no message is in the queue or else an `asb:Error` 
+    # + return - A `asb:Message` record if message is received, `()` if no message is in the queue or else an error
     #            if failed to receive message
     @display {label: "Receive Message"}
     isolated remote function receive(@display {label: "Server Wait Time"} int? serverWaitTime = 60) 
-                                     returns @display {label: "Message"} Message|Error? {
-        Message|Error? message = receive(self.receiverHandle, self, serverWaitTime);
+                                     returns @display {label: "Message"} Message|error? {
+        Message|error? message = receive(self.receiverHandle, self, serverWaitTime);
         return message;     
     }
 
@@ -70,7 +72,7 @@ public isolated client class MessageReceiver {
     # 
     # + maxMessageCount - Maximum message count to receive in a batch
     # + serverWaitTime - Specified server wait time in seconds to receive message (optional)
-    # + return - A `asb:MessageBatch` record if batch is received, `()` if no batch is in the queue or else an `asb:Error` 
+    # + return - A `asb:MessageBatch` record if batch is received, `()` if no batch is in the queue or else an error
     #            if failed to receive batch
     @display {label: "Receive Batch Message"}
     isolated remote function receiveBatch(@display {label: "Maximum Message Count"} int maxMessageCount, 
@@ -84,14 +86,14 @@ public isolated client class MessageReceiver {
     # successfully completed, removing the message from the queue.
     # 
     # + message - `asb:Message` record
-    # + return - An `asb:Error` if failed to complete message or else `()`
+    # + return - An error if failed to complete message or else `()`
     @display {label: "Complete Message"}
     isolated remote function complete(@display {label: "Message"} Message message) 
-                                      returns Error? {
+                                      returns error? {
         if message?.lockToken.toString() != DEFAULT_MESSAGE_LOCK_TOKEN {
             return complete(self.receiverHandle, self, message?.lockToken.toString());
         }
-        return error Error("Failed to complete message with ID " + message?.messageId.toString());
+        return error("Failed to complete message with ID " + message?.messageId.toString());
     }
 
     # Abandon message from queue or subscription based on messageLockToken. Abandon processing of the message for 
@@ -99,13 +101,13 @@ public isolated client class MessageReceiver {
     # receiver.
     # 
     # + message - `asb:Message` record
-    # + return - An `asb:Error` if failed to abandon message or else `()`
+    # + return - An error if failed to abandon message or else `()`
     @display {label: "Abandon Message"}
-    isolated remote function abandon(@display {label: "Message"} Message message) returns Error? {
+    isolated remote function abandon(@display {label: "Message"} Message message) returns error? {
         if message?.lockToken.toString() != DEFAULT_MESSAGE_LOCK_TOKEN {
             return abandon(self.receiverHandle, self, message?.lockToken.toString());
         }
-        return error Error("Failed to abandon message with ID " + message?.messageId.toString());
+        return error("Failed to abandon message with ID " + message?.messageId.toString());
     }
 
     # Dead-Letter the message & moves the message to the Dead-Letter Queue based on messageLockToken. Transfer 
@@ -114,27 +116,27 @@ public isolated client class MessageReceiver {
     # + message - `asb:Message` record
     # + deadLetterReason - The deadletter reason (optional)
     # + deadLetterErrorDescription - The deadletter error description (optional)
-    # + return - An `asb:Error` if failed to deadletter message or else `()`
+    # + return - An error if failed to deadletter message or else `()`
     @display {label: "Dead Letter Message"}
     isolated remote function deadLetter(@display {label: "Message"} Message message, 
                                         @display {label: "Dead Letter Reason"} string? deadLetterReason = (), 
                                         @display{label: "Dead Letter Description"} 
-                                        string? deadLetterErrorDescription = ()) returns Error? {
+                                        string? deadLetterErrorDescription = ()) returns error? {
         if message?.lockToken.toString() != DEFAULT_MESSAGE_LOCK_TOKEN {
             return deadLetter(self.receiverHandle, self, message?.lockToken.toString(), deadLetterReason, 
                 deadLetterErrorDescription);
         }
-        return error Error("Failed to deadletter message with ID " + message?.messageId.toString());
+        return error("Failed to deadletter message with ID " + message?.messageId.toString());
     }
 
     # Defer the message in a Queue or Subscription based on messageLockToken.  It prevents the message from being 
     # directly received from the queue by setting it aside such that it must be received by sequence number.
     # 
     # + message - `asb:Message` record
-    # + return - An `asb:Error` if failed to defer message or else sequence number
+    # + return - An error if failed to defer message or else sequence number
     @display {label: "Defer Message"}
     isolated remote function defer(@display {label: "Message"} Message message) 
-                                   returns @display {label: "Deferred Msg Seq Num"} int|Error {
+                                   returns @display {label: "Deferred Msg Seq Num"} int|error {
         check defer(self.receiverHandle, self, message?.lockToken.toString());
         return <int> message?.sequenceNumber;
     }
@@ -145,11 +147,11 @@ public isolated client class MessageReceiver {
     # + sequenceNumber - Unique number assigned to a message by Service Bus. The sequence number is a unique 64-bit
     #                    integer assigned to a message as it is accepted and stored by the broker and functions as
     #                    its true identifier.
-    # + return - An `asb:Error` if failed to receive deferred message, a Message record if successful or else `()`
+    # + return - An error if failed to receive deferred message, a Message record if successful or else `()`
     @display {label: "Receive Deferred Message"}
     isolated remote function receiveDeferred(@display {label: "Deferred Msg Seq Num"} 
                                              int sequenceNumber) 
-                                             returns @display {label: "Deferred Message"}  Message|Error? {
+                                             returns @display {label: "Deferred Message"}  Message|error? {
         Message? message = check receiveDeferred(self.receiverHandle, self, sequenceNumber);
         return message;
     }
@@ -157,20 +159,20 @@ public isolated client class MessageReceiver {
     # The operation renews lock on a message in a queue or subscription based on messageLockToken.
     # 
     # + message - `asb:Message` record
-    # + return - An `asb:Error` if failed to renew message or else `()`
+    # + return - An error if failed to renew message or else `()`
     @display {label: "Renew Lock On Message"}
-    isolated remote function renewLock(@display {label: "Message"} Message message) returns Error? {
+    isolated remote function renewLock(@display {label: "Message"} Message message) returns error? {
         if message?.lockToken.toString() != DEFAULT_MESSAGE_LOCK_TOKEN {
             return renewLock(self.receiverHandle, self, message?.lockToken.toString());
         }
-        return error Error("Failed to renew lock on message with ID " + message?.messageId.toString());
+        return error("Failed to renew lock on message with ID " + message?.messageId.toString());
     }
 
     # Closes the ASB sender connection.
     #
-    # + return - An `asb:Error` if failed to close connection or else `()`
+    # + return - An error if failed to close connection or else `()`
     @display {label: "Close Receiver Connection"}
-    isolated remote function close() returns Error? {
+    isolated remote function close() returns error? {
         return closeReceiver(self.receiverHandle);
     }
 
@@ -185,45 +187,47 @@ public isolated client class MessageReceiver {
     }
 }
 
-isolated function initMessageReceiver(handle connectionString, handle queueName, handle topicName, handle subscriptionName, handle receiveMode) returns handle|error = @java:Constructor {
+isolated function initMessageReceiver(handle connectionString, handle queueName, handle topicName, 
+        handle subscriptionName, handle receiveMode, handle isLogActive) returns handle|error = @java:Constructor {
     'class: "org.ballerinax.asb.receiver.MessageReceiver",
-    paramTypes: ["java.lang.String", "java.lang.String", "java.lang.String", "java.lang.String", "java.lang.String"]
+    paramTypes: ["java.lang.String", "java.lang.String", "java.lang.String", "java.lang.String", "java.lang.String"
+    ,"java.lang.String"]
 } external;
 
-isolated function receive(handle receiverHandle, MessageReceiver endpointClient, int? serverWaitTime) returns Message|Error? = @java:Method {
+isolated function receive(handle receiverHandle, MessageReceiver endpointClient, int? serverWaitTime) returns Message|error? = @java:Method {
     'class: "org.ballerinax.asb.receiver.MessageReceiver"
 } external;
 
 isolated function receiveBatch(handle receiverHandle, MessageReceiver endpointClient, int? maxMessageCount, int? serverWaitTime) 
-                               returns MessageBatch|Error? = @java:Method {
+                               returns MessageBatch|error? = @java:Method {
     'class: "org.ballerinax.asb.receiver.MessageReceiver"
 } external;
 
-isolated function complete(handle receiverHandle,MessageReceiver endpointClient, string lockToken) returns Error? = @java:Method {
+isolated function complete(handle receiverHandle,MessageReceiver endpointClient, string lockToken) returns error? = @java:Method {
     'class: "org.ballerinax.asb.receiver.MessageReceiver"
 } external;
 
-isolated function abandon(handle receiverHandle, MessageReceiver endpointClient, string lockToken) returns Error? = @java:Method {
+isolated function abandon(handle receiverHandle, MessageReceiver endpointClient, string lockToken) returns error? = @java:Method {
     'class: "org.ballerinax.asb.receiver.MessageReceiver"
 } external;
 
 isolated function deadLetter(handle receiverHandle, MessageReceiver endpointClient, string lockToken, string? deadLetterReason, string? deadLetterErrorDescription) returns 
-                       Error? = @java:Method {
+                       error? = @java:Method {
     'class: "org.ballerinax.asb.receiver.MessageReceiver"
 } external;
 
-isolated function defer(handle receiverHandle, MessageReceiver endpointClient, string lockToken) returns Error? = @java:Method {
+isolated function defer(handle receiverHandle, MessageReceiver endpointClient, string lockToken) returns error? = @java:Method {
     'class: "org.ballerinax.asb.receiver.MessageReceiver"
 } external;
 
-isolated function receiveDeferred(handle receiverHandle, MessageReceiver endpointClient, int sequenceNumber) returns Message|Error? = @java:Method {
+isolated function receiveDeferred(handle receiverHandle, MessageReceiver endpointClient, int sequenceNumber) returns Message|error? = @java:Method {
     'class: "org.ballerinax.asb.receiver.MessageReceiver"
 } external;
 
-isolated function renewLock(handle receiverHandle, MessageReceiver endpointClient, string lockToken) returns Error? = @java:Method {
+isolated function renewLock(handle receiverHandle, MessageReceiver endpointClient, string lockToken) returns error? = @java:Method {
     'class: "org.ballerinax.asb.receiver.MessageReceiver"
 } external;
 
-isolated function closeReceiver(handle receiverHandle) returns Error? = @java:Method {
+isolated function closeReceiver(handle receiverHandle) returns error? = @java:Method {
     'class: "org.ballerinax.asb.receiver.MessageReceiver"
 } external;

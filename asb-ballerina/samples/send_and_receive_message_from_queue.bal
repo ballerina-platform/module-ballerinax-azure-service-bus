@@ -43,11 +43,25 @@ public function main() returns error? {
         applicationProperties: applicationProperties
     };
 
+    asb:ASBServiceSenderConfig senderConfig = {
+        connectionString: connectionString,
+        entityType: asb:QUEUE,
+        topicOrQueueName: queueName
+    };
+
+    asb:ASBServiceReceiverConfig receiverConfig = {
+        connectionString: connectionString,
+        entityConfig: {
+            queueName: queueName
+        },
+        receiveMode: asb:RECEIVE_AND_DELETE
+    };
+
     log:printInfo("Initializing Asb sender client.");
-    asb:MessageSender queueSender = check new (connectionString, queueName);
+    asb:MessageSender queueSender = check new (senderConfig);
 
     log:printInfo("Initializing Asb receiver client.");
-    asb:MessageReceiver queueReceiver = check new (connectionString, queueName, asb:RECEIVEANDDELETE);
+    asb:MessageReceiver queueReceiver = check new (receiverConfig);
 
     log:printInfo("Sending via Asb sender client.");
     check queueSender->send(message1);

@@ -20,7 +20,7 @@ import ballerinax/asb;
 // Connection Configurations
 configurable string connectionString = ?;
 configurable string topicName = ?;
-configurable string subscriptionPath1 = ?;
+configurable string subscriptionName = ?;
 
 // This sample demonstrates a scneario where azure service bus listener is used to
 // send a message to a topic using topic sender, receive that message using subscription receiver with PEEKLOCK mode, 
@@ -50,11 +50,26 @@ public function main() returns error? {
         applicationProperties: applicationProperties
     };
 
+    asb:ASBServiceSenderConfig senderConfig = {
+        connectionString: connectionString,
+        entityType: asb:TOPIC,
+        topicOrQueueName: topicName
+    };
+
+    asb:ASBServiceReceiverConfig receiverConfig = {
+        connectionString: connectionString,
+        entityConfig: {
+            topicName: topicName,
+            subscriptionName: subscriptionName
+        },
+        receiveMode: asb:PEEK_LOCK
+    };
+
     log:printInfo("Initializing Asb sender client.");
-    asb:MessageSender topicSender = check new (connectionString, topicName);
+    asb:MessageSender topicSender = check new (senderConfig);
 
     log:printInfo("Initializing Asb receiver client.");
-    asb:MessageReceiver subscriptionReceiver = check new (connectionString, subscriptionPath1, asb:PEEKLOCK);
+    asb:MessageReceiver subscriptionReceiver = check new (receiverConfig);
     
     log:printInfo("Sending via Asb sender client.");
     check topicSender->send(message1);

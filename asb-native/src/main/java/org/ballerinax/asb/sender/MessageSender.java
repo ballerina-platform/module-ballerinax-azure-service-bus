@@ -31,6 +31,8 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.ballerinax.asb.util.ASBConstants;
 import org.ballerinax.asb.util.ASBUtils;
@@ -40,23 +42,23 @@ import org.ballerinax.asb.util.ASBUtils;
  */
 public class MessageSender {
     private static final Logger log = Logger.getLogger(MessageSender.class);
-    ServiceBusSenderClient sender;
+    private ServiceBusSenderClient sender;
 
     /**
      * Parameterized constructor for Message Sender (ServiceBusSenderClient).
      *
      * @param connectionString Azure service bus connection string.
-     * @param queueName QueueName 
-     * @param topicName Topic Name
+     * @param queueName        QueueName
+     * @param topicName        Topic Name
      * @throws ServiceBusException  on failure initiating IMessage Receiver in Azure
      *                              Service Bus instance.
      * @throws InterruptedException on failure initiating IMessage Receiver due to
      *                              thread interruption.
      */
-    public MessageSender(String connectionString, String entityType, String topicOrQueueName)
+    public MessageSender(String connectionString, String entityType, String topicOrQueueName, String logLevel)
             throws ServiceBusException, InterruptedException {
-        ServiceBusClientBuilder clientBuilder = new ServiceBusClientBuilder()
-                .connectionString(connectionString);
+        log.setLevel(Level.toLevel(logLevel, Level.OFF));
+        ServiceBusClientBuilder clientBuilder = new ServiceBusClientBuilder().connectionString(connectionString);
         if (!entityType.isEmpty() && entityType.equalsIgnoreCase("queue")) {
             this.sender = clientBuilder
                     .sender()
@@ -68,6 +70,7 @@ public class MessageSender {
                     .topicName(topicOrQueueName)
                     .buildClient();
         }
+        log.debug("ServiceBusSenderClient initialized");
     }
 
     /**
@@ -106,15 +109,15 @@ public class MessageSender {
             if (timeToLive != null) {
                 asbMessage.setTimeToLive(Duration.ofSeconds((long) timeToLive));
             }
-            Map<String, Object> map = ASBUtils.toStringMap((BMap) properties);
+            Map<String, Object> map = ASBUtils.toMap((BMap) properties);
             asbMessage.getApplicationProperties().putAll(map);
             sender.sendMessage(asbMessage);
             if (log.isDebugEnabled()) {
-                log.debug("\t=> Sent a message with messageId \n" + asbMessage.getMessageId());
+                log.debug("Sent the message successfully");
             }
             return null;
         } catch (ServiceBusException e) {
-            return ASBUtils.returnErrorValue("Exception while sending batch messages" + e.getMessage());
+            return ASBUtils.returnErrorValue(e.getClass().getSimpleName(), e);
         }
     }
 
@@ -134,7 +137,6 @@ public class MessageSender {
             for (int i = 0; i < messageArray.getLength(); i++) {
                 BMap messageBMap = (BMap) messageArray.get(i);
                 Map<String, Object> messageMap = ASBUtils.toObjectMap(messageBMap);
-
                 byte[] byteArray = ((BArray) messageMap.get(ASBConstants.BODY)).getBytes();
                 ServiceBusMessage asbMessage = new ServiceBusMessage(byteArray);
                 asbMessage.setContentType(ASBUtils.convertString(messageMap, ASBConstants.CONTENT_TYPE));
@@ -154,8 +156,7 @@ public class MessageSender {
                     asbMessage
                             .setTimeToLive(Duration.ofSeconds((long) messageMap.get(ASBConstants.TIME_TO_LIVE)));
                 }
-                Map<String, Object> map = ASBUtils
-                        .toStringMap((BMap) messageMap.get(ASBConstants.APPLICATION_PROPERTIES));
+                Map<String, Object> map = ASBUtils.toMap((BMap) messageMap.get(ASBConstants.APPLICATION_PROPERTIES));
                 asbMessage.getApplicationProperties().putAll(map);
                 messageBatch.add(asbMessage);
             }
@@ -164,6 +165,7 @@ public class MessageSender {
                 if (currentBatch.tryAddMessage(message)) {
                     continue;
                 }
+                
                 // The batch is full, so we create a new batch and send the batch.
                 sender.sendMessages(currentBatch);
                 currentBatch = sender.createMessageBatch();
@@ -172,14 +174,16 @@ public class MessageSender {
                 if (!currentBatch.tryAddMessage(message)) {
                     if (log.isDebugEnabled()) {
                         log.debug("Message is too large for an empty batch. Skipping. Max size: "
-                                + currentBatch.getMaxSizeInBytes() + ". Message: " + message.getBody().toString());
+                                + currentBatch.getMaxSizeInBytes() + ". Message: " +
+                                message.getBody().toString());
                     }
                 }
             }
             sender.sendMessages(currentBatch);
+            log.debug("Sent the batch message successfully");
             return null;
         } catch (ServiceBusException e) {
-            return ASBUtils.returnErrorValue("Exception while sending batch messages" + e.getMessage());
+            return ASBUtils.returnErrorValue(e.getClass().getSimpleName(), e);
         }
     }
 
@@ -191,9 +195,10 @@ public class MessageSender {
     public Object closeSender() {
         try {
             sender.close();
+            log.debug("Closed the sender");
             return null;
-        } catch (ServiceBusException e) {
-            return ASBUtils.returnErrorValue("Exception while closing the sender" + e.getMessage());
+        } catch (Exception e) {
+            return ASBUtils.returnErrorValue(e.getClass().getSimpleName(), e);
         }
     }
 }

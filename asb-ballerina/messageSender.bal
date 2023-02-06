@@ -25,6 +25,7 @@ public isolated client class MessageSender {
     final handle senderHandle;
     private string topicOrQueueName;
     private  string entityType;
+    private LogLevel logLevel;
 
     # Initializes the connector. During initialization you can pass the [Shared Access Signature (SAS) authentication credentials](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-sas)
     # Create an [Azure account](https://docs.microsoft.com/en-us/learn/modules/create-an-azure-account/) and 
@@ -36,17 +37,18 @@ public isolated client class MessageSender {
         self.connectionString = config.connectionString;
         self.topicOrQueueName = config.topicOrQueueName;
         self.entityType = config.entityType;
+        self.logLevel = customConfiguration.logLevel;
         self.senderHandle = check initMessageSender(java:fromString(self.connectionString), java:fromString(self.entityType),
-        java:fromString(self.topicOrQueueName));
+        java:fromString(self.topicOrQueueName), java:fromString(self.logLevel));
     }
 
     # Send message to queue or topic with a message body.
     #
     # + message - Azure service bus message representation (`asb:Message` record)
-    # + return - An `asb:Error` if failed to send message or else `()`
+    # + return - An error if failed to send message or else `()`
     @display {label: "Send Message"}
     isolated remote function send(@display {label: "Message"} Message message) returns error? {
-        Error? response;
+        error? response;
         if message.body is byte[] {
             response = check send(self.senderHandle, message.body, message?.contentType, 
                 message?.messageId, message?.to, message?.replyTo, message?.replyToSessionId, message?.label, 
@@ -65,7 +67,7 @@ public isolated client class MessageSender {
     # Send batch of messages to queue or topic.
     #
     # + messages - Azure service bus batch message representation (`asb:MessageBatch` record)
-    # + return - An `asb:Error` if failed to send message or else `()`
+    # + return - An error if failed to send message or else `()`
     @display {label: "Send Batch Message"}
     isolated remote function sendBatch(@display {label: "Batch Message"} MessageBatch messages) returns error? {
         self.modifyContentToByteArray(messages);
@@ -74,7 +76,7 @@ public isolated client class MessageSender {
 
     # Closes the ASB sender connection.
     #
-    # + return - An `asb:Error` if failed to close connection or else `()`
+    # + return - An error if failed to close connection or else `()`
     @display {label: "Close Sender Connection"}
     isolated remote function close() returns error? {
         return closeSender(self.senderHandle);
@@ -91,15 +93,15 @@ public isolated client class MessageSender {
     }
 }
 
-isolated function initMessageSender(handle connectionString, handle entityType, handle topicOrQueueName ) returns handle|error = @java:Constructor {
+isolated function initMessageSender(handle connectionString, handle entityType, handle topicOrQueueName, handle isLogEnabled) returns handle|error = @java:Constructor {
     'class: "org.ballerinax.asb.sender.MessageSender",
-    paramTypes: ["java.lang.String", "java.lang.String", "java.lang.String"]
+    paramTypes: ["java.lang.String", "java.lang.String", "java.lang.String", "java.lang.String"]
 } external;
 
 isolated function send(handle senderHandle, string|xml|json|byte[] body, string? contentType, 
                        string? messageId, string? to, string? replyTo, string? replyToSessionId, string? label, 
                        string? sessionId, string? correlationId, string? partitionKey, int? timeToLive, 
-                       map<string>? properties) returns error? = @java:Method {
+                       map<any>? properties) returns error? = @java:Method {
     'class: "org.ballerinax.asb.sender.MessageSender"
 } external;
 
