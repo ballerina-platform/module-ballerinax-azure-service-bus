@@ -18,9 +18,10 @@ import ballerina/log;
 import ballerinax/asb;
 
 // Connection Configurations
+
 configurable string connectionString = ?;
 configurable string topicName = ?;
-configurable string subscriptionPath1 = ?;
+configurable string subscriptionName1 = ?;
 
 // This sample demonstrates a scneario where azure service bus connecter is used to 
 // send a message to a topic using topic sender, receive that message using subscription receiver with PEEKLOCK mode, 
@@ -30,7 +31,7 @@ configurable string subscriptionPath1 = ?;
 public function main() returns error? {
 
     // Input values
-    string stringContent = "This is My Message Body"; 
+    string stringContent = "This is My Message Body";
     byte[] byteContent = stringContent.toBytes();
     int timeToLive = 60; // In seconds
     int serverWaitTime = 60; // In seconds
@@ -46,11 +47,26 @@ public function main() returns error? {
         applicationProperties: applicationProperties
     };
 
+    asb:ASBServiceSenderConfig senderConfig = {
+        connectionString: connectionString,
+        entityType: asb:TOPIC,
+        topicOrQueueName: topicName
+    };
+
+    asb:ASBServiceReceiverConfig receiverConfig = {
+        connectionString: connectionString,
+        entityConfig: {
+            topicName: topicName,
+            subscriptionName: subscriptionName1
+        },
+        receiveMode: asb:PEEK_LOCK
+    };
+
     log:printInfo("Initializing Asb sender client.");
-    asb:MessageSender topicSender = check new (connectionString, topicName);
+    asb:MessageSender topicSender = check new (senderConfig);
 
     log:printInfo("Initializing Asb receiver client.");
-    asb:MessageReceiver subscriptionReceiver = check new (connectionString, subscriptionPath1, asb:PEEKLOCK);
+    asb:MessageReceiver subscriptionReceiver = check new (receiverConfig);
 
     log:printInfo("Sending via Asb sender client.");
     check topicSender->send(message1);
@@ -78,4 +94,4 @@ public function main() returns error? {
 
     log:printInfo("Closing Asb receiver client.");
     check subscriptionReceiver->close();
-}    
+}

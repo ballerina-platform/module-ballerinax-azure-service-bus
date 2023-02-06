@@ -20,7 +20,7 @@ import ballerinax/asb;
 // Connection Configurations
 configurable string connectionString = ?;
 configurable string topicName = ?;
-configurable string subscriptionPath1 = ?;
+configurable string subscriptionName = ?;
 
 // This sample demonstrates a scneario where azure service bus connecter is used to 
 // send a batch of messages to a topic using topic sender, 
@@ -53,17 +53,32 @@ public function main() returns error? {
         messages: [message1, message2]
     };
 
+    asb:ASBServiceSenderConfig senderConfig = {
+        connectionString: connectionString,
+        entityType: asb:TOPIC,
+        topicOrQueueName: topicName
+    };
+
+    asb:ASBServiceReceiverConfig receiverConfig = {
+        connectionString: connectionString,
+        entityConfig: {
+            topicName: topicName,
+            subscriptionName: subscriptionName
+        },
+        receiveMode: asb:RECEIVE_AND_DELETE
+    };
+
     log:printInfo("Initializing Asb sender client.");
-    asb:MessageSender topicSender = check new (connectionString, topicName);
+    asb:MessageSender topicSender = check new (senderConfig);
 
     log:printInfo("Initializing Asb receiver client.");
-    asb:MessageReceiver subscriptionReceiver = check new (connectionString, subscriptionPath1, asb:RECEIVEANDDELETE);
+    asb:MessageReceiver subscriptionReceiver = check new (receiverConfig);
 
     log:printInfo("Sending via Asb sender client.");
     check topicSender->sendBatch(messages);
 
     log:printInfo("Receiving from Asb receiver client.");
-    asb:MessageBatch|asb:Error? messageReceived = subscriptionReceiver->receiveBatch(maxMessageCount, serverWaitTime);
+    asb:MessageBatch|error? messageReceived = subscriptionReceiver->receiveBatch(maxMessageCount, serverWaitTime);
 
     if (messageReceived is asb:MessageBatch) {
         foreach asb:Message message in messageReceived.messages {

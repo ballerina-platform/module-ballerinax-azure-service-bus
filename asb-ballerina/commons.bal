@@ -14,8 +14,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import ballerina/jballerina.java as java;
-
 // Default values
 public const DEFAULT_TIME_TO_LIVE = 300; // In seconds
 public const DEFAULT_MAX_MESSAGE_COUNT = 1;
@@ -91,6 +89,14 @@ public type ASBServiceSenderConfig record {
     string connectionString;
 };
 
+# Represents Custom configurations for the ASB connector
+#
+# + logLevel - Enables the connector debug log prints (log4j log levels), default: OFF
+public  type CustomConfiguration record {
+    @display {label: "Log Level"}
+    LogLevel logLevel = OFF; 
+};
+
 //Message entity types
 public enum EntityType {
     @display {label: "Queue"}
@@ -107,32 +113,18 @@ public enum ReceiveMode {
     PEEK_LOCK = "PEEKLOCK"
 }
 
-isolated function nativeGetTextContent(byte[] messageContent) returns string|Error =
-@java:Method {
-    name: "getTextContent",
-    'class: "org.ballerinax.asb.util.ASBUtils"
-} external;
-
-isolated function nativeGetFloatContent(byte[] messageContent) returns float|Error =
-@java:Method {
-    name: "getFloatContent",
-    'class: "org.ballerinax.asb.util.ASBUtils"
-} external;
-
-isolated function nativeGetIntContent(byte[] messageContent) returns int|Error =
-@java:Method {
-    name: "getIntContent",
-    'class: "org.ballerinax.asb.util.ASBUtils"
-} external;
-
-isolated function nativeGetJSONContent(byte[] messageContent) returns json|Error =
-@java:Method {
-    name: "getJSONContent",
-    'class: "org.ballerinax.asb.util.ASBUtils"
-} external;
-
-isolated function nativeGetXMLContent(byte[] messageContent) returns xml|Error =
-@java:Method {
-    name: "getXMLContent",
-    'class: "org.ballerinax.asb.util.ASBUtils"
-} external;
+//Log_levels
+public enum LogLevel {
+    @display {label: "DEBUG"}
+    DEBUG,
+    @display {label: "INFO"}
+    INFO,
+    @display {label: "WARNING"}
+    WARNING,
+    @display {label: "ERROR"}
+    ERROR,
+    @display {label: "FATAL"}
+    FATAL,
+    @display {label: "OFF"}
+    OFF
+}

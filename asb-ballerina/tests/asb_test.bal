@@ -30,7 +30,7 @@ string stringContent = "This is ASB connector test-Message Body";
 byte[] byteContent = stringContent.toBytes();
 json jsonContent = {name: "wso2", color: "orange", price: 5.36};
 byte[] byteContentFromJson = jsonContent.toJsonString().toBytes();
-map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
+map<any> properties = {a: "propertyValue1", b: "propertyValue2", c: 1, d: "true", f: 1.345, s: false, k:1020202, g: jsonContent};
 int timeToLive = 60; // In seconds
 int serverWaitTime = 60; // In seconds
 int maxMessageCount = 2;
@@ -42,7 +42,8 @@ ApplicationProperties applicationProperties = {
 Message message1 = {
     body: byteContent,
     contentType: TEXT,
-    timeToLive: timeToLive
+    timeToLive: timeToLive,
+    applicationProperties: applicationProperties
 };
 
 Message message2 = {
@@ -92,12 +93,13 @@ function testSendAndReceiveMessageFromQueueOperation() returns error? {
     if (messageReceived is Message) {
         var result = check messageReceiver->complete(messageReceived);
         test:assertEquals(result, (), msg = "Complete message not successful.");
+        float mapValue = <float> check getApplicationPropertyByName(messageReceived, "f");
+        test:assertEquals(mapValue, <float>properties["f"], "Retrieving application properties failed");
     } else if (messageReceived is ()) {
         test:assertFail("No message in the queue.");
     } else {
         test:assertFail("Receiving message via Asb receiver connection failed.");
     }
-
     log:printInfo("Closing Asb sender client.");
     check messageSender->close();
 

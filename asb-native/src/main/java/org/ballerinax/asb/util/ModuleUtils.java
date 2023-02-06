@@ -18,8 +18,12 @@
 
 package org.ballerinax.asb.util;
 
+import java.util.logging.LogManager;
 import io.ballerina.runtime.api.Environment;
 import io.ballerina.runtime.api.Module;
+import io.ballerina.runtime.api.creators.ErrorCreator;
+import io.ballerina.runtime.api.utils.StringUtils;
+import io.ballerina.runtime.api.values.BString;
 
 /**
  * This class will hold module related utility functions.
@@ -38,7 +42,22 @@ public class ModuleUtils {
         return asbModule;
     }
 
-    public static void setModule(Environment env) {
+    public static Object setModule(Environment env) {
+        String logLevel = "";
+        try {
+            logLevel = System.getenv("ASB_CLOUD_LOGS");
+        } catch (Exception e) {
+            // If a security manager exists, its checkPermission method is called with a
+            // RuntimePermission("getenv."+name) permission. This may result in a
+            // SecurityException being thrown. If no exception is thrown the value of the
+            // variable name is returned.
+            BString message = StringUtils.fromString("Error returned when trying to read environment variables");
+            return ErrorCreator.createError(message, e);
+        }
+        if (logLevel == null || logLevel.isEmpty() || !logLevel.equalsIgnoreCase("ACTIVE")) {
+            LogManager.getLogManager().reset();
+        }
         asbModule = env.getCurrentModule();
+        return null;
     }
 }

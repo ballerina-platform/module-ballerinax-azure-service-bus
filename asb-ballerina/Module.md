@@ -69,6 +69,19 @@ Before using this connector in your Ballerina application, complete the followin
 ## Quickstart
 
 To use the Azure Service Bus connector in your Ballerina application, update the .bal file as follows:
+### Enabling Azure SDK Logs
+To enable Azure logs in a Ballerina module, you need to set the environment variable ASB_CLOUD_LOGS to ACTIVE. You can do this by adding the following line to your shell script or using the export command in your terminal(to deactivate,remove the variable value):
+
+`export ASB_CLOUD_LOGS=ACTIVE`
+
+### Enabling Internal Connector Logs
+To enable internal connector logs in a Ballerina module, you need to set the log level in the Config.toml file using the  custom configuration record Where <log_level> is the desired log level (e.g. DEBUG, INFO, WARN, ERROR, FATAL, (Default)OFF)
+
+```
+[ballerinax.asb.customConfiguration]
+logLevel="OFF"
+```
+
 
 ### Step 1: Import connector
 
