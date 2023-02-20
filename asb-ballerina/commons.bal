@@ -30,8 +30,8 @@ public const BYTE_ARRAY = "application/octet-stream";
 // Azure Service Bus Client API Record Types.
 
 # Configurations used to create an `asb:Connection`.
-#
-# + connectionString - Service bus connection string with Shared Access Signatures
+# 
+# + connectionString - Service bus connection string with Shared Access Signatures  
 #                      ConnectionString format: 
 #                      Endpoint=sb://namespace_DNS_Name;EntityPath=EVENT_HUB_NAME;
 #                      SharedAccessKeyName=SHARED_ACCESS_KEY_NAME;SharedAccessKey=SHARED_ACCESS_KEY or  
@@ -41,15 +41,19 @@ public const BYTE_ARRAY = "application/octet-stream";
 #                   determined by the entityType field. The actual configuration details are stored in either a 
 #                   TopicSubsConfig or a QueueConfig record  
 # + receiveMode - This field holds the receive modes(RECEIVE_AND_DELETE/PEEK_LOCK) for the connection. The receive mode determines how messages are 
-#                 retrieved from the entity. The default value is PEEK_LOCK
+# retrieved from the entity. The default value is PEEK_LOCK  
+# + maxAutoLockRenewDuration - Max lock renewal duration under PEEK_LOCK mode. Setting to 0 disables auto-renewal (default). 
+#                              For RECEIVE_AND_DELETE mode, auto-renewal is disabled.
 @display {label: "Receiver Connection Config"}
 public type ASBServiceReceiverConfig record {
-    @display {label: "Entity Configuration"}
-    TopicSubsConfig|QueueConfig entityConfig;
     @display {label: "ConnectionString"}
     string connectionString;
+    @display {label: "Entity Configuration"}
+    TopicSubsConfig|QueueConfig entityConfig;
     @display {label: "Receive Mode"}
     ReceiveMode receiveMode = PEEK_LOCK;
+    @display {label: "Max Auto Lock Renew Duration"}
+    int maxAutoLockRenewDuration = 0;
 };
 
 # This record holds the configuration details of a topic and its associated subscription in Azure Service Bus
