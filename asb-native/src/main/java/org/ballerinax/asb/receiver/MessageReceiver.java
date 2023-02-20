@@ -68,13 +68,15 @@ public class MessageReceiver {
      * @param topicName        Topic Name
      * @param subscriptionName Subscription Name
      * @param receiveMode      Receive Mode as PeekLock or Receive&Delete.
+     * @param maxAutoLockRenewDuration Max lock renewal duration under Peek Lock mode. Setting to 0 disables auto-renewal. 
+     *                                  For RECEIVE_AND_DELETE mode, auto-renewal is disabled.
      * @throws ServiceBusException  on failure initiating IMessage Receiver in Azure
      *                              Service Bus instance.
      * @throws InterruptedException on failure initiating IMessage Receiver due to
      *                              thread interruption.
      */
     public MessageReceiver(String connectionString, String queueName, String topicName, String subscriptionName,
-            String receiveMode, String logLevel)
+            String receiveMode, long maxAutoLockRenewDuration, String logLevel)
             throws ServiceBusException, InterruptedException {
         log.setLevel(Level.toLevel(logLevel, Level.OFF));
         ServiceBusReceiverClientBuilder receiverClientBuilder = new ServiceBusClientBuilder()
@@ -91,6 +93,7 @@ public class MessageReceiver {
                 this.receiver = receiverClientBuilder
                         .receiveMode(ServiceBusReceiveMode.PEEK_LOCK)
                         .queueName(queueName)
+                        .maxAutoLockRenewDuration(Duration.ofSeconds(maxAutoLockRenewDuration))
                         .buildClient();
             }
         } else if (!subscriptionName.isEmpty() && !topicName.isEmpty()) {
@@ -106,6 +109,7 @@ public class MessageReceiver {
                         .receiveMode(ServiceBusReceiveMode.PEEK_LOCK)
                         .topicName(topicName)
                         .subscriptionName(subscriptionName)
+                        .maxAutoLockRenewDuration(Duration.ofSeconds(maxAutoLockRenewDuration))
                         .buildClient();
             }
         }

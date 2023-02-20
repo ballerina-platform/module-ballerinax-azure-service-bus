@@ -26,6 +26,7 @@ public isolated client class MessageReceiver {
     private string subscriptionName;
     private string topicName;
     private string receiveMode;
+    private int maxAutoLockRenewDuration;
     private LogLevel logLevel;
     final handle receiverHandle;
 
@@ -50,10 +51,11 @@ public isolated client class MessageReceiver {
         }
         
         self.receiveMode = config.receiveMode;
+        self.maxAutoLockRenewDuration = config.maxAutoLockRenewDuration;
         self.logLevel = customConfiguration.logLevel;
         self.receiverHandle = check initMessageReceiver(java:fromString(self.connectionString), 
         java:fromString(self.queueName),java:fromString(self.topicName), java:fromString(self.subscriptionName), 
-        java:fromString(self.receiveMode), java:fromString(self.logLevel));
+        java:fromString(self.receiveMode), self.maxAutoLockRenewDuration, java:fromString(self.logLevel));
     }
 
     # Receive message from queue or subscription.
@@ -188,10 +190,10 @@ public isolated client class MessageReceiver {
 }
 
 isolated function initMessageReceiver(handle connectionString, handle queueName, handle topicName, 
-        handle subscriptionName, handle receiveMode, handle isLogActive) returns handle|error = @java:Constructor {
+        handle subscriptionName, handle receiveMode, int maxAutoLockRenewDuration, handle isLogActive) returns handle|error = @java:Constructor {
     'class: "org.ballerinax.asb.receiver.MessageReceiver",
-    paramTypes: ["java.lang.String", "java.lang.String", "java.lang.String", "java.lang.String", "java.lang.String"
-    ,"java.lang.String"]
+    paramTypes: ["java.lang.String", "java.lang.String", "java.lang.String", "java.lang.String", "java.lang.String",
+                 "long","java.lang.String"]
 } external;
 
 isolated function receive(handle receiverHandle, MessageReceiver endpointClient, int? serverWaitTime) returns Message|error? = @java:Method {
