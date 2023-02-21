@@ -15,23 +15,24 @@
 // under the License.
 
 import ballerina/jballerina.java as java;
+import ballerina/time;
 
 # Ballerina Service Bus connector provides the capability to access Azure Service Bus SDK.
 # Service Bus API provides data access to highly reliable queues and publish/subscribe topics of Azure Service Bus with deep feature capabilities.
 @display {label: "Azure Service Bus Message Sender", iconPath: "icon.png"}
 public isolated client class MessageSender {
 
-    private  string connectionString;
+    private string connectionString;
     final handle senderHandle;
     private string topicOrQueueName;
-    private  string entityType;
+    private string entityType;
     private LogLevel logLevel;
 
     # Initializes the connector. During initialization you can pass the [Shared Access Signature (SAS) authentication credentials](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-sas)
     # Create an [Azure account](https://docs.microsoft.com/en-us/learn/modules/create-an-azure-account/) and 
     # obtain tokens following [this guide](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-portal#get-the-connection-string). 
     # Configure the connection string to have the [required permission](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-sas).
-    # 
+    #
     # + config - Azure service bus sender configuration
     public isolated function init(ASBServiceSenderConfig config) returns error? {
         self.connectionString = config.connectionString;
@@ -49,19 +50,27 @@ public isolated client class MessageSender {
     @display {label: "Send Message"}
     isolated remote function send(@display {label: "Message"} Message message) returns error? {
         error? response;
-        if message.body is byte[] {
-            response = check send(self.senderHandle, message.body, message?.contentType, 
-                message?.messageId, message?.to, message?.replyTo, message?.replyToSessionId, message?.label, 
-                message?.sessionId, message?.correlationId, message?.partitionKey, message?.timeToLive, 
-                message?.applicationProperties?.properties);
-        } else {
-            byte[] messageBodyAsByteArray = message.body.toString().toBytes();
-            response = check send(self.senderHandle, messageBodyAsByteArray, message?.contentType, 
-                message?.messageId, message?.to, message?.replyTo, message?.replyToSessionId, message?.label, 
-                message?.sessionId, message?.correlationId, message?.partitionKey, message?.timeToLive, 
-                message?.applicationProperties?.properties);
-        }
+        response = check send(self.senderHandle, message);
         return response;
+    }
+
+    # Sends a scheduled message to the Azure Service Bus entity this sender is connected to. 
+    # A scheduled message is enqueued and made available to receivers only at the scheduled enqueue time.
+    #
+    # + message - Message to be scheduled  
+    # + scheduledEnqueueTime - Datetime at which the message should appear in the Service Bus queue or topic
+    # + return - The sequence number of the scheduled message which can be used to cancel the scheduling of the message
+    isolated remote function schedule(@display {label: "Message"} Message message,
+            time:Civil scheduledEnqueueTime) returns int|error {
+        return schedule(self.senderHandle, message, scheduledEnqueueTime);
+    }
+
+    # Cancels the enqueuing of a scheduled message, if they are not already enqueued.
+    #
+    # + sequenceNumber - The sequence number of the message to cancel
+    # + return - If the message could not be cancelled
+    isolated remote function cancel(@display {label: "Sequence Number"} int sequenceNumber) returns error? {
+        return cancel(self.senderHandle, sequenceNumber);
     }
 
     # Send batch of messages to queue or topic.
@@ -98,14 +107,19 @@ isolated function initMessageSender(handle connectionString, handle entityType, 
     paramTypes: ["java.lang.String", "java.lang.String", "java.lang.String", "java.lang.String"]
 } external;
 
-isolated function send(handle senderHandle, string|xml|json|byte[] body, string? contentType, 
-                       string? messageId, string? to, string? replyTo, string? replyToSessionId, string? label, 
-                       string? sessionId, string? correlationId, string? partitionKey, int? timeToLive, 
-                       map<any>? properties) returns error? = @java:Method {
+isolated function send(handle senderHandle, Message message) returns error? = @java:Method {
     'class: "org.ballerinax.asb.sender.MessageSender"
 } external;
 
 isolated function sendBatch(handle senderHandle, MessageBatch messages) returns error? = @java:Method {
+    'class: "org.ballerinax.asb.sender.MessageSender"
+} external;
+
+isolated function schedule(handle senderHandle, Message message, time:Civil scheduleTime) returns int|error = @java:Method {
+    'class: "org.ballerinax.asb.sender.MessageSender"
+} external;
+
+isolated function cancel(handle senderHandle, int sequenceNumber) returns error? = @java:Method {
     'class: "org.ballerinax.asb.sender.MessageSender"
 } external;
 

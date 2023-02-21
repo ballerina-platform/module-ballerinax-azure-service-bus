@@ -257,7 +257,7 @@ public class MessageReceiver {
         map.put("deadLetterSource", StringUtils.fromString(receivedMessage.getDeadLetterSource()));
         map.put("state", StringUtils.fromString(receivedMessage.getState().toString()));
         BMap<BString, Object> applicationProperties = ValueCreator.createRecordValue(ModuleUtils.getModule(),
-                ASBConstants.APPLICATION_PROPERTIES);
+                ASBConstants.APPLICATION_PROPERTY_TYPE);
         Object appProperties = ASBUtils.toBMap(receivedMessage.getApplicationProperties());
         map.put("applicationProperties", ValueCreator.createRecordValue(applicationProperties, appProperties));
         BMap<BString, Object> createRecordValue = ValueCreator.createRecordValue(ModuleUtils.getModule(),
