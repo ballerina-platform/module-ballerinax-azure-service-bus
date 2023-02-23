@@ -112,7 +112,7 @@ public class ASBUtils {
      * @param map Input BMap used to convert to Map.
      * @return Converted Map object.
      */
-    public static Map<String, Object> toMap(BMap map) {
+    public static Map<String, Object> toMap(BMap<BString, Object> map) {
         Map<String, Object> returnMap = new HashMap<>();
         Object value;
         String classType;
@@ -164,7 +164,7 @@ public class ASBUtils {
      * @param map Input BMap used to convert to Map.
      * @return Converted Map object.
      */
-    public static Map<String, Object> toObjectMap(BMap map) {
+    public static Map<String, Object> toObjectMap(BMap<BString, Object> map) {
         Map<String, Object> returnMap = new HashMap<>();
         if (map != null) {
             for (Object aKey : map.getKeys()) {
