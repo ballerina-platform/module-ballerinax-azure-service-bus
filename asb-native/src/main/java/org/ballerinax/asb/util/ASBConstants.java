@@ -28,7 +28,7 @@ public class ASBConstants {
 
     // Message constant fields
     public static final String MESSAGE_RECORD = "Message";
-    public static final String APPLICATION_PROPERTIES = "ApplicationProperties";
+    public static final String APPLICATION_PROPERTY_TYPE = "ApplicationProperties";
     // Message content data binding errors
     public static final String XML_CONTENT_ERROR = "Error while retrieving the xml content of the message. ";
     public static final String JSON_CONTENT_ERROR = "Error while retrieving the json content of the message. ";
@@ -56,6 +56,9 @@ public class ASBConstants {
     public static final String TIME_TO_LIVE = "timeToLive";
     public static final String PARTITION_KEY = "partitionKey";
     public static final int DEFAULT_TIME_TO_LIVE = 60; // In seconds
+    public static final String APPLICATION_PROPERTY_KEY = "applicationProperties";
+    public static final String APPLICATION_PROPERIES = "properties";
+
     // listener constant fields
     public static final String CONSUMER_SERVICES = "consumer_services";
     public static final String ASB_CALLER = "asb_caller";

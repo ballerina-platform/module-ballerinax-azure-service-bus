@@ -24,10 +24,18 @@ import com.azure.messaging.servicebus.ServiceBusMessage;
 import com.azure.messaging.servicebus.ServiceBusMessageBatch;
 import com.azure.messaging.servicebus.ServiceBusSenderClient;
 import com.azure.messaging.servicebus.models.CreateMessageBatchOptions;
+
+import io.ballerina.runtime.api.TypeTags;
+import io.ballerina.runtime.api.types.Type;
+import io.ballerina.runtime.api.utils.StringUtils;
+import io.ballerina.runtime.api.utils.TypeUtils;
 import io.ballerina.runtime.api.values.BArray;
+import io.ballerina.runtime.api.values.BDecimal;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BString;
 import java.time.Duration;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
@@ -73,52 +81,69 @@ public class MessageSender {
         log.debug("ServiceBusSenderClient initialized");
     }
 
-    /**
-     * Send Message with configurable parameters when Sender Connection is given as
-     * a parameter and
-     * message content as a byte array.
-     *
-     * @param body             Input message content as byte array
-     * @param contentType      Input message content type
-     * @param messageId        Input Message ID
-     * @param to               Input Message to
-     * @param replyTo          Input Message reply to
-     * @param replyToSessionId Identifier of the session to reply to
-     * @param label            Input Message label
-     * @param sessionId        Input Message session Id
-     * @param correlationId    Input Message correlationId
-     * @param timeToLive       Input Message time to live in minutes
-     * @param properties       Input Message properties
-     * @return An error if failed send the message.
-     */
-    public Object send(Object body, Object contentType, Object messageId,
-            Object to, Object replyTo, Object replyToSessionId, Object label, Object sessionId,
-            Object correlationId, Object partitionKey, Object timeToLive, Object properties) {
+    public Object send(BMap<BString, Object> message) {
         try {
-            byte[] byteArray = ((BArray) body).getBytes();
-            ServiceBusMessage asbMessage = new ServiceBusMessage(byteArray);
-            asbMessage.setContentType(ASBUtils.convertString(contentType));
-            asbMessage.setMessageId(ASBUtils.convertString(messageId));
-            asbMessage.setTo(ASBUtils.convertString(to));
-            asbMessage.setReplyTo(ASBUtils.convertString(replyTo));
-            asbMessage.setReplyToSessionId(ASBUtils.convertString(replyToSessionId));
-            asbMessage.setSubject(ASBUtils.convertString(label));
-            asbMessage.setSessionId(ASBUtils.convertString(sessionId));
-            asbMessage.setCorrelationId(ASBUtils.convertString(correlationId));
-            asbMessage.setPartitionKey(ASBUtils.convertString(partitionKey));
-            if (timeToLive != null) {
-                asbMessage.setTimeToLive(Duration.ofSeconds((long) timeToLive));
-            }
-            Map<String, Object> map = ASBUtils.toMap((BMap) properties);
-            asbMessage.getApplicationProperties().putAll(map);
-            sender.sendMessage(asbMessage);
+            ServiceBusMessage messageToSend = constructMessage(message);
+            sender.sendMessage(messageToSend);
             if (log.isDebugEnabled()) {
-                log.debug("Sent the message successfully");
+                log.debug("Sent the message successfully. Message Id = " + messageToSend.getMessageId());
             }
             return null;
         } catch (ServiceBusException e) {
             return ASBUtils.returnErrorValue(e.getClass().getSimpleName(), e);
         }
+    }
+
+    public Object schedule(BMap<BString, Object> message, BMap<BString, Object> scheduleTime) {
+        try {
+            ServiceBusMessage messageToSend = constructMessage(message);
+            Long sequenceNumber = sender.scheduleMessage(messageToSend, constrcutOffset(scheduleTime));
+            if (log.isDebugEnabled()) {
+                log.debug("Scheduled the message successfully. Message Id = " + messageToSend.getMessageId());
+            }
+            return sequenceNumber;
+        } catch (ServiceBusException e) {
+            return ASBUtils.returnErrorValue(e.getClass().getSimpleName(), e);
+        }
+    }
+
+    public Object cancel(long sequenceNumber) {
+        try {
+            sender.cancelScheduledMessage(sequenceNumber);
+            if(log.isDebugEnabled()) {
+                log.debug("Successfully cancelled scheduled message with sequenceNumber = " + sequenceNumber);
+            }
+            return null;
+        } catch (IllegalArgumentException | ServiceBusException | IllegalStateException e) {
+            return ASBUtils.returnErrorValue(e.getClass().getSimpleName(), e);
+        }
+    }
+
+    private OffsetDateTime constrcutOffset(BMap<BString, Object> scheduleTime) {
+
+        int year = ((Long) scheduleTime.get(StringUtils.fromString("year"))).intValue();
+        int month = ((Long) scheduleTime.get(StringUtils.fromString("month"))).intValue();
+        int day = ((Long) scheduleTime.get(StringUtils.fromString("day"))).intValue();
+        int hour = ((Long) scheduleTime.get(StringUtils.fromString("hour"))).intValue();
+        int minute = ((Long) scheduleTime.get(StringUtils.fromString("minute"))).intValue();
+        int seconds = 0;
+        int zoneOffsetHours = 0;
+        int zoneOffsetMinutes = 0;
+
+        if (scheduleTime.containsKey(StringUtils.fromString("second"))) {
+            BDecimal secondsAsObject = (BDecimal) scheduleTime.get(StringUtils.fromString("second"));
+            seconds = secondsAsObject.byteValue();
+        }
+
+        if (scheduleTime.containsKey(StringUtils.fromString("utcOffset"))) {
+            BMap<BString, Object> utcOffsetBMap = (BMap<BString, Object>) scheduleTime
+                    .get(StringUtils.fromString("utcOffset"));
+            zoneOffsetHours = (int) utcOffsetBMap.get(StringUtils.fromString("hours"));
+            zoneOffsetMinutes = (int) utcOffsetBMap.get(StringUtils.fromString("minutes"));
+        }
+
+        ZoneOffset zoneOffset = ZoneOffset.ofHoursMinutes(zoneOffsetHours, zoneOffsetMinutes);
+        return OffsetDateTime.of(year, month, day, hour, minute, seconds, 0, zoneOffset);
     }
 
     /**
@@ -131,33 +156,12 @@ public class MessageSender {
      */
     public Object sendBatch(BMap<BString, Object> messages) {
         try {
-            Map<String, Object> messagesMap = ASBUtils.toObjectMap((BMap) messages);
+            Map<String, Object> messagesMap = ASBUtils.toObjectMap((BMap<BString, Object>) messages);
             BArray messageArray = (BArray) messagesMap.get("messages");
             Collection<ServiceBusMessage> messageBatch = new ArrayList<>();
             for (int i = 0; i < messageArray.getLength(); i++) {
-                BMap messageBMap = (BMap) messageArray.get(i);
-                Map<String, Object> messageMap = ASBUtils.toObjectMap(messageBMap);
-                byte[] byteArray = ((BArray) messageMap.get(ASBConstants.BODY)).getBytes();
-                ServiceBusMessage asbMessage = new ServiceBusMessage(byteArray);
-                asbMessage.setContentType(ASBUtils.convertString(messageMap, ASBConstants.CONTENT_TYPE));
-                asbMessage
-                        .setMessageId(ASBUtils.convertString(messageMap.get(ASBConstants.MESSAGE_ID)));
-                asbMessage.setTo(ASBUtils.convertString(messageMap, ASBConstants.TO));
-                asbMessage.setReplyTo(ASBUtils.convertString(messageMap, ASBConstants.REPLY_TO));
-                asbMessage.setReplyToSessionId(
-                        ASBUtils.convertString(messageMap, ASBConstants.REPLY_TO_SESSION_ID));
-                asbMessage.setSubject(ASBUtils.convertString(messageMap, ASBConstants.LABEL));
-                asbMessage.setSessionId(ASBUtils.convertString(messageMap, ASBConstants.SESSION_ID));
-                asbMessage
-                        .setCorrelationId(ASBUtils.convertString(messageMap, ASBConstants.CORRELATION_ID));
-                asbMessage
-                        .setPartitionKey(ASBUtils.convertString(messageMap, ASBConstants.PARTITION_KEY));
-                if (messageMap.get(ASBConstants.TIME_TO_LIVE) != null) {
-                    asbMessage
-                            .setTimeToLive(Duration.ofSeconds((long) messageMap.get(ASBConstants.TIME_TO_LIVE)));
-                }
-                Map<String, Object> map = ASBUtils.toMap((BMap) messageMap.get(ASBConstants.APPLICATION_PROPERTIES));
-                asbMessage.getApplicationProperties().putAll(map);
+                BMap<BString, Object> messageBMap = (BMap<BString, Object>) messageArray.get(i);
+                ServiceBusMessage asbMessage = constructMessage(messageBMap);
                 messageBatch.add(asbMessage);
             }
             ServiceBusMessageBatch currentBatch = sender.createMessageBatch(new CreateMessageBatchOptions());
@@ -165,7 +169,6 @@ public class MessageSender {
                 if (currentBatch.tryAddMessage(message)) {
                     continue;
                 }
-                
                 // The batch is full, so we create a new batch and send the batch.
                 sender.sendMessages(currentBatch);
                 currentBatch = sender.createMessageBatch();
@@ -180,11 +183,80 @@ public class MessageSender {
                 }
             }
             sender.sendMessages(currentBatch);
-            log.debug("Sent the batch message successfully");
+            if (log.isDebugEnabled()) {
+                log.debug("Sent the batch message successfully");
+            }
             return null;
         } catch (ServiceBusException e) {
             return ASBUtils.returnErrorValue(e.getClass().getSimpleName(), e);
         }
+    }
+
+    private ServiceBusMessage constructMessage(BMap<BString, Object> message) {
+
+        Object messageBody = message.get(StringUtils.fromString(ASBConstants.BODY));
+        byte[] byteArray;
+        Type type = TypeUtils.getType(messageBody);
+        if (type.getTag() == TypeTags.STRING_TAG) {
+            byteArray = ((BString) messageBody).toString().getBytes();
+        } else if (type.getTag() == TypeTags.INT_TAG) {
+            byteArray = Integer.toString((int) messageBody).getBytes();
+        } else {
+            byteArray = ((BArray) messageBody).getBytes();
+        }
+
+        ServiceBusMessage asbMessage = new ServiceBusMessage(byteArray);
+
+        if (message.containsKey(StringUtils.fromString(ASBConstants.CONTENT_TYPE))) {
+            String contentType = message.getStringValue(StringUtils.fromString(ASBConstants.CONTENT_TYPE)).getValue();
+            asbMessage.setContentType(contentType);
+        }
+        if (message.containsKey(StringUtils.fromString(ASBConstants.MESSAGE_ID))) {
+            String messageId = message.getStringValue(StringUtils.fromString(ASBConstants.MESSAGE_ID)).getValue();
+            asbMessage.setMessageId(messageId);
+        }
+        if (message.containsKey(StringUtils.fromString(ASBConstants.TO))) {
+            String to = message.getStringValue(StringUtils.fromString(ASBConstants.TO)).getValue();
+            asbMessage.setTo(to);
+        }
+        if (message.containsKey(StringUtils.fromString(ASBConstants.REPLY_TO))) {
+            String replyTo = message.getStringValue(StringUtils.fromString(ASBConstants.REPLY_TO)).getValue();
+            asbMessage.setReplyTo(replyTo);
+        }
+        if (message.containsKey(StringUtils.fromString(ASBConstants.REPLY_TO_SESSION_ID))) {
+            String replyToSessionId = message.getStringValue(StringUtils.fromString(ASBConstants.REPLY_TO_SESSION_ID))
+                    .getValue();
+            asbMessage.setReplyToSessionId(replyToSessionId);
+        }
+        if (message.containsKey(StringUtils.fromString(ASBConstants.LABEL))) {
+            String subject = message.getStringValue(StringUtils.fromString(ASBConstants.LABEL)).getValue();
+            asbMessage.setSubject(subject);
+        }
+        if (message.containsKey(StringUtils.fromString(ASBConstants.SESSION_ID))) {
+            String sessionId = message.getStringValue(StringUtils.fromString(ASBConstants.SESSION_ID)).getValue();
+            asbMessage.setSessionId(sessionId);
+        }
+        if (message.containsKey(StringUtils.fromString(ASBConstants.CORRELATION_ID))) {
+            String correlationId = message.getStringValue(StringUtils.fromString(ASBConstants.CORRELATION_ID))
+                    .getValue();
+            asbMessage.setCorrelationId(correlationId);
+        }
+        if (message.containsKey(StringUtils.fromString(ASBConstants.PARTITION_KEY))) {
+            String partitionKey = message.getStringValue(StringUtils.fromString(ASBConstants.PARTITION_KEY)).getValue();
+            asbMessage.setPartitionKey(partitionKey);
+        }
+        if (message.containsKey(StringUtils.fromString(ASBConstants.TIME_TO_LIVE))) {
+            long timeToLive = message.getIntValue(StringUtils.fromString(ASBConstants.TIME_TO_LIVE));
+            asbMessage.setTimeToLive(Duration.ofSeconds(timeToLive));
+        }
+        if (message.containsKey(StringUtils.fromString(ASBConstants.APPLICATION_PROPERTY_KEY))) {
+            BMap<BString, Object> propertyBMap = (BMap<BString, Object>) message.get(StringUtils.fromString(ASBConstants.APPLICATION_PROPERTY_KEY));
+            Object propertyMap = (BMap<BString, Object>) propertyBMap.get(StringUtils.fromString(ASBConstants.APPLICATION_PROPERIES));
+            Map<String, Object> map = ASBUtils.toMap((BMap)propertyMap);
+            asbMessage.getApplicationProperties().putAll(map);
+        }
+
+        return asbMessage;
     }
 
     /**
@@ -195,7 +267,7 @@ public class MessageSender {
     public Object closeSender() {
         try {
             sender.close();
-            log.debug("Closed the sender");
+            log.debug("Closed the sender. Idetifier=" + sender.getIdentifier());
             return null;
         } catch (Exception e) {
             return ASBUtils.returnErrorValue(e.getClass().getSimpleName(), e);

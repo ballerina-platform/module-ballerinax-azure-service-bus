@@ -42,8 +42,8 @@ public const BYTE_ARRAY = "application/octet-stream";
 #                   TopicSubsConfig or a QueueConfig record  
 # + receiveMode - This field holds the receive modes(RECEIVE_AND_DELETE/PEEK_LOCK) for the connection. The receive mode determines how messages are 
 # retrieved from the entity. The default value is PEEK_LOCK  
-# + maxAutoLockRenewDuration - Max lock renewal duration under PEEK_LOCK mode. Setting to 0 disables auto-renewal (default). 
-#                              For RECEIVE_AND_DELETE mode, auto-renewal is disabled.
+# + maxAutoLockRenewDuration - Max lock renewal duration under PEEK_LOCK mode in seconds. Setting to 0 disables auto-renewal. 
+#                              For RECEIVE_AND_DELETE mode, auto-renewal is disabled. Default 300 seconds.
 @display {label: "Receiver Connection Config"}
 public type ASBServiceReceiverConfig record {
     @display {label: "ConnectionString"}
@@ -53,7 +53,7 @@ public type ASBServiceReceiverConfig record {
     @display {label: "Receive Mode"}
     ReceiveMode receiveMode = PEEK_LOCK;
     @display {label: "Max Auto Lock Renew Duration"}
-    int maxAutoLockRenewDuration = 0;
+    int maxAutoLockRenewDuration = 300;
 };
 
 # This record holds the configuration details of a topic and its associated subscription in Azure Service Bus

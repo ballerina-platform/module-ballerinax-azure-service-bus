@@ -17,6 +17,7 @@
 import ballerina/log;
 import ballerina/os;
 import ballerina/test;
+import ballerina/time;
 
 // Connection Configurations
 configurable string connectionString = os:getEnv("CONNECTION_STRING");
@@ -548,4 +549,62 @@ function testDeferMessageFromSubscriptionOperation() returns error? {
 
     log:printInfo("Closing Asb receiver client.");
     check subscriptionReceiver->close();
+}
+
+@test:Config {
+    groups: ["asb"],
+    dependsOn: [testDeferMessageFromSubscriptionOperation],
+    enable: true
+}
+function testMessageScheduling() returns error? {
+
+    MessageSender topicSender;
+    MessageReceiver subscriptionReceiver;
+
+    do {
+
+        log:printInfo("Initializing Asb sender client.");
+        senderConfig.topicOrQueueName = topicName;
+        topicSender = check new (senderConfig);
+
+        log:printInfo("Initializing Asb receiver client.");
+        receiverConfig.entityConfig = {
+            topicName: topicName,
+            subscriptionName: subscriptionName1
+        };
+        receiverConfig.receiveMode = RECEIVE_AND_DELETE;
+        subscriptionReceiver = check new (receiverConfig);
+
+        log:printInfo("Scheduling message via Asb sender client to be enqueued by 15 seconds");
+        time:Utc utcScheduleTime = time:utcAddSeconds(time:utcNow(), 15);
+        time:Civil civilScheduleTime = time:utcToCivil(utcScheduleTime);
+
+        int sequenceNumber = check topicSender->schedule(message1, civilScheduleTime);
+
+        log:printInfo("Scheduled message with sequence ID = " + sequenceNumber.toString());
+        log:printInfo("Receiving from Asb receiver client. Max wait = " + serverWaitTime.toString());
+        Message|error? messageReceived = subscriptionReceiver->receive(serverWaitTime);
+
+        if (messageReceived is Message) {
+            log:printInfo(messageReceived.toString());
+            string msg = check string:fromBytes(<byte[]>messageReceived.body);
+            test:assertEquals(msg, stringContent, msg = "Sent & received message not equal.");
+        } else if (messageReceived is ()) {
+            test:assertFail("Subscription did not receive message within " + serverWaitTime.toString());
+        } else {
+            test:assertFail("Receiving message via Asb receiver connection failed.");
+        }
+    } on fail error e {
+        log:printInfo("Closing Asb sender client.");
+        if (topicSender is MessageSender) {
+            check topicSender->close();
+        }
+        log:printInfo("Closing Asb receiver client.");
+        if (subscriptionReceiver is MessageReceiver) {
+            check subscriptionReceiver->close();
+        }
+        return error("Error while executing test testMessageScheduling", e);
+    }
+
+
 }
