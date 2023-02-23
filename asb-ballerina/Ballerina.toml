@@ -2,7 +2,7 @@
 distribution = "2201.3.1"
 org = "ballerinax"
 name = "asb"
-version = "3.0.2"
+version = "3.0.3"
 license= ["Apache-2.0"]
 authors = ["Ballerina"]
 keywords = ["IT Operations/Message Brokers", "Cost/Paid", "Vendor/Microsoft"]
@@ -13,9 +13,9 @@ repository = "https://github.com/ballerina-platform/module-ballerinax-azure-serv
 observabilityIncluded = true
 
 [[platform.java11.dependency]]
-path = "../asb-native/build/libs/asb-native-3.0.2.jar"
+path = "../asb-native/build/libs/asb-native-3.0.3.jar"
 groupId = "org.ballerinax"
 artifactId = "asb-native"
 module = "asb-native" 
-version = "3.0.2"
+version = "3.0.3"
 
