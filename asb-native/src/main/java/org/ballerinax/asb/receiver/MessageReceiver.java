@@ -23,12 +23,19 @@ import com.azure.core.amqp.models.AmqpMessageBodyType;
 import com.azure.core.util.IterableStream;
 import com.azure.messaging.servicebus.ServiceBusClientBuilder;
 import com.azure.messaging.servicebus.ServiceBusException;
+import com.azure.messaging.servicebus.ServiceBusMessage;
 import com.azure.messaging.servicebus.ServiceBusReceivedMessage;
 import com.azure.messaging.servicebus.ServiceBusReceiverClient;
 import com.azure.messaging.servicebus.ServiceBusClientBuilder.ServiceBusReceiverClientBuilder;
 import com.azure.messaging.servicebus.models.DeadLetterOptions;
 import com.azure.messaging.servicebus.models.ServiceBusReceiveMode;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.ballerina.runtime.api.PredefinedTypes;
+import io.ballerina.runtime.api.creators.TypeCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
+import io.ballerina.runtime.api.types.ArrayType;
+import io.ballerina.runtime.api.types.MapType;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.utils.TypeUtils;
 import io.ballerina.runtime.api.values.BMap;
@@ -58,6 +65,7 @@ import static org.ballerinax.asb.util.ASBConstants.RECEIVE_AND_DELETE;
  */
 public class MessageReceiver {
     private static final Logger log = Logger.getLogger(MessageReceiver.class);
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private ServiceBusReceiverClient receiver;
 
     /**
@@ -256,14 +264,27 @@ public class MessageReceiver {
         map.put("deadLetterReason", StringUtils.fromString(receivedMessage.getDeadLetterReason()));
         map.put("deadLetterSource", StringUtils.fromString(receivedMessage.getDeadLetterSource()));
         map.put("state", StringUtils.fromString(receivedMessage.getState().toString()));
-        BMap<BString, Object> applicationProperties = ValueCreator.createRecordValue(ModuleUtils.getModule(),
-                ASBConstants.APPLICATION_PROPERTY_TYPE);
-        Object appProperties = ASBUtils.toBMap(receivedMessage.getApplicationProperties());
-        map.put("applicationProperties", ValueCreator.createRecordValue(applicationProperties, appProperties));
+        map.put("applicationProperties", getApplicationProperties(receivedMessage));
         BMap<BString, Object> createRecordValue = ValueCreator.createRecordValue(ModuleUtils.getModule(),
                 ASBConstants.MESSAGE_RECORD, map);
         endpointClient.addNativeData(receivedMessage.getLockToken(), receivedMessage);
         return createRecordValue;
+    }
+
+    private static BMap<BString, Object> getApplicationProperties(ServiceBusReceivedMessage message)
+            throws JsonProcessingException {
+        BMap<BString, Object> applicationPropertiesRecord = ValueCreator.createRecordValue(ModuleUtils.getModule(),
+                ASBConstants.APPLICATION_PROPERTY_TYPE);
+        ArrayType byteArrayType = TypeCreator.createArrayType(PredefinedTypes.TYPE_BYTE);
+        MapType mapType = TypeCreator.createMapType(byteArrayType);
+        BMap<BString, Object> applicationProperties = ValueCreator.createMapValue(mapType);
+        for (Map.Entry<String, Object> property: message.getApplicationProperties().entrySet()) {
+            String propertyKey = property.getKey();
+            byte[] propertyValue = OBJECT_MAPPER.writeValueAsBytes(property.getValue());
+            applicationProperties.put(
+                    StringUtils.fromString(propertyKey), ValueCreator.createArrayValue(propertyValue));
+        }
+        return ValueCreator.createRecordValue(applicationPropertiesRecord, applicationProperties);
     }
 
     /**
