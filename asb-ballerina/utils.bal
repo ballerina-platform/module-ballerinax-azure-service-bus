@@ -19,8 +19,8 @@
 # + message - Represents a message that contains application properties
 # + name - Represents the name of the application property that the user wants to retrieve.
 # + return - Returns null if the requested property does not exist
-public isolated function getApplicationPropertyByName(Message message, string name) returns any|error? {
+public isolated function getApplicationPropertyByName(Message message, string name) returns anydata|error? {
         ApplicationProperties applicationPropertiesResult = check message.applicationProperties.ensureType();
-        map<any> properties = check applicationPropertiesResult.properties.ensureType();
+        map<anydata> properties = check applicationPropertiesResult.properties.ensureType();
         return properties[name];
 }
