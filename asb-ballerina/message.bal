@@ -91,5 +91,5 @@ public type Message record {|
 @display {label: "Application Properties"}
 public type ApplicationProperties record {|
     @display {label: "Properties"}
-    map<any> properties?;
+    map<byte[]> properties?;
 |};
