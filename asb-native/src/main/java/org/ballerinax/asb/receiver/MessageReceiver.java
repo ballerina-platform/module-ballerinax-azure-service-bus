@@ -23,18 +23,15 @@ import com.azure.core.amqp.models.AmqpMessageBodyType;
 import com.azure.core.util.IterableStream;
 import com.azure.messaging.servicebus.ServiceBusClientBuilder;
 import com.azure.messaging.servicebus.ServiceBusException;
-import com.azure.messaging.servicebus.ServiceBusMessage;
 import com.azure.messaging.servicebus.ServiceBusReceivedMessage;
 import com.azure.messaging.servicebus.ServiceBusReceiverClient;
 import com.azure.messaging.servicebus.ServiceBusClientBuilder.ServiceBusReceiverClientBuilder;
 import com.azure.messaging.servicebus.models.DeadLetterOptions;
 import com.azure.messaging.servicebus.models.ServiceBusReceiveMode;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.ballerina.runtime.api.PredefinedTypes;
 import io.ballerina.runtime.api.creators.TypeCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
-import io.ballerina.runtime.api.types.ArrayType;
 import io.ballerina.runtime.api.types.MapType;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.utils.TypeUtils;
@@ -271,20 +268,40 @@ public class MessageReceiver {
         return createRecordValue;
     }
 
-    private static BMap<BString, Object> getApplicationProperties(ServiceBusReceivedMessage message)
-            throws JsonProcessingException {
+    private static BMap<BString, Object> getApplicationProperties(ServiceBusReceivedMessage message) {
         BMap<BString, Object> applicationPropertiesRecord = ValueCreator.createRecordValue(ModuleUtils.getModule(),
                 ASBConstants.APPLICATION_PROPERTY_TYPE);
-        ArrayType byteArrayType = TypeCreator.createArrayType(PredefinedTypes.TYPE_BYTE);
-        MapType mapType = TypeCreator.createMapType(byteArrayType);
+        MapType mapType = TypeCreator.createMapType(PredefinedTypes.TYPE_ANYDATA);
         BMap<BString, Object> applicationProperties = ValueCreator.createMapValue(mapType);
         for (Map.Entry<String, Object> property: message.getApplicationProperties().entrySet()) {
-            String propertyKey = property.getKey();
-            byte[] propertyValue = OBJECT_MAPPER.writeValueAsBytes(property.getValue());
-            applicationProperties.put(
-                    StringUtils.fromString(propertyKey), ValueCreator.createArrayValue(propertyValue));
+            populateApplicationProperty(applicationProperties, property.getKey(), property.getValue());
         }
         return ValueCreator.createRecordValue(applicationPropertiesRecord, applicationProperties);
+    }
+    private static void populateApplicationProperty(BMap<BString, Object> applicationProperties,
+                                                    String key, Object value) {
+        BString propertyKey = StringUtils.fromString(key);
+        if (value instanceof String) {
+            applicationProperties.put(propertyKey, StringUtils.fromString((String) value));
+        } else if (value instanceof Integer) {
+            applicationProperties.put(propertyKey, (Integer) value);
+        } else if (value instanceof Long) {
+            applicationProperties.put(propertyKey, (Long) value);
+        } else if (value instanceof Float) {
+            applicationProperties.put(propertyKey, (Float) value);
+        } else if (value instanceof Double) {
+            applicationProperties.put(propertyKey, (Double) value);
+        } else if (value instanceof Boolean) {
+            applicationProperties.put(propertyKey, (Boolean) value);
+        } else if (value instanceof Character) {
+            applicationProperties.put(propertyKey, (Character) value);
+        } else if (value instanceof Byte) {
+            applicationProperties.put(propertyKey, (Byte) value);
+        } else if (value instanceof Short) {
+            applicationProperties.put(propertyKey, (Short) value);
+        } else {
+            applicationProperties.put(propertyKey, StringUtils.fromString(value.toString()));
+        }
     }
 
     /**
