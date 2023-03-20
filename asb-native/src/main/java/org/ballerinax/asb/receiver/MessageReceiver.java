@@ -18,6 +18,8 @@
 
 package org.ballerinax.asb.receiver;
 
+import com.azure.core.amqp.AmqpRetryMode;
+import com.azure.core.amqp.AmqpRetryOptions;
 import com.azure.core.amqp.models.AmqpAnnotatedMessage;
 import com.azure.core.amqp.models.AmqpMessageBodyType;
 import com.azure.core.util.IterableStream;
@@ -35,6 +37,7 @@ import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.MapType;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.utils.TypeUtils;
+import io.ballerina.runtime.api.values.BDecimal;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
@@ -54,7 +57,12 @@ import org.ballerinax.asb.util.ASBConstants;
 import org.ballerinax.asb.util.ASBUtils;
 import org.ballerinax.asb.util.ModuleUtils;
 
+import static org.ballerinax.asb.util.ASBConstants.DELAY;
+import static org.ballerinax.asb.util.ASBConstants.MAX_DELAY;
+import static org.ballerinax.asb.util.ASBConstants.MAX_RETRIES;
 import static org.ballerinax.asb.util.ASBConstants.RECEIVE_AND_DELETE;
+import static org.ballerinax.asb.util.ASBConstants.RETRY_MODE;
+import static org.ballerinax.asb.util.ASBConstants.TRY_TIMEOUT;
 
 /**
  * This facilitates the client operations of MessageReceiver client in
@@ -81,11 +89,13 @@ public class MessageReceiver {
      *                              thread interruption.
      */
     public MessageReceiver(String connectionString, String queueName, String topicName, String subscriptionName,
-            String receiveMode, long maxAutoLockRenewDuration, String logLevel)
+            String receiveMode, long maxAutoLockRenewDuration, String logLevel, BMap<BString, Object> retryConfigs)
             throws ServiceBusException, InterruptedException {
         log.setLevel(Level.toLevel(logLevel, Level.OFF));
+        AmqpRetryOptions retryOptions = getRetryOptions(retryConfigs);
         ServiceBusReceiverClientBuilder receiverClientBuilder = new ServiceBusClientBuilder()
                 .connectionString(connectionString)
+                .retryOptions(retryOptions)
                 .receiver();
         if (!queueName.isEmpty()) {
             if (Objects.equals(receiveMode, RECEIVE_AND_DELETE)) {
@@ -119,6 +129,20 @@ public class MessageReceiver {
             }
         }
         log.debug("ServiceBusReceiverClient initialized");
+    }
+
+    private AmqpRetryOptions getRetryOptions(BMap<BString, Object> retryConfigs) {
+        Long maxRetries = retryConfigs.getIntValue(MAX_RETRIES);
+        BigDecimal delayConfig = ((BDecimal) retryConfigs.get(DELAY)).decimalValue();
+        BigDecimal maxDelay = ((BDecimal) retryConfigs.get(MAX_DELAY)).decimalValue();
+        BigDecimal tryTimeout = ((BDecimal) retryConfigs.get(TRY_TIMEOUT)).decimalValue();
+        String retryMode = retryConfigs.getStringValue(RETRY_MODE).getValue();
+        return new AmqpRetryOptions()
+                .setMaxRetries(maxRetries.intValue())
+                .setDelay(Duration.ofSeconds(delayConfig.intValue()))
+                .setMaxDelay(Duration.ofSeconds(maxDelay.intValue()))
+                .setTryTimeout(Duration.ofSeconds(tryTimeout.intValue()))
+                .setMode(AmqpRetryMode.valueOf(retryMode));
     }
 
     /**

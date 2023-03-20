@@ -20,7 +20,7 @@ import ballerina/jballerina.java as java;
 # Service Bus API provides data access to highly reliable queues and publish/subscribe topics of Azure Service Bus with deep feature capabilities.
 @display {label: "Azure Service Bus Message Receiver", iconPath: "icon.png"}
 public isolated client class MessageReceiver {
-
+    
     private  string connectionString;
     private string queueName;
     private string subscriptionName;
@@ -49,13 +49,12 @@ public isolated client class MessageReceiver {
             self.subscriptionName = topicSubsConfig.subscriptionName;
             self.queueName = EMPTY_STRING;
         }
-        
         self.receiveMode = config.receiveMode;
         self.maxAutoLockRenewDuration = config.maxAutoLockRenewDuration;
         self.logLevel = customConfiguration.logLevel;
         self.receiverHandle = check initMessageReceiver(java:fromString(self.connectionString), 
         java:fromString(self.queueName),java:fromString(self.topicName), java:fromString(self.subscriptionName), 
-        java:fromString(self.receiveMode), self.maxAutoLockRenewDuration, java:fromString(self.logLevel));
+        java:fromString(self.receiveMode), self.maxAutoLockRenewDuration, java:fromString(self.logLevel), config.amqpRetryOptions);
     }
 
     # Receive message from queue or subscription.
@@ -190,10 +189,10 @@ public isolated client class MessageReceiver {
 }
 
 isolated function initMessageReceiver(handle connectionString, handle queueName, handle topicName, 
-        handle subscriptionName, handle receiveMode, int maxAutoLockRenewDuration, handle isLogActive) returns handle|error = @java:Constructor {
+        handle subscriptionName, handle receiveMode, int maxAutoLockRenewDuration, handle isLogActive, AmqpRetryOptions retryOptions) returns handle|error = @java:Constructor {
     'class: "org.ballerinax.asb.receiver.MessageReceiver",
     paramTypes: ["java.lang.String", "java.lang.String", "java.lang.String", "java.lang.String", "java.lang.String",
-                 "long","java.lang.String"]
+                 "long","java.lang.String", "io.ballerina.runtime.api.values.BMap"]
 } external;
 
 isolated function receive(handle receiverHandle, MessageReceiver endpointClient, int? serverWaitTime) returns Message|error? = @java:Method {
