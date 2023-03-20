@@ -88,7 +88,7 @@ public class MessageReceiver {
             String receiveMode, long maxAutoLockRenewDuration, String logLevel, BMap<BString, Object> retryConfigs)
             throws ServiceBusException, InterruptedException {
         log.setLevel(Level.toLevel(logLevel, Level.OFF));
-        AmqpRetryOptions retryOptions = getRetryOptions(receiverConfig);
+        AmqpRetryOptions retryOptions = getRetryOptions(retryConfigs);
         ServiceBusReceiverClientBuilder receiverClientBuilder = new ServiceBusClientBuilder()
                 .connectionString(connectionString)
                 .retryOptions(retryOptions)
