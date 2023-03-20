@@ -35,7 +35,7 @@ public isolated client class MessageReceiver {
     # Configure the connection string to have the [required permission](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-sas).
     #
     # + config - Azure service bus receiver configuration.(Default receiver mode is PEEK_LOCK)
-    public isolated function init(ASBServiceReceiverConfig config) returns error? {        
+    public isolated function init(ASBServiceReceiverConfig config) returns error? {
         self.connectionString = config.connectionString;
         if config.entityConfig is QueueConfig {
             QueueConfig queueConfig = check config.entityConfig.ensureType(QueueConfig);
@@ -48,7 +48,6 @@ public isolated client class MessageReceiver {
             self.subscriptionName = topicSubsConfig.subscriptionName;
             self.queueName = EMPTY_STRING;
         }
-
         self.receiveMode = config.receiveMode;
         self.maxAutoLockRenewDuration = config.maxAutoLockRenewDuration;
         self.logLevel = customConfiguration.logLevel;

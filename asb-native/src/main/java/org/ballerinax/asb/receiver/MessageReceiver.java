@@ -141,18 +141,6 @@ public class MessageReceiver {
                 .setMode(AmqpRetryMode.valueOf(retryMode));
     }
 
-    private void updateClientEntityConfig(ServiceBusReceiverClientBuilder clientBuilder,
-                                          BMap<BString, Object> entityConfig) {
-        if (entityConfig.containsKey(QUEUE_NAME)) {
-            clientBuilder
-                    .queueName(entityConfig.getStringValue(QUEUE_NAME).getValue());
-        } else {
-            clientBuilder
-                    .topicName(entityConfig.getStringValue(TOPIC_NAME).getValue())
-                    .subscriptionName(entityConfig.getStringValue(SUBSCRIPTION_NAME).getValue());
-        }
-    }
-
     /**
      * Receive Message with configurable parameters as Map when Receiver Connection
      * is given as a parameter and
