@@ -21,7 +21,13 @@ import ballerina/jballerina.java as java;
 @display {label: "Azure Service Bus Message Receiver", iconPath: "icon.png"}
 public isolated client class MessageReceiver {
     final handle receiverHandle;
-    private final readonly & ASBServiceReceiverConfig receiverConfig;
+    private  string connectionString;
+    private string queueName;
+    private string subscriptionName;
+    private string topicName;
+    private string receiveMode;
+    private int maxAutoLockRenewDuration;
+    private LogLevel logLevel;
 
     # Initializes the connector. During initialization you can pass the [Shared Access Signature (SAS) authentication credentials](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-sas)
     # Create an [Azure account](https://docs.microsoft.com/en-us/learn/modules/create-an-azure-account/) and
@@ -30,8 +36,25 @@ public isolated client class MessageReceiver {
     #
     # + config - Azure service bus receiver configuration.(Default receiver mode is PEEK_LOCK)
     public isolated function init(ASBServiceReceiverConfig config) returns error? {        
-        self.receiverConfig = config.cloneReadOnly();
-        self.receiverHandle = check initMessageReceiver(config, customConfiguration.logLevel);
+        self.connectionString = config.connectionString;
+        if config.entityConfig is QueueConfig {
+            QueueConfig queueConfig = check config.entityConfig.ensureType(QueueConfig);
+            self.queueName = queueConfig.queueName;
+            self.subscriptionName = EMPTY_STRING;
+            self.topicName = EMPTY_STRING;
+        } else {
+            TopicSubsConfig topicSubsConfig = check config.entityConfig.ensureType(TopicSubsConfig);
+            self.topicName = topicSubsConfig.topicName;
+            self.subscriptionName = topicSubsConfig.subscriptionName;
+            self.queueName = EMPTY_STRING;
+        }
+
+        self.receiveMode = config.receiveMode;
+        self.maxAutoLockRenewDuration = config.maxAutoLockRenewDuration;
+        self.logLevel = customConfiguration.logLevel;
+        self.receiverHandle = check initMessageReceiver(java:fromString(self.connectionString), 
+        java:fromString(self.queueName),java:fromString(self.topicName), java:fromString(self.subscriptionName), 
+        java:fromString(self.receiveMode), self.maxAutoLockRenewDuration, java:fromString(self.logLevel), config.amqpRetryOptions);
     }
 
     # Receive message from queue or subscription.
@@ -165,9 +188,11 @@ public isolated client class MessageReceiver {
     }
 }
 
-isolated function initMessageReceiver(ASBServiceReceiverConfig config, string logLevel) returns handle|error = @java:Constructor {
+isolated function initMessageReceiver(handle connectionString, handle queueName, handle topicName, 
+        handle subscriptionName, handle receiveMode, int maxAutoLockRenewDuration, handle isLogActive, AmqpRetryOptions retryOptions) returns handle|error = @java:Constructor {
     'class: "org.ballerinax.asb.receiver.MessageReceiver",
-    paramTypes: ["io.ballerina.runtime.api.values.BMap", "io.ballerina.runtime.api.values.BString"]
+    paramTypes: ["java.lang.String", "java.lang.String", "java.lang.String", "java.lang.String", "java.lang.String",
+                 "long","java.lang.String", "io.ballerina.runtime.api.values.BMap"]
 } external;
 
 isolated function receive(handle receiverHandle, MessageReceiver endpointClient, int? serverWaitTime) returns Message|error? = @java:Method {

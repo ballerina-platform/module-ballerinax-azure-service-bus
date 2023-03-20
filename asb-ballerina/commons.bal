@@ -85,7 +85,7 @@ public type AmqpRetryOptions record {|
     @display {
         label: "Approach to calculated the retry"
     }
-    AmqpRetryMode retryMode = EXPONENTIAL;
+    AmqpRetryMode retryMode = FIXED;
 |};
 
 # The type of approach to apply when calculating the delay between retry attempts.
