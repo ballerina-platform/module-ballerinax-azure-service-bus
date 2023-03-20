@@ -151,13 +151,13 @@ public class MessageReceiver {
 
     private AmqpRetryOptions getRetryOptions(BMap<BString, Object> receiverConfig) {
         BMap<BString, Object> retryConfigs = getMapValue(receiverConfig, AMQP_RETRY_OPTIONS);
-        int maxRetries = (int) retryConfigs.get(MAX_RETRIES);
-        BigDecimal delayConfig = ((BDecimal) receiverConfig.get(DELAY)).decimalValue();
-        BigDecimal maxDelay = ((BDecimal) receiverConfig.get(MAX_DELAY)).decimalValue();
-        BigDecimal tryTimeout = ((BDecimal) receiverConfig.get(TRY_TIMEOUT)).decimalValue();
+        Long maxRetries = retryConfigs.getIntValue(MAX_RETRIES);
+        BigDecimal delayConfig = ((BDecimal) retryConfigs.get(DELAY)).decimalValue();
+        BigDecimal maxDelay = ((BDecimal) retryConfigs.get(MAX_DELAY)).decimalValue();
+        BigDecimal tryTimeout = ((BDecimal) retryConfigs.get(TRY_TIMEOUT)).decimalValue();
         String retryMode = retryConfigs.getStringValue(RETRY_MODE).getValue();
         return new AmqpRetryOptions()
-                .setMaxRetries(maxRetries)
+                .setMaxRetries(maxRetries.intValue())
                 .setDelay(Duration.ofSeconds(delayConfig.intValue()))
                 .setMaxDelay(Duration.ofSeconds(maxDelay.intValue()))
                 .setTryTimeout(Duration.ofSeconds(tryTimeout.intValue()))

@@ -85,7 +85,7 @@ public type AmqpRetryOptions record {|
     @display {
         label: "Approach to calculated the retry"
     }
-    AmqpRetryMode retryMode = RETRY_MODE_EXPONENTIAL;
+    AmqpRetryMode retryMode = EXPONENTIAL;
 |};
 
 # The type of approach to apply when calculating the delay between retry attempts.
@@ -94,12 +94,12 @@ public enum AmqpRetryMode {
     @display {
         label: "Retry on fixed intervals"
     }
-    RETRY_MODE_FIXED,
+    FIXED,
     # Retry attempts will delay based on a backoff strategy, where each attempt will increase the duration that it waits before retrying.
     @display {
         label: "Retry based on a backoff strategy"
     }
-    RETRY_MODE_EXPONENTIAL
+    EXPONENTIAL
 };
 
 # This record holds the configuration details of a topic and its associated subscription in Azure Service Bus
