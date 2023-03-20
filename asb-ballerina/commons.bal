@@ -29,6 +29,14 @@ public const BYTE_ARRAY = "application/octet-stream";
 
 // Azure Service Bus Client API Record Types.
 
+// AmqpRetryOptions retryOptions = new AmqpRetryOptions()
+//         .setMode(AmqpRetryMode.FIXED)
+//         .setMaxRetries(3)
+//         .setDelay(Duration.ofSeconds(1))
+//         .setTryTimeout(Duration.ofSeconds(10))
+//         .setMaxDelay(Duration.ofSeconds(10));
+
+
 # Configurations used to create an `asb:Connection`.
 # 
 # + connectionString - Service bus connection string with Shared Access Signatures  
@@ -44,6 +52,7 @@ public const BYTE_ARRAY = "application/octet-stream";
 # retrieved from the entity. The default value is PEEK_LOCK  
 # + maxAutoLockRenewDuration - Max lock renewal duration under PEEK_LOCK mode in seconds. Setting to 0 disables auto-renewal. 
 #                              For RECEIVE_AND_DELETE mode, auto-renewal is disabled. Default 300 seconds.
+# + amqpRetryOptions - Retry configurations related to underlying AMQP message receiver
 @display {label: "Receiver Connection Config"}
 public type ASBServiceReceiverConfig record {
     @display {label: "ConnectionString"}
@@ -54,6 +63,52 @@ public type ASBServiceReceiverConfig record {
     ReceiveMode receiveMode = PEEK_LOCK;
     @display {label: "Max Auto Lock Renew Duration"}
     int maxAutoLockRenewDuration = 300;
+    @display {label: "AMQP retry configurations"}
+    AmqpRetryOptions amqpRetryOptions = {};
+};
+
+# Set of options that can be specified to influence how the retry attempts are made.
+#
+# + maxRetries - Maximum number of retry attempts  
+# + delay - Delay between retry attempts  
+# + maxDelay - Maximum permissible delay between retry attempts  
+# + tryTimeout - Maximum duration to wait for completion of a single attempt  
+# + retryMode - Approach to use for calculating retry delays
+public type AmqpRetryOptions record {|
+    @display {
+        label: "Max retry attempts"
+    }
+    int maxRetries = 3;
+    @display {
+        label: "Duration between retries"
+    }
+    decimal delay = 10;
+    @display {
+        label: "Maximum duration between retries"
+    }
+    decimal maxDelay = 60;
+    @display {
+        label: "Timeout duration for retry attempt"
+    }
+    decimal tryTimeout = 60;
+    @display {
+        label: "Approach to calculated the retry"
+    }
+    AmqpRetryMode retryMode = RETRY_MODE_EXPONENTIAL;
+|};
+
+# The type of approach to apply when calculating the delay between retry attempts.
+public enum AmqpRetryMode {
+    # Retry attempts happen at fixed intervals; each delay is a consistent duration.
+    @display {
+        label: "Retry on fixed intervals"
+    }
+    RETRY_MODE_FIXED,
+    # Retry attempts will delay based on a backoff strategy, where each attempt will increase the duration that it waits before retrying.
+    @display {
+        label: "Retry based on a backoff strategy"
+    }
+    RETRY_MODE_EXPONENTIAL
 };
 
 # This record holds the configuration details of a topic and its associated subscription in Azure Service Bus
