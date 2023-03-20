@@ -85,11 +85,13 @@ public class MessageReceiver {
      *                              thread interruption.
      */
     public MessageReceiver(String connectionString, String queueName, String topicName, String subscriptionName,
-            String receiveMode, long maxAutoLockRenewDuration, String logLevel)
+            String receiveMode, long maxAutoLockRenewDuration, String logLevel, BMap<BString, Object> retryConfigs)
             throws ServiceBusException, InterruptedException {
         log.setLevel(Level.toLevel(logLevel, Level.OFF));
+        AmqpRetryOptions retryOptions = getRetryOptions(receiverConfig);
         ServiceBusReceiverClientBuilder receiverClientBuilder = new ServiceBusClientBuilder()
                 .connectionString(connectionString)
+                .retryOptions(retryOptions)
                 .receiver();
         if (!queueName.isEmpty()) {
             if (Objects.equals(receiveMode, RECEIVE_AND_DELETE)) {
@@ -125,32 +127,7 @@ public class MessageReceiver {
         log.debug("ServiceBusReceiverClient initialized");
     }
 
-    public MessageReceiver(BMap<BString, Object> receiverConfig, BString logLevel) 
-        throws ServiceBusException, InterruptedException {
-        log.setLevel(Level.toLevel(logLevel.getValue(), Level.OFF));
-        AmqpRetryOptions retryOptions = getRetryOptions(receiverConfig);
-        ServiceBusReceiverClientBuilder receiverClientBuilder = new ServiceBusClientBuilder()
-                .connectionString(receiverConfig.getStringValue(CONNECTION_STRING).getValue())
-                .retryOptions(retryOptions)
-                .receiver();
-        String receiveMode = receiverConfig.getStringValue(RECEIVE_MODE).getValue();
-        if (RECEIVE_AND_DELETE.equals(receiveMode)) {
-            receiverClientBuilder
-                    .receiveMode(ServiceBusReceiveMode.RECEIVE_AND_DELETE);
-        } else {
-            Long maxAutoLockRenewDuration = receiverConfig.getIntValue(MAX_AUTOLOCK_RENEW_DURATION);
-            receiverClientBuilder
-                    .receiveMode(ServiceBusReceiveMode.PEEK_LOCK)
-                    .maxAutoLockRenewDuration(Duration.ofSeconds(maxAutoLockRenewDuration));
-        }
-        BMap<BString, Object> entityConfig = getMapValue(receiverConfig, ENTITY_CONFIG);
-        updateClientEntityConfig(receiverClientBuilder, entityConfig);
-        this.receiver = receiverClientBuilder.buildClient();
-        log.debug("ServiceBusReceiverClient initialized");
-    }
-
-    private AmqpRetryOptions getRetryOptions(BMap<BString, Object> receiverConfig) {
-        BMap<BString, Object> retryConfigs = getMapValue(receiverConfig, AMQP_RETRY_OPTIONS);
+    private AmqpRetryOptions getRetryOptions(BMap<BString, Object> retryConfigs) {
         Long maxRetries = retryConfigs.getIntValue(MAX_RETRIES);
         BigDecimal delayConfig = ((BDecimal) retryConfigs.get(DELAY)).decimalValue();
         BigDecimal maxDelay = ((BDecimal) retryConfigs.get(MAX_DELAY)).decimalValue();
