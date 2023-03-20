@@ -80,7 +80,7 @@ public class ASBConstants {
 
     // Retry configurations
     public static final BString AMQP_RETRY_OPTIONS = StringUtils.fromString("amqpRetryOptions");
-    public static final BString MAX_RETRIES = StringUtils.fromString("amqpRetryOptions");
+    public static final BString MAX_RETRIES = StringUtils.fromString("maxRetries");
     public static final BString DELAY = StringUtils.fromString("delay");
     public static final BString MAX_DELAY = StringUtils.fromString("maxDelay");
     public static final BString TRY_TIMEOUT = StringUtils.fromString("tryTimeout");
