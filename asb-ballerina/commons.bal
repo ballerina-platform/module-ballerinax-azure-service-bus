@@ -27,15 +27,6 @@ public const JSON = "application/json";
 public const XML = "application/xml";
 public const BYTE_ARRAY = "application/octet-stream";
 
-// Azure Service Bus Client API Record Types.
-
-// AmqpRetryOptions retryOptions = new AmqpRetryOptions()
-//         .setMode(AmqpRetryMode.FIXED)
-//         .setMaxRetries(3)
-//         .setDelay(Duration.ofSeconds(1))
-//         .setTryTimeout(Duration.ofSeconds(10))
-//         .setMaxDelay(Duration.ofSeconds(10));
-
 
 # Configurations used to create an `asb:Connection`.
 # 
