@@ -125,7 +125,8 @@ public class MessageReceiver {
         log.debug("ServiceBusReceiverClient initialized");
     }
 
-    public MessageReceiver(BMap<BString, Object> receiverConfig, BString logLevel) throws ServiceBusException {
+    public MessageReceiver(BMap<BString, Object> receiverConfig, BString logLevel) 
+        throws ServiceBusException, InterruptedException {
         log.setLevel(Level.toLevel(logLevel.getValue(), Level.OFF));
         AmqpRetryOptions retryOptions = getRetryOptions(receiverConfig);
         ServiceBusReceiverClientBuilder receiverClientBuilder = new ServiceBusClientBuilder()
