@@ -57,8 +57,12 @@ import org.ballerinax.asb.util.ASBConstants;
 import org.ballerinax.asb.util.ASBUtils;
 import org.ballerinax.asb.util.ModuleUtils;
 
-import static org.ballerinax.asb.util.ASBConstants.*;
-import static org.ballerinax.asb.util.ASBUtils.getMapValue;
+import static org.ballerinax.asb.util.ASBConstants.DELAY;
+import static org.ballerinax.asb.util.ASBConstants.MAX_DELAY;
+import static org.ballerinax.asb.util.ASBConstants.MAX_RETRIES;
+import static org.ballerinax.asb.util.ASBConstants.RECEIVE_AND_DELETE;
+import static org.ballerinax.asb.util.ASBConstants.RETRY_MODE;
+import static org.ballerinax.asb.util.ASBConstants.TRY_TIMEOUT;
 
 /**
  * This facilitates the client operations of MessageReceiver client in
