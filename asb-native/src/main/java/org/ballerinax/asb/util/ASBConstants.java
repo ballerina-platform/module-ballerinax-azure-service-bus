@@ -71,8 +71,6 @@ public class ASBConstants {
     public static final BString SUBSCRIPTION_NAME = StringUtils.fromString("subscriptionName");
     public static final BString CONNECTION_STRING = StringUtils.fromString("connectionString");
     public static final BString RECEIVE_MODE = StringUtils.fromString("receiveMode");
-    public static final BString MAX_AUTOLOCK_RENEW_DURATION = StringUtils.fromString("maxAutoLockRenewDuration");
-    public static final BString ENTITY_CONFIG = StringUtils.fromString("entityConfig");
     public static final String CONNECTION_NATIVE_OBJECT = "asb_connection_object";
     public static final String SERVICE_CONFIG = "ServiceConfig";
     public static final BString ALIAS_QUEUE_CONFIG = StringUtils.fromString("entityConfig");

@@ -20,6 +20,7 @@ import ballerina/jballerina.java as java;
 # Service Bus API provides data access to highly reliable queues and publish/subscribe topics of Azure Service Bus with deep feature capabilities.
 @display {label: "Azure Service Bus Message Receiver", iconPath: "icon.png"}
 public isolated client class MessageReceiver {
+    
     private  string connectionString;
     private string queueName;
     private string subscriptionName;
