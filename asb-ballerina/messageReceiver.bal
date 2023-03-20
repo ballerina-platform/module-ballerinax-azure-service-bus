@@ -20,7 +20,6 @@ import ballerina/jballerina.java as java;
 # Service Bus API provides data access to highly reliable queues and publish/subscribe topics of Azure Service Bus with deep feature capabilities.
 @display {label: "Azure Service Bus Message Receiver", iconPath: "icon.png"}
 public isolated client class MessageReceiver {
-    final handle receiverHandle;
     private  string connectionString;
     private string queueName;
     private string subscriptionName;
@@ -28,6 +27,7 @@ public isolated client class MessageReceiver {
     private string receiveMode;
     private int maxAutoLockRenewDuration;
     private LogLevel logLevel;
+    final handle receiverHandle;
 
     # Initializes the connector. During initialization you can pass the [Shared Access Signature (SAS) authentication credentials](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-sas)
     # Create an [Azure account](https://docs.microsoft.com/en-us/learn/modules/create-an-azure-account/) and
