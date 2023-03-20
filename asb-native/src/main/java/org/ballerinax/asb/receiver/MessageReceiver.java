@@ -18,6 +18,8 @@
 
 package org.ballerinax.asb.receiver;
 
+import com.azure.core.amqp.AmqpRetryMode;
+import com.azure.core.amqp.AmqpRetryOptions;
 import com.azure.core.amqp.models.AmqpAnnotatedMessage;
 import com.azure.core.amqp.models.AmqpMessageBodyType;
 import com.azure.core.util.IterableStream;
@@ -35,6 +37,7 @@ import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.MapType;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.utils.TypeUtils;
+import io.ballerina.runtime.api.values.BDecimal;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
@@ -54,7 +57,8 @@ import org.ballerinax.asb.util.ASBConstants;
 import org.ballerinax.asb.util.ASBUtils;
 import org.ballerinax.asb.util.ModuleUtils;
 
-import static org.ballerinax.asb.util.ASBConstants.RECEIVE_AND_DELETE;
+import static org.ballerinax.asb.util.ASBConstants.*;
+import static org.ballerinax.asb.util.ASBUtils.getMapValue;
 
 /**
  * This facilitates the client operations of MessageReceiver client in
@@ -119,6 +123,56 @@ public class MessageReceiver {
             }
         }
         log.debug("ServiceBusReceiverClient initialized");
+    }
+
+    public MessageReceiver(BMap<BString, Object> receiverConfig, BString logLevel) throws ServiceBusException {
+        log.setLevel(Level.toLevel(logLevel.getValue(), Level.OFF));
+        AmqpRetryOptions retryOptions = getRetryOptions(receiverConfig);
+        ServiceBusReceiverClientBuilder receiverClientBuilder = new ServiceBusClientBuilder()
+                .connectionString(receiverConfig.getStringValue(CONNECTION_STRING).getValue())
+                .retryOptions(retryOptions)
+                .receiver();
+        String receiveMode = receiverConfig.getStringValue(RECEIVE_MODE).getValue();
+        if (RECEIVE_AND_DELETE.equals(receiveMode)) {
+            receiverClientBuilder
+                    .receiveMode(ServiceBusReceiveMode.RECEIVE_AND_DELETE);
+        } else {
+            Long maxAutoLockRenewDuration = receiverConfig.getIntValue(MAX_AUTOLOCK_RENEW_DURATION);
+            receiverClientBuilder
+                    .receiveMode(ServiceBusReceiveMode.PEEK_LOCK)
+                    .maxAutoLockRenewDuration(Duration.ofSeconds(maxAutoLockRenewDuration));
+        }
+        BMap<BString, Object> entityConfig = getMapValue(receiverConfig, ENTITY_CONFIG);
+        updateClientEntityConfig(receiverClientBuilder, entityConfig);
+        this.receiver = receiverClientBuilder.buildClient();
+        log.debug("ServiceBusReceiverClient initialized");
+    }
+
+    private AmqpRetryOptions getRetryOptions(BMap<BString, Object> receiverConfig) {
+        BMap<BString, Object> retryConfigs = getMapValue(receiverConfig, AMQP_RETRY_OPTIONS);
+        int maxRetries = (int) retryConfigs.get(MAX_RETRIES);
+        BigDecimal delayConfig = ((BDecimal) receiverConfig.get(DELAY)).decimalValue();
+        BigDecimal maxDelay = ((BDecimal) receiverConfig.get(MAX_DELAY)).decimalValue();
+        BigDecimal tryTimeout = ((BDecimal) receiverConfig.get(TRY_TIMEOUT)).decimalValue();
+        String retryMode = retryConfigs.getStringValue(RETRY_MODE).getValue();
+        return new AmqpRetryOptions()
+                .setMaxRetries(maxRetries)
+                .setDelay(Duration.ofSeconds(delayConfig.intValue()))
+                .setMaxDelay(Duration.ofSeconds(maxDelay.intValue()))
+                .setTryTimeout(Duration.ofSeconds(tryTimeout.intValue()))
+                .setMode(AmqpRetryMode.valueOf(retryMode));
+    }
+
+    private void updateClientEntityConfig(ServiceBusReceiverClientBuilder clientBuilder,
+                                          BMap<BString, Object> entityConfig) {
+        if (entityConfig.containsKey(QUEUE_NAME)) {
+            clientBuilder
+                    .queueName(entityConfig.getStringValue(QUEUE_NAME).getValue());
+        } else {
+            clientBuilder
+                    .topicName(entityConfig.getStringValue(TOPIC_NAME).getValue())
+                    .subscriptionName(entityConfig.getStringValue(SUBSCRIPTION_NAME).getValue());
+        }
     }
 
     /**
