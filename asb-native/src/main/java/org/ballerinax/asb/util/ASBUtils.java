@@ -174,6 +174,11 @@ public class ASBUtils {
         return returnMap;
     }
 
+    @SuppressWarnings("unchecked")
+    public static BMap<BString, Object> getMapValue(BMap<BString, Object> config, BString parameterName) {
+        return (BMap<BString, Object>) config.getMapValue(parameterName);
+    }
+
     /**
      * Returns a Ballerina Error with the given String message and exception.
      *

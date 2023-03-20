@@ -70,9 +70,9 @@ public type ASBServiceReceiverConfig record {
 # Set of options that can be specified to influence how the retry attempts are made.
 #
 # + maxRetries - Maximum number of retry attempts  
-# + delay - Delay between retry attempts  
-# + maxDelay - Maximum permissible delay between retry attempts  
-# + tryTimeout - Maximum duration to wait for completion of a single attempt  
+# + delay - Delay between retry attempts in seconds 
+# + maxDelay - Maximum permissible delay between retry attempts in seconds
+# + tryTimeout - Maximum duration to wait for completion of a single attempt in seconds  
 # + retryMode - Approach to use for calculating retry delays
 public type AmqpRetryOptions record {|
     @display {
