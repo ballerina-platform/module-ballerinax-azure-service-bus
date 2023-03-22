@@ -129,6 +129,7 @@ public  type QueueConfig record {
 #                The valid values are TOPIC and QUEUE  
 # + topicOrQueueName - A string field that holds the name of the topic or queue
 # + connectionString - A string field that holds the Service Bus connection string with Shared Access Signatures.
+# + amqpRetryOptions - Retry configurations related to underlying AMQP message sender
 @display {label: "Sender Connection Config"}
 public type ASBServiceSenderConfig record {
     @display {label: "EntityType"}
@@ -137,6 +138,8 @@ public type ASBServiceSenderConfig record {
     string topicOrQueueName;
     @display {label: "ConnectionString"}
     string connectionString;
+    @display {label: "AMQP retry configurations"}
+    AmqpRetryOptions amqpRetryOptions = {};
 };
 
 # Represents Custom configurations for the ASB connector
