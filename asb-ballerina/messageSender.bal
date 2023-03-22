@@ -104,7 +104,7 @@ public isolated client class MessageSender {
 
 isolated function initMessageSender(handle connectionString, handle entityType, handle topicOrQueueName, handle isLogEnabled, AmqpRetryOptions retryOptions) returns handle|error = @java:Constructor {
     'class: "org.ballerinax.asb.sender.MessageSender",
-    paramTypes: ["java.lang.String", "java.lang.String", "java.lang.String", "java.lang.String"]
+    paramTypes: ["java.lang.String", "java.lang.String", "java.lang.String", "java.lang.String", "io.ballerina.runtime.api.values.BMap"]
 } external;
 
 isolated function send(handle senderHandle, Message message) returns error? = @java:Method {
