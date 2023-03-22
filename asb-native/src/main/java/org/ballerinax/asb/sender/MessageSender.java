@@ -18,6 +18,7 @@
 
 package org.ballerinax.asb.sender;
 
+import com.azure.core.amqp.AmqpRetryOptions;
 import com.azure.messaging.servicebus.ServiceBusClientBuilder;
 import com.azure.messaging.servicebus.ServiceBusException;
 import com.azure.messaging.servicebus.ServiceBusMessage;
@@ -45,6 +46,8 @@ import org.apache.log4j.Logger;
 import org.ballerinax.asb.util.ASBConstants;
 import org.ballerinax.asb.util.ASBUtils;
 
+import static org.ballerinax.asb.util.ASBUtils.getRetryOptions;
+
 /**
  * This facilitates the client operations of MessageSender client in Ballerina.
  */
@@ -63,10 +66,14 @@ public class MessageSender {
      * @throws InterruptedException on failure initiating IMessage Receiver due to
      *                              thread interruption.
      */
-    public MessageSender(String connectionString, String entityType, String topicOrQueueName, String logLevel)
+    public MessageSender(String connectionString, String entityType, String topicOrQueueName, String logLevel,
+                         BMap<BString, Object> retryConfigs)
             throws ServiceBusException, InterruptedException {
         log.setLevel(Level.toLevel(logLevel, Level.OFF));
-        ServiceBusClientBuilder clientBuilder = new ServiceBusClientBuilder().connectionString(connectionString);
+        AmqpRetryOptions retryOptions = getRetryOptions(retryConfigs);
+        ServiceBusClientBuilder clientBuilder = new ServiceBusClientBuilder()
+                .retryOptions(retryOptions)
+                .connectionString(connectionString);
         if (!entityType.isEmpty() && entityType.equalsIgnoreCase("queue")) {
             this.sender = clientBuilder
                     .sender()
