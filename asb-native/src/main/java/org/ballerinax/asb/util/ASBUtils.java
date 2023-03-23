@@ -18,6 +18,8 @@
 
 package org.ballerinax.asb.util;
 
+import com.azure.core.amqp.AmqpRetryMode;
+import com.azure.core.amqp.AmqpRetryOptions;
 import io.ballerina.runtime.api.PredefinedTypes;
 import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.creators.TypeCreator;
@@ -25,11 +27,21 @@ import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.ErrorType;
 import io.ballerina.runtime.api.types.MapType;
 import io.ballerina.runtime.api.utils.StringUtils;
+import io.ballerina.runtime.api.values.BDecimal;
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BString;
+
+import java.math.BigDecimal;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.ballerinax.asb.util.ASBConstants.DELAY;
+import static org.ballerinax.asb.util.ASBConstants.MAX_DELAY;
+import static org.ballerinax.asb.util.ASBConstants.MAX_RETRIES;
+import static org.ballerinax.asb.util.ASBConstants.RETRY_MODE;
+import static org.ballerinax.asb.util.ASBConstants.TRY_TIMEOUT;
 
 public class ASBUtils {
 
@@ -191,5 +203,19 @@ public class ASBUtils {
         BError er = ErrorCreator.createError(StringUtils.fromString(errorMessage));
         return ErrorCreator.createError(errorType, StringUtils.fromString(message + "error from " + errorFromClass), er,
                 null);
+    }
+
+    public static AmqpRetryOptions getRetryOptions(BMap<BString, Object> retryConfigs) {
+        Long maxRetries = retryConfigs.getIntValue(MAX_RETRIES);
+        BigDecimal delayConfig = ((BDecimal) retryConfigs.get(DELAY)).decimalValue();
+        BigDecimal maxDelay = ((BDecimal) retryConfigs.get(MAX_DELAY)).decimalValue();
+        BigDecimal tryTimeout = ((BDecimal) retryConfigs.get(TRY_TIMEOUT)).decimalValue();
+        String retryMode = retryConfigs.getStringValue(RETRY_MODE).getValue();
+        return new AmqpRetryOptions()
+                .setMaxRetries(maxRetries.intValue())
+                .setDelay(Duration.ofSeconds(delayConfig.intValue()))
+                .setMaxDelay(Duration.ofSeconds(maxDelay.intValue()))
+                .setTryTimeout(Duration.ofSeconds(tryTimeout.intValue()))
+                .setMode(AmqpRetryMode.valueOf(retryMode));
     }
 }

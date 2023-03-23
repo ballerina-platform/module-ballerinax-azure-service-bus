@@ -57,12 +57,8 @@ import org.ballerinax.asb.util.ASBConstants;
 import org.ballerinax.asb.util.ASBUtils;
 import org.ballerinax.asb.util.ModuleUtils;
 
-import static org.ballerinax.asb.util.ASBConstants.DELAY;
-import static org.ballerinax.asb.util.ASBConstants.MAX_DELAY;
-import static org.ballerinax.asb.util.ASBConstants.MAX_RETRIES;
 import static org.ballerinax.asb.util.ASBConstants.RECEIVE_AND_DELETE;
-import static org.ballerinax.asb.util.ASBConstants.RETRY_MODE;
-import static org.ballerinax.asb.util.ASBConstants.TRY_TIMEOUT;
+import static org.ballerinax.asb.util.ASBUtils.getRetryOptions;
 
 /**
  * This facilitates the client operations of MessageReceiver client in
@@ -129,20 +125,6 @@ public class MessageReceiver {
             }
         }
         log.debug("ServiceBusReceiverClient initialized");
-    }
-
-    private AmqpRetryOptions getRetryOptions(BMap<BString, Object> retryConfigs) {
-        Long maxRetries = retryConfigs.getIntValue(MAX_RETRIES);
-        BigDecimal delayConfig = ((BDecimal) retryConfigs.get(DELAY)).decimalValue();
-        BigDecimal maxDelay = ((BDecimal) retryConfigs.get(MAX_DELAY)).decimalValue();
-        BigDecimal tryTimeout = ((BDecimal) retryConfigs.get(TRY_TIMEOUT)).decimalValue();
-        String retryMode = retryConfigs.getStringValue(RETRY_MODE).getValue();
-        return new AmqpRetryOptions()
-                .setMaxRetries(maxRetries.intValue())
-                .setDelay(Duration.ofSeconds(delayConfig.intValue()))
-                .setMaxDelay(Duration.ofSeconds(maxDelay.intValue()))
-                .setTryTimeout(Duration.ofSeconds(tryTimeout.intValue()))
-                .setMode(AmqpRetryMode.valueOf(retryMode));
     }
 
     /**

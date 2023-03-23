@@ -40,7 +40,7 @@ public isolated client class MessageSender {
         self.entityType = config.entityType;
         self.logLevel = customConfiguration.logLevel;
         self.senderHandle = check initMessageSender(java:fromString(self.connectionString), java:fromString(self.entityType),
-        java:fromString(self.topicOrQueueName), java:fromString(self.logLevel));
+        java:fromString(self.topicOrQueueName), java:fromString(self.logLevel), config.amqpRetryOptions);
     }
 
     # Send message to queue or topic with a message body.
@@ -102,9 +102,9 @@ public isolated client class MessageSender {
     }
 }
 
-isolated function initMessageSender(handle connectionString, handle entityType, handle topicOrQueueName, handle isLogEnabled) returns handle|error = @java:Constructor {
+isolated function initMessageSender(handle connectionString, handle entityType, handle topicOrQueueName, handle isLogEnabled, AmqpRetryOptions retryOptions) returns handle|error = @java:Constructor {
     'class: "org.ballerinax.asb.sender.MessageSender",
-    paramTypes: ["java.lang.String", "java.lang.String", "java.lang.String", "java.lang.String"]
+    paramTypes: ["java.lang.String", "java.lang.String", "java.lang.String", "java.lang.String", "io.ballerina.runtime.api.values.BMap"]
 } external;
 
 isolated function send(handle senderHandle, Message message) returns error? = @java:Method {
