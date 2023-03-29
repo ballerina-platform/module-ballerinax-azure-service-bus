@@ -341,7 +341,6 @@ public class MessageReceiver {
         int messageCount = 0;
         Map<String, Object> map = new HashMap<>();
         int maxCount = Long.valueOf(maxMessageCount.toString()).intValue();
-        Object[] messages = new Object[maxCount];
         IterableStream<ServiceBusReceivedMessage> receivedMessageStream;
         if (serverWaitTime != null) {
             receivedMessageStream = receiver.receiveMessages(maxCount, Duration.ofSeconds((long) serverWaitTime));
@@ -350,6 +349,8 @@ public class MessageReceiver {
         }
         BMap<BString, Object> messageRecord = ValueCreator.createRecordValue(ModuleUtils.getModule(),
                 ASBConstants.MESSAGE_RECORD);
+        int noOfReceivedMessages = (int) receivedMessageStream.stream().count();
+        Object[] messages = new Object[noOfReceivedMessages];
         for (ServiceBusReceivedMessage receivedMessage : receivedMessageStream) {
             BMap<BString, Object> recordMap = getReceivedMessage(endpointClient, receivedMessage);
             messages[messageCount] = ValueCreator.createRecordValue(ModuleUtils.getModule(),
