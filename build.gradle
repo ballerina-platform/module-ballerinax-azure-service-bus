@@ -1,4 +1,8 @@
-plugins {}
+plugins {
+    id "com.github.spotbugs" version "${githubSpotbugsVersion}"
+    id "com.github.johnrengelman.shadow" version "${githubJohnrengelmanShadowVersion}"
+    id "de.undercouch.download" version "${underCouchDownloadVersion}"
+}
 
 ext.ballerinaLangVersion = project.ballerinaLangVersion
 
@@ -64,9 +68,9 @@ task copyDistribution {
 }
 
 task createArtifactZip(type: Zip) {
-   from "${buildDir}/cache_parent"
-   archiveName 'distribution.zip'
-   destinationDir(file("${buildDir}/distribution"))
+    from "${buildDir}/cache_parent"
+    archiveName 'distribution.zip'
+    destinationDir(file("${buildDir}/distribution"))
 }
 
 publishing {

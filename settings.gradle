@@ -1,2 +1,18 @@
+plugins {
+    id "com.gradle.enterprise" version "3.2"
+}
+
 rootProject.name = 'module-ballerinax-azure-service-bus'
+
 include ':asb-native'
+include ':checkstyle'
+
+project(':checkstyle').projectDir = file("build-config${File.separator}checkstyle")
+project(':asb-native').projectDir = file('asb-native')
+
+gradleEnterprise {
+    buildScan {
+        termsOfServiceUrl = 'https://gradle.com/terms-of-service'
+        termsOfServiceAgree = 'yes'
+    }
+}
