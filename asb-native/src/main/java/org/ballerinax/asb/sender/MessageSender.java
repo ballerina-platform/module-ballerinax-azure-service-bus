@@ -25,7 +25,6 @@ import com.azure.messaging.servicebus.ServiceBusMessage;
 import com.azure.messaging.servicebus.ServiceBusMessageBatch;
 import com.azure.messaging.servicebus.ServiceBusSenderClient;
 import com.azure.messaging.servicebus.models.CreateMessageBatchOptions;
-
 import io.ballerina.runtime.api.TypeTags;
 import io.ballerina.runtime.api.types.Type;
 import io.ballerina.runtime.api.utils.StringUtils;
@@ -34,6 +33,11 @@ import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BDecimal;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BString;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.ballerinax.asb.util.ASBConstants;
+import org.ballerinax.asb.util.ASBUtils;
+
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -41,45 +45,37 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.ballerinax.asb.util.ASBConstants;
-import org.ballerinax.asb.util.ASBUtils;
-
 import static org.ballerinax.asb.util.ASBUtils.getRetryOptions;
 
 /**
  * This facilitates the client operations of MessageSender client in Ballerina.
  */
 public class MessageSender {
+
     private static final Logger log = Logger.getLogger(MessageSender.class);
     private ServiceBusSenderClient sender;
 
     /**
      * Parameterized constructor for Message Sender (ServiceBusSenderClient).
      *
-     * @param connectionString Azure service bus connection string.
-     * @param queueName        QueueName
-     * @param topicName        Topic Name
-     * @throws ServiceBusException  on failure initiating IMessage Receiver in Azure
-     *                              Service Bus instance.
-     * @throws InterruptedException on failure initiating IMessage Receiver due to
-     *                              thread interruption.
+     * @param connectionString Azure service bus connection string
+     * @param topicOrQueueName Queue/topic name
+     * @throws ServiceBusException on failure initiating IMessage Receiver in Azure Service Bus instance.
      */
     public MessageSender(String connectionString, String entityType, String topicOrQueueName, String logLevel,
-                         BMap<BString, Object> retryConfigs)
-            throws ServiceBusException, InterruptedException {
+                         BMap<BString, Object> retryConfigs) throws ServiceBusException {
+
         log.setLevel(Level.toLevel(logLevel, Level.OFF));
         AmqpRetryOptions retryOptions = getRetryOptions(retryConfigs);
         ServiceBusClientBuilder clientBuilder = new ServiceBusClientBuilder()
                 .retryOptions(retryOptions)
                 .connectionString(connectionString);
-        if (!entityType.isEmpty() && entityType.equalsIgnoreCase("queue")) {
+        if (entityType.equalsIgnoreCase("queue")) {
             this.sender = clientBuilder
                     .sender()
                     .queueName(topicOrQueueName)
                     .buildClient();
-        } else if (!entityType.isEmpty() && entityType.equalsIgnoreCase("topic")) {
+        } else if (entityType.equalsIgnoreCase("topic")) {
             this.sender = clientBuilder
                     .sender()
                     .topicName(topicOrQueueName)
@@ -104,7 +100,7 @@ public class MessageSender {
     public Object schedule(BMap<BString, Object> message, BMap<BString, Object> scheduleTime) {
         try {
             ServiceBusMessage messageToSend = constructMessage(message);
-            Long sequenceNumber = sender.scheduleMessage(messageToSend, constrcutOffset(scheduleTime));
+            Long sequenceNumber = sender.scheduleMessage(messageToSend, constructOffset(scheduleTime));
             if (log.isDebugEnabled()) {
                 log.debug("Scheduled the message successfully. Message Id = " + messageToSend.getMessageId());
             }
@@ -117,7 +113,7 @@ public class MessageSender {
     public Object cancel(long sequenceNumber) {
         try {
             sender.cancelScheduledMessage(sequenceNumber);
-            if(log.isDebugEnabled()) {
+            if (log.isDebugEnabled()) {
                 log.debug("Successfully cancelled scheduled message with sequenceNumber = " + sequenceNumber);
             }
             return null;
@@ -126,7 +122,7 @@ public class MessageSender {
         }
     }
 
-    private OffsetDateTime constrcutOffset(BMap<BString, Object> scheduleTime) {
+    private OffsetDateTime constructOffset(BMap<BString, Object> scheduleTime) {
 
         int year = ((Long) scheduleTime.get(StringUtils.fromString("year"))).intValue();
         int month = ((Long) scheduleTime.get(StringUtils.fromString("month"))).intValue();
@@ -163,7 +159,7 @@ public class MessageSender {
      */
     public Object sendBatch(BMap<BString, Object> messages) {
         try {
-            Map<String, Object> messagesMap = ASBUtils.toObjectMap((BMap<BString, Object>) messages);
+            Map<String, Object> messagesMap = ASBUtils.toObjectMap(messages);
             BArray messageArray = (BArray) messagesMap.get("messages");
             Collection<ServiceBusMessage> messageBatch = new ArrayList<>();
             for (int i = 0; i < messageArray.getLength(); i++) {
@@ -257,9 +253,10 @@ public class MessageSender {
             asbMessage.setTimeToLive(Duration.ofSeconds(timeToLive));
         }
         if (message.containsKey(StringUtils.fromString(ASBConstants.APPLICATION_PROPERTY_KEY))) {
-            BMap<BString, Object> propertyBMap = (BMap<BString, Object>) message.get(StringUtils.fromString(ASBConstants.APPLICATION_PROPERTY_KEY));
-            Object propertyMap = (BMap<BString, Object>) propertyBMap.get(StringUtils.fromString(ASBConstants.APPLICATION_PROPERIES));
-            Map<String, Object> map = ASBUtils.toMap((BMap)propertyMap);
+            BMap<BString, Object> propertyBMap = (BMap<BString, Object>) message.get(StringUtils.fromString(
+                    ASBConstants.APPLICATION_PROPERTY_KEY));
+            Object propertyMap = propertyBMap.get(StringUtils.fromString(ASBConstants.APPLICATION_PROPERIES));
+            Map<String, Object> map = ASBUtils.toMap((BMap) propertyMap);
             asbMessage.getApplicationProperties().putAll(map);
         }
 
@@ -274,7 +271,7 @@ public class MessageSender {
     public Object closeSender() {
         try {
             sender.close();
-            log.debug("Closed the sender. Idetifier=" + sender.getIdentifier());
+            log.debug("Closed the sender. Identifier=" + sender.getIdentifier());
             return null;
         } catch (Exception e) {
             return ASBUtils.returnErrorValue(e.getClass().getSimpleName(), e);

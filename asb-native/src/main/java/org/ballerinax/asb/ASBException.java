@@ -19,11 +19,11 @@
 package org.ballerinax.asb;
 
 /**
- * Exception class for Azure Service Bus
+ * Exception class for Azure Service Bus.
  */
 public class ASBException extends Exception {
     /**
-     * Create an exception with given exception message
+     * Create an exception with given exception message.
      *
      * @param msg an exception message
      */
@@ -32,7 +32,7 @@ public class ASBException extends Exception {
     }
 
     /**
-     * Create an exception with given message and wrapping the given exception object
+     * Create an exception with given message and wrapping the given exception object.
      *
      * @param msg exception message
      * @param e   exception
