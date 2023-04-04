@@ -21,6 +21,13 @@ jobs:
           packagePAT: ${{ secrets.GITHUB_TOKEN }}
           JAVA_OPTS: -DBALLERINA_DEV_COMPILE_BALLERINA_ORG=true
         run: ./gradlew build --scan --no-daemon
+      - name: Ballerina Build
+        uses: ballerina-platform/ballerina-action/@master
+        with:
+          args:
+            build ./asb-ballerina
+        env:
+          JAVA_HOME: /usr/lib/jvm/default-jvm
 
   windows-build:
     name: Build on Windows
@@ -39,24 +46,23 @@ jobs:
           packagePAT: ${{ secrets.GITHUB_TOKEN }}
           JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF8
         run: ./gradlew.bat build --scan --no-daemon
-
-  ballerina-build:
-    name: Build and Test Ballerina Modules
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-      # Build Ballerina Project
       - name: Ballerina Build
-        uses: ballerina-platform/ballerina-action/@nightly
+        uses: ballerina-platform/ballerina-action/@master
         with:
           args:
             build ./asb-ballerina
         env:
           JAVA_HOME: /usr/lib/jvm/default-jvm
+
+  ballerina-tests:
+    name: Run Ballerina Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
       # Test Ballerina Project
       - name: Ballerina Test
-        uses: ballerina-platform/ballerina-action/@nightly
+        uses: ballerina-platform/ballerina-action/@master
         with:
           args:
             test ./asb-ballerina
