@@ -32,7 +32,7 @@ public type MessageBatch record {|
 # will be received in Ballerina Byte[] type. VALUE message bodies can be any primitive AMQP type. therefore, the connector  
 # supports for string, int or byte[]. Please refer Azure docs (https://learn.microsoft.com/en-us/java/api/com.azure.core.amqp.models.amqpmessagebody?view=azure-java-stable)  
 # and AMQP docs (https://qpid.apache.org/amqp/type-reference.html#PrimitiveTypes)  
-# + contentType - Message content type  
+# + contentType - Message content type, with a descriptor following the format of `RFC2045`, (e.g. `application/json`) (optional)
 # + messageId - Message Id (optional)  
 # + to - Message to (optional)  
 # + replyTo - Message reply to (optional)  
@@ -57,7 +57,7 @@ public type Message record {|
     @display {label: "Message Body"}
     anydata body;
     @display {label: "Content Type"}
-    string contentType = TEXT;
+    string contentType = BYTE_ARRAY;
     @display {label: "Message Id"}
     string messageId?;
     @display {label: "To"}
