@@ -20,7 +20,32 @@
 # + name - Represents the name of the application property that the user wants to retrieve.
 # + return - Returns null if the requested property does not exist
 public isolated function getApplicationPropertyByName(Message message, string name) returns anydata|error? {
-        ApplicationProperties applicationPropertiesResult = check message.applicationProperties.ensureType();
-        map<anydata> properties = check applicationPropertiesResult.properties.ensureType();
-        return properties[name];
+    ApplicationProperties applicationPropertiesResult = check message.applicationProperties.ensureType();
+    map<anydata> properties = check applicationPropertiesResult.properties.ensureType();
+    return properties[name];
+}
+
+# constructs a message from the given payload.
+#
+# + messageBody - Represents the message body
+# + return - Returns the constructed message
+isolated function constructMessageFromPayload(anydata messageBody) returns Message {
+    Message message = {body: messageBody};
+    return message;
+}
+
+# Serializes the message body to a byte array using ballerina default serialization logic.
+#
+# + messageBody - Represents the message body
+# + return - Returns the serialized message body as a byte array
+isolated function serializeToByteArray(anydata messageBody) returns byte[] {
+    if messageBody is byte[] {
+        return messageBody;
+    } else if messageBody is xml {
+        return messageBody.toString().toBytes();
+    } else if messageBody is string {
+        return messageBody.toBytes();
+    } else {
+        return messageBody.toJsonString().toBytes();
+    }
 }

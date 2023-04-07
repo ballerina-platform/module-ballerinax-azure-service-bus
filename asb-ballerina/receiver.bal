@@ -52,22 +52,36 @@ public isolated client class MessageReceiver {
         self.receiveMode = config.receiveMode;
         self.maxAutoLockRenewDuration = config.maxAutoLockRenewDuration;
         self.logLevel = customConfiguration.logLevel;
-        self.receiverHandle = check initMessageReceiver(java:fromString(self.connectionString), 
-        java:fromString(self.queueName),java:fromString(self.topicName), java:fromString(self.subscriptionName), 
+        self.receiverHandle = check initMessageReceiver(java:fromString(self.connectionString),
+        java:fromString(self.queueName), java:fromString(self.topicName), java:fromString(self.subscriptionName),
         java:fromString(self.receiveMode), self.maxAutoLockRenewDuration, java:fromString(self.logLevel), config.amqpRetryOptions);
     }
 
     # Receive message from queue or subscription.
     # 
     # + serverWaitTime - Specified server wait time in seconds to receive message (optional)
+    # + T - Expected type of the message. This can be either a `asb:Message` or a subtype of it.
     # + return - A `asb:Message` record if message is received, `()` if no message is in the queue or else an error
     #            if failed to receive message
     @display {label: "Receive Message"}
-    isolated remote function receive(@display {label: "Server Wait Time"} int? serverWaitTime = 60) 
-                                     returns @display {label: "Message"} Message|error? {
-        Message|error? message = receive(self.receiverHandle, self, serverWaitTime);
-        return message;     
-    }
+    isolated remote function receive(@display {label: "Server Wait Time"} int? serverWaitTime = 60,
+                                     @display {label: "Expected Type"} typedesc<Message> T = <>) 
+                             returns @display {label: "Message"} T|error? = @java:Method {
+        'class: "org.ballerinax.asb.receiver.MessageReceiver"
+    } external;
+
+    # Receive message payload from queue or subscription.
+    #
+    # + serverWaitTime - Specified server wait time in seconds to receive message (optional)
+    # + T - Expected type of the message. This can be any subtype of `anydata` type
+    # + return - A `asb:Message` record if message is received, `()` if no message is in the queue or else an error
+    #            if failed to receive message
+    @display {label: "Receive Message Payload"}
+    isolated remote function receivePayload(@display {label: "Server Wait Time"} int? serverWaitTime = 60, 
+                                            @display {label: "Expected Type"} typedesc<anydata> T = <>)
+                                    returns @display {label: "Message Payload"} T|error = @java:Method {
+        'class: "org.ballerinax.asb.receiver.MessageReceiver"
+    } external;
 
     # Receive batch of messages from queue or subscription.
     # 
@@ -204,7 +218,7 @@ isolated function receiveBatch(handle receiverHandle, MessageReceiver endpointCl
     'class: "org.ballerinax.asb.receiver.MessageReceiver"
 } external;
 
-isolated function complete(handle receiverHandle,MessageReceiver endpointClient, string lockToken) returns error? = @java:Method {
+isolated function complete(handle receiverHandle, MessageReceiver endpointClient, string lockToken) returns error? = @java:Method {
     'class: "org.ballerinax.asb.receiver.MessageReceiver"
 } external;
 
