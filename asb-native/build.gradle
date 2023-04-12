@@ -27,18 +27,15 @@ repositories {
 }
 
 dependencies {
+    checkstyle project(':checkstyle')
+    checkstyle "com.puppycrawl.tools:checkstyle:${puppycrawlCheckstyleVersion}"
     implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: "${azureServiceBusVersion}"
     implementation group: 'log4j', name: 'log4j', version: "${log4jVersion}"
     implementation group: 'org.ballerinalang', name: 'ballerina-lang', version: project.ballerinaLangVersion
-    implementation(group: 'org.ballerinalang', name: 'ballerina-runtime', version: project.ballerinaLangVersion) {
-        transitive = false
-    }
-
+    implementation(group: 'org.ballerinalang', name: 'ballerina-runtime', version: project.ballerinaLangVersion) { transitive = false }
+    implementation group: 'org.ballerinalang', name: 'value', version: "${ballerinaLangVersion}"
     dist group: 'com.azure', name: 'azure-messaging-servicebus', version: "${azureServiceBusVersion}"
     dist group: 'log4j', name: 'log4j', version: "${log4jVersion}"
-
-    checkstyle project(':checkstyle')
-    checkstyle "com.puppycrawl.tools:checkstyle:${puppycrawlCheckstyleVersion}"
 }
 
 checkstyle {
@@ -69,6 +66,15 @@ spotbugsMain {
 
 spotbugsTest {
     enabled = false
+}
+
+compileJava {
+    doFirst {
+        options.compilerArgs = [
+                '--module-path', classpath.asPath,
+        ]
+        classpath = files()
+    }
 }
 
 jar {
