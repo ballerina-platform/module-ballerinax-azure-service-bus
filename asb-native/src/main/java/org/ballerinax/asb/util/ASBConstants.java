@@ -43,7 +43,8 @@ public class ASBConstants {
     // Message receive modes
     public static final String PEEK_LOCK = "PEEKLOCK";
     public static final String RECEIVE_AND_DELETE = "RECEIVEANDDELETE";
-    // Keys of the input message optional parameters specified as a Map
+
+    // Field names of the ASB Message request and response
     public static final String BODY = "body";
     public static final String CONTENT_TYPE = "contentType";
     public static final String MESSAGE_ID = "messageId";
@@ -55,9 +56,19 @@ public class ASBConstants {
     public static final String CORRELATION_ID = "correlationId";
     public static final String TIME_TO_LIVE = "timeToLive";
     public static final String PARTITION_KEY = "partitionKey";
-    public static final int DEFAULT_TIME_TO_LIVE = 60; // In seconds
+    public static final String SEQUENCE_NUMBER = "sequenceNumber";
+    public static final String LOCK_TOKEN = "lockToken";
+    public static final String DELIVERY_COUNT = "deliveryCount";
+    public static final String ENQUEUED_TIME = "enqueuedTime";
+    public static final String ENQUEUED_SEQUENCE_NUMBER = "enqueuedSequenceNumber";
+    public static final String DEAD_LETTER_REASON = "deadLetterReason";
+    public static final String DEAD_LETTER_SOURCE = "deadLetterSource";
+    public static final String DEAD_LETTER_ERROR_DESCRIPTION = "deadLetterErrorDescription";
+    public static final String STATE = "state";
     public static final String APPLICATION_PROPERTY_KEY = "applicationProperties";
-    public static final String APPLICATION_PROPERIES = "properties";
+    public static final String APPLICATION_PROPERTIES = "properties";
+
+    public static final int DEFAULT_TIME_TO_LIVE = 60; // In seconds
 
     // listener constant fields
     public static final String CONSUMER_SERVICES = "consumer_services";

@@ -24,20 +24,39 @@ import io.ballerina.runtime.api.PredefinedTypes;
 import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.creators.TypeCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
+import io.ballerina.runtime.api.types.ArrayType;
 import io.ballerina.runtime.api.types.ErrorType;
+import io.ballerina.runtime.api.types.IntersectionType;
 import io.ballerina.runtime.api.types.MapType;
+import io.ballerina.runtime.api.types.RecordType;
+import io.ballerina.runtime.api.types.Type;
+import io.ballerina.runtime.api.types.UnionType;
+import io.ballerina.runtime.api.utils.JsonUtils;
 import io.ballerina.runtime.api.utils.StringUtils;
+import io.ballerina.runtime.api.utils.XmlUtils;
 import io.ballerina.runtime.api.values.BDecimal;
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BString;
+import io.ballerina.runtime.api.values.BTypedesc;
+import org.ballerinalang.langlib.value.CloneWithType;
+import org.ballerinalang.langlib.value.FromJsonWithType;
 
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import static io.ballerina.runtime.api.TypeTags.ANYDATA_TAG;
+import static io.ballerina.runtime.api.TypeTags.ARRAY_TAG;
+import static io.ballerina.runtime.api.TypeTags.BYTE_TAG;
+import static io.ballerina.runtime.api.TypeTags.RECORD_TYPE_TAG;
+import static io.ballerina.runtime.api.TypeTags.STRING_TAG;
+import static io.ballerina.runtime.api.TypeTags.UNION_TAG;
+import static io.ballerina.runtime.api.TypeTags.XML_TAG;
+import static io.ballerina.runtime.api.utils.TypeUtils.getReferredType;
 import static org.ballerinax.asb.util.ASBConstants.DELAY;
 import static org.ballerinax.asb.util.ASBConstants.MAX_DELAY;
 import static org.ballerinax.asb.util.ASBConstants.MAX_RETRIES;
@@ -221,5 +240,87 @@ public class ASBUtils {
                 .setMaxDelay(Duration.ofSeconds(maxDelay.intValue()))
                 .setTryTimeout(Duration.ofSeconds(tryTimeout.intValue()))
                 .setMode(AmqpRetryMode.valueOf(retryMode));
+    }
+
+    public static RecordType getRecordType(BTypedesc bTypedesc) {
+        RecordType recordType;
+        if (bTypedesc.getDescribingType().isReadOnly()) {
+            recordType = (RecordType) getReferredType(((IntersectionType) getReferredType(
+                    bTypedesc.getDescribingType())).getConstituentTypes().get(0));
+        } else {
+            recordType = (RecordType) getReferredType(bTypedesc.getDescribingType());
+        }
+        return recordType;
+    }
+
+    /**
+     * Converts `byte[]` value to the intended Ballerina type.
+     *
+     * @param type  expected type
+     * @param value Value to be converted
+     * @return value with the intended type
+     */
+    public static Object getValueWithIntendedType(byte[] value, Type type) {
+        String strValue = new String(value, StandardCharsets.UTF_8);
+        Object intendedValue = null;
+        try {
+            switch (type.getTag()) {
+                case STRING_TAG:
+                    intendedValue = StringUtils.fromString(strValue);
+                    break;
+                case XML_TAG:
+                    intendedValue = XmlUtils.parse(strValue);
+                    break;
+                case ANYDATA_TAG:
+                    intendedValue = ValueCreator.createArrayValue(value);
+                    break;
+                case RECORD_TYPE_TAG:
+                    intendedValue = CloneWithType.convert(type, JsonUtils.parse(strValue));
+                    break;
+                case UNION_TAG:
+                    if (hasStringType((UnionType) type)) {
+                        intendedValue = StringUtils.fromString(strValue);
+                        break;
+                    }
+                    intendedValue = getValueFromJson(type, strValue);
+                    break;
+                case ARRAY_TAG:
+                    if (getReferredType(((ArrayType) type).getElementType()).getTag() == BYTE_TAG) {
+                        intendedValue = ValueCreator.createArrayValue(value);
+                        break;
+                    }
+                    /*-fallthrough*/
+                default:
+                    intendedValue = getValueFromJson(type, strValue);
+            }
+        } catch (BError bError) {
+            // todo: handle
+        }
+        if (intendedValue instanceof BError) {
+            // todo: handle
+        }
+        return intendedValue;
+    }
+
+    private static boolean hasStringType(UnionType type) {
+        return type.getMemberTypes().stream().anyMatch(memberType -> memberType.getTag() == STRING_TAG);
+    }
+
+    private static Object getValueFromJson(Type type, String stringValue) {
+        BTypedesc typeDesc = ValueCreator.createTypedescValue(type);
+        return FromJsonWithType.fromJsonWithType(JsonUtils.parse(stringValue), typeDesc);
+    }
+
+    /**
+     * Adds the ASB properties to the Ballerina record response, only if present.
+     *
+     * @param map              Ballerina record map
+     * @param key              Key of the property
+     * @param receivedProperty Received property
+     */
+    public static void addMessageFieldIfPresent(Map<String, Object> map, String key, Object receivedProperty) {
+        if (receivedProperty != null) {
+            map.put(key, receivedProperty);
+        }
     }
 }

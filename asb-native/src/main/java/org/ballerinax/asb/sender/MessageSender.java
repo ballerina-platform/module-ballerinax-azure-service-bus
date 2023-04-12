@@ -63,7 +63,7 @@ public class MessageSender {
      * @throws ServiceBusException on failure initiating IMessage Receiver in Azure Service Bus instance.
      */
     public MessageSender(String connectionString, String entityType, String topicOrQueueName, String logLevel,
-                         BMap<BString, Object> retryConfigs) throws ServiceBusException {
+                         BMap<BString, Object> retryConfigs) throws ServiceBusException, InterruptedException {
 
         log.setLevel(Level.toLevel(logLevel, Level.OFF));
         AmqpRetryOptions retryOptions = getRetryOptions(retryConfigs);
@@ -84,6 +84,12 @@ public class MessageSender {
         log.debug("ServiceBusSenderClient initialized");
     }
 
+    /**
+     * Sends a message to the configured service bus queue or topic, using the java SDK.
+     *
+     * @param message Input message record as a BMap
+     * @return An error if failed to send the message
+     */
     public Object send(BMap<BString, Object> message) {
         try {
             ServiceBusMessage messageToSend = constructMessage(message);
@@ -97,6 +103,14 @@ public class MessageSender {
         }
     }
 
+    /**
+     * Sends a scheduled message to the Azure Service Bus entity this sender is connected to. A scheduled message is
+     * enqueued and made available to receivers only at the scheduled enqueue time.
+     *
+     * @param message      Input message record as a BMap
+     * @param scheduleTime Input schedule time record as a BMap
+     * @return An error if failed to send the message
+     */
     public Object schedule(BMap<BString, Object> message, BMap<BString, Object> scheduleTime) {
         try {
             ServiceBusMessage messageToSend = constructMessage(message);
@@ -110,6 +124,12 @@ public class MessageSender {
         }
     }
 
+    /**
+     * Cancels the enqueuing of a scheduled message, if they are not already enqueued.
+     *
+     * @param sequenceNumber The sequence number of the message to cance
+     * @return An error if failed to send the message
+     */
     public Object cancel(long sequenceNumber) {
         try {
             sender.cancelScheduledMessage(sequenceNumber);
@@ -120,33 +140,6 @@ public class MessageSender {
         } catch (IllegalArgumentException | ServiceBusException | IllegalStateException e) {
             return ASBUtils.returnErrorValue(e.getClass().getSimpleName(), e);
         }
-    }
-
-    private OffsetDateTime constructOffset(BMap<BString, Object> scheduleTime) {
-
-        int year = ((Long) scheduleTime.get(StringUtils.fromString("year"))).intValue();
-        int month = ((Long) scheduleTime.get(StringUtils.fromString("month"))).intValue();
-        int day = ((Long) scheduleTime.get(StringUtils.fromString("day"))).intValue();
-        int hour = ((Long) scheduleTime.get(StringUtils.fromString("hour"))).intValue();
-        int minute = ((Long) scheduleTime.get(StringUtils.fromString("minute"))).intValue();
-        int seconds = 0;
-        int zoneOffsetHours = 0;
-        int zoneOffsetMinutes = 0;
-
-        if (scheduleTime.containsKey(StringUtils.fromString("second"))) {
-            BDecimal secondsAsObject = (BDecimal) scheduleTime.get(StringUtils.fromString("second"));
-            seconds = secondsAsObject.byteValue();
-        }
-
-        if (scheduleTime.containsKey(StringUtils.fromString("utcOffset"))) {
-            BMap<BString, Object> utcOffsetBMap = (BMap<BString, Object>) scheduleTime
-                    .get(StringUtils.fromString("utcOffset"));
-            zoneOffsetHours = (int) utcOffsetBMap.get(StringUtils.fromString("hours"));
-            zoneOffsetMinutes = (int) utcOffsetBMap.get(StringUtils.fromString("minutes"));
-        }
-
-        ZoneOffset zoneOffset = ZoneOffset.ofHoursMinutes(zoneOffsetHours, zoneOffsetMinutes);
-        return OffsetDateTime.of(year, month, day, hour, minute, seconds, 0, zoneOffset);
     }
 
     /**
@@ -191,6 +184,21 @@ public class MessageSender {
             }
             return null;
         } catch (ServiceBusException e) {
+            return ASBUtils.returnErrorValue(e.getClass().getSimpleName(), e);
+        }
+    }
+
+    /**
+     * Closes the Asb Sender Connection using the given connection parameters.
+     *
+     * @return @return An error if failed close the sender.
+     */
+    public Object closeSender() {
+        try {
+            sender.close();
+            log.debug("Closed the sender. Identifier=" + sender.getIdentifier());
+            return null;
+        } catch (Exception e) {
             return ASBUtils.returnErrorValue(e.getClass().getSimpleName(), e);
         }
     }
@@ -255,7 +263,7 @@ public class MessageSender {
         if (message.containsKey(StringUtils.fromString(ASBConstants.APPLICATION_PROPERTY_KEY))) {
             BMap<BString, Object> propertyBMap = (BMap<BString, Object>) message.get(StringUtils.fromString(
                     ASBConstants.APPLICATION_PROPERTY_KEY));
-            Object propertyMap = propertyBMap.get(StringUtils.fromString(ASBConstants.APPLICATION_PROPERIES));
+            Object propertyMap = propertyBMap.get(StringUtils.fromString(ASBConstants.APPLICATION_PROPERTIES));
             Map<String, Object> map = ASBUtils.toMap((BMap) propertyMap);
             asbMessage.getApplicationProperties().putAll(map);
         }
@@ -263,18 +271,30 @@ public class MessageSender {
         return asbMessage;
     }
 
-    /**
-     * Closes the Asb Sender Connection using the given connection parameters.
-     *
-     * @return @return An error if failed close the sender.
-     */
-    public Object closeSender() {
-        try {
-            sender.close();
-            log.debug("Closed the sender. Identifier=" + sender.getIdentifier());
-            return null;
-        } catch (Exception e) {
-            return ASBUtils.returnErrorValue(e.getClass().getSimpleName(), e);
+    private OffsetDateTime constructOffset(BMap<BString, Object> scheduleTime) {
+
+        int year = ((Long) scheduleTime.get(StringUtils.fromString("year"))).intValue();
+        int month = ((Long) scheduleTime.get(StringUtils.fromString("month"))).intValue();
+        int day = ((Long) scheduleTime.get(StringUtils.fromString("day"))).intValue();
+        int hour = ((Long) scheduleTime.get(StringUtils.fromString("hour"))).intValue();
+        int minute = ((Long) scheduleTime.get(StringUtils.fromString("minute"))).intValue();
+        int seconds = 0;
+        int zoneOffsetHours = 0;
+        int zoneOffsetMinutes = 0;
+
+        if (scheduleTime.containsKey(StringUtils.fromString("second"))) {
+            BDecimal secondsAsObject = (BDecimal) scheduleTime.get(StringUtils.fromString("second"));
+            seconds = secondsAsObject.byteValue();
         }
+
+        if (scheduleTime.containsKey(StringUtils.fromString("utcOffset"))) {
+            BMap<BString, Object> utcOffsetBMap = (BMap<BString, Object>) scheduleTime
+                    .get(StringUtils.fromString("utcOffset"));
+            zoneOffsetHours = (int) utcOffsetBMap.get(StringUtils.fromString("hours"));
+            zoneOffsetMinutes = (int) utcOffsetBMap.get(StringUtils.fromString("minutes"));
+        }
+
+        ZoneOffset zoneOffset = ZoneOffset.ofHoursMinutes(zoneOffsetHours, zoneOffsetMinutes);
+        return OffsetDateTime.of(year, month, day, hour, minute, seconds, 0, zoneOffset);
     }
 }
