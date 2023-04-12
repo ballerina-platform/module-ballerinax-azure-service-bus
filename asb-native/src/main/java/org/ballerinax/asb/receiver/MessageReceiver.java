@@ -79,7 +79,7 @@ public class MessageReceiver {
      */
     public MessageReceiver(String connectionString, String queueName, String topicName, String subscriptionName,
                            String receiveMode, long maxAutoLockRenewDuration, String logLevel,
-                           BMap<BString, Object> retryConfigs) throws ServiceBusException {
+                           BMap<BString, Object> retryConfigs) throws ServiceBusException, InterruptedException {
 
         log.setLevel(Level.toLevel(logLevel, Level.OFF));
         AmqpRetryOptions retryOptions = getRetryOptions(retryConfigs);

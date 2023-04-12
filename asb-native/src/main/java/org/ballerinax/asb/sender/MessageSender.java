@@ -63,7 +63,7 @@ public class MessageSender {
      * @throws ServiceBusException on failure initiating IMessage Receiver in Azure Service Bus instance.
      */
     public MessageSender(String connectionString, String entityType, String topicOrQueueName, String logLevel,
-                         BMap<BString, Object> retryConfigs) throws ServiceBusException {
+                         BMap<BString, Object> retryConfigs) throws ServiceBusException, InterruptedException {
 
         log.setLevel(Level.toLevel(logLevel, Level.OFF));
         AmqpRetryOptions retryOptions = getRetryOptions(retryConfigs);
