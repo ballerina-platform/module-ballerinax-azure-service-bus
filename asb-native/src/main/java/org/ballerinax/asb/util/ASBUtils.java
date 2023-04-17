@@ -52,6 +52,7 @@ import java.util.Objects;
 import static io.ballerina.runtime.api.TypeTags.ANYDATA_TAG;
 import static io.ballerina.runtime.api.TypeTags.ARRAY_TAG;
 import static io.ballerina.runtime.api.TypeTags.BYTE_TAG;
+import static io.ballerina.runtime.api.TypeTags.NULL_TAG;
 import static io.ballerina.runtime.api.TypeTags.RECORD_TYPE_TAG;
 import static io.ballerina.runtime.api.TypeTags.STRING_TAG;
 import static io.ballerina.runtime.api.TypeTags.UNION_TAG;
@@ -278,11 +279,12 @@ public class ASBUtils {
                     intendedValue = CloneWithType.convert(type, JsonUtils.parse(strValue));
                     break;
                 case UNION_TAG:
-                    if (hasStringType((UnionType) type)) {
-                        intendedValue = StringUtils.fromString(strValue);
-                        break;
+                    if (isSupportedUnionType(type)) {
+                        intendedValue = getValueWithIntendedType(value, getExpectedTypeFromNilableType(type));
+                    } else {
+                        intendedValue = ErrorCreator.createError(StringUtils.fromString("Union types are not " +
+                                "supported for the contextually expected type, except for nilable types"));
                     }
-                    intendedValue = getValueFromJson(type, strValue);
                     break;
                 case ARRAY_TAG:
                     if (getReferredType(((ArrayType) type).getElementType()).getTag() == BYTE_TAG) {
@@ -304,6 +306,25 @@ public class ASBUtils {
 
     private static boolean hasStringType(UnionType type) {
         return type.getMemberTypes().stream().anyMatch(memberType -> memberType.getTag() == STRING_TAG);
+    }
+
+    /**
+     * Checks whether the given type is a union type of two member types, including the nil type.
+     *
+     * @param type Type to be checked
+     * @return True if the given type is a union type of two member types, including nil type.
+     */
+    private static boolean isSupportedUnionType(Type type) {
+        return type.getTag() == UNION_TAG
+                && ((UnionType) type).getMemberTypes().size() == 2
+                && ((UnionType) type).getMemberTypes().stream().anyMatch(memberType -> memberType.getTag() == NULL_TAG);
+    }
+
+    public static Type getExpectedTypeFromNilableType(Type type) {
+        return ((UnionType) type).getMemberTypes().stream()
+                .filter(memberType -> memberType.getTag() != NULL_TAG)
+                .findFirst()
+                .orElse(null);
     }
 
     private static Object getValueFromJson(Type type, String stringValue) {

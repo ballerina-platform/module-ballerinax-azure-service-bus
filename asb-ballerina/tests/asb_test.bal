@@ -26,11 +26,24 @@ configurable string topicName = "mytopic";
 configurable string subscriptionName1 = "mysubscription1";
 string subscriptionPath1 = subscriptionName1;
 
+type Order record {
+    string color;
+    decimal price;
+};
+
 // Input values
+() nilContent = ();
+int intContent = 1;
+float floatContent = 1.345;
+boolean booleanContent = true;
+map<anydata> mapContent = {color: "orange", price: 5.36d};
+Order recordContent = {color: "orange", price: 5.36d};
 string stringContent = "This is ASB connector test-Message Body";
 byte[] byteContent = stringContent.toBytes();
-json jsonContent = {name: "wso2", color: "orange", price: 5.36};
+json jsonContent = {name: "wso2", color: "orange", price: 5.36d};
 byte[] byteContentFromJson = jsonContent.toJsonString().toBytes();
+xml xmlContent = xml `<name>wso2</name>`;
+
 map<anydata> properties = {a: "propertyValue1", b: "propertyValue2", c: 1, d: "true", f: 1.345, s: false, k: 1020202, g: jsonContent};
 int timeToLive = 60; // In seconds
 int serverWaitTime = 60; // In seconds
@@ -101,6 +114,72 @@ function testSendAndReceiveMessageFromQueueOperation() returns error? {
     } else {
         test:assertFail("Receiving message via Asb receiver connection failed.");
     }
+    log:printInfo("Closing Asb sender client.");
+    check messageSender->close();
+
+    log:printInfo("Closing Asb receiver client.");
+    check messageReceiver->close();
+}
+
+@test:Config {
+    groups: ["asb"],
+    dependsOn: [testSendAndReceiveMessageFromQueueOperation],
+    enable: true
+}
+function testSendAndReceiveMessagePayloadFromQueueOperation() returns error? {
+    log:printInfo("[[testSendAndReceiveMessagePayloadFromQueueOperation]]");
+    log:printInfo("Creating Asb message sender.");
+    MessageSender messageSender = check new (senderConfig);
+
+    log:printInfo("Sending all the anydata payloads via ASB sender");
+    check messageSender->sendPayload(nilContent);
+    check messageSender->sendPayload(booleanContent);
+    check messageSender->sendPayload(intContent);
+    check messageSender->sendPayload(floatContent);
+    check messageSender->sendPayload(stringContent);
+    check messageSender->sendPayload(jsonContent);
+    check messageSender->sendPayload(byteContent);
+    check messageSender->sendPayload(xmlContent);
+    check messageSender->sendPayload(mapContent);
+    check messageSender->sendPayload(recordContent);
+
+    log:printInfo("Creating Asb message receiver.");
+    receiverConfig.receiveMode = RECEIVE_AND_DELETE;
+    MessageReceiver messageReceiver = check new (receiverConfig);
+    log:printInfo("Receiving from Asb receiver client.");
+    error? nilPayload = messageReceiver->receivePayload(serverWaitTime);
+    boolean|error? booleanPayload = messageReceiver->receivePayload(serverWaitTime);
+    int|error? intPayload = messageReceiver->receivePayload(serverWaitTime);
+    float|error? floatPayload = messageReceiver->receivePayload(serverWaitTime);
+    string|error? stringPayload = messageReceiver->receivePayload(serverWaitTime);
+    json|error? jsonPayload = messageReceiver->receivePayload(serverWaitTime);
+    byte[]|error? bytePayload = messageReceiver->receivePayload(serverWaitTime);
+    xml|error? xmlPayload = messageReceiver->receivePayload(serverWaitTime);
+    map<anydata>|error? mapPayload = messageReceiver->receivePayload(serverWaitTime);
+    Order|error? recordPayload = messageReceiver->receivePayload(serverWaitTime);
+
+    log:printInfo("Asserting received payloads.");
+    test:assertTrue(nilPayload is (), msg = "Nil payload not received.");
+    test:assertEquals(nilPayload, nilContent, msg = "Nil payload not received.");
+    test:assertTrue(booleanPayload is boolean, msg = "Boolean payload not received.");
+    test:assertEquals(booleanPayload, true, msg = "Boolean payload not received.");
+    test:assertTrue(intPayload is int, msg = "Int payload not received.");
+    test:assertEquals(intPayload, intContent, msg = "Int payload not received.");
+    test:assertTrue(floatPayload is float, msg = "Float payload not received.");
+    test:assertEquals(floatPayload, floatContent, msg = "Float payload not received.");
+    test:assertTrue(stringPayload is string, msg = "String payload not received.");
+    test:assertEquals(stringPayload, stringContent, msg = "String payload not received.");
+    test:assertTrue(jsonPayload is json, msg = "Json payload not received.");
+    test:assertEquals(jsonPayload, jsonContent, msg = "Json payload not received.");
+    test:assertTrue(bytePayload is byte[], msg = "Byte payload not received.");
+    test:assertEquals(bytePayload, byteContent, msg = "Byte payload not received.");
+    test:assertTrue(xmlPayload is xml, msg = "Xml payload not received.");
+    test:assertEquals(xmlPayload, xmlContent, msg = "Xml payload not received.");
+    test:assertTrue(mapPayload is map<anydata>, msg = "Map payload not received.");
+    test:assertEquals(mapPayload, mapContent, msg = "Map payload not received.");
+    test:assertTrue(recordPayload is Order, msg = "Record payload not received.");
+    test:assertEquals(recordPayload, recordContent, msg = "Record payload not received.");
+
     log:printInfo("Closing Asb sender client.");
     check messageSender->close();
 
