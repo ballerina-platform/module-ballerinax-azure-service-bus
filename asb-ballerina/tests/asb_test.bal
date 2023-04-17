@@ -21,17 +21,17 @@ import ballerina/time;
 
 // Connection Configurations
 configurable string connectionString = os:getEnv("CONNECTION_STRING");
-configurable string queueName = os:getEnv("QUEUE_NAME");
-configurable string topicName = os:getEnv("TOPIC_NAME");
-configurable string subscriptionName1 = os:getEnv("SUBSCRIPTION_NAME1");
+configurable string queueName = "myqueue";
+configurable string topicName = "mytopic";
+configurable string subscriptionName1 = "mysubscription1";
 string subscriptionPath1 = subscriptionName1;
 
 // Input values
-string stringContent = "This is ASB connector test-Message Body"; 
+string stringContent = "This is ASB connector test-Message Body";
 byte[] byteContent = stringContent.toBytes();
 json jsonContent = {name: "wso2", color: "orange", price: 5.36};
 byte[] byteContentFromJson = jsonContent.toJsonString().toBytes();
-map<anydata> properties = {a: "propertyValue1", b: "propertyValue2", c: 1, d: "true", f: 1.345, s: false, k:1020202, g: jsonContent};
+map<anydata> properties = {a: "propertyValue1", b: "propertyValue2", c: 1, d: "true", f: 1.345, s: false, k: 1020202, g: jsonContent};
 int timeToLive = 60; // In seconds
 int serverWaitTime = 60; // In seconds
 int maxMessageCount = 2;
@@ -72,7 +72,7 @@ ASBServiceReceiverConfig receiverConfig = {
     receiveMode: PEEK_LOCK
 };
 
-@test:Config { 
+@test:Config {
     groups: ["asb"],
     enable: true
 }
@@ -80,7 +80,7 @@ function testSendAndReceiveMessageFromQueueOperation() returns error? {
     log:printInfo("[[testSendAndReceiveMessageFromQueueOperation]]");
 
     log:printInfo("Creating Asb message sender.");
-    MessageSender messageSender = check new(senderConfig);
+    MessageSender messageSender = check new (senderConfig);
 
     log:printInfo("Creating Asb message receiver.");
     MessageReceiver messageReceiver = check new (receiverConfig);
@@ -108,7 +108,7 @@ function testSendAndReceiveMessageFromQueueOperation() returns error? {
     check messageReceiver->close();
 }
 
-@test:Config { 
+@test:Config {
     groups: ["asb"],
     dependsOn: [testSendAndReceiveMessageFromQueueOperation],
     enable: true
@@ -117,7 +117,7 @@ function testSendAndReceiveBatchFromQueueOperation() returns error? {
     log:printInfo("[[testSendAndReceiveBatchFromQueueOperation]]");
 
     log:printInfo("Initializing Asb sender client.");
-    MessageSender messageSender = check new(senderConfig);
+    MessageSender messageSender = check new (senderConfig);
 
     log:printInfo("Initializing Asb receiver client.");
     receiverConfig.receiveMode = RECEIVE_AND_DELETE;
@@ -133,7 +133,7 @@ function testSendAndReceiveBatchFromQueueOperation() returns error? {
         log:printInfo(messageReceived.toString());
         foreach Message message in messageReceived.messages {
             if (message.toString() != "") {
-                string msg =  check string:fromBytes(<byte[]>message.body);
+                string msg = check string:fromBytes(<byte[]>message.body);
                 test:assertEquals(msg, stringContent, msg = "Sent & received message are not equal.");
             }
         }
@@ -150,7 +150,7 @@ function testSendAndReceiveBatchFromQueueOperation() returns error? {
     check messageReceiver->close();
 }
 
-@test:Config { 
+@test:Config {
     groups: ["asb"],
     dependsOn: [testSendAndReceiveBatchFromQueueOperation],
     enable: true
@@ -159,7 +159,7 @@ function testCompleteMessageFromQueueOperation() returns error? {
     log:printInfo("[[testCompleteMessageFromQueueOperation]]");
 
     log:printInfo("Initializing Asb sender client.");
-    MessageSender messageSender = check new(senderConfig);
+    MessageSender messageSender = check new (senderConfig);
 
     log:printInfo("Initializing Asb receiver client.");
     receiverConfig.receiveMode = PEEK_LOCK;
@@ -173,7 +173,7 @@ function testCompleteMessageFromQueueOperation() returns error? {
     Message|error? messageReceived = messageReceiver->receive(serverWaitTime);
 
     if (messageReceived is Message) {
-        log:printInfo("messgae" +  messageReceived.toString());
+        log:printInfo("messgae" + messageReceived.toString());
         var result = check messageReceiver->complete(messageReceived);
         test:assertEquals(result, (), msg = "Complete message not successful.");
     } else if (messageReceived is ()) {
@@ -189,7 +189,7 @@ function testCompleteMessageFromQueueOperation() returns error? {
     check messageSender->close();
 }
 
-@test:Config { 
+@test:Config {
     groups: ["asb"],
     dependsOn: [testCompleteMessageFromQueueOperation],
     enable: true
@@ -198,7 +198,7 @@ function testAbandonMessageFromQueueOperation() returns error? {
     log:printInfo("[[testAbandonMessageFromQueueOperation]]");
 
     log:printInfo("Initializing Asb sender client.");
-    MessageSender messageSender = check new(senderConfig);
+    MessageSender messageSender = check new (senderConfig);
 
     log:printInfo("Initializing Asb receiver client.");
     MessageReceiver messageReceiver = check new (receiverConfig);
@@ -214,7 +214,7 @@ function testAbandonMessageFromQueueOperation() returns error? {
         test:assertEquals(result, (), msg = "Abandon message not successful.");
         Message|error? messageReceivedAgain = messageReceiver->receive(serverWaitTime);
         if (messageReceivedAgain is Message) {
-            test:assertEquals(messageReceivedAgain?.messageId, messageReceived?.messageId, 
+            test:assertEquals(messageReceivedAgain?.messageId, messageReceived?.messageId,
                 msg = "Abandon message not successful.");
             check messageReceiver->complete(messageReceivedAgain);
         } else {
@@ -233,7 +233,7 @@ function testAbandonMessageFromQueueOperation() returns error? {
     check messageReceiver->close();
 }
 
-@test:Config { 
+@test:Config {
     groups: ["asb"],
     dependsOn: [testAbandonMessageFromQueueOperation],
     enable: true
@@ -242,7 +242,7 @@ function testDeadletterMessageFromQueueOperation() returns error? {
     log:printInfo("[[testDeadletterMessageFromQueueOperation]]");
 
     log:printInfo("Initializing Asb sender.");
-    MessageSender messageSender = check new(senderConfig);
+    MessageSender messageSender = check new (senderConfig);
 
     log:printInfo("Initializing Asb receiver.");
     MessageReceiver messageReceiver = check new (receiverConfig);
@@ -269,7 +269,7 @@ function testDeadletterMessageFromQueueOperation() returns error? {
     check messageReceiver->close();
 }
 
-@test:Config { 
+@test:Config {
     groups: ["asb"],
     dependsOn: [testDeadletterMessageFromQueueOperation],
     enable: true
@@ -278,7 +278,7 @@ function testDeferMessageFromQueueOperation() returns error? {
     log:printInfo("[[testDeferMessageFromQueueOperation]]");
 
     log:printInfo("Initializing Asb sender.");
-    MessageSender messageSender = check new(senderConfig);
+    MessageSender messageSender = check new (senderConfig);
 
     log:printInfo("Initializing Asb receiver.");
     MessageReceiver messageReceiver = check new (receiverConfig);
@@ -294,7 +294,7 @@ function testDeferMessageFromQueueOperation() returns error? {
         test:assertNotEquals(result, 0, msg = "Defer message not successful.");
         Message|error? messageReceivedAgain = check messageReceiver->receiveDeferred(result);
         if (messageReceivedAgain is Message) {
-            test:assertEquals(messageReceivedAgain?.messageId, messageReceived?.messageId, 
+            test:assertEquals(messageReceivedAgain?.messageId, messageReceived?.messageId,
                 msg = "Receiving deferred message not succesful.");
             check messageReceiver->complete(messageReceivedAgain);
         }
@@ -311,7 +311,7 @@ function testDeferMessageFromQueueOperation() returns error? {
     check messageReceiver->close();
 }
 
-@test:Config { 
+@test:Config {
     groups: ["asb"],
     dependsOn: [testDeferMessageFromQueueOperation],
     enable: true
@@ -339,7 +339,7 @@ function testSendAndReceiveMessageFromSubscriptionOperation() returns error? {
 
     if (messageReceived is Message) {
         log:printInfo(messageReceived.toString());
-        string msg =  check string:fromBytes(<byte[]>messageReceived.body);
+        string msg = check string:fromBytes(<byte[]>messageReceived.body);
         test:assertEquals(msg, stringContent, msg = "Sent & received message not equal.");
     } else if (messageReceived is ()) {
         test:assertFail("No message in the subscription.");
@@ -354,7 +354,7 @@ function testSendAndReceiveMessageFromSubscriptionOperation() returns error? {
     check subscriptionReceiver->close();
 }
 
-@test:Config { 
+@test:Config {
     groups: ["asb"],
     dependsOn: [testSendAndReceiveMessageFromSubscriptionOperation],
     enable: true
@@ -377,7 +377,7 @@ function testSendAndReceiveBatchFromSubscriptionOperation() returns error? {
     if (messageReceived is MessageBatch) {
         foreach Message message in messageReceived.messages {
             if (message.toString() != "") {
-                string msg =  check string:fromBytes(<byte[]>message.body);
+                string msg = check string:fromBytes(<byte[]>message.body);
                 test:assertEquals(msg, stringContent, msg = "Sent & received message not equal.");
             }
         }
@@ -394,7 +394,7 @@ function testSendAndReceiveBatchFromSubscriptionOperation() returns error? {
     check subscriptionReceiver->close();
 }
 
-@test:Config { 
+@test:Config {
     groups: ["asb"],
     dependsOn: [testSendAndReceiveBatchFromSubscriptionOperation],
     enable: true
@@ -431,7 +431,7 @@ function testCompleteMessageFromSubscriptionOperation() returns error? {
     check subscriptionReceiver->close();
 }
 
-@test:Config { 
+@test:Config {
     groups: ["asb"],
     dependsOn: [testCompleteMessageFromSubscriptionOperation],
     enable: true
@@ -473,7 +473,7 @@ function testAbandonMessageFromSubscriptionOperation() returns error? {
     check subscriptionReceiver->close();
 }
 
-@test:Config { 
+@test:Config {
     groups: ["asb"],
     dependsOn: [testAbandonMessageFromSubscriptionOperation],
     enable: true
@@ -509,7 +509,7 @@ function testDeadletterMessageFromSubscriptionOperation() returns error? {
     check subscriptionReceiver->close();
 }
 
-@test:Config { 
+@test:Config {
     groups: ["asb"],
     dependsOn: [testDeadletterMessageFromSubscriptionOperation],
     enable: true
@@ -534,7 +534,7 @@ function testDeferMessageFromSubscriptionOperation() returns error? {
         test:assertNotEquals(result, 0, msg = "Defer message not successful.");
         Message|error? messageReceivedAgain = check subscriptionReceiver->receiveDeferred(result);
         if (messageReceivedAgain is Message) {
-            test:assertEquals(messageReceivedAgain?.messageId, messageReceived?.messageId, 
+            test:assertEquals(messageReceivedAgain?.messageId, messageReceived?.messageId,
                 msg = "Receiving deferred message not successful.");
             check subscriptionReceiver->complete(messageReceivedAgain);
         }
@@ -605,6 +605,4 @@ function testMessageScheduling() returns error? {
         }
         return error("Error while executing test testMessageScheduling", e);
     }
-
-
 }

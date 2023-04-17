@@ -349,7 +349,7 @@ public class MessageReceiver {
                 return null;
             }
             log.debug("Received deferred message using its sequenceNumber from " + receiver.getEntityPath());
-            return constructAsbMessageRecord(endpointClient, receivedMessage);
+            return constructExpectedMessageRecord(endpointClient, receivedMessage, null);
         } catch (Exception e) {
             return ASBUtils.returnErrorValue(e.getClass().getSimpleName(), e);
         }
@@ -422,24 +422,8 @@ public class MessageReceiver {
     }
 
     /**
-     * Converts the received message to a Ballerina ASB message record.
-     *
-     * @param endpointClient Ballerina client object
-     * @param message        Received Message
-     */
-    private static BMap<BString, Object> constructAsbMessageRecord(BObject endpointClient,
-                                                                   ServiceBusReceivedMessage message) {
-        Map<String, Object> map = populateOptionalFieldsMap(message);
-        BMap<BString, Object> balRecord = createBRecordValue(map, null);
-
-        // Adds body content to the record
-        map.put(BODY, getMessagePayload(message));
-        endpointClient.addNativeData(message.getLockToken(), message);
-        return balRecord;
-    }
-
-    /**
-     * Converts the received message to the contextually expected Ballerina record type.
+     * Converts the received message to the contextually expected Ballerina record type (or to anydata, if not
+     * specified).
      *
      * @param endpointClient Ballerina client object
      * @param message        Received Message
@@ -448,17 +432,19 @@ public class MessageReceiver {
                                                                         ServiceBusReceivedMessage message,
                                                                         RecordType expectedType) {
         Map<String, Object> map = populateOptionalFieldsMap(message);
-        BMap<BString, Object> balRecord = createBRecordValue(map, expectedType);
-
         Object messageBody = getMessagePayload(message);
         if (messageBody instanceof byte[]) {
-            map.put(BODY, getValueWithIntendedType((byte[]) messageBody,
-                    expectedType.getFields().get(BODY).getFieldType()));
+            if (expectedType != null) {
+                map.put(BODY, getValueWithIntendedType((byte[]) messageBody, expectedType.getFields().get(BODY)
+                        .getFieldType()));
+            } else {
+                map.put(BODY, getValueWithIntendedType((byte[]) messageBody, PredefinedTypes.TYPE_ANYDATA));
+            }
         } else {
             map.put(BODY, messageBody);
         }
         endpointClient.addNativeData(message.getLockToken(), message);
-        return balRecord;
+        return createBRecordValue(map, expectedType);
     }
 
     private static Map<String, Object> populateOptionalFieldsMap(ServiceBusReceivedMessage message) {
@@ -532,7 +518,7 @@ public class MessageReceiver {
 
         int messageCount = 0;
         for (ServiceBusReceivedMessage receivedMessage : receivedMessageStream) {
-            BMap<BString, Object> recordMap = constructAsbMessageRecord(endpointClient, receivedMessage);
+            BMap<BString, Object> recordMap = constructExpectedMessageRecord(endpointClient, receivedMessage, null);
             messages[messageCount++] = ValueCreator.createRecordValue(ModuleUtils.getModule(),
                     ASBConstants.MESSAGE_RECORD, recordMap);
         }

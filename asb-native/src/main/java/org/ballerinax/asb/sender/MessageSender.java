@@ -209,7 +209,7 @@ public class MessageSender {
         byte[] byteArray;
         Type type = TypeUtils.getType(messageBody);
         if (type.getTag() == TypeTags.STRING_TAG) {
-            byteArray = ((BString) messageBody).toString().getBytes();
+            byteArray = ((BString) messageBody).getValue().getBytes();
         } else if (type.getTag() == TypeTags.INT_TAG) {
             byteArray = Integer.toString((int) messageBody).getBytes();
         } else {
