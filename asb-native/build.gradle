@@ -1,6 +1,8 @@
 plugins {
     id 'java'
-    id "com.github.johnrengelman.shadow" version "5.2.0"
+    id 'checkstyle'
+    id 'com.github.spotbugs'
+    id "com.github.johnrengelman.shadow"
 }
 
 group project.group
@@ -25,23 +27,59 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.azure:azure-messaging-servicebus:7.13.1'
-    dist group: 'com.azure', name: 'azure-messaging-servicebus', version: '7.13.1'
-    implementation group: 'log4j', name: 'log4j', version: '1.2.17'
-    dist group: 'log4j', name: 'log4j', version: '1.2.17'
-    compile group: 'org.ballerinalang', name: 'ballerina-lang', version: project.ballerinaLangVersion
-    compile(group: 'org.ballerinalang', name: 'ballerina-runtime', version: project.ballerinaLangVersion) {
+    implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: "${azureServiceBusVersion}"
+    implementation group: 'log4j', name: 'log4j', version: "${log4jVersion}"
+    implementation group: 'org.ballerinalang', name: 'ballerina-lang', version: project.ballerinaLangVersion
+    implementation(group: 'org.ballerinalang', name: 'ballerina-runtime', version: project.ballerinaLangVersion) {
         transitive = false
     }
+
+    dist group: 'com.azure', name: 'azure-messaging-servicebus', version: "${azureServiceBusVersion}"
+    dist group: 'log4j', name: 'log4j', version: "${log4jVersion}"
+
+    checkstyle project(':checkstyle')
+    checkstyle "com.puppycrawl.tools:checkstyle:${puppycrawlCheckstyleVersion}"
+}
+
+checkstyle {
+    toolVersion "${checkstyleToolVersion}"
+    configFile rootProject.file("build-config/checkstyle/build/checkstyle.xml")
+    configProperties = ["suppressionFile": file("${rootDir}/build-config/checkstyle/build/suppressions.xml")]
+}
+
+def excludePattern = '**/module-info.java'
+tasks.withType(Checkstyle).configureEach {
+    exclude excludePattern
+}
+
+spotbugsMain {
+    ignoreFailures = true
+    effort "max"
+    reportLevel "low"
+    reportsDir = file("$project.buildDir/reports/spotbugs")
+    def excludeFile = file("${rootDir}/build-config/spotbugs-exclude.xml")
+    if (excludeFile.exists()) {
+        excludeFilter = excludeFile
+    }
+    reports {
+        html.enabled true
+        text.enabled = true
+    }
+}
+
+spotbugsTest {
+    enabled = false
 }
 
 jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     dependsOn configurations.dist
     from { configurations.dist.collect { it.isDirectory() ? it : zipTree(it) } } {
-        exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA', 'io/netty/**', 'com/google/gson/**', 
-        'org/slf4j/**', 'org/apache/commons/lang3/**', 'com/ctc/wstx/**', 'org/codehaus/**'
+        exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA', 'io/netty/**', 'com/google/gson/**',
+                'org/slf4j/**', 'org/apache/commons/lang3/**', 'com/ctc/wstx/**', 'org/codehaus/**'
     }
 }
 
+checkstyleMain.dependsOn(":checkstyle:downloadCheckstyleRuleFiles")
+checkstyleTest.dependsOn(":checkstyle:downloadCheckstyleRuleFiles")
 build.dependsOn(shadowJar)

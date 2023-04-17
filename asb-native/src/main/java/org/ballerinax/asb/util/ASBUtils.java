@@ -36,6 +36,7 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.ballerinax.asb.util.ASBConstants.DELAY;
 import static org.ballerinax.asb.util.ASBConstants.MAX_DELAY;
@@ -43,6 +44,9 @@ import static org.ballerinax.asb.util.ASBConstants.MAX_RETRIES;
 import static org.ballerinax.asb.util.ASBConstants.RETRY_MODE;
 import static org.ballerinax.asb.util.ASBConstants.TRY_TIMEOUT;
 
+/**
+ * Utility class for Azure Service Bus.
+ */
 public class ASBUtils {
 
     /**
@@ -103,7 +107,7 @@ public class ASBUtils {
      * @return value as a string or empty.
      */
     public static String convertString(Object value) {
-        return (value == null || value.toString() == "") ? null : value.toString();
+        return (value == null || Objects.equals(value.toString(), "")) ? null : value.toString();
     }
 
     /**
@@ -189,7 +193,7 @@ public class ASBUtils {
     /**
      * Returns a Ballerina Error with the given String message and exception.
      *
-     * @param errorMessage The error message
+     * @param message The error message
      * @return Resulting Ballerina Error
      */
     public static BError returnErrorValue(String message, Exception error) {

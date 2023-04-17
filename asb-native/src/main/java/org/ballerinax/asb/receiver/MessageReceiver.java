@@ -18,44 +18,38 @@
 
 package org.ballerinax.asb.receiver;
 
-import com.azure.core.amqp.AmqpRetryMode;
 import com.azure.core.amqp.AmqpRetryOptions;
 import com.azure.core.amqp.models.AmqpAnnotatedMessage;
 import com.azure.core.amqp.models.AmqpMessageBodyType;
 import com.azure.core.util.IterableStream;
 import com.azure.messaging.servicebus.ServiceBusClientBuilder;
+import com.azure.messaging.servicebus.ServiceBusClientBuilder.ServiceBusReceiverClientBuilder;
 import com.azure.messaging.servicebus.ServiceBusException;
 import com.azure.messaging.servicebus.ServiceBusReceivedMessage;
 import com.azure.messaging.servicebus.ServiceBusReceiverClient;
-import com.azure.messaging.servicebus.ServiceBusClientBuilder.ServiceBusReceiverClientBuilder;
 import com.azure.messaging.servicebus.models.DeadLetterOptions;
 import com.azure.messaging.servicebus.models.ServiceBusReceiveMode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.ballerina.runtime.api.PredefinedTypes;
 import io.ballerina.runtime.api.creators.TypeCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.MapType;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.utils.TypeUtils;
-import io.ballerina.runtime.api.values.BDecimal;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
 import io.ballerina.runtime.internal.types.BArrayType;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.time.Duration;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.ballerinax.asb.util.ASBConstants;
 import org.ballerinax.asb.util.ASBUtils;
 import org.ballerinax.asb.util.ModuleUtils;
+
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Objects;
 
 import static org.ballerinax.asb.util.ASBConstants.RECEIVE_AND_DELETE;
 import static org.ballerinax.asb.util.ASBUtils.getRetryOptions;
@@ -65,28 +59,28 @@ import static org.ballerinax.asb.util.ASBUtils.getRetryOptions;
  * Ballerina.
  */
 public class MessageReceiver {
+
     private static final Logger log = Logger.getLogger(MessageReceiver.class);
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private ServiceBusReceiverClient receiver;
 
     /**
      * Parameterized constructor for Message Receiver (IMessageReceiver).
      *
-     * @param connectionString Azure service bus connection string.
-     * @param queueName        QueueName
-     * @param topicName        Topic Name
-     * @param subscriptionName Subscription Name
-     * @param receiveMode      Receive Mode as PeekLock or Receive&Delete.
-     * @param maxAutoLockRenewDuration Max lock renewal duration under Peek Lock mode. Setting to 0 disables auto-renewal. 
-     *                                  For RECEIVE_AND_DELETE mode, auto-renewal is disabled.
-     * @throws ServiceBusException  on failure initiating IMessage Receiver in Azure
-     *                              Service Bus instance.
-     * @throws InterruptedException on failure initiating IMessage Receiver due to
-     *                              thread interruption.
+     * @param connectionString         Azure service bus connection string.
+     * @param queueName                QueueName
+     * @param topicName                Topic Name
+     * @param subscriptionName         Subscription Name
+     * @param receiveMode              Receive Mode as PeekLock or Receive&Delete.
+     * @param maxAutoLockRenewDuration Max lock renewal duration under Peek Lock mode.
+     *                                 Setting to 0 disables auto-renewal.
+     *                                 For RECEIVE_AND_DELETE mode, auto-renewal is disabled.
+     * @throws ServiceBusException on failure initiating IMessage Receiver in Azure
+     *                             Service Bus instance.
      */
     public MessageReceiver(String connectionString, String queueName, String topicName, String subscriptionName,
-            String receiveMode, long maxAutoLockRenewDuration, String logLevel, BMap<BString, Object> retryConfigs)
-            throws ServiceBusException, InterruptedException {
+                           String receiveMode, long maxAutoLockRenewDuration, String logLevel,
+                           BMap<BString, Object> retryConfigs) throws ServiceBusException, InterruptedException {
+
         log.setLevel(Level.toLevel(logLevel, Level.OFF));
         AmqpRetryOptions retryOptions = getRetryOptions(retryConfigs);
         ServiceBusReceiverClientBuilder receiverClientBuilder = new ServiceBusClientBuilder()
@@ -114,7 +108,6 @@ public class MessageReceiver {
                         .topicName(topicName)
                         .subscriptionName(subscriptionName)
                         .buildClient();
-
             } else {
                 this.receiver = receiverClientBuilder
                         .receiveMode(ServiceBusReceiveMode.PEEK_LOCK)
@@ -144,16 +137,12 @@ public class MessageReceiver {
             Iterator<ServiceBusReceivedMessage> iterator;
             if (serverWaitTime != null) {
                 receivedMessages = this.receiver.receiveMessages(1, Duration.ofSeconds((long) serverWaitTime));
-                iterator = receivedMessages.iterator();
-                while (iterator.hasNext()) {
-                    receivedMessage = iterator.next();
-                }
             } else {
                 receivedMessages = receiver.receiveMessages(1);
-                iterator = receivedMessages.iterator();
-                while (iterator.hasNext()) {
-                    receivedMessage = iterator.next();
-                }
+            }
+            iterator = receivedMessages.iterator();
+            while (iterator.hasNext()) {
+                receivedMessage = iterator.next();
             }
             if (receivedMessage == null) {
                 return null;
@@ -162,151 +151,6 @@ public class MessageReceiver {
             return getReceivedMessage(endpointClient, receivedMessage);
         } catch (Exception e) {
             return ASBUtils.returnErrorValue(e.getClass().getSimpleName(), e);
-        }
-    }
-
-    /**
-     * Converts AMPQ Body value to Java objects
-     * 
-     * @param amqpValue AMQP Value type object
-     * @return
-     */
-    public Object convertAMQPToJava(String messageId, Object amqpValue) {
-        log.debug("Type of amqpValue object  of received message "+ messageId +" is " + amqpValue.getClass());
-        Class<?> clazz = amqpValue.getClass();
-        switch (clazz.getSimpleName()) {
-            case "Integer":
-                return (Integer) amqpValue;
-            case "Long":
-                return (Long) amqpValue;
-            case "Float":
-                return (Float) amqpValue;
-            case "Double":
-                return (Double) amqpValue;
-            case "String":
-                return (String) amqpValue;
-            case "Boolean":
-                return (Boolean) amqpValue;
-            case "Byte":
-                return (Byte) amqpValue;
-            case "Short":
-                return (Short) amqpValue;
-            case "Character":
-                return (Character) amqpValue;
-            case "BigDecimal":
-                return (BigDecimal) amqpValue;
-            case "Date":
-                return (java.util.Date) amqpValue;
-            case "UUID":
-                return (UUID) amqpValue;
-            default:
-                log.debug("The type of amqpValue object " + clazz + " is not supported");
-                return null;
-        }
-    }    
-
-    /**
-     * Prepares the message body content
-     * 
-     * @param receivedMessage ASB received message
-     * @return
-     * @throws IOException
-     */
-    private Object getMessageContent(ServiceBusReceivedMessage receivedMessage) throws IOException {
-        AmqpAnnotatedMessage rawAmqpMessage = receivedMessage.getRawAmqpMessage();
-        AmqpMessageBodyType bodyType = rawAmqpMessage.getBody().getBodyType();
-        switch (bodyType) {
-            case DATA:
-                return rawAmqpMessage.getBody().getFirstData();
-            case VALUE:
-                Object amqpValue = rawAmqpMessage.getBody().getValue();
-                log.debug("Received a message with messageId " + receivedMessage.getMessageId()
-                        + " AMQPMessageBodyType:" + bodyType);
-
-                amqpValue = convertAMQPToJava(receivedMessage.getMessageId(), amqpValue);
-                return amqpValue;
-            default:
-                throw new RuntimeException("Invalid message body type: " + receivedMessage.getMessageId());
-        }
-    }
-
-    /**
-     * @param endpointClient  Ballerina client object
-     * @param receivedMessage Received Message
-     * @return
-     * @throws IOException
-     */
-    private BMap<BString, Object> getReceivedMessage(BObject endpointClient, ServiceBusReceivedMessage receivedMessage)
-            throws IOException {
-        Map<String, Object> map = new HashMap<>();
-        Object body = getMessageContent(receivedMessage);
-        if (body instanceof byte[]) {
-            byte[] bodyA = (byte[]) body;
-            map.put("body", ValueCreator.createArrayValue(bodyA));
-        } else {
-            map.put("body", body);
-        }
-        if (receivedMessage.getContentType() != null) {
-            map.put("contentType", StringUtils.fromString(receivedMessage.getContentType()));
-        }
-        map.put("messageId", StringUtils.fromString(receivedMessage.getMessageId()));
-        map.put("to", StringUtils.fromString(receivedMessage.getTo()));
-        map.put("replyTo", StringUtils.fromString(receivedMessage.getReplyTo()));
-        map.put("replyToSessionId", StringUtils.fromString(receivedMessage.getReplyToSessionId()));
-        map.put("label", StringUtils.fromString(receivedMessage.getSubject()));
-        map.put("sessionId", StringUtils.fromString(receivedMessage.getSessionId()));
-        map.put("correlationId", StringUtils.fromString(receivedMessage.getCorrelationId()));
-        map.put("partitionKey", StringUtils.fromString(receivedMessage.getPartitionKey()));
-        map.put("timeToLive", (int) receivedMessage.getTimeToLive().getSeconds());
-        map.put("sequenceNumber", (int) receivedMessage.getSequenceNumber());
-        map.put("lockToken", StringUtils.fromString(receivedMessage.getLockToken()));
-        map.put("deliveryCount", (int) receivedMessage.getDeliveryCount());
-        map.put("enqueuedTime", StringUtils.fromString(receivedMessage.getEnqueuedTime().toString()));
-        map.put("enqueuedSequenceNumber", (int) receivedMessage.getEnqueuedSequenceNumber());
-        map.put("deadLetterErrorDescription", StringUtils.fromString(receivedMessage.getDeadLetterErrorDescription()));
-        map.put("deadLetterReason", StringUtils.fromString(receivedMessage.getDeadLetterReason()));
-        map.put("deadLetterSource", StringUtils.fromString(receivedMessage.getDeadLetterSource()));
-        map.put("state", StringUtils.fromString(receivedMessage.getState().toString()));
-        map.put("applicationProperties", getApplicationProperties(receivedMessage));
-        BMap<BString, Object> createRecordValue = ValueCreator.createRecordValue(ModuleUtils.getModule(),
-                ASBConstants.MESSAGE_RECORD, map);
-        endpointClient.addNativeData(receivedMessage.getLockToken(), receivedMessage);
-        return createRecordValue;
-    }
-
-    private static BMap<BString, Object> getApplicationProperties(ServiceBusReceivedMessage message) {
-        BMap<BString, Object> applicationPropertiesRecord = ValueCreator.createRecordValue(ModuleUtils.getModule(),
-                ASBConstants.APPLICATION_PROPERTY_TYPE);
-        MapType mapType = TypeCreator.createMapType(PredefinedTypes.TYPE_ANYDATA);
-        BMap<BString, Object> applicationProperties = ValueCreator.createMapValue(mapType);
-        for (Map.Entry<String, Object> property: message.getApplicationProperties().entrySet()) {
-            populateApplicationProperty(applicationProperties, property.getKey(), property.getValue());
-        }
-        return ValueCreator.createRecordValue(applicationPropertiesRecord, applicationProperties);
-    }
-    private static void populateApplicationProperty(BMap<BString, Object> applicationProperties,
-                                                    String key, Object value) {
-        BString propertyKey = StringUtils.fromString(key);
-        if (value instanceof String) {
-            applicationProperties.put(propertyKey, StringUtils.fromString((String) value));
-        } else if (value instanceof Integer) {
-            applicationProperties.put(propertyKey, (Integer) value);
-        } else if (value instanceof Long) {
-            applicationProperties.put(propertyKey, (Long) value);
-        } else if (value instanceof Float) {
-            applicationProperties.put(propertyKey, (Float) value);
-        } else if (value instanceof Double) {
-            applicationProperties.put(propertyKey, (Double) value);
-        } else if (value instanceof Boolean) {
-            applicationProperties.put(propertyKey, (Boolean) value);
-        } else if (value instanceof Character) {
-            applicationProperties.put(propertyKey, (Character) value);
-        } else if (value instanceof Byte) {
-            applicationProperties.put(propertyKey, (Byte) value);
-        } else if (value instanceof Short) {
-            applicationProperties.put(propertyKey, (Short) value);
-        } else {
-            applicationProperties.put(propertyKey, StringUtils.fromString(value.toString()));
         }
     }
 
@@ -336,8 +180,9 @@ public class MessageReceiver {
     }
 
     private BMap<BString, Object> getReceivedMessageBatch(BObject endpointClient, Object maxMessageCount,
-            Object serverWaitTime)
-            throws InterruptedException, ServiceBusException, IOException {
+                                                          Object serverWaitTime)
+            throws InterruptedException, ServiceBusException {
+
         int messageCount = 0;
         Map<String, Object> map = new HashMap<>();
         int maxCount = Long.valueOf(maxMessageCount.toString()).intValue();
@@ -364,8 +209,8 @@ public class MessageReceiver {
     }
 
     /**
-     * Completes Messages from Queue or Subscription based on messageLockToken
-     * 
+     * Completes Messages from Queue or Subscription based on messageLockToken.
+     *
      * @param endpointClient Ballerina ASB client object
      * @param lockToken      Message lock token.
      * @return An error if failed to complete the message.
@@ -383,9 +228,8 @@ public class MessageReceiver {
     }
 
     /**
-     * Abandons message & make available again for processing from Queue or
-     * Subscription based on messageLockToken
-     * 
+     * Abandons message & make available again for processing from Queue or Subscription, based on messageLockToken.
+     *
      * @param endpointClient Ballerina ASB client object
      * @param lockToken      Message lock token.
      * @return An error if failed to abandon the message.
@@ -404,8 +248,7 @@ public class MessageReceiver {
     }
 
     /**
-     * Dead-Letter the message & moves the message to the Dead-Letter Queue based on
-     * messageLockToken
+     * Dead-Letter the message & moves the message to the Dead-Letter Queue based on messageLockToken.
      *
      * @param endpointClient             Ballerina ASB client object
      * @param lockToken                  Message lock token.
@@ -414,7 +257,7 @@ public class MessageReceiver {
      * @return An error if failed to dead letter the message.
      */
     public Object deadLetter(BObject endpointClient, BString lockToken, Object deadLetterReason,
-            Object deadLetterErrorDescription) {
+                             Object deadLetterErrorDescription) {
         try {
             ServiceBusReceivedMessage message = (ServiceBusReceivedMessage) endpointClient
                     .getNativeData(lockToken.getValue());
@@ -432,7 +275,7 @@ public class MessageReceiver {
     }
 
     /**
-     * Defer the message in a Queue or Subscription based on messageLockToken
+     * Defer the message in a Queue or Subscription based on messageLockToken.
      *
      * @param endpointClient Ballerina ASB client object
      * @param lockToken      Message lock token.
@@ -452,8 +295,7 @@ public class MessageReceiver {
     }
 
     /**
-     * Receives a deferred Message. Deferred messages can only be received by using
-     * sequence number and return
+     * Receives a deferred Message. Deferred messages can only be received by using sequence number and return
      * Message object.
      *
      * @param endpointClient Ballerina ASB client object
@@ -462,8 +304,7 @@ public class MessageReceiver {
      *                       integer assigned to a message as it is accepted and
      *                       stored by the broker and functions as
      *                       its true identifier.
-     * @return The received Message or null if there is no message for given
-     *         sequence number.
+     * @return The received Message or null if there is no message for given sequence number.
      */
     public Object receiveDeferred(BObject endpointClient, int sequenceNumber) {
         try {
@@ -511,6 +352,137 @@ public class MessageReceiver {
             return null;
         } catch (Exception e) {
             return ASBUtils.returnErrorValue(e.getClass().getSimpleName(), e);
+        }
+    }
+
+    /**
+     * Converts AMPQ Body value to Java objects.
+     *
+     * @param amqpValue AMQP Value type object
+     */
+    private Object convertAMQPToJava(String messageId, Object amqpValue) {
+        log.debug("Type of amqpValue object  of received message " + messageId + " is " + amqpValue.getClass());
+        Class<?> clazz = amqpValue.getClass();
+        switch (clazz.getSimpleName()) {
+            case "Integer":
+            case "Long":
+            case "Float":
+            case "Double":
+            case "String":
+            case "Boolean":
+            case "Byte":
+            case "Short":
+            case "Character":
+            case "BigDecimal":
+            case "Date":
+            case "UUID":
+                return amqpValue;
+            default:
+                log.debug("The type of amqpValue object " + clazz + " is not supported");
+                return null;
+        }
+    }
+
+    /**
+     * Converts the received message to a Ballerina map.
+     *
+     * @param endpointClient Ballerina client object
+     * @param message        Received Message
+     */
+    private BMap<BString, Object> getReceivedMessage(BObject endpointClient, ServiceBusReceivedMessage message) {
+        Map<String, Object> map = new HashMap<>();
+        Object body = getMessageContent(message);
+        if (body instanceof byte[]) {
+            byte[] bodyA = (byte[]) body;
+            map.put("body", ValueCreator.createArrayValue(bodyA));
+        } else {
+            map.put("body", body);
+        }
+        if (message.getContentType() != null) {
+            map.put("contentType", StringUtils.fromString(message.getContentType()));
+        }
+        map.put("messageId", StringUtils.fromString(message.getMessageId()));
+        map.put("to", StringUtils.fromString(message.getTo()));
+        map.put("replyTo", StringUtils.fromString(message.getReplyTo()));
+        map.put("replyToSessionId", StringUtils.fromString(message.getReplyToSessionId()));
+        map.put("label", StringUtils.fromString(message.getSubject()));
+        map.put("sessionId", StringUtils.fromString(message.getSessionId()));
+        map.put("correlationId", StringUtils.fromString(message.getCorrelationId()));
+        map.put("partitionKey", StringUtils.fromString(message.getPartitionKey()));
+        map.put("timeToLive", (int) message.getTimeToLive().getSeconds());
+        map.put("sequenceNumber", (int) message.getSequenceNumber());
+        map.put("lockToken", StringUtils.fromString(message.getLockToken()));
+        map.put("deliveryCount", (int) message.getDeliveryCount());
+        map.put("enqueuedTime", StringUtils.fromString(message.getEnqueuedTime().toString()));
+        map.put("enqueuedSequenceNumber", (int) message.getEnqueuedSequenceNumber());
+        map.put("deadLetterErrorDescription", StringUtils.fromString(message.getDeadLetterErrorDescription()));
+        map.put("deadLetterReason", StringUtils.fromString(message.getDeadLetterReason()));
+        map.put("deadLetterSource", StringUtils.fromString(message.getDeadLetterSource()));
+        map.put("state", StringUtils.fromString(message.getState().toString()));
+        map.put("applicationProperties", getApplicationProperties(message));
+        BMap<BString, Object> createRecordValue = ValueCreator.createRecordValue(ModuleUtils.getModule(),
+                ASBConstants.MESSAGE_RECORD, map);
+        endpointClient.addNativeData(message.getLockToken(), message);
+        return createRecordValue;
+    }
+
+    /**
+     * Prepares the message body content.
+     *
+     * @param receivedMessage ASB received message
+     */
+    private Object getMessageContent(ServiceBusReceivedMessage receivedMessage) {
+        AmqpAnnotatedMessage rawAmqpMessage = receivedMessage.getRawAmqpMessage();
+        AmqpMessageBodyType bodyType = rawAmqpMessage.getBody().getBodyType();
+        switch (bodyType) {
+            case DATA:
+                return rawAmqpMessage.getBody().getFirstData();
+            case VALUE:
+                Object amqpValue = rawAmqpMessage.getBody().getValue();
+                log.debug("Received a message with messageId " + receivedMessage.getMessageId()
+                        + " AMQPMessageBodyType:" + bodyType);
+
+                amqpValue = convertAMQPToJava(receivedMessage.getMessageId(), amqpValue);
+                return amqpValue;
+            default:
+                throw new RuntimeException("Invalid message body type: " + receivedMessage.getMessageId());
+        }
+    }
+
+    private static BMap<BString, Object> getApplicationProperties(ServiceBusReceivedMessage message) {
+        BMap<BString, Object> applicationPropertiesRecord = ValueCreator.createRecordValue(ModuleUtils.getModule(),
+                ASBConstants.APPLICATION_PROPERTY_TYPE);
+        MapType mapType = TypeCreator.createMapType(PredefinedTypes.TYPE_ANYDATA);
+        BMap<BString, Object> applicationProperties = ValueCreator.createMapValue(mapType);
+        for (Map.Entry<String, Object> property : message.getApplicationProperties().entrySet()) {
+            populateApplicationProperty(applicationProperties, property.getKey(), property.getValue());
+        }
+        return ValueCreator.createRecordValue(applicationPropertiesRecord, applicationProperties);
+    }
+
+    private static void populateApplicationProperty(BMap<BString, Object> applicationProperties,
+                                                    String key, Object value) {
+        BString propertyKey = StringUtils.fromString(key);
+        if (value instanceof String) {
+            applicationProperties.put(propertyKey, StringUtils.fromString((String) value));
+        } else if (value instanceof Integer) {
+            applicationProperties.put(propertyKey, value);
+        } else if (value instanceof Long) {
+            applicationProperties.put(propertyKey, value);
+        } else if (value instanceof Float) {
+            applicationProperties.put(propertyKey, value);
+        } else if (value instanceof Double) {
+            applicationProperties.put(propertyKey, value);
+        } else if (value instanceof Boolean) {
+            applicationProperties.put(propertyKey, value);
+        } else if (value instanceof Character) {
+            applicationProperties.put(propertyKey, value);
+        } else if (value instanceof Byte) {
+            applicationProperties.put(propertyKey, value);
+        } else if (value instanceof Short) {
+            applicationProperties.put(propertyKey, value);
+        } else {
+            applicationProperties.put(propertyKey, StringUtils.fromString(value.toString()));
         }
     }
 }
