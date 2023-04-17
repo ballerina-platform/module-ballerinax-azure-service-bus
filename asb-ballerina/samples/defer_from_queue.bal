@@ -68,12 +68,12 @@ public function main() returns error? {
     check queueSender->send(message1);
 
     log:printInfo("Receiving from Asb receiver client.");
-    asb:Message|asb:Error? messageReceived = queueReceiver->receive(serverWaitTime);
+    asb:Message|error? messageReceived = queueReceiver->receive(serverWaitTime);
 
     if (messageReceived is asb:Message) {
         int sequenceNumber = check queueReceiver->defer(messageReceived);
         log:printInfo("Defer message successful");
-        asb:Message|asb:Error? messageReceivedAgain = 
+        asb:Message|error? messageReceivedAgain = 
             check queueReceiver->receiveDeferred(sequenceNumber);
         if (messageReceivedAgain is asb:Message) {
             log:printInfo("Reading Deferred Message : " + messageReceivedAgain.toString());

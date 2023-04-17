@@ -21,7 +21,7 @@ import ballerinax/asb;
 configurable string connectionString = ?;
 configurable string queueName = ?;
 
-// This sample demonstrates a scneario where azure service bus connecter is used to 
+// This sample demonstrates a scenario where azure service bus connecter is used to 
 // send a message to a queue using message sender, receive that message using message receiver with PEEKLOCK mode, 
 // abadon that message (discards the message and relinquishes the message lock ownership),
 // finally complete the processing of message using complete function of the caller. 
@@ -69,11 +69,11 @@ public function main() returns error? {
     check queueSender->send(message1);
 
     log:printInfo("Receiving from Asb receiver client.");
-    asb:Message|asb:Error? messageReceived = queueReceiver->receive(serverWaitTime);
+    asb:Message|error? messageReceived = queueReceiver->receive(serverWaitTime);
 
     if (messageReceived is asb:Message) {
         check queueReceiver->abandon(messageReceived);
-        asb:Message|asb:Error? messageReceivedAgain = queueReceiver->receive(serverWaitTime);
+        asb:Message|error? messageReceivedAgain = queueReceiver->receive(serverWaitTime);
         if (messageReceivedAgain is asb:Message) {
             check queueReceiver->complete(messageReceivedAgain);
             log:printInfo("Abandon message successful");
