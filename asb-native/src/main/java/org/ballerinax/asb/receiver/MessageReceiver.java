@@ -53,6 +53,7 @@ import java.util.UUID;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.qpid.proton.amqp.Binary;
 import org.ballerinax.asb.util.ASBConstants;
 import org.ballerinax.asb.util.ASBUtils;
 import org.ballerinax.asb.util.ModuleUtils;
@@ -199,6 +200,8 @@ public class MessageReceiver {
                 return (java.util.Date) amqpValue;
             case "UUID":
                 return (UUID) amqpValue;
+            case "Binary":
+                return ((Binary) amqpValue).getArray();
             default:
                 log.debug("The type of amqpValue object " + clazz + " is not supported");
                 return null;
