@@ -30,6 +30,7 @@ import com.azure.messaging.servicebus.ServiceBusReceiverClient;
 import com.azure.messaging.servicebus.models.DeadLetterOptions;
 import com.azure.messaging.servicebus.models.ServiceBusReceiveMode;
 import io.ballerina.runtime.api.PredefinedTypes;
+import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.creators.TypeCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.ArrayType;
@@ -52,6 +53,7 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import static org.ballerinax.asb.util.ASBConstants.APPLICATION_PROPERTY_KEY;
 import static org.ballerinax.asb.util.ASBConstants.BODY;
@@ -76,6 +78,8 @@ import static org.ballerinax.asb.util.ASBConstants.STATE;
 import static org.ballerinax.asb.util.ASBConstants.TIME_TO_LIVE;
 import static org.ballerinax.asb.util.ASBConstants.TO;
 import static org.ballerinax.asb.util.ASBUtils.addMessageFieldIfPresent;
+import static org.ballerinax.asb.util.ASBUtils.convertAMQPToJava;
+import static org.ballerinax.asb.util.ASBUtils.convertJavaToBValue;
 import static org.ballerinax.asb.util.ASBUtils.getRetryOptions;
 import static org.ballerinax.asb.util.ASBUtils.getValueWithIntendedType;
 
@@ -207,7 +211,10 @@ public class MessageReceiver {
             if (messageBody instanceof byte[]) {
                 return getValueWithIntendedType((byte[]) messageBody, expectedType.getDescribingType());
             } else {
-                return messageBody;
+                Optional<Object> bValue = convertJavaToBValue(receivedMessage.getMessageId(), messageBody);
+                return bValue.orElseGet(() ->
+                        ErrorCreator.createError(StringUtils.fromString("Failed to bind the received ASB message " +
+                                "value to the expected Ballerina type: '" + expectedType.toString() + "'")));
             }
         } catch (Exception e) {
             return ASBUtils.returnErrorValue(e.getClass().getSimpleName(), e);
@@ -390,34 +397,6 @@ public class MessageReceiver {
             return null;
         } catch (Exception e) {
             return ASBUtils.returnErrorValue(e.getClass().getSimpleName(), e);
-        }
-    }
-
-    /**
-     * Converts AMPQ Body value to Java objects.
-     *
-     * @param amqpValue AMQP Value type object
-     */
-    private static Object convertAMQPToJava(String messageId, Object amqpValue) {
-        log.debug("Type of amqpValue object  of received message " + messageId + " is " + amqpValue.getClass());
-        Class<?> clazz = amqpValue.getClass();
-        switch (clazz.getSimpleName()) {
-            case "Integer":
-            case "Long":
-            case "Float":
-            case "Double":
-            case "String":
-            case "Boolean":
-            case "Byte":
-            case "Short":
-            case "Character":
-            case "BigDecimal":
-            case "Date":
-            case "UUID":
-                return amqpValue;
-            default:
-                log.debug("The type of amqpValue object " + clazz + " is not supported");
-                return null;
         }
     }
 

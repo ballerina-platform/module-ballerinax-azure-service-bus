@@ -39,8 +39,11 @@ import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BString;
 import io.ballerina.runtime.api.values.BTypedesc;
+import org.apache.log4j.Logger;
+import org.apache.qpid.proton.amqp.Binary;
 import org.ballerinalang.langlib.value.CloneWithType;
 import org.ballerinalang.langlib.value.FromJsonWithType;
+import org.ballerinax.asb.receiver.MessageReceiver;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -48,6 +51,7 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import static io.ballerina.runtime.api.TypeTags.ANYDATA_TAG;
 import static io.ballerina.runtime.api.TypeTags.ARRAY_TAG;
@@ -68,6 +72,8 @@ import static org.ballerinax.asb.util.ASBConstants.TRY_TIMEOUT;
  * Utility class for Azure Service Bus.
  */
 public class ASBUtils {
+
+    private static final Logger LOGGER = Logger.getLogger(MessageReceiver.class);
 
     /**
      * Convert Map to BMap.
@@ -255,6 +261,64 @@ public class ASBUtils {
     }
 
     /**
+     * Converts AMPQ Body value to Java objects.
+     *
+     * @param amqpValue AMQP Value type object
+     */
+    public static Object convertAMQPToJava(String messageId, Object amqpValue) {
+        LOGGER.debug("Type of amqpValue object  of received message " + messageId + " is " + amqpValue.getClass());
+        Class<?> clazz = amqpValue.getClass();
+        switch (clazz.getSimpleName()) {
+            case "Integer":
+            case "Long":
+            case "Float":
+            case "Double":
+            case "String":
+            case "Boolean":
+            case "Byte":
+            case "Short":
+            case "Character":
+            case "BigDecimal":
+            case "Date":
+            case "UUID":
+                return amqpValue;
+            case "Binary":
+                return ((Binary) amqpValue).getArray();
+            default:
+                LOGGER.debug("The type of amqpValue object " + clazz + " is not supported");
+                return null;
+        }
+    }
+
+    /**
+     * Converts a given java value its counterpart BValue instance.
+     *
+     * @param jValue java value
+     */
+    public static Optional<Object> convertJavaToBValue(String messageId, Object jValue) {
+        LOGGER.debug("Type of java object of received message " + messageId + " is " + jValue.getClass());
+        Class<?> clazz = jValue.getClass();
+        switch (clazz.getSimpleName()) {
+            case "Integer":
+            case "Long":
+            case "Float":
+            case "Double":
+            case "Boolean":
+            case "Byte":
+            case "Short":
+            case "Character":
+                return Optional.of(jValue);
+            case "String":
+                return Optional.of(StringUtils.fromString((String) jValue));
+            case "BigDecimal":
+                return Optional.of(ValueCreator.createDecimalValue((BigDecimal) jValue));
+            default:
+                LOGGER.debug("java object with type '" + clazz + "' can not be converted to as a Ballerina value");
+                return Optional.empty();
+        }
+    }
+
+    /**
      * Converts `byte[]` value to the intended Ballerina type.
      *
      * @param type  expected type
@@ -296,7 +360,7 @@ public class ASBUtils {
                     intendedValue = getValueFromJson(type, strValue);
             }
         } catch (BError bError) {
-            // todo: handle
+            intendedValue = bError;
         }
         if (intendedValue instanceof BError) {
             // todo: handle
