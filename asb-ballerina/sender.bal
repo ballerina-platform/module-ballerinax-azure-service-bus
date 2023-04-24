@@ -48,10 +48,20 @@ public isolated client class MessageSender {
     # + message - Azure service bus message representation (`asb:Message` record)
     # + return - An error if failed to send message or else `()`
     @display {label: "Send Message"}
-    isolated remote function send(@display {label: "Message"} Message message) returns error? {
-        error? response;
-        response = check send(self.senderHandle, message);
-        return response;
+    isolated remote function send(@display {label: "Message Record"} Message message) returns error? {
+        message.body = serializeToByteArray(message.body);
+        return send(self.senderHandle, message);
+    }
+
+    # Send message to queue or topic with a message body.
+    #
+    # + messagePayload - Message body
+    # + return - An error if failed to send message or else `()`
+    @display {label: "Send Message Payload"}
+    isolated remote function sendPayload(@display {label: "Message Payload"} anydata messagePayload) returns error? {
+        Message messageToSend = constructMessageFromPayload(messagePayload);
+        messageToSend.body = serializeToByteArray(messageToSend.body);
+        return send(self.senderHandle, messageToSend);
     }
 
     # Sends a scheduled message to the Azure Service Bus entity this sender is connected to. 
@@ -60,8 +70,9 @@ public isolated client class MessageSender {
     # + message - Message to be scheduled  
     # + scheduledEnqueueTime - Datetime at which the message should appear in the Service Bus queue or topic
     # + return - The sequence number of the scheduled message which can be used to cancel the scheduling of the message
-    isolated remote function schedule(@display {label: "Message"} Message message,
+    isolated remote function schedule(@display {label: "Message Record or Payload"} Message message,
             time:Civil scheduledEnqueueTime) returns int|error {
+        message.body = serializeToByteArray(message.body);
         return schedule(self.senderHandle, message, scheduledEnqueueTime);
     }
 
@@ -75,12 +86,14 @@ public isolated client class MessageSender {
 
     # Send batch of messages to queue or topic.
     #
-    # + messages - Azure service bus batch message representation (`asb:MessageBatch` record)
+    # + messageBatch - Azure service bus batch message representation (`asb:MessageBatch` record)
     # + return - An error if failed to send message or else `()`
     @display {label: "Send Batch Message"}
-    isolated remote function sendBatch(@display {label: "Batch Message"} MessageBatch messages) returns error? {
-        self.modifyContentToByteArray(messages);
-        return sendBatch(self.senderHandle, messages);
+    isolated remote function sendBatch(@display {label: "Message Batch"} MessageBatch messageBatch) returns error? {
+        foreach Message message in messageBatch.messages {
+            message.body = serializeToByteArray(message.body);
+        }
+        return sendBatch(self.senderHandle, messageBatch);
     }
 
     # Closes the ASB sender connection.
@@ -89,16 +102,6 @@ public isolated client class MessageSender {
     @display {label: "Close Sender Connection"}
     isolated remote function close() returns error? {
         return closeSender(self.senderHandle);
-    }
-
-    isolated function modifyContentToByteArray(MessageBatch messagesRecord) {
-        foreach Message message in messagesRecord.messages {
-            if message.body is byte[] {
-                message.body = message.body;
-            } else {
-                message.body = message.body.toString().toBytes();
-            }
-        }
     }
 }
 

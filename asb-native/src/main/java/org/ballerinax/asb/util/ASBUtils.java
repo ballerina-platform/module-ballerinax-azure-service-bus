@@ -24,20 +24,44 @@ import io.ballerina.runtime.api.PredefinedTypes;
 import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.creators.TypeCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
+import io.ballerina.runtime.api.types.ArrayType;
 import io.ballerina.runtime.api.types.ErrorType;
+import io.ballerina.runtime.api.types.IntersectionType;
 import io.ballerina.runtime.api.types.MapType;
+import io.ballerina.runtime.api.types.RecordType;
+import io.ballerina.runtime.api.types.Type;
+import io.ballerina.runtime.api.types.UnionType;
+import io.ballerina.runtime.api.utils.JsonUtils;
 import io.ballerina.runtime.api.utils.StringUtils;
+import io.ballerina.runtime.api.utils.XmlUtils;
 import io.ballerina.runtime.api.values.BDecimal;
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BString;
+import io.ballerina.runtime.api.values.BTypedesc;
+import org.apache.log4j.Logger;
+import org.apache.qpid.proton.amqp.Binary;
+import org.ballerinalang.langlib.value.CloneWithType;
+import org.ballerinalang.langlib.value.FromJsonWithType;
+import org.ballerinax.asb.receiver.MessageReceiver;
 
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
+import static io.ballerina.runtime.api.TypeTags.ANYDATA_TAG;
+import static io.ballerina.runtime.api.TypeTags.ARRAY_TAG;
+import static io.ballerina.runtime.api.TypeTags.BYTE_TAG;
+import static io.ballerina.runtime.api.TypeTags.NULL_TAG;
+import static io.ballerina.runtime.api.TypeTags.RECORD_TYPE_TAG;
+import static io.ballerina.runtime.api.TypeTags.STRING_TAG;
+import static io.ballerina.runtime.api.TypeTags.UNION_TAG;
+import static io.ballerina.runtime.api.TypeTags.XML_TAG;
+import static io.ballerina.runtime.api.utils.TypeUtils.getReferredType;
 import static org.ballerinax.asb.util.ASBConstants.DELAY;
 import static org.ballerinax.asb.util.ASBConstants.MAX_DELAY;
 import static org.ballerinax.asb.util.ASBConstants.MAX_RETRIES;
@@ -48,6 +72,8 @@ import static org.ballerinax.asb.util.ASBConstants.TRY_TIMEOUT;
  * Utility class for Azure Service Bus.
  */
 public class ASBUtils {
+
+    private static final Logger LOGGER = Logger.getLogger(MessageReceiver.class);
 
     /**
      * Convert Map to BMap.
@@ -221,5 +247,165 @@ public class ASBUtils {
                 .setMaxDelay(Duration.ofSeconds(maxDelay.intValue()))
                 .setTryTimeout(Duration.ofSeconds(tryTimeout.intValue()))
                 .setMode(AmqpRetryMode.valueOf(retryMode));
+    }
+
+    public static RecordType getRecordType(BTypedesc bTypedesc) {
+        RecordType recordType;
+        if (bTypedesc.getDescribingType().isReadOnly()) {
+            recordType = (RecordType) getReferredType(((IntersectionType) getReferredType(
+                    bTypedesc.getDescribingType())).getConstituentTypes().get(0));
+        } else {
+            recordType = (RecordType) getReferredType(bTypedesc.getDescribingType());
+        }
+        return recordType;
+    }
+
+    /**
+     * Converts AMPQ Body value to Java objects.
+     *
+     * @param amqpValue AMQP Value type object
+     */
+    public static Object convertAMQPToJava(String messageId, Object amqpValue) {
+        LOGGER.debug("Type of amqpValue object  of received message " + messageId + " is " + amqpValue.getClass());
+        Class<?> clazz = amqpValue.getClass();
+        switch (clazz.getSimpleName()) {
+            case "Integer":
+            case "Long":
+            case "Float":
+            case "Double":
+            case "String":
+            case "Boolean":
+            case "Byte":
+            case "Short":
+            case "Character":
+            case "BigDecimal":
+            case "Date":
+            case "UUID":
+                return amqpValue;
+            case "Binary":
+                return ((Binary) amqpValue).getArray();
+            default:
+                LOGGER.debug("The type of amqpValue object " + clazz + " is not supported");
+                return null;
+        }
+    }
+
+    /**
+     * Converts a given java value its counterpart BValue instance.
+     *
+     * @param jValue java value
+     */
+    public static Optional<Object> convertJavaToBValue(String messageId, Object jValue) {
+        LOGGER.debug("Type of java object of received message " + messageId + " is " + jValue.getClass());
+        Class<?> clazz = jValue.getClass();
+        switch (clazz.getSimpleName()) {
+            case "Integer":
+            case "Long":
+            case "Float":
+            case "Double":
+            case "Boolean":
+            case "Byte":
+            case "Short":
+            case "Character":
+                return Optional.of(jValue);
+            case "String":
+                return Optional.of(StringUtils.fromString((String) jValue));
+            case "BigDecimal":
+                return Optional.of(ValueCreator.createDecimalValue((BigDecimal) jValue));
+            default:
+                LOGGER.debug("java object with type '" + clazz + "' can not be converted to as a Ballerina value");
+                return Optional.empty();
+        }
+    }
+
+    /**
+     * Converts `byte[]` value to the intended Ballerina type.
+     *
+     * @param type  expected type
+     * @param value Value to be converted
+     * @return value with the intended type
+     */
+    public static Object getValueWithIntendedType(byte[] value, Type type) {
+        String strValue = new String(value, StandardCharsets.UTF_8);
+        Object intendedValue = null;
+        try {
+            switch (type.getTag()) {
+                case STRING_TAG:
+                    intendedValue = StringUtils.fromString(strValue);
+                    break;
+                case XML_TAG:
+                    intendedValue = XmlUtils.parse(strValue);
+                    break;
+                case ANYDATA_TAG:
+                    intendedValue = ValueCreator.createArrayValue(value);
+                    break;
+                case RECORD_TYPE_TAG:
+                    intendedValue = CloneWithType.convert(type, JsonUtils.parse(strValue));
+                    break;
+                case UNION_TAG:
+                    if (isSupportedUnionType(type)) {
+                        intendedValue = getValueWithIntendedType(value, getExpectedTypeFromNilableType(type));
+                    } else {
+                        intendedValue = ErrorCreator.createError(StringUtils.fromString("Union types are not " +
+                                "supported for the contextually expected type, except for nilable types"));
+                    }
+                    break;
+                case ARRAY_TAG:
+                    if (getReferredType(((ArrayType) type).getElementType()).getTag() == BYTE_TAG) {
+                        intendedValue = ValueCreator.createArrayValue(value);
+                        break;
+                    }
+                    /*-fallthrough*/
+                default:
+                    intendedValue = getValueFromJson(type, strValue);
+            }
+        } catch (BError bError) {
+            intendedValue = bError;
+        }
+        if (intendedValue instanceof BError) {
+            // todo: handle
+        }
+        return intendedValue;
+    }
+
+    private static boolean hasStringType(UnionType type) {
+        return type.getMemberTypes().stream().anyMatch(memberType -> memberType.getTag() == STRING_TAG);
+    }
+
+    /**
+     * Checks whether the given type is a union type of two member types, including the nil type.
+     *
+     * @param type Type to be checked
+     * @return True if the given type is a union type of two member types, including nil type.
+     */
+    private static boolean isSupportedUnionType(Type type) {
+        return type.getTag() == UNION_TAG
+                && ((UnionType) type).getMemberTypes().size() == 2
+                && ((UnionType) type).getMemberTypes().stream().anyMatch(memberType -> memberType.getTag() == NULL_TAG);
+    }
+
+    public static Type getExpectedTypeFromNilableType(Type type) {
+        return ((UnionType) type).getMemberTypes().stream()
+                .filter(memberType -> memberType.getTag() != NULL_TAG)
+                .findFirst()
+                .orElse(null);
+    }
+
+    private static Object getValueFromJson(Type type, String stringValue) {
+        BTypedesc typeDesc = ValueCreator.createTypedescValue(type);
+        return FromJsonWithType.fromJsonWithType(JsonUtils.parse(stringValue), typeDesc);
+    }
+
+    /**
+     * Adds the ASB properties to the Ballerina record response, only if present.
+     *
+     * @param map              Ballerina record map
+     * @param key              Key of the property
+     * @param receivedProperty Received property
+     */
+    public static void addMessageFieldIfPresent(Map<String, Object> map, String key, Object receivedProperty) {
+        if (receivedProperty != null) {
+            map.put(key, receivedProperty);
+        }
     }
 }

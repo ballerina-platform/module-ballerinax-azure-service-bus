@@ -68,7 +68,7 @@ public function main() returns error? {
     check queueSender->send(message1);
 
     log:printInfo("Receiving from Asb receiver client.");
-    asb:Message|asb:Error? messageReceived = queueReceiver->receive(serverWaitTime);
+    asb:Message|error? messageReceived = queueReceiver->receive(serverWaitTime);
 
     if (messageReceived is asb:Message) {
         check queueReceiver->complete(messageReceived);

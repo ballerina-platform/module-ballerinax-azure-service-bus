@@ -70,11 +70,11 @@ public function main() returns error? {
     check topicSender->send(message1);
 
     log:printInfo("Receiving from Asb receiver client.");
-    asb:Message|asb:Error? messageReceived = subscriptionReceiver->receive(serverWaitTime);
+    asb:Message|error? messageReceived = subscriptionReceiver->receive(serverWaitTime);
 
     if (messageReceived is asb:Message) {
         check subscriptionReceiver->deadLetter(messageReceived);
-        asb:Message|asb:Error? messageReceivedAgain = subscriptionReceiver->receive(serverWaitTime);
+        asb:Message|error? messageReceivedAgain = subscriptionReceiver->receive(serverWaitTime);
         if (messageReceivedAgain is ()) {
             log:printInfo("Deadletter message successful");
         } else {

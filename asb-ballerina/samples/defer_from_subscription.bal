@@ -70,13 +70,12 @@ public function main() returns error? {
     check topicSender->send(message1);
 
     log:printInfo("Receiving from Asb receiver client.");
-    asb:Message|asb:Error? messageReceived = subscriptionReceiver->receive(serverWaitTime);
+    asb:Message|error? messageReceived = subscriptionReceiver->receive(serverWaitTime);
 
     if (messageReceived is asb:Message) {
         int sequenceNumber = check subscriptionReceiver->defer(messageReceived);
         log:printInfo("Defer message successful");
-        asb:Message|asb:Error? messageReceivedAgain = 
-            check subscriptionReceiver->receiveDeferred(sequenceNumber);
+        asb:Message|error? messageReceivedAgain = subscriptionReceiver->receiveDeferred(sequenceNumber);
         if (messageReceivedAgain is asb:Message) {
             log:printInfo("Reading Deferred Message : " + messageReceivedAgain.toString());
         }
