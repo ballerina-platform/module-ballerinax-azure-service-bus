@@ -96,6 +96,7 @@ function testSendAndReceiveMessageFromQueueOperation() returns error? {
     MessageSender messageSender = check new (senderConfig);
 
     log:printInfo("Creating Asb message receiver.");
+    receiverConfig.receiveMode = PEEK_LOCK;
     MessageReceiver messageReceiver = check new (receiverConfig);
 
     log:printInfo("Sending via Asb sender.");
