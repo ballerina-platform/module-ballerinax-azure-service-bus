@@ -31,12 +31,14 @@ import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.utils.TypeUtils;
 import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BDecimal;
+import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BString;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.ballerinax.asb.util.ASBConstants;
 import org.ballerinax.asb.util.ASBUtils;
+import org.ballerinax.asb.util.ExceptionUtils;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
@@ -46,13 +48,15 @@ import java.util.Collection;
 import java.util.Map;
 
 import static org.ballerinax.asb.util.ASBUtils.getRetryOptions;
+import static org.ballerinax.asb.util.ExceptionUtils.ASB_ERR_DEFAULT_PREFIX;
+import static org.ballerinax.asb.util.ExceptionUtils.ASB_ERR_PREFIX;
 
 /**
  * This facilitates the client operations of MessageSender client in Ballerina.
  */
 public class MessageSender {
 
-    private static final Logger log = Logger.getLogger(MessageSender.class);
+    private static final Logger LOGGER = Logger.getLogger(MessageSender.class);
     private ServiceBusSenderClient sender;
 
     /**
@@ -63,25 +67,32 @@ public class MessageSender {
      * @throws ServiceBusException on failure initiating IMessage Receiver in Azure Service Bus instance.
      */
     public MessageSender(String connectionString, String entityType, String topicOrQueueName, String logLevel,
-                         BMap<BString, Object> retryConfigs) throws ServiceBusException, InterruptedException {
-
-        log.setLevel(Level.toLevel(logLevel, Level.OFF));
-        AmqpRetryOptions retryOptions = getRetryOptions(retryConfigs);
-        ServiceBusClientBuilder clientBuilder = new ServiceBusClientBuilder()
-                .retryOptions(retryOptions)
-                .connectionString(connectionString);
-        if (entityType.equalsIgnoreCase("queue")) {
-            this.sender = clientBuilder
-                    .sender()
-                    .queueName(topicOrQueueName)
-                    .buildClient();
-        } else if (entityType.equalsIgnoreCase("topic")) {
-            this.sender = clientBuilder
-                    .sender()
-                    .topicName(topicOrQueueName)
-                    .buildClient();
+                         BMap<BString, Object> retryConfigs) {
+        try {
+            LOGGER.setLevel(Level.toLevel(logLevel, Level.OFF));
+            AmqpRetryOptions retryOptions = getRetryOptions(retryConfigs);
+            ServiceBusClientBuilder clientBuilder = new ServiceBusClientBuilder()
+                    .retryOptions(retryOptions)
+                    .connectionString(connectionString);
+            if (entityType.equalsIgnoreCase("queue")) {
+                this.sender = clientBuilder
+                        .sender()
+                        .queueName(topicOrQueueName)
+                        .buildClient();
+            } else if (entityType.equalsIgnoreCase("topic")) {
+                this.sender = clientBuilder
+                        .sender()
+                        .topicName(topicOrQueueName)
+                        .buildClient();
+            }
+            LOGGER.debug("ServiceBusSenderClient initialized");
+        } catch (BError e) {
+            throw ExceptionUtils.createAsbError(e);
+        } catch (ServiceBusException e) {
+            throw ExceptionUtils.createAsbError(ASB_ERR_PREFIX + e.getReason().toString(), e.getCause());
+        } catch (Exception e) {
+            throw ExceptionUtils.createAsbError(ASB_ERR_DEFAULT_PREFIX + e.getMessage(), e.getCause());
         }
-        log.debug("ServiceBusSenderClient initialized");
     }
 
     /**
@@ -94,12 +105,16 @@ public class MessageSender {
         try {
             ServiceBusMessage messageToSend = constructMessage(message);
             sender.sendMessage(messageToSend);
-            if (log.isDebugEnabled()) {
-                log.debug("Sent the message successfully. Message Id = " + messageToSend.getMessageId());
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Sent the message successfully. Message Id = " + messageToSend.getMessageId());
             }
             return null;
+        } catch (BError e) {
+            return ExceptionUtils.createAsbError(e);
         } catch (ServiceBusException e) {
-            return ASBUtils.returnErrorValue(e.getClass().getSimpleName(), e);
+            return ExceptionUtils.createAsbError(ASB_ERR_PREFIX + e.getReason().toString(), e.getCause());
+        } catch (Exception e) {
+            return ExceptionUtils.createAsbError(ASB_ERR_DEFAULT_PREFIX + e.getMessage(), e.getCause());
         }
     }
 
@@ -115,12 +130,16 @@ public class MessageSender {
         try {
             ServiceBusMessage messageToSend = constructMessage(message);
             Long sequenceNumber = sender.scheduleMessage(messageToSend, constructOffset(scheduleTime));
-            if (log.isDebugEnabled()) {
-                log.debug("Scheduled the message successfully. Message Id = " + messageToSend.getMessageId());
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Scheduled the message successfully. Message Id = " + messageToSend.getMessageId());
             }
             return sequenceNumber;
+        } catch (BError e) {
+            return ExceptionUtils.createAsbError(e);
         } catch (ServiceBusException e) {
-            return ASBUtils.returnErrorValue(e.getClass().getSimpleName(), e);
+            return ExceptionUtils.createAsbError(ASB_ERR_PREFIX + e.getReason().toString(), e.getCause());
+        } catch (Exception e) {
+            return ExceptionUtils.createAsbError(ASB_ERR_DEFAULT_PREFIX + e.getMessage(), e.getCause());
         }
     }
 
@@ -133,12 +152,16 @@ public class MessageSender {
     public Object cancel(long sequenceNumber) {
         try {
             sender.cancelScheduledMessage(sequenceNumber);
-            if (log.isDebugEnabled()) {
-                log.debug("Successfully cancelled scheduled message with sequenceNumber = " + sequenceNumber);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Successfully cancelled scheduled message with sequenceNumber = " + sequenceNumber);
             }
             return null;
-        } catch (IllegalArgumentException | ServiceBusException | IllegalStateException e) {
-            return ASBUtils.returnErrorValue(e.getClass().getSimpleName(), e);
+        } catch (BError e) {
+            return ExceptionUtils.createAsbError(e);
+        } catch (ServiceBusException e) {
+            return ExceptionUtils.createAsbError(ASB_ERR_PREFIX + e.getReason().toString(), e.getCause());
+        } catch (Exception e) {
+            return ExceptionUtils.createAsbError(ASB_ERR_DEFAULT_PREFIX + e.getMessage(), e.getCause());
         }
     }
 
@@ -171,20 +194,24 @@ public class MessageSender {
 
                 // Add that message that we couldn't before.
                 if (!currentBatch.tryAddMessage(message)) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Message is too large for an empty batch. Skipping. Max size: "
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("Message is too large for an empty batch. Skipping. Max size: "
                                 + currentBatch.getMaxSizeInBytes() + ". Message: " +
                                 message.getBody().toString());
                     }
                 }
             }
             sender.sendMessages(currentBatch);
-            if (log.isDebugEnabled()) {
-                log.debug("Sent the batch message successfully");
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Sent the batch message successfully");
             }
             return null;
+        } catch (BError e) {
+            return ExceptionUtils.createAsbError(e);
         } catch (ServiceBusException e) {
-            return ASBUtils.returnErrorValue(e.getClass().getSimpleName(), e);
+            return ExceptionUtils.createAsbError(ASB_ERR_PREFIX + e.getReason().toString(), e.getCause());
+        } catch (Exception e) {
+            return ExceptionUtils.createAsbError(ASB_ERR_DEFAULT_PREFIX + e.getMessage(), e.getCause());
         }
     }
 
@@ -196,10 +223,14 @@ public class MessageSender {
     public Object closeSender() {
         try {
             sender.close();
-            log.debug("Closed the sender. Identifier=" + sender.getIdentifier());
+            LOGGER.debug("Closed the sender. Identifier=" + sender.getIdentifier());
             return null;
+        } catch (BError e) {
+            return ExceptionUtils.createAsbError(e);
+        } catch (ServiceBusException e) {
+            return ExceptionUtils.createAsbError(ASB_ERR_PREFIX + e.getReason().toString(), e.getCause());
         } catch (Exception e) {
-            return ASBUtils.returnErrorValue(e.getClass().getSimpleName(), e);
+            return ExceptionUtils.createAsbError(ASB_ERR_DEFAULT_PREFIX + e.getMessage(), e.getCause());
         }
     }
 

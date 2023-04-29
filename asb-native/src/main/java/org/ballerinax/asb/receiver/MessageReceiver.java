@@ -38,6 +38,7 @@ import io.ballerina.runtime.api.types.MapType;
 import io.ballerina.runtime.api.types.RecordType;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.utils.TypeUtils;
+import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BHandle;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
@@ -47,6 +48,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.ballerinax.asb.util.ASBConstants;
 import org.ballerinax.asb.util.ASBUtils;
+import org.ballerinax.asb.util.ExceptionUtils;
 import org.ballerinax.asb.util.ModuleUtils;
 
 import java.time.Duration;
@@ -82,6 +84,8 @@ import static org.ballerinax.asb.util.ASBUtils.convertAMQPToJava;
 import static org.ballerinax.asb.util.ASBUtils.convertJavaToBValue;
 import static org.ballerinax.asb.util.ASBUtils.getRetryOptions;
 import static org.ballerinax.asb.util.ASBUtils.getValueWithIntendedType;
+import static org.ballerinax.asb.util.ExceptionUtils.ASB_ERR_DEFAULT_PREFIX;
+import static org.ballerinax.asb.util.ExceptionUtils.ASB_ERR_PREFIX;
 
 /**
  * This facilitates the client operations of MessageReceiver client in
@@ -89,7 +93,7 @@ import static org.ballerinax.asb.util.ASBUtils.getValueWithIntendedType;
  */
 public class MessageReceiver {
 
-    private static final Logger log = Logger.getLogger(MessageReceiver.class);
+    private static final Logger LOGGER = Logger.getLogger(MessageReceiver.class);
 
     /**
      * Initializes the MessageReceiver client.
@@ -109,37 +113,44 @@ public class MessageReceiver {
                                                               String topicName, String subscriptionName,
                                                               String receiveMode, long maxAutoLockRenewDuration,
                                                               String logLevel, BMap<BString, Object> retryConfigs) {
+        try {
+            LOGGER.setLevel(Level.toLevel(logLevel, Level.OFF));
+            AmqpRetryOptions retryOptions = getRetryOptions(retryConfigs);
+            ServiceBusReceiverClientBuilder receiverClientBuilder = new ServiceBusClientBuilder()
+                    .connectionString(connectionString)
+                    .retryOptions(retryOptions)
+                    .receiver();
+            if (!queueName.isEmpty()) {
+                if (Objects.equals(receiveMode, RECEIVE_AND_DELETE)) {
+                    receiverClientBuilder.receiveMode(ServiceBusReceiveMode.RECEIVE_AND_DELETE)
+                            .queueName(queueName);
+                } else {
+                    receiverClientBuilder.receiveMode(ServiceBusReceiveMode.PEEK_LOCK)
+                            .queueName(queueName)
+                            .maxAutoLockRenewDuration(Duration.ofSeconds(maxAutoLockRenewDuration));
+                }
+            } else if (!subscriptionName.isEmpty() && !topicName.isEmpty()) {
+                if (Objects.equals(receiveMode, RECEIVE_AND_DELETE)) {
+                    receiverClientBuilder.receiveMode(ServiceBusReceiveMode.RECEIVE_AND_DELETE)
+                            .topicName(topicName)
+                            .subscriptionName(subscriptionName);
+                } else {
+                    receiverClientBuilder.receiveMode(ServiceBusReceiveMode.PEEK_LOCK)
+                            .topicName(topicName)
+                            .subscriptionName(subscriptionName)
+                            .maxAutoLockRenewDuration(Duration.ofSeconds(maxAutoLockRenewDuration));
+                }
+            }
 
-        log.setLevel(Level.toLevel(logLevel, Level.OFF));
-        AmqpRetryOptions retryOptions = getRetryOptions(retryConfigs);
-        ServiceBusReceiverClientBuilder receiverClientBuilder = new ServiceBusClientBuilder()
-                .connectionString(connectionString)
-                .retryOptions(retryOptions)
-                .receiver();
-        if (!queueName.isEmpty()) {
-            if (Objects.equals(receiveMode, RECEIVE_AND_DELETE)) {
-                receiverClientBuilder.receiveMode(ServiceBusReceiveMode.RECEIVE_AND_DELETE)
-                        .queueName(queueName);
-            } else {
-                receiverClientBuilder.receiveMode(ServiceBusReceiveMode.PEEK_LOCK)
-                        .queueName(queueName)
-                        .maxAutoLockRenewDuration(Duration.ofSeconds(maxAutoLockRenewDuration));
-            }
-        } else if (!subscriptionName.isEmpty() && !topicName.isEmpty()) {
-            if (Objects.equals(receiveMode, RECEIVE_AND_DELETE)) {
-                receiverClientBuilder.receiveMode(ServiceBusReceiveMode.RECEIVE_AND_DELETE)
-                        .topicName(topicName)
-                        .subscriptionName(subscriptionName);
-            } else {
-                receiverClientBuilder.receiveMode(ServiceBusReceiveMode.PEEK_LOCK)
-                        .topicName(topicName)
-                        .subscriptionName(subscriptionName)
-                        .maxAutoLockRenewDuration(Duration.ofSeconds(maxAutoLockRenewDuration));
-            }
+            LOGGER.debug("ServiceBusReceiverClient initialized");
+            return receiverClientBuilder.buildClient();
+        } catch (BError e) {
+            throw ExceptionUtils.createAsbError(e);
+        } catch (ServiceBusException e) {
+            throw ExceptionUtils.createAsbError(ASB_ERR_PREFIX + e.getReason().toString(), e.getCause());
+        } catch (Exception e) {
+            throw ExceptionUtils.createAsbError(ASB_ERR_DEFAULT_PREFIX + e.getMessage(), e.getCause());
         }
-
-        log.debug("ServiceBusReceiverClient initialized");
-        return receiverClientBuilder.buildClient();
     }
 
     /**
@@ -171,11 +182,15 @@ public class MessageReceiver {
                 return null;
             }
 
-            log.debug("Received message with messageId: " + receivedMessage.getMessageId());
+            LOGGER.debug("Received message with messageId: " + receivedMessage.getMessageId());
             RecordType expectedRecordType = ASBUtils.getRecordType(expectedType);
             return constructExpectedMessageRecord(endpointClient, receivedMessage, expectedRecordType);
+        } catch (BError e) {
+            return ExceptionUtils.createAsbError(e);
+        } catch (ServiceBusException e) {
+            return ExceptionUtils.createAsbError(ASB_ERR_PREFIX + e.getReason().toString(), e.getCause());
         } catch (Exception e) {
-            return ASBUtils.returnErrorValue(e.getClass().getSimpleName(), e);
+            return ExceptionUtils.createAsbError(ASB_ERR_DEFAULT_PREFIX + e.getMessage(), e.getCause());
         }
     }
 
@@ -206,7 +221,7 @@ public class MessageReceiver {
                 return null;
             }
 
-            log.debug("Received message with messageId: " + receivedMessage.getMessageId());
+            LOGGER.debug("Received message with messageId: " + receivedMessage.getMessageId());
             Object messageBody = getMessagePayload(receivedMessage);
             if (messageBody instanceof byte[]) {
                 return getValueWithIntendedType((byte[]) messageBody, expectedType.getDescribingType());
@@ -216,8 +231,12 @@ public class MessageReceiver {
                         ErrorCreator.createError(StringUtils.fromString("Failed to bind the received ASB message " +
                                 "value to the expected Ballerina type: '" + expectedType.toString() + "'")));
             }
+        } catch (BError e) {
+            return ExceptionUtils.createAsbError(e);
+        } catch (ServiceBusException e) {
+            return ExceptionUtils.createAsbError(ASB_ERR_PREFIX + e.getReason().toString(), e.getCause());
         } catch (Exception e) {
-            return ASBUtils.returnErrorValue(e.getClass().getSimpleName(), e);
+            return ExceptionUtils.createAsbError(ASB_ERR_DEFAULT_PREFIX + e.getMessage(), e.getCause());
         }
     }
 
@@ -235,15 +254,19 @@ public class MessageReceiver {
     public static Object receiveBatch(BObject endpointClient, Object maxMessageCount, Object serverWaitTime) {
         try {
             ServiceBusReceiverClient receiver = getReceiverFromBObject(endpointClient);
-            if (log.isDebugEnabled()) {
-                log.debug("Waiting up to 'serverWaitTime' seconds for messages from " + receiver.getEntityPath());
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Waiting up to 'serverWaitTime' seconds for messages from " + receiver.getEntityPath());
             }
             return getReceivedMessageBatch(endpointClient, maxMessageCount, serverWaitTime);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             return null;
+        } catch (BError e) {
+            return ExceptionUtils.createAsbError(e);
+        } catch (ServiceBusException e) {
+            return ExceptionUtils.createAsbError(ASB_ERR_PREFIX + e.getReason().toString(), e.getCause());
         } catch (Exception e) {
-            return ASBUtils.returnErrorValue(e.getClass().getSimpleName(), e);
+            return ExceptionUtils.createAsbError(ASB_ERR_DEFAULT_PREFIX + e.getMessage(), e.getCause());
         }
     }
 
@@ -260,10 +283,14 @@ public class MessageReceiver {
             ServiceBusReceivedMessage message = (ServiceBusReceivedMessage) endpointClient
                     .getNativeData(lockToken.getValue());
             receiver.complete(message);
-            log.debug("Completed the message(Id: " + message.getMessageId() + ") with lockToken " + lockToken);
+            LOGGER.debug("Completed the message(Id: " + message.getMessageId() + ") with lockToken " + lockToken);
             return null;
+        } catch (BError e) {
+            return ExceptionUtils.createAsbError(e);
+        } catch (ServiceBusException e) {
+            return ExceptionUtils.createAsbError(ASB_ERR_PREFIX + e.getReason().toString(), e.getCause());
         } catch (Exception e) {
-            return ASBUtils.returnErrorValue(e.getClass().getSimpleName(), e);
+            return ExceptionUtils.createAsbError(ASB_ERR_DEFAULT_PREFIX + e.getMessage(), e.getCause());
         }
     }
 
@@ -280,11 +307,15 @@ public class MessageReceiver {
             ServiceBusReceivedMessage message = (ServiceBusReceivedMessage) endpointClient
                     .getNativeData(lockToken.getValue());
             receiver.abandon(message);
-            log.debug(String.format("Done abandoning a message(Id: %s) using its lock token from \n%s",
+            LOGGER.debug(String.format("Done abandoning a message(Id: %s) using its lock token from \n%s",
                     message.getMessageId(), receiver.getEntityPath()));
             return null;
+        } catch (BError e) {
+            return ExceptionUtils.createAsbError(e);
+        } catch (ServiceBusException e) {
+            return ExceptionUtils.createAsbError(ASB_ERR_PREFIX + e.getReason().toString(), e.getCause());
         } catch (Exception e) {
-            return ASBUtils.returnErrorValue(e.getClass().getSimpleName(), e);
+            return ExceptionUtils.createAsbError(ASB_ERR_DEFAULT_PREFIX + e.getMessage(), e.getCause());
         }
     }
 
@@ -307,11 +338,15 @@ public class MessageReceiver {
                     .setDeadLetterErrorDescription(ASBUtils.convertString(deadLetterErrorDescription));
             options.setDeadLetterReason(ASBUtils.convertString(deadLetterReason));
             receiver.deadLetter(message, options);
-            log.debug(String.format("Done dead-lettering a message(Id: %s) using its lock token from %s",
+            LOGGER.debug(String.format("Done dead-lettering a message(Id: %s) using its lock token from %s",
                     message.getMessageId(), receiver.getEntityPath()));
             return null;
+        } catch (BError e) {
+            return ExceptionUtils.createAsbError(e);
+        } catch (ServiceBusException e) {
+            return ExceptionUtils.createAsbError(ASB_ERR_PREFIX + e.getReason().toString(), e.getCause());
         } catch (Exception e) {
-            return ASBUtils.returnErrorValue(e.getClass().getSimpleName(), e);
+            return ExceptionUtils.createAsbError(ASB_ERR_DEFAULT_PREFIX + e.getMessage(), e.getCause());
         }
     }
 
@@ -328,11 +363,15 @@ public class MessageReceiver {
             ServiceBusReceivedMessage message = (ServiceBusReceivedMessage) endpointClient
                     .getNativeData(lockToken.getValue());
             receiver.defer(message);
-            log.debug(String.format("Done deferring a message(Id: %s) using its lock token from %s",
+            LOGGER.debug(String.format("Done deferring a message(Id: %s) using its lock token from %s",
                     message.getMessageId(), receiver.getEntityPath()));
             return null;
+        } catch (BError e) {
+            return ExceptionUtils.createAsbError(e);
+        } catch (ServiceBusException e) {
+            return ExceptionUtils.createAsbError(ASB_ERR_PREFIX + e.getReason().toString(), e.getCause());
         } catch (Exception e) {
-            return ASBUtils.returnErrorValue(e.getClass().getSimpleName(), e);
+            return ExceptionUtils.createAsbError(ASB_ERR_DEFAULT_PREFIX + e.getMessage(), e.getCause());
         }
     }
 
@@ -355,10 +394,14 @@ public class MessageReceiver {
             if (receivedMessage == null) {
                 return null;
             }
-            log.debug("Received deferred message using its sequenceNumber from " + receiver.getEntityPath());
+            LOGGER.debug("Received deferred message using its sequenceNumber from " + receiver.getEntityPath());
             return constructExpectedMessageRecord(endpointClient, receivedMessage, null);
+        } catch (BError e) {
+            return ExceptionUtils.createAsbError(e);
+        } catch (ServiceBusException e) {
+            return ExceptionUtils.createAsbError(ASB_ERR_PREFIX + e.getReason().toString(), e.getCause());
         } catch (Exception e) {
-            return ASBUtils.returnErrorValue(e.getClass().getSimpleName(), e);
+            return ExceptionUtils.createAsbError(ASB_ERR_DEFAULT_PREFIX + e.getMessage(), e.getCause());
         }
     }
 
@@ -376,11 +419,15 @@ public class MessageReceiver {
                     .getNativeData(lockToken.getValue());
             ServiceBusReceiverClient receiver = getReceiverFromBObject(endpointClient);
             receiver.renewMessageLock(message);
-            log.debug(String.format("Done renewing a message(Id: %s) using its lock token from %s",
+            LOGGER.debug(String.format("Done renewing a message(Id: %s) using its lock token from %s",
                     message.getMessageId(), receiver.getEntityPath()));
             return null;
+        } catch (BError e) {
+            return ExceptionUtils.createAsbError(e);
+        } catch (ServiceBusException e) {
+            return ExceptionUtils.createAsbError(ASB_ERR_PREFIX + e.getReason().toString(), e.getCause());
         } catch (Exception e) {
-            return ASBUtils.returnErrorValue(e.getClass().getSimpleName(), e);
+            return ExceptionUtils.createAsbError(ASB_ERR_DEFAULT_PREFIX + e.getMessage(), e.getCause());
         }
     }
 
@@ -393,10 +440,14 @@ public class MessageReceiver {
         try {
             ServiceBusReceiverClient receiver = getReceiverFromBObject(endpointClient);
             receiver.close();
-            log.debug("Closed the receiver");
+            LOGGER.debug("Closed the receiver");
             return null;
+        } catch (BError e) {
+            return ExceptionUtils.createAsbError(e);
+        } catch (ServiceBusException e) {
+            return ExceptionUtils.createAsbError(ASB_ERR_PREFIX + e.getReason().toString(), e.getCause());
         } catch (Exception e) {
-            return ASBUtils.returnErrorValue(e.getClass().getSimpleName(), e);
+            return ExceptionUtils.createAsbError(ASB_ERR_DEFAULT_PREFIX + e.getMessage(), e.getCause());
         }
     }
 
@@ -472,7 +523,7 @@ public class MessageReceiver {
             case DATA:
                 return rawAmqpMessage.getBody().getFirstData();
             case VALUE:
-                log.debug(String.format("Received a message with messageId: %s and AMQPMessageBodyType: %s",
+                LOGGER.debug(String.format("Received a message with messageId: %s and AMQPMessageBodyType: %s",
                         receivedMessage.getMessageId(), bodyType));
                 Object amqpValue = rawAmqpMessage.getBody().getValue();
                 amqpValue = convertAMQPToJava(receivedMessage.getMessageId(), amqpValue);
