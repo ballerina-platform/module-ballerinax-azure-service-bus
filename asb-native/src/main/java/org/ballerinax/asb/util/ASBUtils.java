@@ -342,7 +342,6 @@ public class ASBUtils {
         if (intendedValue instanceof BError) {
             throw (BError) intendedValue;
         }
-
         return intendedValue;
     }
 

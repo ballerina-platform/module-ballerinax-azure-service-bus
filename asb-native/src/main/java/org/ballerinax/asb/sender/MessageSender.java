@@ -38,7 +38,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.ballerinax.asb.util.ASBConstants;
 import org.ballerinax.asb.util.ASBUtils;
-import org.ballerinax.asb.util.ExceptionUtils;
+import org.ballerinax.asb.util.ASBErrorCreator;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
@@ -48,8 +48,6 @@ import java.util.Collection;
 import java.util.Map;
 
 import static org.ballerinax.asb.util.ASBUtils.getRetryOptions;
-import static org.ballerinax.asb.util.ExceptionUtils.ASB_ERR_DEFAULT_PREFIX;
-import static org.ballerinax.asb.util.ExceptionUtils.ASB_ERR_PREFIX;
 
 /**
  * This facilitates the client operations of MessageSender client in Ballerina.
@@ -87,11 +85,11 @@ public class MessageSender {
             }
             LOGGER.debug("ServiceBusSenderClient initialized");
         } catch (BError e) {
-            throw ExceptionUtils.createAsbError(e);
+            throw ASBErrorCreator.fromBError(e);
         } catch (ServiceBusException e) {
-            throw ExceptionUtils.createAsbError(ASB_ERR_PREFIX + e.getReason().toString(), e.getCause());
+            throw ASBErrorCreator.fromASBException(e);
         } catch (Exception e) {
-            throw ExceptionUtils.createAsbError(ASB_ERR_DEFAULT_PREFIX + e.getMessage(), e.getCause());
+            throw ASBErrorCreator.fromUnhandledException(e);
         }
     }
 
@@ -110,11 +108,11 @@ public class MessageSender {
             }
             return null;
         } catch (BError e) {
-            return ExceptionUtils.createAsbError(e);
+            throw ASBErrorCreator.fromBError(e);
         } catch (ServiceBusException e) {
-            return ExceptionUtils.createAsbError(ASB_ERR_PREFIX + e.getReason().toString(), e.getCause());
+            throw ASBErrorCreator.fromASBException(e);
         } catch (Exception e) {
-            return ExceptionUtils.createAsbError(ASB_ERR_DEFAULT_PREFIX + e.getMessage(), e.getCause());
+            throw ASBErrorCreator.fromUnhandledException(e);
         }
     }
 
@@ -135,11 +133,11 @@ public class MessageSender {
             }
             return sequenceNumber;
         } catch (BError e) {
-            return ExceptionUtils.createAsbError(e);
+            throw ASBErrorCreator.fromBError(e);
         } catch (ServiceBusException e) {
-            return ExceptionUtils.createAsbError(ASB_ERR_PREFIX + e.getReason().toString(), e.getCause());
+            throw ASBErrorCreator.fromASBException(e);
         } catch (Exception e) {
-            return ExceptionUtils.createAsbError(ASB_ERR_DEFAULT_PREFIX + e.getMessage(), e.getCause());
+            throw ASBErrorCreator.fromUnhandledException(e);
         }
     }
 
@@ -157,11 +155,11 @@ public class MessageSender {
             }
             return null;
         } catch (BError e) {
-            return ExceptionUtils.createAsbError(e);
+            throw ASBErrorCreator.fromBError(e);
         } catch (ServiceBusException e) {
-            return ExceptionUtils.createAsbError(ASB_ERR_PREFIX + e.getReason().toString(), e.getCause());
+            throw ASBErrorCreator.fromASBException(e);
         } catch (Exception e) {
-            return ExceptionUtils.createAsbError(ASB_ERR_DEFAULT_PREFIX + e.getMessage(), e.getCause());
+            throw ASBErrorCreator.fromUnhandledException(e);
         }
     }
 
@@ -207,11 +205,11 @@ public class MessageSender {
             }
             return null;
         } catch (BError e) {
-            return ExceptionUtils.createAsbError(e);
+            throw ASBErrorCreator.fromBError(e);
         } catch (ServiceBusException e) {
-            return ExceptionUtils.createAsbError(ASB_ERR_PREFIX + e.getReason().toString(), e.getCause());
+            throw ASBErrorCreator.fromASBException(e);
         } catch (Exception e) {
-            return ExceptionUtils.createAsbError(ASB_ERR_DEFAULT_PREFIX + e.getMessage(), e.getCause());
+            throw ASBErrorCreator.fromUnhandledException(e);
         }
     }
 
@@ -226,11 +224,11 @@ public class MessageSender {
             LOGGER.debug("Closed the sender. Identifier=" + sender.getIdentifier());
             return null;
         } catch (BError e) {
-            return ExceptionUtils.createAsbError(e);
+            throw ASBErrorCreator.fromBError(e);
         } catch (ServiceBusException e) {
-            return ExceptionUtils.createAsbError(ASB_ERR_PREFIX + e.getReason().toString(), e.getCause());
+            throw ASBErrorCreator.fromASBException(e);
         } catch (Exception e) {
-            return ExceptionUtils.createAsbError(ASB_ERR_DEFAULT_PREFIX + e.getMessage(), e.getCause());
+            throw ASBErrorCreator.fromUnhandledException(e);
         }
     }
 

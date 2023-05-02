@@ -18,6 +18,7 @@
 
 package org.ballerinax.asb.util;
 
+import com.azure.messaging.servicebus.ServiceBusException;
 import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BError;
@@ -26,26 +27,30 @@ import static org.ballerinax.asb.util.ASBConstants.ASB_ERROR;
 import static org.ballerinax.asb.util.ModuleUtils.getModule;
 
 /**
- * ASB module exceptions related utilities.
+ * ASB module error related utilities.
  */
-public class ExceptionUtils {
+public class ASBErrorCreator {
 
-    public static final String ASB_ERR_PREFIX = "ASB request Failed due to: ";
-    public static final String ASB_ERR_DEFAULT_PREFIX = "Unexpected error occurred: ";
+    public static final String ASB_ERROR_PREFIX = "ASB request failed due to: ";
+    public static final String UNHANDLED_ERROR_PREFIX = "Unexpected error occurred while processing request: ";
 
-    public static BError createAsbError(String message) {
-        return ErrorCreator.createDistinctError(ASB_ERROR, getModule(), StringUtils.fromString(message));
+    public static BError fromASBException(ServiceBusException e) {
+        return createAsbError(ASB_ERROR_PREFIX + e.getReason().toString(), e.getCause());
     }
 
-    public static BError createAsbError(BError error) {
+    public static BError fromUnhandledException(Exception e) {
+        return createAsbError(UNHANDLED_ERROR_PREFIX + e.getMessage(), e.getCause());
+    }
+
+    public static BError fromBError(BError error) {
         return createAsbError(error.getMessage(), error.getCause());
     }
 
-    public static BError createAsbError(String message, Throwable cause) {
+    private static BError createAsbError(String message, Throwable cause) {
         return createAsbError(message, ErrorCreator.createError(cause));
     }
 
-    public static BError createAsbError(String message, BError cause) {
+    private static BError createAsbError(String message, BError cause) {
         return ErrorCreator.createDistinctError(ASB_ERROR, getModule(), StringUtils.fromString(message), cause);
     }
 }

@@ -48,7 +48,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.ballerinax.asb.util.ASBConstants;
 import org.ballerinax.asb.util.ASBUtils;
-import org.ballerinax.asb.util.ExceptionUtils;
+import org.ballerinax.asb.util.ASBErrorCreator;
 import org.ballerinax.asb.util.ModuleUtils;
 
 import java.time.Duration;
@@ -84,8 +84,6 @@ import static org.ballerinax.asb.util.ASBUtils.convertAMQPToJava;
 import static org.ballerinax.asb.util.ASBUtils.convertJavaToBValue;
 import static org.ballerinax.asb.util.ASBUtils.getRetryOptions;
 import static org.ballerinax.asb.util.ASBUtils.getValueWithIntendedType;
-import static org.ballerinax.asb.util.ExceptionUtils.ASB_ERR_DEFAULT_PREFIX;
-import static org.ballerinax.asb.util.ExceptionUtils.ASB_ERR_PREFIX;
 
 /**
  * This facilitates the client operations of MessageReceiver client in
@@ -145,11 +143,11 @@ public class MessageReceiver {
             LOGGER.debug("ServiceBusReceiverClient initialized");
             return receiverClientBuilder.buildClient();
         } catch (BError e) {
-            throw ExceptionUtils.createAsbError(e);
+            throw ASBErrorCreator.fromBError(e);
         } catch (ServiceBusException e) {
-            throw ExceptionUtils.createAsbError(ASB_ERR_PREFIX + e.getReason().toString(), e.getCause());
+            throw ASBErrorCreator.fromASBException(e);
         } catch (Exception e) {
-            throw ExceptionUtils.createAsbError(ASB_ERR_DEFAULT_PREFIX + e.getMessage(), e.getCause());
+            throw ASBErrorCreator.fromUnhandledException(e);
         }
     }
 
@@ -186,11 +184,11 @@ public class MessageReceiver {
             RecordType expectedRecordType = ASBUtils.getRecordType(expectedType);
             return constructExpectedMessageRecord(endpointClient, receivedMessage, expectedRecordType);
         } catch (BError e) {
-            return ExceptionUtils.createAsbError(e);
+            throw ASBErrorCreator.fromBError(e);
         } catch (ServiceBusException e) {
-            return ExceptionUtils.createAsbError(ASB_ERR_PREFIX + e.getReason().toString(), e.getCause());
+            throw ASBErrorCreator.fromASBException(e);
         } catch (Exception e) {
-            return ExceptionUtils.createAsbError(ASB_ERR_DEFAULT_PREFIX + e.getMessage(), e.getCause());
+            throw ASBErrorCreator.fromUnhandledException(e);
         }
     }
 
@@ -232,11 +230,11 @@ public class MessageReceiver {
                                 "value to the expected Ballerina type: '" + expectedType.toString() + "'")));
             }
         } catch (BError e) {
-            return ExceptionUtils.createAsbError(e);
+            throw ASBErrorCreator.fromBError(e);
         } catch (ServiceBusException e) {
-            return ExceptionUtils.createAsbError(ASB_ERR_PREFIX + e.getReason().toString(), e.getCause());
+            throw ASBErrorCreator.fromASBException(e);
         } catch (Exception e) {
-            return ExceptionUtils.createAsbError(ASB_ERR_DEFAULT_PREFIX + e.getMessage(), e.getCause());
+            throw ASBErrorCreator.fromUnhandledException(e);
         }
     }
 
@@ -262,11 +260,11 @@ public class MessageReceiver {
             Thread.currentThread().interrupt();
             return null;
         } catch (BError e) {
-            return ExceptionUtils.createAsbError(e);
+            throw ASBErrorCreator.fromBError(e);
         } catch (ServiceBusException e) {
-            return ExceptionUtils.createAsbError(ASB_ERR_PREFIX + e.getReason().toString(), e.getCause());
+            throw ASBErrorCreator.fromASBException(e);
         } catch (Exception e) {
-            return ExceptionUtils.createAsbError(ASB_ERR_DEFAULT_PREFIX + e.getMessage(), e.getCause());
+            throw ASBErrorCreator.fromUnhandledException(e);
         }
     }
 
@@ -286,11 +284,11 @@ public class MessageReceiver {
             LOGGER.debug("Completed the message(Id: " + message.getMessageId() + ") with lockToken " + lockToken);
             return null;
         } catch (BError e) {
-            return ExceptionUtils.createAsbError(e);
+            throw ASBErrorCreator.fromBError(e);
         } catch (ServiceBusException e) {
-            return ExceptionUtils.createAsbError(ASB_ERR_PREFIX + e.getReason().toString(), e.getCause());
+            throw ASBErrorCreator.fromASBException(e);
         } catch (Exception e) {
-            return ExceptionUtils.createAsbError(ASB_ERR_DEFAULT_PREFIX + e.getMessage(), e.getCause());
+            throw ASBErrorCreator.fromUnhandledException(e);
         }
     }
 
@@ -311,11 +309,11 @@ public class MessageReceiver {
                     message.getMessageId(), receiver.getEntityPath()));
             return null;
         } catch (BError e) {
-            return ExceptionUtils.createAsbError(e);
+            throw ASBErrorCreator.fromBError(e);
         } catch (ServiceBusException e) {
-            return ExceptionUtils.createAsbError(ASB_ERR_PREFIX + e.getReason().toString(), e.getCause());
+            throw ASBErrorCreator.fromASBException(e);
         } catch (Exception e) {
-            return ExceptionUtils.createAsbError(ASB_ERR_DEFAULT_PREFIX + e.getMessage(), e.getCause());
+            throw ASBErrorCreator.fromUnhandledException(e);
         }
     }
 
@@ -342,11 +340,11 @@ public class MessageReceiver {
                     message.getMessageId(), receiver.getEntityPath()));
             return null;
         } catch (BError e) {
-            return ExceptionUtils.createAsbError(e);
+            throw ASBErrorCreator.fromBError(e);
         } catch (ServiceBusException e) {
-            return ExceptionUtils.createAsbError(ASB_ERR_PREFIX + e.getReason().toString(), e.getCause());
+            throw ASBErrorCreator.fromASBException(e);
         } catch (Exception e) {
-            return ExceptionUtils.createAsbError(ASB_ERR_DEFAULT_PREFIX + e.getMessage(), e.getCause());
+            throw ASBErrorCreator.fromUnhandledException(e);
         }
     }
 
@@ -367,11 +365,11 @@ public class MessageReceiver {
                     message.getMessageId(), receiver.getEntityPath()));
             return null;
         } catch (BError e) {
-            return ExceptionUtils.createAsbError(e);
+            throw ASBErrorCreator.fromBError(e);
         } catch (ServiceBusException e) {
-            return ExceptionUtils.createAsbError(ASB_ERR_PREFIX + e.getReason().toString(), e.getCause());
+            throw ASBErrorCreator.fromASBException(e);
         } catch (Exception e) {
-            return ExceptionUtils.createAsbError(ASB_ERR_DEFAULT_PREFIX + e.getMessage(), e.getCause());
+            throw ASBErrorCreator.fromUnhandledException(e);
         }
     }
 
@@ -397,11 +395,11 @@ public class MessageReceiver {
             LOGGER.debug("Received deferred message using its sequenceNumber from " + receiver.getEntityPath());
             return constructExpectedMessageRecord(endpointClient, receivedMessage, null);
         } catch (BError e) {
-            return ExceptionUtils.createAsbError(e);
+            throw ASBErrorCreator.fromBError(e);
         } catch (ServiceBusException e) {
-            return ExceptionUtils.createAsbError(ASB_ERR_PREFIX + e.getReason().toString(), e.getCause());
+            throw ASBErrorCreator.fromASBException(e);
         } catch (Exception e) {
-            return ExceptionUtils.createAsbError(ASB_ERR_DEFAULT_PREFIX + e.getMessage(), e.getCause());
+            throw ASBErrorCreator.fromUnhandledException(e);
         }
     }
 
@@ -423,11 +421,11 @@ public class MessageReceiver {
                     message.getMessageId(), receiver.getEntityPath()));
             return null;
         } catch (BError e) {
-            return ExceptionUtils.createAsbError(e);
+            throw ASBErrorCreator.fromBError(e);
         } catch (ServiceBusException e) {
-            return ExceptionUtils.createAsbError(ASB_ERR_PREFIX + e.getReason().toString(), e.getCause());
+            throw ASBErrorCreator.fromASBException(e);
         } catch (Exception e) {
-            return ExceptionUtils.createAsbError(ASB_ERR_DEFAULT_PREFIX + e.getMessage(), e.getCause());
+            throw ASBErrorCreator.fromUnhandledException(e);
         }
     }
 
@@ -443,11 +441,11 @@ public class MessageReceiver {
             LOGGER.debug("Closed the receiver");
             return null;
         } catch (BError e) {
-            return ExceptionUtils.createAsbError(e);
+            throw ASBErrorCreator.fromBError(e);
         } catch (ServiceBusException e) {
-            return ExceptionUtils.createAsbError(ASB_ERR_PREFIX + e.getReason().toString(), e.getCause());
+            throw ASBErrorCreator.fromASBException(e);
         } catch (Exception e) {
-            return ExceptionUtils.createAsbError(ASB_ERR_DEFAULT_PREFIX + e.getMessage(), e.getCause());
+            throw ASBErrorCreator.fromUnhandledException(e);
         }
     }
 
