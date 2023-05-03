@@ -28,6 +28,8 @@ import static org.ballerinax.asb.util.ModuleUtils.getModule;
 
 /**
  * ASB module error related utilities.
+ *
+ * @since 4.0.0
  */
 public class ASBErrorCreator {
 

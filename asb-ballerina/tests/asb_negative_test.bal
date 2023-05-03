@@ -36,10 +36,9 @@ function testReceivePayloadWithIncorrectExpectedType() returns error? {
     float|Error? expectedPayload = messageReceiver->receivePayload(serverWaitTime);
     log:printInfo("Asserting received payloads.");
     test:assertTrue(expectedPayload is Error, msg = "Unexpected payload received");
-    test:assertEquals((<Error>expectedPayload).message(), "Failed to deserialize the received ASB message payload " +
-                    "to the contextually expected type 'float?'. If you require using any custom deserialization logic," +
-                    "it is recommended use 'byte[]' for the contextually expected type and, do the deserialization in" +
-                    " user's code.");
+    test:assertEquals((<Error>expectedPayload).message(), "Failed to deserialize the message payload " +
+                            "into the contextually expected type 'float?'. Use a compatible Ballerina type or, " +
+                            "use 'byte[]' type along with an appropriate deserialization logic afterwards.");
 
     log:printInfo("Closing Asb sender client.");
     check messageSender->close();
@@ -67,11 +66,9 @@ function testReceivePayloadWithUnsupportedUnionExpectedType() returns error? {
     int|string|Error? expectedPayload = messageReceiver->receivePayload(serverWaitTime);
     log:printInfo("Asserting received payloads.");
     test:assertTrue(expectedPayload is error, msg = "Unexpected payload received");
-    test:assertEquals((<Error>expectedPayload).message(), "Failed to deserialize the received ASB message payload " +
-                    "to the contextually expected type '(int|string)?'. If you require using any custom deserialization logic," +
-                    "it is recommended use 'byte[]' for the contextually expected type and, do the deserialization in" +
-                    " user's code.");
-
+    test:assertEquals((<Error>expectedPayload).message(), "Failed to deserialize the message payload " +
+                            "into the contextually expected type '(int|string)?'. Use a compatible Ballerina type or, " +
+                            "use 'byte[]' type along with an appropriate deserialization logic afterwards.");
     log:printInfo("Closing Asb sender client.");
     check messageSender->close();
 
@@ -82,8 +79,8 @@ function testReceivePayloadWithUnsupportedUnionExpectedType() returns error? {
 @test:Config {
     groups: ["asb_negative"]
 }
-function testSendToInvalidTopicName() returns error? {
-    log:printInfo("[[testSendToInvalidTopicName]]");
+function testSendToInvalidTopic() returns error? {
+    log:printInfo("[[testSendToInvalidTopic]]");
     log:printInfo("Creating Asb message sender.");
     senderConfig.topicOrQueueName = "non-existing-topic";
     MessageSender messageSender = check new (senderConfig);
@@ -100,8 +97,8 @@ function testSendToInvalidTopicName() returns error? {
 @test:Config {
     groups: ["asb_negative"]
 }
-function testReceiveFromInvalidTopicName() returns error? {
-    log:printInfo("[[testReceiveFromInvalidTopicName]]");
+function testReceiveFromInvalidQueue() returns error? {
+    log:printInfo("[[testReceiveFromInvalidQueue]]");
     log:printInfo("Creating Asb message receiver.");
     receiverConfig.entityConfig = {queueName: "non-existing-queue"};
     MessageReceiver messageReceiver = check new (receiverConfig);

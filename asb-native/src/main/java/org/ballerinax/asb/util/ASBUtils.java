@@ -309,10 +309,10 @@ public class ASBUtils {
         try {
             return getValueWithIntendedTypeRecursive(value, type);
         } catch (BError be) {
-            throw ASBErrorCreator.fromBError(String.format("Failed to deserialize the received ASB message payload " +
-                    "to the contextually expected type '%s'. If you require using any custom deserialization logic," +
-                    "it is recommended use 'byte[]' for the contextually expected type and, do the deserialization in" +
-                    " user's code.", type.toString()), be);
+            throw ASBErrorCreator.fromBError(String.format("Failed to deserialize the message payload " +
+                            "into the contextually expected type '%s'. Use a compatible Ballerina type or, " +
+                            "use 'byte[]' type along with an appropriate deserialization logic afterwards.",
+                    type.toString()), be);
         }
     }
 
