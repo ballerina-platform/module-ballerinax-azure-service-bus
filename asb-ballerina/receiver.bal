@@ -37,28 +37,35 @@ public isolated client class MessageReceiver {
     #
     # + config - Azure service bus receiver configuration.(Default receiver mode is PEEK_LOCK)
     public isolated function init(ASBServiceReceiverConfig config) returns Error? {
-        do {
-            self.connectionString = config.connectionString;
-            if config.entityConfig is QueueConfig {
-                QueueConfig queueConfig = check config.entityConfig.ensureType(QueueConfig);
-                self.queueName = queueConfig.queueName;
-                self.subscriptionName = EMPTY_STRING;
-                self.topicName = EMPTY_STRING;
-            } else {
-                TopicSubsConfig topicSubsConfig = check config.entityConfig.ensureType(TopicSubsConfig);
-                self.topicName = topicSubsConfig.topicName;
-                self.subscriptionName = topicSubsConfig.subscriptionName;
-                self.queueName = EMPTY_STRING;
+        self.connectionString = config.connectionString;
+        if config.entityConfig is QueueConfig {
+            QueueConfig|error queueConfig = config.entityConfig.ensureType(QueueConfig);
+            if queueConfig is error {
+                return createError(queueConfig);
             }
-            self.receiveMode = config.receiveMode;
-            self.maxAutoLockRenewDuration = config.maxAutoLockRenewDuration;
-            self.logLevel = customConfiguration.logLevel;
-            self.receiverHandle = check initMessageReceiver(java:fromString(self.connectionString),
+            self.queueName = queueConfig.queueName;
+            self.subscriptionName = EMPTY_STRING;
+            self.topicName = EMPTY_STRING;
+        } else {
+            TopicSubsConfig|error topicSubsConfig = config.entityConfig.ensureType(TopicSubsConfig);
+            if topicSubsConfig is error {
+                return createError(topicSubsConfig);
+            }
+            self.topicName = topicSubsConfig.topicName;
+            self.subscriptionName = topicSubsConfig.subscriptionName;
+            self.queueName = EMPTY_STRING;
+        }
+        self.receiveMode = config.receiveMode;
+        self.maxAutoLockRenewDuration = config.maxAutoLockRenewDuration;
+        self.logLevel = customConfiguration.logLevel;
+        handle|Error initResult = initMessageReceiver(java:fromString(self.connectionString),
             java:fromString(self.queueName), java:fromString(self.topicName), java:fromString(self.subscriptionName),
             java:fromString(self.receiveMode), self.maxAutoLockRenewDuration, java:fromString(self.logLevel), config.amqpRetryOptions);
-        } on fail error e {
-            return createError(e);
+        if initResult is Error {
+            return initResult;
         }
+
+        self.receiverHandle = initResult;
     }
 
     # Receive message from queue or subscription.

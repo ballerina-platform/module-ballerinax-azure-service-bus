@@ -33,10 +33,13 @@ function testReceivePayloadWithIncorrectExpectedType() returns error? {
     MessageReceiver messageReceiver = check new (receiverConfig);
     log:printInfo("Receiving from Asb receiver client.");
 
-    float|error? expectedPayload = messageReceiver->receivePayload(serverWaitTime);
+    float|Error? expectedPayload = messageReceiver->receivePayload(serverWaitTime);
     log:printInfo("Asserting received payloads.");
-    test:assertTrue(expectedPayload is error, msg = "Unexpected payload received");
-    test:assertEquals((<error>expectedPayload).message(), "{ballerina/lang.value}ConversionError");
+    test:assertTrue(expectedPayload is Error, msg = "Unexpected payload received");
+    test:assertEquals((<Error>expectedPayload).message(), "Failed to deserialize the received ASB message payload " +
+                    "to the contextually expected type 'float?'. If you require using any custom deserialization logic," +
+                    "it is recommended use 'byte[]' for the contextually expected type and, do the deserialization in" +
+                    " user's code.");
 
     log:printInfo("Closing Asb sender client.");
     check messageSender->close();
@@ -61,14 +64,67 @@ function testReceivePayloadWithUnsupportedUnionExpectedType() returns error? {
     MessageReceiver messageReceiver = check new (receiverConfig);
     log:printInfo("Receiving from Asb receiver client.");
 
-    int|string|error? expectedPayload = messageReceiver->receivePayload(serverWaitTime);
+    int|string|Error? expectedPayload = messageReceiver->receivePayload(serverWaitTime);
     log:printInfo("Asserting received payloads.");
     test:assertTrue(expectedPayload is error, msg = "Unexpected payload received");
-    test:assertEquals((<error>expectedPayload).message(), "Union types are not supported for the contextually expected type, except for nilable types");
+    test:assertEquals((<Error>expectedPayload).message(), "Failed to deserialize the received ASB message payload " +
+                    "to the contextually expected type '(int|string)?'. If you require using any custom deserialization logic," +
+                    "it is recommended use 'byte[]' for the contextually expected type and, do the deserialization in" +
+                    " user's code.");
 
     log:printInfo("Closing Asb sender client.");
     check messageSender->close();
 
     log:printInfo("Closing Asb receiver client.");
     check messageReceiver->close();
+}
+
+@test:Config {
+    groups: ["asb_negative"]
+}
+function testSendToInvalidTopicName() returns error? {
+    log:printInfo("[[testSendToInvalidTopicName]]");
+    log:printInfo("Creating Asb message sender.");
+    senderConfig.topicOrQueueName = "non-existing-topic";
+    MessageSender messageSender = check new (senderConfig);
+
+    log:printInfo("Sending payloads via ASB sender");
+    Error? e = messageSender->sendPayload("message");
+    test:assertTrue(e is error, msg = "Unexpected response received");
+    test:assertEquals((<Error>e).message(), "ASB request failed due to: MESSAGING_ENTITY_NOT_FOUND");
+
+    log:printInfo("Closing Asb sender client.");
+    check messageSender->close();
+}
+
+@test:Config {
+    groups: ["asb_negative"]
+}
+function testReceiveFromInvalidTopicName() returns error? {
+    log:printInfo("[[testReceiveFromInvalidTopicName]]");
+    log:printInfo("Creating Asb message receiver.");
+    receiverConfig.entityConfig = {queueName: "non-existing-queue"};
+    MessageReceiver messageReceiver = check new (receiverConfig);
+
+    log:printInfo("Sending payloads via ASB sender");
+    Message|error? e = messageReceiver->receive(5);
+    test:assertTrue(e is error, msg = "Unexpected response received");
+    test:assertEquals((<Error>e).message(), "ASB request failed due to: MESSAGING_ENTITY_NOT_FOUND");
+
+    log:printInfo("Closing Asb receiver client.");
+    check messageReceiver->close();
+}
+
+@test:Config {
+    groups: ["asb_negative"]
+}
+function testInvalidConnectionString() returns error? {
+    log:printInfo("[[testInvalidConnectionString]]");
+    log:printInfo("Creating Asb message sender.");
+    senderConfig.connectionString = "invalid-connection-string";
+    MessageSender|Error messageSender = new (senderConfig);
+
+    test:assertTrue(messageSender is error, msg = "Client creation should have failed.");
+    test:assertEquals((<Error>messageSender).message(), "Error occurred while processing request: " +
+    "Connection string has invalid key value pair: invalid-connection-string");
 }

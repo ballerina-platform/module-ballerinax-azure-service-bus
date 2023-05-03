@@ -686,3 +686,21 @@ function testMessageScheduling() returns error? {
         return error("Error while executing test testMessageScheduling", e);
     }
 }
+
+@test:AfterEach
+function afterEach() {
+    // Restore sender and receiver configurations after each test, as they are modified by some of the tests.
+    senderConfig = {
+        connectionString: connectionString,
+        entityType: QUEUE,
+        topicOrQueueName: queueName
+    };
+
+    receiverConfig = {
+        connectionString: connectionString,
+        entityConfig: {
+            queueName: queueName
+        },
+        receiveMode: PEEK_LOCK
+    };
+}

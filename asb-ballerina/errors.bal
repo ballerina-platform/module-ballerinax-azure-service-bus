@@ -17,9 +17,12 @@
 # Defines the common error type for the module.
 public type Error distinct error;
 
-isolated function createError(string|error errorOrMessage) returns Error {
-    if errorOrMessage is error {
-        // input is an `error`
+isolated function createError(string|error|Error errorOrMessage) returns Error {
+    if errorOrMessage is Error {
+        // input is a ASB 'error' value
+        return errorOrMessage;
+    } else if errorOrMessage is error {
+        // input is a Ballerina 'error' value
         return error Error(errorOrMessage.message(), detail = errorOrMessage.detail(), cause = errorOrMessage.cause());
     } else {
         // input is the error message
