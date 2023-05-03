@@ -31,15 +31,15 @@ import static org.ballerinax.asb.util.ModuleUtils.getModule;
  */
 public class ASBErrorCreator {
 
-    public static final String ASB_ERROR_PREFIX = "ASB request failed due to: ";
-    public static final String UNHANDLED_ERROR_PREFIX = "Unexpected error occurred while processing request: ";
+    public static final String ASB_ERROR_PREFIX = "ASB Error: ";
+    public static final String UNHANDLED_ERROR_PREFIX = "Error occurred while processing request: ";
 
     public static BError fromASBException(ServiceBusException e) {
-        return fromJavaException(ASB_ERROR_PREFIX + e.getReason().toString(), e.getCause());
+        return fromJavaException(ASB_ERROR_PREFIX + e.getReason().toString(), e);
     }
 
     public static BError fromUnhandledException(Exception e) {
-        return fromJavaException(UNHANDLED_ERROR_PREFIX + e.getMessage(), e.getCause());
+        return fromJavaException(UNHANDLED_ERROR_PREFIX + e.getMessage(), e);
     }
 
     public static BError fromBError(BError error) {

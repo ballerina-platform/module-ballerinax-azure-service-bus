@@ -107,40 +107,47 @@ public class MessageReceiver {
      * @throws ServiceBusException on failure initiating IMessage Receiver in Azure
      *                             Service Bus instance.
      */
-    public static ServiceBusReceiverClient initializeReceiver(String connectionString, String queueName,
-                                                              String topicName, String subscriptionName,
-                                                              String receiveMode, long maxAutoLockRenewDuration,
-                                                              String logLevel, BMap<BString, Object> retryConfigs) {
-        LOGGER.setLevel(Level.toLevel(logLevel, Level.OFF));
-        AmqpRetryOptions retryOptions = getRetryOptions(retryConfigs);
-        ServiceBusReceiverClientBuilder receiverClientBuilder = new ServiceBusClientBuilder()
-                .connectionString(connectionString)
-                .retryOptions(retryOptions)
-                .receiver();
-        if (!queueName.isEmpty()) {
-            if (Objects.equals(receiveMode, RECEIVE_AND_DELETE)) {
-                receiverClientBuilder.receiveMode(ServiceBusReceiveMode.RECEIVE_AND_DELETE)
-                        .queueName(queueName);
-            } else {
-                receiverClientBuilder.receiveMode(ServiceBusReceiveMode.PEEK_LOCK)
-                        .queueName(queueName)
-                        .maxAutoLockRenewDuration(Duration.ofSeconds(maxAutoLockRenewDuration));
+    public static Object initializeReceiver(String connectionString, String queueName,
+                                            String topicName, String subscriptionName,
+                                            String receiveMode, long maxAutoLockRenewDuration,
+                                            String logLevel, BMap<BString, Object> retryConfigs) {
+        try {
+            LOGGER.setLevel(Level.toLevel(logLevel, Level.OFF));
+            AmqpRetryOptions retryOptions = getRetryOptions(retryConfigs);
+            ServiceBusReceiverClientBuilder receiverClientBuilder = new ServiceBusClientBuilder()
+                    .connectionString(connectionString)
+                    .retryOptions(retryOptions)
+                    .receiver();
+            if (!queueName.isEmpty()) {
+                if (Objects.equals(receiveMode, RECEIVE_AND_DELETE)) {
+                    receiverClientBuilder.receiveMode(ServiceBusReceiveMode.RECEIVE_AND_DELETE)
+                            .queueName(queueName);
+                } else {
+                    receiverClientBuilder.receiveMode(ServiceBusReceiveMode.PEEK_LOCK)
+                            .queueName(queueName)
+                            .maxAutoLockRenewDuration(Duration.ofSeconds(maxAutoLockRenewDuration));
+                }
+            } else if (!subscriptionName.isEmpty() && !topicName.isEmpty()) {
+                if (Objects.equals(receiveMode, RECEIVE_AND_DELETE)) {
+                    receiverClientBuilder.receiveMode(ServiceBusReceiveMode.RECEIVE_AND_DELETE)
+                            .topicName(topicName)
+                            .subscriptionName(subscriptionName);
+                } else {
+                    receiverClientBuilder.receiveMode(ServiceBusReceiveMode.PEEK_LOCK)
+                            .topicName(topicName)
+                            .subscriptionName(subscriptionName)
+                            .maxAutoLockRenewDuration(Duration.ofSeconds(maxAutoLockRenewDuration));
+                }
             }
-        } else if (!subscriptionName.isEmpty() && !topicName.isEmpty()) {
-            if (Objects.equals(receiveMode, RECEIVE_AND_DELETE)) {
-                receiverClientBuilder.receiveMode(ServiceBusReceiveMode.RECEIVE_AND_DELETE)
-                        .topicName(topicName)
-                        .subscriptionName(subscriptionName);
-            } else {
-                receiverClientBuilder.receiveMode(ServiceBusReceiveMode.PEEK_LOCK)
-                        .topicName(topicName)
-                        .subscriptionName(subscriptionName)
-                        .maxAutoLockRenewDuration(Duration.ofSeconds(maxAutoLockRenewDuration));
-            }
+            LOGGER.debug("ServiceBusReceiverClient initialized");
+            return receiverClientBuilder.buildClient();
+        } catch (BError e) {
+            return ASBErrorCreator.fromBError(e);
+        } catch (ServiceBusException e) {
+            return ASBErrorCreator.fromASBException(e);
+        } catch (Exception e) {
+            return ASBErrorCreator.fromUnhandledException(e);
         }
-
-        LOGGER.debug("ServiceBusReceiverClient initialized");
-        return receiverClientBuilder.buildClient();
     }
 
     /**
