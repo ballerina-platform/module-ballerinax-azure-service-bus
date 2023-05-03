@@ -88,7 +88,7 @@ function testSendToInvalidTopic() returns error? {
     log:printInfo("Sending payloads via ASB sender");
     Error? e = messageSender->sendPayload("message");
     test:assertTrue(e is error, msg = "Unexpected response received");
-    test:assertEquals((<Error>e).message(), "ASB request failed due to: MESSAGING_ENTITY_NOT_FOUND");
+    test:assertEquals((<Error>e).message(), "ASB Error: MESSAGING_ENTITY_NOT_FOUND");
 
     log:printInfo("Closing Asb sender client.");
     check messageSender->close();
@@ -106,7 +106,7 @@ function testReceiveFromInvalidQueue() returns error? {
     log:printInfo("Sending payloads via ASB sender");
     Message|error? e = messageReceiver->receive(5);
     test:assertTrue(e is error, msg = "Unexpected response received");
-    test:assertEquals((<Error>e).message(), "ASB request failed due to: MESSAGING_ENTITY_NOT_FOUND");
+    test:assertEquals((<Error>e).message(), "ASB Error: MESSAGING_ENTITY_NOT_FOUND");
 
     log:printInfo("Closing Asb receiver client.");
     check messageReceiver->close();
