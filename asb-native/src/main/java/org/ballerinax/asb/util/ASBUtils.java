@@ -306,6 +306,24 @@ public class ASBUtils {
      * @return value with the intended type
      */
     public static Object getValueWithIntendedType(byte[] value, Type type) {
+        try {
+            return getValueWithIntendedTypeRecursive(value, type);
+        } catch (BError be) {
+            throw ASBErrorCreator.fromBError(String.format("Failed to deserialize the received ASB message payload " +
+                    "to the contextually expected type '%s'. If you require using any custom deserialization logic," +
+                    "it is recommended use 'byte[]' for the contextually expected type and, do the deserialization in" +
+                    " user's code.", type.toString()), be);
+        }
+    }
+
+    /**
+     * Converts `byte[]` value to the intended Ballerina type.
+     *
+     * @param type  expected type
+     * @param value Value to be converted
+     * @return value with the intended type
+     */
+    private static Object getValueWithIntendedTypeRecursive(byte[] value, Type type) {
         String strValue = new String(value, StandardCharsets.UTF_8);
         Object intendedValue;
         switch (type.getTag()) {

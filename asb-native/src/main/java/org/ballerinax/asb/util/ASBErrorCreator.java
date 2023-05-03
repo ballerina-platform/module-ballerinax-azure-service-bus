@@ -35,22 +35,22 @@ public class ASBErrorCreator {
     public static final String UNHANDLED_ERROR_PREFIX = "Unexpected error occurred while processing request: ";
 
     public static BError fromASBException(ServiceBusException e) {
-        return createAsbError(ASB_ERROR_PREFIX + e.getReason().toString(), e.getCause());
+        return fromJavaException(ASB_ERROR_PREFIX + e.getReason().toString(), e.getCause());
     }
 
     public static BError fromUnhandledException(Exception e) {
-        return createAsbError(UNHANDLED_ERROR_PREFIX + e.getMessage(), e.getCause());
+        return fromJavaException(UNHANDLED_ERROR_PREFIX + e.getMessage(), e.getCause());
     }
 
     public static BError fromBError(BError error) {
-        return createAsbError(error.getMessage(), error.getCause());
+        return fromBError(error.getMessage(), error.getCause());
     }
 
-    private static BError createAsbError(String message, Throwable cause) {
-        return createAsbError(message, ErrorCreator.createError(cause));
-    }
-
-    private static BError createAsbError(String message, BError cause) {
+    public static BError fromBError(String message, BError cause) {
         return ErrorCreator.createDistinctError(ASB_ERROR, getModule(), StringUtils.fromString(message), cause);
+    }
+
+    private static BError fromJavaException(String message, Throwable cause) {
+        return fromBError(message, ErrorCreator.createError(cause));
     }
 }

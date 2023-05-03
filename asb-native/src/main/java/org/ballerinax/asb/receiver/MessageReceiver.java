@@ -47,8 +47,8 @@ import io.ballerina.runtime.api.values.BTypedesc;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.ballerinax.asb.util.ASBConstants;
-import org.ballerinax.asb.util.ASBUtils;
 import org.ballerinax.asb.util.ASBErrorCreator;
+import org.ballerinax.asb.util.ASBUtils;
 import org.ballerinax.asb.util.ModuleUtils;
 
 import java.time.Duration;
@@ -111,44 +111,36 @@ public class MessageReceiver {
                                                               String topicName, String subscriptionName,
                                                               String receiveMode, long maxAutoLockRenewDuration,
                                                               String logLevel, BMap<BString, Object> retryConfigs) {
-        try {
-            LOGGER.setLevel(Level.toLevel(logLevel, Level.OFF));
-            AmqpRetryOptions retryOptions = getRetryOptions(retryConfigs);
-            ServiceBusReceiverClientBuilder receiverClientBuilder = new ServiceBusClientBuilder()
-                    .connectionString(connectionString)
-                    .retryOptions(retryOptions)
-                    .receiver();
-            if (!queueName.isEmpty()) {
-                if (Objects.equals(receiveMode, RECEIVE_AND_DELETE)) {
-                    receiverClientBuilder.receiveMode(ServiceBusReceiveMode.RECEIVE_AND_DELETE)
-                            .queueName(queueName);
-                } else {
-                    receiverClientBuilder.receiveMode(ServiceBusReceiveMode.PEEK_LOCK)
-                            .queueName(queueName)
-                            .maxAutoLockRenewDuration(Duration.ofSeconds(maxAutoLockRenewDuration));
-                }
-            } else if (!subscriptionName.isEmpty() && !topicName.isEmpty()) {
-                if (Objects.equals(receiveMode, RECEIVE_AND_DELETE)) {
-                    receiverClientBuilder.receiveMode(ServiceBusReceiveMode.RECEIVE_AND_DELETE)
-                            .topicName(topicName)
-                            .subscriptionName(subscriptionName);
-                } else {
-                    receiverClientBuilder.receiveMode(ServiceBusReceiveMode.PEEK_LOCK)
-                            .topicName(topicName)
-                            .subscriptionName(subscriptionName)
-                            .maxAutoLockRenewDuration(Duration.ofSeconds(maxAutoLockRenewDuration));
-                }
+        LOGGER.setLevel(Level.toLevel(logLevel, Level.OFF));
+        AmqpRetryOptions retryOptions = getRetryOptions(retryConfigs);
+        ServiceBusReceiverClientBuilder receiverClientBuilder = new ServiceBusClientBuilder()
+                .connectionString(connectionString)
+                .retryOptions(retryOptions)
+                .receiver();
+        if (!queueName.isEmpty()) {
+            if (Objects.equals(receiveMode, RECEIVE_AND_DELETE)) {
+                receiverClientBuilder.receiveMode(ServiceBusReceiveMode.RECEIVE_AND_DELETE)
+                        .queueName(queueName);
+            } else {
+                receiverClientBuilder.receiveMode(ServiceBusReceiveMode.PEEK_LOCK)
+                        .queueName(queueName)
+                        .maxAutoLockRenewDuration(Duration.ofSeconds(maxAutoLockRenewDuration));
             }
-
-            LOGGER.debug("ServiceBusReceiverClient initialized");
-            return receiverClientBuilder.buildClient();
-        } catch (BError e) {
-            throw ASBErrorCreator.fromBError(e);
-        } catch (ServiceBusException e) {
-            throw ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            throw ASBErrorCreator.fromUnhandledException(e);
+        } else if (!subscriptionName.isEmpty() && !topicName.isEmpty()) {
+            if (Objects.equals(receiveMode, RECEIVE_AND_DELETE)) {
+                receiverClientBuilder.receiveMode(ServiceBusReceiveMode.RECEIVE_AND_DELETE)
+                        .topicName(topicName)
+                        .subscriptionName(subscriptionName);
+            } else {
+                receiverClientBuilder.receiveMode(ServiceBusReceiveMode.PEEK_LOCK)
+                        .topicName(topicName)
+                        .subscriptionName(subscriptionName)
+                        .maxAutoLockRenewDuration(Duration.ofSeconds(maxAutoLockRenewDuration));
+            }
         }
+
+        LOGGER.debug("ServiceBusReceiverClient initialized");
+        return receiverClientBuilder.buildClient();
     }
 
     /**
@@ -184,11 +176,11 @@ public class MessageReceiver {
             RecordType expectedRecordType = ASBUtils.getRecordType(expectedType);
             return constructExpectedMessageRecord(endpointClient, receivedMessage, expectedRecordType);
         } catch (BError e) {
-            throw ASBErrorCreator.fromBError(e);
+            return ASBErrorCreator.fromBError(e);
         } catch (ServiceBusException e) {
-            throw ASBErrorCreator.fromASBException(e);
+            return ASBErrorCreator.fromASBException(e);
         } catch (Exception e) {
-            throw ASBErrorCreator.fromUnhandledException(e);
+            return ASBErrorCreator.fromUnhandledException(e);
         }
     }
 
@@ -230,11 +222,11 @@ public class MessageReceiver {
                                 "value to the expected Ballerina type: '" + expectedType.toString() + "'")));
             }
         } catch (BError e) {
-            throw ASBErrorCreator.fromBError(e);
+            return ASBErrorCreator.fromBError(e);
         } catch (ServiceBusException e) {
-            throw ASBErrorCreator.fromASBException(e);
+            return ASBErrorCreator.fromASBException(e);
         } catch (Exception e) {
-            throw ASBErrorCreator.fromUnhandledException(e);
+            return ASBErrorCreator.fromUnhandledException(e);
         }
     }
 
@@ -260,11 +252,11 @@ public class MessageReceiver {
             Thread.currentThread().interrupt();
             return null;
         } catch (BError e) {
-            throw ASBErrorCreator.fromBError(e);
+            return ASBErrorCreator.fromBError(e);
         } catch (ServiceBusException e) {
-            throw ASBErrorCreator.fromASBException(e);
+            return ASBErrorCreator.fromASBException(e);
         } catch (Exception e) {
-            throw ASBErrorCreator.fromUnhandledException(e);
+            return ASBErrorCreator.fromUnhandledException(e);
         }
     }
 
@@ -284,11 +276,11 @@ public class MessageReceiver {
             LOGGER.debug("Completed the message(Id: " + message.getMessageId() + ") with lockToken " + lockToken);
             return null;
         } catch (BError e) {
-            throw ASBErrorCreator.fromBError(e);
+            return ASBErrorCreator.fromBError(e);
         } catch (ServiceBusException e) {
-            throw ASBErrorCreator.fromASBException(e);
+            return ASBErrorCreator.fromASBException(e);
         } catch (Exception e) {
-            throw ASBErrorCreator.fromUnhandledException(e);
+            return ASBErrorCreator.fromUnhandledException(e);
         }
     }
 
@@ -309,11 +301,11 @@ public class MessageReceiver {
                     message.getMessageId(), receiver.getEntityPath()));
             return null;
         } catch (BError e) {
-            throw ASBErrorCreator.fromBError(e);
+            return ASBErrorCreator.fromBError(e);
         } catch (ServiceBusException e) {
-            throw ASBErrorCreator.fromASBException(e);
+            return ASBErrorCreator.fromASBException(e);
         } catch (Exception e) {
-            throw ASBErrorCreator.fromUnhandledException(e);
+            return ASBErrorCreator.fromUnhandledException(e);
         }
     }
 
@@ -340,11 +332,11 @@ public class MessageReceiver {
                     message.getMessageId(), receiver.getEntityPath()));
             return null;
         } catch (BError e) {
-            throw ASBErrorCreator.fromBError(e);
+            return ASBErrorCreator.fromBError(e);
         } catch (ServiceBusException e) {
-            throw ASBErrorCreator.fromASBException(e);
+            return ASBErrorCreator.fromASBException(e);
         } catch (Exception e) {
-            throw ASBErrorCreator.fromUnhandledException(e);
+            return ASBErrorCreator.fromUnhandledException(e);
         }
     }
 
@@ -365,11 +357,11 @@ public class MessageReceiver {
                     message.getMessageId(), receiver.getEntityPath()));
             return null;
         } catch (BError e) {
-            throw ASBErrorCreator.fromBError(e);
+            return ASBErrorCreator.fromBError(e);
         } catch (ServiceBusException e) {
-            throw ASBErrorCreator.fromASBException(e);
+            return ASBErrorCreator.fromASBException(e);
         } catch (Exception e) {
-            throw ASBErrorCreator.fromUnhandledException(e);
+            return ASBErrorCreator.fromUnhandledException(e);
         }
     }
 
@@ -395,11 +387,11 @@ public class MessageReceiver {
             LOGGER.debug("Received deferred message using its sequenceNumber from " + receiver.getEntityPath());
             return constructExpectedMessageRecord(endpointClient, receivedMessage, null);
         } catch (BError e) {
-            throw ASBErrorCreator.fromBError(e);
+            return ASBErrorCreator.fromBError(e);
         } catch (ServiceBusException e) {
-            throw ASBErrorCreator.fromASBException(e);
+            return ASBErrorCreator.fromASBException(e);
         } catch (Exception e) {
-            throw ASBErrorCreator.fromUnhandledException(e);
+            return ASBErrorCreator.fromUnhandledException(e);
         }
     }
 
@@ -421,11 +413,11 @@ public class MessageReceiver {
                     message.getMessageId(), receiver.getEntityPath()));
             return null;
         } catch (BError e) {
-            throw ASBErrorCreator.fromBError(e);
+            return ASBErrorCreator.fromBError(e);
         } catch (ServiceBusException e) {
-            throw ASBErrorCreator.fromASBException(e);
+            return ASBErrorCreator.fromASBException(e);
         } catch (Exception e) {
-            throw ASBErrorCreator.fromUnhandledException(e);
+            return ASBErrorCreator.fromUnhandledException(e);
         }
     }
 
@@ -441,11 +433,11 @@ public class MessageReceiver {
             LOGGER.debug("Closed the receiver");
             return null;
         } catch (BError e) {
-            throw ASBErrorCreator.fromBError(e);
+            return ASBErrorCreator.fromBError(e);
         } catch (ServiceBusException e) {
-            throw ASBErrorCreator.fromASBException(e);
+            return ASBErrorCreator.fromASBException(e);
         } catch (Exception e) {
-            throw ASBErrorCreator.fromUnhandledException(e);
+            return ASBErrorCreator.fromUnhandledException(e);
         }
     }
 
