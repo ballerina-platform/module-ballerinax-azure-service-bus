@@ -37,11 +37,11 @@ import io.ballerina.runtime.api.values.BHandle;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.ballerinax.asb.util.ASBConstants;
 import org.ballerinax.asb.util.ASBErrorCreator;
 import org.ballerinax.asb.util.ASBUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
@@ -57,7 +57,7 @@ import static org.ballerinax.asb.util.ASBUtils.getRetryOptions;
  */
 public class MessageSender {
 
-    private static final Logger LOGGER = Logger.getLogger(MessageSender.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MessageSender.class);
 
     /**
      * Parameterized constructor for Message Sender (ServiceBusSenderClient).
@@ -69,7 +69,6 @@ public class MessageSender {
     public static Object initializeSender(String connectionString, String entityType, String topicOrQueueName,
                                           String logLevel, BMap<BString, Object> retryConfigs) {
         try {
-            LOGGER.setLevel(Level.toLevel(logLevel, Level.OFF));
             AmqpRetryOptions retryOptions = getRetryOptions(retryConfigs);
             ServiceBusSenderClientBuilder senderClientBuilder = new ServiceBusClientBuilder()
                     .retryOptions(retryOptions)

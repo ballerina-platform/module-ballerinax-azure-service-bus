@@ -44,12 +44,12 @@ import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
 import io.ballerina.runtime.api.values.BTypedesc;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.ballerinax.asb.util.ASBConstants;
 import org.ballerinax.asb.util.ASBErrorCreator;
 import org.ballerinax.asb.util.ASBUtils;
 import org.ballerinax.asb.util.ModuleUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -91,7 +91,7 @@ import static org.ballerinax.asb.util.ASBUtils.getValueWithIntendedType;
  */
 public class MessageReceiver {
 
-    private static final Logger LOGGER = Logger.getLogger(MessageReceiver.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MessageReceiver.class);
 
     /**
      * Initializes the MessageReceiver client.
@@ -112,7 +112,6 @@ public class MessageReceiver {
                                             String receiveMode, long maxAutoLockRenewDuration,
                                             String logLevel, BMap<BString, Object> retryConfigs) {
         try {
-            LOGGER.setLevel(Level.toLevel(logLevel, Level.OFF));
             AmqpRetryOptions retryOptions = getRetryOptions(retryConfigs);
             ServiceBusReceiverClientBuilder receiverClientBuilder = new ServiceBusClientBuilder()
                     .connectionString(connectionString)
