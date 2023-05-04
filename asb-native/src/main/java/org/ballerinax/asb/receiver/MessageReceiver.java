@@ -51,12 +51,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.apache.qpid.proton.amqp.Binary;
 import org.ballerinax.asb.util.ASBConstants;
 import org.ballerinax.asb.util.ASBUtils;
 import org.ballerinax.asb.util.ModuleUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.ballerinax.asb.util.ASBConstants.RECEIVE_AND_DELETE;
 import static org.ballerinax.asb.util.ASBUtils.getRetryOptions;
@@ -66,7 +66,7 @@ import static org.ballerinax.asb.util.ASBUtils.getRetryOptions;
  * Ballerina.
  */
 public class MessageReceiver {
-    private static final Logger log = Logger.getLogger(MessageReceiver.class);
+    private static final Logger log = LoggerFactory.getLogger(MessageReceiver.class);
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private ServiceBusReceiverClient receiver;
 
@@ -88,7 +88,6 @@ public class MessageReceiver {
     public MessageReceiver(String connectionString, String queueName, String topicName, String subscriptionName,
             String receiveMode, long maxAutoLockRenewDuration, String logLevel, BMap<BString, Object> retryConfigs)
             throws ServiceBusException, InterruptedException {
-        log.setLevel(Level.toLevel(logLevel, Level.OFF));
         AmqpRetryOptions retryOptions = getRetryOptions(retryConfigs);
         ServiceBusReceiverClientBuilder receiverClientBuilder = new ServiceBusClientBuilder()
                 .connectionString(connectionString)
