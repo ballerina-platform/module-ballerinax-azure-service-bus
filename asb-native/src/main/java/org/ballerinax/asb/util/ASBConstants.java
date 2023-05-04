@@ -96,6 +96,5 @@ public class ASBConstants {
     public static final BString RETRY_MODE = StringUtils.fromString("retryMode");
 
     // Error constant fields
-    static final String ASB_ERROR = "AsbError";
-    public static final String LOG_ERROR_MSG = "Error while receiving message";
+    static final String ASB_ERROR = "Error";
 }

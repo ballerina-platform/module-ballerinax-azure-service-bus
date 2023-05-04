@@ -34,34 +34,41 @@ public isolated client class MessageSender {
     # Configure the connection string to have the [required permission](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-sas).
     #
     # + config - Azure service bus sender configuration
-    public isolated function init(ASBServiceSenderConfig config) returns error? {
+    public isolated function init(ASBServiceSenderConfig config) returns Error? {
+
         self.connectionString = config.connectionString;
         self.topicOrQueueName = config.topicOrQueueName;
         self.entityType = config.entityType;
         self.logLevel = customConfiguration.logLevel;
-        self.senderHandle = check initMessageSender(java:fromString(self.connectionString), java:fromString(self.entityType),
-        java:fromString(self.topicOrQueueName), java:fromString(self.logLevel), config.amqpRetryOptions);
+        handle|Error initResult = initMessageSender(java:fromString(self.connectionString),
+            java:fromString(self.entityType), java:fromString(self.topicOrQueueName),
+            java:fromString(self.logLevel), config.amqpRetryOptions);
+        if (initResult is Error) {
+            return initResult;
+        }
+
+        self.senderHandle = initResult;
     }
 
     # Send message to queue or topic with a message body.
     #
     # + message - Azure service bus message representation (`asb:Message` record)
-    # + return - An error if failed to send message or else `()`
+    # + return - An `asb:Error` if failed to send message or else `()`
     @display {label: "Send Message"}
-    isolated remote function send(@display {label: "Message Record"} Message message) returns error? {
+    isolated remote function send(@display {label: "Message Record"} Message message) returns Error? {
         message.body = serializeToByteArray(message.body);
-        return send(self.senderHandle, message);
+        return send(self, message);
     }
 
     # Send message to queue or topic with a message body.
     #
     # + messagePayload - Message body
-    # + return - An error if failed to send message or else `()`
+    # + return - An `asb:Error` if failed to send message or else `()`
     @display {label: "Send Message Payload"}
-    isolated remote function sendPayload(@display {label: "Message Payload"} anydata messagePayload) returns error? {
+    isolated remote function sendPayload(@display {label: "Message Payload"} anydata messagePayload) returns Error? {
         Message messageToSend = constructMessageFromPayload(messagePayload);
         messageToSend.body = serializeToByteArray(messageToSend.body);
-        return send(self.senderHandle, messageToSend);
+        return send(self, messageToSend);
     }
 
     # Sends a scheduled message to the Azure Service Bus entity this sender is connected to. 
@@ -71,61 +78,61 @@ public isolated client class MessageSender {
     # + scheduledEnqueueTime - Datetime at which the message should appear in the Service Bus queue or topic
     # + return - The sequence number of the scheduled message which can be used to cancel the scheduling of the message
     isolated remote function schedule(@display {label: "Message Record or Payload"} Message message,
-            time:Civil scheduledEnqueueTime) returns int|error {
+            time:Civil scheduledEnqueueTime) returns int|Error {
         message.body = serializeToByteArray(message.body);
-        return schedule(self.senderHandle, message, scheduledEnqueueTime);
+        return schedule(self, message, scheduledEnqueueTime);
     }
 
     # Cancels the enqueuing of a scheduled message, if they are not already enqueued.
     #
     # + sequenceNumber - The sequence number of the message to cancel
     # + return - If the message could not be cancelled
-    isolated remote function cancel(@display {label: "Sequence Number"} int sequenceNumber) returns error? {
-        return cancel(self.senderHandle, sequenceNumber);
+    isolated remote function cancel(@display {label: "Sequence Number"} int sequenceNumber) returns Error? {
+        return cancel(self, sequenceNumber);
     }
 
     # Send batch of messages to queue or topic.
     #
     # + messageBatch - Azure service bus batch message representation (`asb:MessageBatch` record)
-    # + return - An error if failed to send message or else `()`
+    # + return - An `asb:Error` if failed to send message or else `()`
     @display {label: "Send Batch Message"}
-    isolated remote function sendBatch(@display {label: "Message Batch"} MessageBatch messageBatch) returns error? {
+    isolated remote function sendBatch(@display {label: "Message Batch"} MessageBatch messageBatch) returns Error? {
         foreach Message message in messageBatch.messages {
             message.body = serializeToByteArray(message.body);
         }
-        return sendBatch(self.senderHandle, messageBatch);
+        return sendBatch(self, messageBatch);
     }
 
     # Closes the ASB sender connection.
     #
-    # + return - An error if failed to close connection or else `()`
+    # + return - An `asb:Error` if failed to close connection or else `()`
     @display {label: "Close Sender Connection"}
-    isolated remote function close() returns error? {
-        return closeSender(self.senderHandle);
+    isolated remote function close() returns Error? {
+        return closeSender(self);
     }
 }
 
-isolated function initMessageSender(handle connectionString, handle entityType, handle topicOrQueueName, handle isLogEnabled, AmqpRetryOptions retryOptions) returns handle|error = @java:Constructor {
-    'class: "org.ballerinax.asb.sender.MessageSender",
-    paramTypes: ["java.lang.String", "java.lang.String", "java.lang.String", "java.lang.String", "io.ballerina.runtime.api.values.BMap"]
-} external;
-
-isolated function send(handle senderHandle, Message message) returns error? = @java:Method {
+isolated function initMessageSender(handle connectionString, handle entityType, handle topicOrQueueName, handle isLogEnabled, AmqpRetryOptions retryOptions) returns handle|Error = @java:Method {
+    name: "initializeSender",
     'class: "org.ballerinax.asb.sender.MessageSender"
 } external;
 
-isolated function sendBatch(handle senderHandle, MessageBatch messages) returns error? = @java:Method {
+isolated function send(MessageSender endpointClient, Message message) returns Error? = @java:Method {
     'class: "org.ballerinax.asb.sender.MessageSender"
 } external;
 
-isolated function schedule(handle senderHandle, Message message, time:Civil scheduleTime) returns int|error = @java:Method {
+isolated function sendBatch(MessageSender endpointClient, MessageBatch messages) returns Error? = @java:Method {
     'class: "org.ballerinax.asb.sender.MessageSender"
 } external;
 
-isolated function cancel(handle senderHandle, int sequenceNumber) returns error? = @java:Method {
+isolated function schedule(MessageSender endpointClient, Message message, time:Civil scheduleTime) returns int|Error = @java:Method {
     'class: "org.ballerinax.asb.sender.MessageSender"
 } external;
 
-isolated function closeSender(handle senderHandle) returns error? = @java:Method {
+isolated function cancel(MessageSender endpointClient, int sequenceNumber) returns Error? = @java:Method {
+    'class: "org.ballerinax.asb.sender.MessageSender"
+} external;
+
+isolated function closeSender(MessageSender endpointClient) returns Error? = @java:Method {
     'class: "org.ballerinax.asb.sender.MessageSender"
 } external;

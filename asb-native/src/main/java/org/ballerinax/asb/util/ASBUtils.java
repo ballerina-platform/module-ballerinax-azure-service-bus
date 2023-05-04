@@ -25,7 +25,6 @@ import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.creators.TypeCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.ArrayType;
-import io.ballerina.runtime.api.types.ErrorType;
 import io.ballerina.runtime.api.types.IntersectionType;
 import io.ballerina.runtime.api.types.MapType;
 import io.ballerina.runtime.api.types.RecordType;
@@ -216,25 +215,6 @@ public class ASBUtils {
         return returnMap;
     }
 
-    /**
-     * Returns a Ballerina Error with the given String message and exception.
-     *
-     * @param message The error message
-     * @return Resulting Ballerina Error
-     */
-    public static BError returnErrorValue(String message, Exception error) {
-        ErrorType errorType = TypeCreator.createErrorType(error.getClass().getTypeName(), ModuleUtils.getModule());
-        String errorFromClass = error.getStackTrace()[0].getClassName();
-        String errorMessage = "An error occurred while processing your request.\n\n";
-        errorMessage += "Error Details:\n";
-        errorMessage += "Message: " + error.getMessage() + "\n";
-        errorMessage += "Cause: " + error.getCause() + "\n";
-        errorMessage += "Class: " + error.getClass() + "\n";
-        BError er = ErrorCreator.createError(StringUtils.fromString(errorMessage));
-        return ErrorCreator.createError(errorType, StringUtils.fromString(message + "error from " + errorFromClass), er,
-                null);
-    }
-
     public static AmqpRetryOptions getRetryOptions(BMap<BString, Object> retryConfigs) {
         Long maxRetries = retryConfigs.getIntValue(MAX_RETRIES);
         BigDecimal delayConfig = ((BDecimal) retryConfigs.get(DELAY)).decimalValue();
@@ -326,44 +306,59 @@ public class ASBUtils {
      * @return value with the intended type
      */
     public static Object getValueWithIntendedType(byte[] value, Type type) {
-        String strValue = new String(value, StandardCharsets.UTF_8);
-        Object intendedValue = null;
         try {
-            switch (type.getTag()) {
-                case STRING_TAG:
-                    intendedValue = StringUtils.fromString(strValue);
-                    break;
-                case XML_TAG:
-                    intendedValue = XmlUtils.parse(strValue);
-                    break;
-                case ANYDATA_TAG:
+            return getValueWithIntendedTypeRecursive(value, type);
+        } catch (BError be) {
+            throw ASBErrorCreator.fromBError(String.format("Failed to deserialize the message payload " +
+                            "into the contextually expected type '%s'. Use a compatible Ballerina type or, " +
+                            "use 'byte[]' type along with an appropriate deserialization logic afterwards.",
+                    type.toString()), be);
+        }
+    }
+
+    /**
+     * Converts `byte[]` value to the intended Ballerina type.
+     *
+     * @param type  expected type
+     * @param value Value to be converted
+     * @return value with the intended type
+     */
+    private static Object getValueWithIntendedTypeRecursive(byte[] value, Type type) {
+        String strValue = new String(value, StandardCharsets.UTF_8);
+        Object intendedValue;
+        switch (type.getTag()) {
+            case STRING_TAG:
+                intendedValue = StringUtils.fromString(strValue);
+                break;
+            case XML_TAG:
+                intendedValue = XmlUtils.parse(strValue);
+                break;
+            case ANYDATA_TAG:
+                intendedValue = ValueCreator.createArrayValue(value);
+                break;
+            case RECORD_TYPE_TAG:
+                intendedValue = CloneWithType.convert(type, JsonUtils.parse(strValue));
+                break;
+            case UNION_TAG:
+                if (isSupportedUnionType(type)) {
+                    intendedValue = getValueWithIntendedType(value, getExpectedTypeFromNilableType(type));
+                } else {
+                    intendedValue = ErrorCreator.createError(StringUtils.fromString("Union types are not " +
+                            "supported for the contextually expected type, except for nilable types"));
+                }
+                break;
+            case ARRAY_TAG:
+                if (getReferredType(((ArrayType) type).getElementType()).getTag() == BYTE_TAG) {
                     intendedValue = ValueCreator.createArrayValue(value);
                     break;
-                case RECORD_TYPE_TAG:
-                    intendedValue = CloneWithType.convert(type, JsonUtils.parse(strValue));
-                    break;
-                case UNION_TAG:
-                    if (isSupportedUnionType(type)) {
-                        intendedValue = getValueWithIntendedType(value, getExpectedTypeFromNilableType(type));
-                    } else {
-                        intendedValue = ErrorCreator.createError(StringUtils.fromString("Union types are not " +
-                                "supported for the contextually expected type, except for nilable types"));
-                    }
-                    break;
-                case ARRAY_TAG:
-                    if (getReferredType(((ArrayType) type).getElementType()).getTag() == BYTE_TAG) {
-                        intendedValue = ValueCreator.createArrayValue(value);
-                        break;
-                    }
-                    /*-fallthrough*/
-                default:
-                    intendedValue = getValueFromJson(type, strValue);
-            }
-        } catch (BError bError) {
-            intendedValue = bError;
+                }
+                /*-fallthrough*/
+            default:
+                intendedValue = getValueFromJson(type, strValue);
         }
+
         if (intendedValue instanceof BError) {
-            // todo: handle
+            throw (BError) intendedValue;
         }
         return intendedValue;
     }
