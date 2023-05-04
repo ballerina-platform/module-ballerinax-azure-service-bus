@@ -38,11 +38,12 @@ import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BString;
 import io.ballerina.runtime.api.values.BTypedesc;
-import org.apache.log4j.Logger;
 import org.apache.qpid.proton.amqp.Binary;
 import org.ballerinalang.langlib.value.CloneWithType;
 import org.ballerinalang.langlib.value.FromJsonWithType;
 import org.ballerinax.asb.receiver.MessageReceiver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -72,7 +73,7 @@ import static org.ballerinax.asb.util.ASBConstants.TRY_TIMEOUT;
  */
 public class ASBUtils {
 
-    private static final Logger LOGGER = Logger.getLogger(MessageReceiver.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MessageReceiver.class);
 
     /**
      * Convert Map to BMap.
