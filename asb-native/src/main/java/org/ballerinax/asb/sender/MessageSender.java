@@ -41,10 +41,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.ballerinax.asb.util.ASBConstants;
 import org.ballerinax.asb.util.ASBUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.ballerinax.asb.util.ASBUtils.getRetryOptions;
 
@@ -52,7 +52,7 @@ import static org.ballerinax.asb.util.ASBUtils.getRetryOptions;
  * This facilitates the client operations of MessageSender client in Ballerina.
  */
 public class MessageSender {
-    private static final Logger log = Logger.getLogger(MessageSender.class);
+    private static final Logger log = LoggerFactory.getLogger(MessageSender.class);
     private ServiceBusSenderClient sender;
 
     /**
@@ -69,7 +69,6 @@ public class MessageSender {
     public MessageSender(String connectionString, String entityType, String topicOrQueueName, String logLevel,
                          BMap<BString, Object> retryConfigs)
             throws ServiceBusException, InterruptedException {
-        log.setLevel(Level.toLevel(logLevel, Level.OFF));
         AmqpRetryOptions retryOptions = getRetryOptions(retryConfigs);
         ServiceBusClientBuilder clientBuilder = new ServiceBusClientBuilder()
                 .retryOptions(retryOptions)
