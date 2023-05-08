@@ -22,7 +22,6 @@ module org.ballerinax.asb {
     requires java.transaction.xa;
     requires com.azure.core.amqp;
     requires com.azure.messaging.servicebus;
-    requires log4j;
     requires org.slf4j;
     requires java.logging;
 }
