@@ -24,7 +24,7 @@ jobs:
       - name: Set Up Ballerina
         uses: ballerina-platform/setup-ballerina@v1
         with:
-          version: 2201.3.1
+          version: 2201.4.1
       - name: Ballerina Build
         run: bal build ./asb-ballerina
 
@@ -48,7 +48,7 @@ jobs:
       - name: Set Up Ballerina
         uses: ballerina-platform/setup-ballerina@v1
         with:
-          version: 2201.3.1
+          version: 2201.4.1
       - name: Ballerina Build
         run: bal build ./asb-ballerina
 
@@ -61,7 +61,7 @@ jobs:
       - name: Set Up Ballerina
         uses: ballerina-platform/setup-ballerina@v1
         with:
-          version: 2201.3.1
+          version: 2201.4.1
       - name: Ballerina Test
         run: bal test ./asb-ballerina
         env:
