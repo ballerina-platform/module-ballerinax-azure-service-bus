@@ -53,10 +53,12 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import static io.ballerina.runtime.api.creators.ValueCreator.createRecordValue;
 import static org.ballerinax.asb.util.ASBConstants.APPLICATION_PROPERTY_KEY;
 import static org.ballerinax.asb.util.ASBConstants.BODY;
 import static org.ballerinax.asb.util.ASBConstants.CONTENT_TYPE;
@@ -501,9 +503,9 @@ public class MessageReceiver {
 
     private static BMap<BString, Object> createBRecordValue(Map<String, Object> map, RecordType recordType) {
         if (recordType == null) {
-            return ValueCreator.createRecordValue(ModuleUtils.getModule(), ASBConstants.MESSAGE_RECORD, map);
+            return createRecordValue(ModuleUtils.getModule(), ASBConstants.MESSAGE_RECORD, map);
         } else {
-            return ValueCreator.createRecordValue(recordType.getPackage(), recordType.getName(), map);
+            return createRecordValue(recordType.getPackage(), recordType.getName(), map);
         }
     }
 
@@ -534,7 +536,6 @@ public class MessageReceiver {
             throws InterruptedException, ServiceBusException {
         ServiceBusReceiverClient receiver = getReceiverFromBObject(endpointClient);
         int maxCount = Long.valueOf(maxMessageCount.toString()).intValue();
-        Object[] messages = new Object[maxCount];
         IterableStream<ServiceBusReceivedMessage> receivedMessageStream;
         if (serverWaitTime != null) {
             receivedMessageStream = receiver.receiveMessages(maxCount, Duration.ofSeconds((long) serverWaitTime));
@@ -542,11 +543,10 @@ public class MessageReceiver {
             receivedMessageStream = receiver.receiveMessages(maxCount);
         }
 
-        int messageCount = 0;
+        LinkedList<Object> receivedMessages = new LinkedList<>();
         for (ServiceBusReceivedMessage receivedMessage : receivedMessageStream) {
             BMap<BString, Object> recordMap = constructExpectedMessageRecord(endpointClient, receivedMessage, null);
-            messages[messageCount++] = ValueCreator.createRecordValue(ModuleUtils.getModule(),
-                    ASBConstants.MESSAGE_RECORD, recordMap);
+            receivedMessages.add(createRecordValue(ModuleUtils.getModule(), ASBConstants.MESSAGE_RECORD, recordMap));
         }
 
         BMap<BString, Object> messageRecord = ValueCreator.createRecordValue(ModuleUtils.getModule(),
@@ -554,20 +554,20 @@ public class MessageReceiver {
         ArrayType sourceArrayType = TypeCreator.createArrayType(TypeUtils.getType(messageRecord));
 
         Map<String, Object> map = new HashMap<>();
-        map.put("messageCount", messageCount);
-        map.put("messages", ValueCreator.createArrayValue(messages, sourceArrayType));
-        return ValueCreator.createRecordValue(ModuleUtils.getModule(), ASBConstants.MESSAGE_BATCH_RECORD, map);
+        map.put("messageCount", receivedMessages.size());
+        map.put("messages", ValueCreator.createArrayValue(receivedMessages.toArray(new Object[0]), sourceArrayType));
+        return createRecordValue(ModuleUtils.getModule(), ASBConstants.MESSAGE_BATCH_RECORD, map);
     }
 
     private static BMap<BString, Object> getApplicationProperties(ServiceBusReceivedMessage message) {
-        BMap<BString, Object> applicationPropertiesRecord = ValueCreator.createRecordValue(ModuleUtils.getModule(),
+        BMap<BString, Object> applicationPropertiesRecord = createRecordValue(ModuleUtils.getModule(),
                 ASBConstants.APPLICATION_PROPERTY_TYPE);
         MapType mapType = TypeCreator.createMapType(PredefinedTypes.TYPE_ANYDATA);
         BMap<BString, Object> applicationProperties = ValueCreator.createMapValue(mapType);
         for (Map.Entry<String, Object> property : message.getApplicationProperties().entrySet()) {
             populateApplicationProperty(applicationProperties, property.getKey(), property.getValue());
         }
-        return ValueCreator.createRecordValue(applicationPropertiesRecord, applicationProperties);
+        return createRecordValue(applicationPropertiesRecord, applicationProperties);
     }
 
     private static void populateApplicationProperty(BMap<BString, Object> applicationProperties,
