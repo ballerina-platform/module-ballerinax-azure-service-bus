@@ -206,11 +206,15 @@ function testSendAndReceiveBatchFromQueueOperation() returns error? {
     log:printInfo("Sending via Asb sender.");
     check messageSender->sendBatch(messages);
 
+    // Here we set the batch size to be more than the number of messages sent. 
+    // This is to validate whether the received message count is always same as the sent count, 
+    // even when the expected count is larger than the sent count
     log:printInfo("Receiving from Asb receiver.");
-    MessageBatch|error? messageReceived = messageReceiver->receiveBatch(maxMessageCount);
+    MessageBatch|error? messageReceived = messageReceiver->receiveBatch(messages.length() + 5);
 
     if (messageReceived is MessageBatch) {
         log:printInfo(messageReceived.toString());
+        test:assertEquals(messageReceived.messages.length(), messages.length(), msg = "Sent & received message counts are not equal.");
         foreach Message message in messageReceived.messages {
             if (message.toString() != "") {
                 string msg = check string:fromBytes(<byte[]>message.body);
