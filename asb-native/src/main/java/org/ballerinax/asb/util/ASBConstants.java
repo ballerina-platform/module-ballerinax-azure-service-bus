@@ -97,4 +97,11 @@ public class ASBConstants {
 
     // Error constant fields
     static final String ASB_ERROR = "Error";
+
+    // Constants related to management operations
+    public static final String NAMESPACE_INFO = "NamespaceInfo";
+    public static final String MESSAGE_COUNT_DETAILS = "MessageCountDetails";
+    public static final String QUEUE_PROPERTIES = "QueueProperties";
+    public static final String TOPIC_PROPERTIES = "TopicProperties";
+    public static final String SUBSCRIPTION_PROPERTIES = "SubscriptionProperties";
 }
