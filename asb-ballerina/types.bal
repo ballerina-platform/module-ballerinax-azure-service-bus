@@ -114,6 +114,7 @@ public type ApplicationProperties record {|
 #                      SharedAccessKeyName=SHARED_ACCESS_KEY_NAME;SharedAccessKey=SHARED_ACCESS_KEY or  
 #                      Endpoint=sb://namespace_DNS_Name;EntityPath=EVENT_HUB_NAME;
 #                      SharedAccessSignatureToken=SHARED_ACCESS_SIGNATURE_TOKEN 
+# + isDeadLetterQueue - To mark whether it is dead letter queue
 # + entityConfig -  This field holds the configuration details of either a topic or a queue. The type of the entity is 
 #                   determined by the entityType field. The actual configuration details are stored in either a 
 #                   TopicSubsConfig or a QueueConfig record  
@@ -128,6 +129,8 @@ public type ASBServiceReceiverConfig record {
     string connectionString;
     @display {label: "Entity Configuration"}
     TopicSubsConfig|QueueConfig entityConfig;
+    @display {label: "Dead letter queue"}
+    boolean isDeadLetterQueue = false;
     @display {label: "Receive Mode"}
     ReceiveMode receiveMode = PEEK_LOCK;
     @display {label: "Max Auto Lock Renew Duration"}

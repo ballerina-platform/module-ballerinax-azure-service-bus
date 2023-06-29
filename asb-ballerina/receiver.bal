@@ -23,6 +23,7 @@ public isolated client class MessageReceiver {
     
     private  string connectionString;
     private string queueName;
+    private boolean isDeadLetterQueue;
     private string subscriptionName;
     private string topicName;
     private string receiveMode;
@@ -43,7 +44,11 @@ public isolated client class MessageReceiver {
             if queueConfig is error {
                 return createError(queueConfig);
             }
+            self.isDeadLetterQueue = config.isDeadLetterQueue;
             self.queueName = queueConfig.queueName;
+            if self.isDeadLetterQueue {
+                self.queueName = queueConfig.queueName + DEAD_LETTER_QUEUE_PATH;                
+            }
             self.subscriptionName = EMPTY_STRING;
             self.topicName = EMPTY_STRING;
         } else {
@@ -51,8 +56,12 @@ public isolated client class MessageReceiver {
             if topicSubsConfig is error {
                 return createError(topicSubsConfig);
             }
+            self.isDeadLetterQueue = config.isDeadLetterQueue;
             self.topicName = topicSubsConfig.topicName;
             self.subscriptionName = topicSubsConfig.subscriptionName;
+            if self.isDeadLetterQueue {
+                self.subscriptionName = topicSubsConfig.subscriptionName + DEAD_LETTER_QUEUE_PATH;                
+            }
             self.queueName = EMPTY_STRING;
         }
         self.receiveMode = config.receiveMode;

@@ -20,6 +20,7 @@ public const DEFAULT_MAX_MESSAGE_COUNT = 1;
 public const DEFAULT_SERVER_WAIT_TIME = 300; // In seconds
 public const DEFAULT_MESSAGE_LOCK_TOKEN = "00000000-0000-0000-0000-000000000000";
 const EMPTY_STRING = "";
+const DEAD_LETTER_QUEUE_PATH = "/$deadletterqueue";
 
 // Message content types
 public const TEXT = "text/plain";
