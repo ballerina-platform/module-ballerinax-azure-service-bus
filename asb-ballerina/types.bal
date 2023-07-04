@@ -129,7 +129,7 @@ public type ASBServiceReceiverConfig record {
     string connectionString;
     @display {label: "Entity Configuration"}
     TopicSubsConfig|QueueConfig entityConfig;
-    @display {label: "Dead letter queue"}
+    @display {label: "Dead Letter Queue"}
     boolean isDeadLetterQueue = false;
     @display {label: "Receive Mode"}
     ReceiveMode receiveMode = PEEK_LOCK;
