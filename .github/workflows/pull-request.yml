@@ -22,7 +22,7 @@ jobs:
           JAVA_OPTS: -DBALLERINA_DEV_COMPILE_BALLERINA_ORG=true
         run: ./gradlew build --scan --no-daemon
       - name: Set Up Ballerina
-        uses: ballerina-platform/setup-ballerina@v1.1
+        uses: ballerina-platform/setup-ballerina@v1.1.0
         with:
           version: latest
       - name: Ballerina Build
@@ -46,7 +46,7 @@ jobs:
           JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF8
         run: ./gradlew.bat build --scan --no-daemon
       - name: Set Up Ballerina
-        uses: ballerina-platform/setup-ballerina@v1.1
+        uses: ballerina-platform/setup-ballerina@v1.1.0
         with:
           version: latest
       - name: Ballerina Build
@@ -60,7 +60,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
       - name: Set Up Ballerina
-        uses: ballerina-platform/setup-ballerina@v1.1
+        uses: ballerina-platform/setup-ballerina@v1.1.0
         with:
           version: latest
       - name: Ballerina Test
