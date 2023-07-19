@@ -26,7 +26,7 @@ jobs:
         with:
           version: 2201.3.1
       - name: Ballerina Build
-        run: bal build ./asb-ballerina
+        run: bal build ./ballerina
 
   windows-build:
     name: Build on Windows
@@ -50,7 +50,7 @@ jobs:
         with:
           version: 2201.3.1
       - name: Ballerina Build
-        run: bal build ./asb-ballerina
+        run: bal build ./ballerina
 
   ballerina-tests:
     name: Run Ballerina Tests
@@ -64,7 +64,7 @@ jobs:
         with:
           version: 2201.6.0
       - name: Ballerina Test
-        run: bal test ./asb-ballerina
+        run: bal test ./ballerina
         env:
           CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
           QUEUE_NAME: ${{ secrets.QUEUE_NAME }}

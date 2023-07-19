@@ -41,7 +41,7 @@ jobs:
               uses: ballerina-platform/ballerina-action/@nightly
               with:
                 args:
-                  pack ./asb-ballerina
+                  pack ./ballerina
               env:
                 JAVA_HOME: /usr/lib/jvm/default-jvm
             
@@ -50,7 +50,7 @@ jobs:
               uses: ballerina-platform/ballerina-action/@nightly
               with:
                 args:
-                  test --code-coverage ./asb-ballerina
+                  test --code-coverage ./ballerina
               env:
                 JAVA_HOME: /usr/lib/jvm/default-jvm
                 CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
@@ -64,7 +64,7 @@ jobs:
             - name: Read Ballerina Test Results
               id: test_results
               run: |
-                content=`cat ./asb-ballerina/target/report/test_results.json`                
+                content=`cat ./ballerina/target/report/test_results.json`                
                 content="${content//'%'/'%25'}"
                 content="${content//$'\n'/'%0A'}"
                 content="${content//$'\r'/'%0D'}"

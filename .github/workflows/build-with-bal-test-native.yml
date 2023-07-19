@@ -49,7 +49,7 @@ jobs:
                 version: latest
 
             - name: Run Ballerina tests using the native executable
-              run: bal test --native ./asb-ballerina
+              run: bal test --native ./ballerina
               env:
                 JAVA_HOME: /usr/lib/jvm/default-jvm
                 CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}

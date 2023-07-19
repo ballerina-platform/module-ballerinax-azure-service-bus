@@ -44,7 +44,7 @@ jobs:
         uses: ballerina-platform/ballerina-action/@2201.3.1
         with:
           args:
-            pack ./asb-ballerina
+            pack ./ballerina
         env:
           JAVA_HOME: /usr/lib/jvm/default-jvm
           CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
@@ -61,6 +61,6 @@ jobs:
           args:
             push
         env:
-          WORKING_DIR: ./asb-ballerina
+          WORKING_DIR: ./ballerina
           BALLERINA_CENTRAL_ACCESS_TOKEN: ${{ secrets.BALLERINA_CENTRAL_ACCESS_TOKEN }}
           JAVA_HOME: /usr/lib/jvm/default-jvm
