@@ -78,17 +78,17 @@ To enable Azure logs in a Ballerina module, you need to set the environment vari
 To enable internal connector logs in a Ballerina module, you need to set the log level in the Config.toml file using the  custom configuration record Where <log_level> is the desired log level (e.g. DEBUG, INFO, WARN, ERROR, FATAL, (Default)OFF)
 
 ```
-[ballerinax.asb.customConfiguration]
+[ballerinax.azure.sb.customConfiguration]
 logLevel="OFF"
 ```
 
 
 ### Step 1: Import connector
 
-Import the `ballerinax/asb` module into the Ballerina project.
+Import the `ballerinax/azure.sb` module into the Ballerina project.
 
 ```ballerina
-import ballerinax/asb as asb;
+import ballerinax/azure.sb;
 ```
 
 ### Step 2: Create a new connector instance
@@ -98,8 +98,8 @@ import ballerinax/asb as asb;
 This can be done providing connection string with queue or topic name.
 
 ```ballerina
-asb:MessageSender queueSender = check new (senderConfig);
-asb:MessageSender topicSender = check new (senderConfig);
+sb:MessageSender queueSender = check new (senderConfig);
+sb:MessageSender topicSender = check new (senderConfig);
 ```
 
 #### Initialize a Message Receiver client
@@ -108,8 +108,8 @@ This can be done providing connection string with queue name, topic name or subs
 optional. (Default : PEEKLOCK)
 
 ```ballerina
-asb:MessageReceiver queueReceiver = check new (receiverConfig);
-asb:MessageReceiver subscriptionReceiver = check new (receiverConfig);
+sb:MessageReceiver queueReceiver = check new (receiverConfig);
+sb:MessageReceiver subscriptionReceiver = check new (receiverConfig);
 ```
 
 ### Step 3: Invoke connector operation
@@ -122,19 +122,19 @@ asb:MessageReceiver subscriptionReceiver = check new (receiverConfig);
 
     ```ballerina
     public function main() returns error? {
-        asb:MessageSender queueSender = check new (senderConfig);
+        sb:MessageSender queueSender = check new (senderConfig);
 
         string stringContent = "This is My Message Body"; 
         byte[] byteContent = stringContent.toBytes();
         int timeToLive = 60; // In seconds
 
-        asb:ApplicationProperties applicationProperties = {
+        sb:ApplicationProperties applicationProperties = {
             properties: {a: "propertyValue1", b: "propertyValue2"}
         };
 
-        asb:Message message = {
+        sb:Message message = {
             body: byteContent,
-            contentType: asb:TEXT,
+            contentType: sb:TEXT,
             timeToLive: timeToLive,
             applicationProperties: applicationProperties
         };
@@ -154,13 +154,13 @@ asb:MessageReceiver subscriptionReceiver = check new (receiverConfig);
 
     ```ballerina
         public function main() returns error? {
-            asb:MessageReceiver queueReceiver = check new (receiverConfig);
+            sb:MessageReceiver queueReceiver = check new (receiverConfig);
 
             int serverWaitTime = 60; // In seconds
 
-            asb:Message|asb:Error? messageReceived = queueReceiver->receive(serverWaitTime);
+            sb:Message|sb:Error? messageReceived = queueReceiver->receive(serverWaitTime);
 
-            if (messageReceived is asb:Message) {
+            if (messageReceived is sb:Message) {
                 log:printInfo("Reading Received Message : " + messageReceived.toString());
             } else if (messageReceived is ()) {
                 log:printError("No message in the queue.");
@@ -173,7 +173,7 @@ asb:MessageReceiver subscriptionReceiver = check new (receiverConfig);
     ```
     
    **!!! NOTE:**
-   Currently we are using the asb:Message record for both sender & receiver operations. When we use the ASB receiver
+   Currently we are using the sb:Message record for both sender & receiver operations. When we use the ASB receiver
    connector instead of the ASB listener to receive messages we return the exact message converted (re-engineered) to
    the specific data type based on the content type of the message. But in the ASB listener we receive the message body
    as byte[] which is the standard according to the AMQP protocol. We haven't re-engineered the listener. Rather we

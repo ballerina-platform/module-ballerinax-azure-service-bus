@@ -18,7 +18,7 @@ from subscription, etc.
 
 For more information, go to the module(s).
 
-- [asb](asb-ballerina/Module.md)
+- [azure.sb](asb-ballerina/Module.md)
 
 ## Building from the source
 
