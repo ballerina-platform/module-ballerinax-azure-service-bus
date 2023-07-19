@@ -8,7 +8,7 @@ include ':asb-native'
 include ':checkstyle'
 
 project(':checkstyle').projectDir = file("build-config${File.separator}checkstyle")
-project(':asb-native').projectDir = file('asb-native')
+project(':asb-native').projectDir = file('native')
 
 gradleEnterprise {
     buildScan {
