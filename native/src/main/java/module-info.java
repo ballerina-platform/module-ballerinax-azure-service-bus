@@ -16,7 +16,7 @@
  * under the License.
  */
 
-module org.ballerinax.asb {
+module org.ballerinax.azure.sb {
     requires io.ballerina.runtime;
     requires io.ballerina.lang.value;
     requires java.transaction.xa;

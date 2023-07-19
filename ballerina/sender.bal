@@ -114,25 +114,25 @@ public isolated client class MessageSender {
 
 isolated function initMessageSender(handle connectionString, handle entityType, handle topicOrQueueName, handle isLogEnabled, AmqpRetryOptions retryOptions) returns handle|Error = @java:Method {
     name: "initializeSender",
-    'class: "org.ballerinax.asb.sender.MessageSender"
+    'class: "org.ballerinax.azure.asb.sender.MessageSender"
 } external;
 
 isolated function send(MessageSender endpointClient, Message message) returns Error? = @java:Method {
-    'class: "org.ballerinax.asb.sender.MessageSender"
+    'class: "org.ballerinax.azure.asb.sender.MessageSender"
 } external;
 
 isolated function sendBatch(MessageSender endpointClient, MessageBatch messages) returns Error? = @java:Method {
-    'class: "org.ballerinax.asb.sender.MessageSender"
+    'class: "org.ballerinax.azure.asb.sender.MessageSender"
 } external;
 
 isolated function schedule(MessageSender endpointClient, Message message, time:Civil scheduleTime) returns int|Error = @java:Method {
-    'class: "org.ballerinax.asb.sender.MessageSender"
+    'class: "org.ballerinax.azure.asb.sender.MessageSender"
 } external;
 
 isolated function cancel(MessageSender endpointClient, int sequenceNumber) returns Error? = @java:Method {
-    'class: "org.ballerinax.asb.sender.MessageSender"
+    'class: "org.ballerinax.azure.asb.sender.MessageSender"
 } external;
 
 isolated function closeSender(MessageSender endpointClient) returns Error? = @java:Method {
-    'class: "org.ballerinax.asb.sender.MessageSender"
+    'class: "org.ballerinax.azure.asb.sender.MessageSender"
 } external;

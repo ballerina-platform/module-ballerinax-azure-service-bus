@@ -78,7 +78,7 @@ public isolated client class MessageReceiver {
     isolated remote function receive(@display {label: "Server Wait Time"} int? serverWaitTime = 60,
                                      @display {label: "Expected Type"} typedesc<Message> T = <>) 
                              returns @display {label: "Message"} T|Error? = @java:Method {
-        'class: "org.ballerinax.asb.receiver.MessageReceiver"
+        'class: "org.ballerinax.azure.asb.receiver.MessageReceiver"
     } external;
 
     # Receive message payload from queue or subscription.
@@ -91,7 +91,7 @@ public isolated client class MessageReceiver {
     isolated remote function receivePayload(@display {label: "Server Wait Time"} int? serverWaitTime = 60, 
                                             @display {label: "Expected Type"} typedesc<anydata> T = <>)
                                     returns @display {label: "Message Payload"} T|Error = @java:Method {
-        'class: "org.ballerinax.asb.receiver.MessageReceiver"
+        'class: "org.ballerinax.azure.asb.receiver.MessageReceiver"
     } external;
 
     # Receive batch of messages from queue or subscription.
@@ -199,42 +199,42 @@ public isolated client class MessageReceiver {
     @display {label: "Close Receiver Connection"}
     isolated remote function close() returns Error? = @java:Method {
         name: "closeReceiver",
-        'class: "org.ballerinax.asb.receiver.MessageReceiver"
+        'class: "org.ballerinax.azure.asb.receiver.MessageReceiver"
     } external;
 }
 
 isolated function initMessageReceiver(handle connectionString, handle queueName, handle topicName, 
         handle subscriptionName, handle receiveMode, int maxAutoLockRenewDuration, handle isLogActive, AmqpRetryOptions retryOptions) returns handle|Error = @java:Method {
     name: "initializeReceiver",
-    'class: "org.ballerinax.asb.receiver.MessageReceiver"
+    'class: "org.ballerinax.azure.asb.receiver.MessageReceiver"
 } external;
 
 isolated function receiveBatch(MessageReceiver endpointClient, int? maxMessageCount, int? serverWaitTime) 
                                returns MessageBatch|Error? = @java:Method {
-    'class: "org.ballerinax.asb.receiver.MessageReceiver"
+    'class: "org.ballerinax.azure.asb.receiver.MessageReceiver"
 } external;
 
 isolated function complete(MessageReceiver endpointClient, string lockToken) returns Error? = @java:Method {
-    'class: "org.ballerinax.asb.receiver.MessageReceiver"
+    'class: "org.ballerinax.azure.asb.receiver.MessageReceiver"
 } external;
 
 isolated function abandon(MessageReceiver endpointClient, string lockToken) returns Error? = @java:Method {
-    'class: "org.ballerinax.asb.receiver.MessageReceiver"
+    'class: "org.ballerinax.azure.asb.receiver.MessageReceiver"
 } external;
 
 isolated function deadLetter(MessageReceiver endpointClient, string lockToken, string? deadLetterReason, string? deadLetterErrorDescription) returns 
                        Error? = @java:Method {
-    'class: "org.ballerinax.asb.receiver.MessageReceiver"
+    'class: "org.ballerinax.azure.asb.receiver.MessageReceiver"
 } external;
 
 isolated function defer(MessageReceiver endpointClient, string lockToken) returns Error? = @java:Method {
-    'class: "org.ballerinax.asb.receiver.MessageReceiver"
+    'class: "org.ballerinax.azure.asb.receiver.MessageReceiver"
 } external;
 
 isolated function receiveDeferred(MessageReceiver endpointClient, int sequenceNumber) returns Message|Error? = @java:Method {
-    'class: "org.ballerinax.asb.receiver.MessageReceiver"
+    'class: "org.ballerinax.azure.asb.receiver.MessageReceiver"
 } external;
 
 isolated function renewLock(MessageReceiver endpointClient, string lockToken) returns Error? = @java:Method {
-    'class: "org.ballerinax.asb.receiver.MessageReceiver"
+    'class: "org.ballerinax.azure.asb.receiver.MessageReceiver"
 } external;

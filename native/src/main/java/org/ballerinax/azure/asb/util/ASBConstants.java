@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.ballerinax.asb.util;
+package org.ballerinax.azure.asb.util;
 
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BString;
