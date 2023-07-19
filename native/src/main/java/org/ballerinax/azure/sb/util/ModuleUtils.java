@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.ballerinax.azure.asb.util;
+package org.ballerinax.azure.sb.util;
 
 import io.ballerina.runtime.api.Environment;
 import io.ballerina.runtime.api.Module;

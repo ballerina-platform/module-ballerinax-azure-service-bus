@@ -15,7 +15,7 @@
 // under the License.
 
 import ballerina/log;
-import ballerinax/asb;
+import ballerinax/azure.sb;
 
 // Connection Configurations
 configurable string connectionString = ?;
@@ -39,47 +39,47 @@ public function main() returns error? {
     int timeToLive = 60; // In seconds
     int serverWaitTime = 60; // In seconds
 
-    asb:ApplicationProperties applicationProperties = {
+    sb:ApplicationProperties applicationProperties = {
         properties: {a: "propertyValue1", b: "propertyValue2"}
     };
 
-    asb:Message message1 = {
+    sb:Message message1 = {
         body: byteContent,
-        contentType: asb:TEXT,
+        contentType: sb:TEXT,
         timeToLive: timeToLive,
         applicationProperties: applicationProperties
     };
 
-    asb:ASBServiceSenderConfig senderConfig = {
+    sb:ASBServiceSenderConfig senderConfig = {
         connectionString: connectionString,
-        entityType: asb:TOPIC,
+        entityType: sb:TOPIC,
         topicOrQueueName: topicName
     };
 
-    asb:ASBServiceReceiverConfig receiverConfig = {
+    sb:ASBServiceReceiverConfig receiverConfig = {
         connectionString: connectionString,
         entityConfig: {
             topicName: topicName,
             subscriptionName: subscriptionName
         },
-        receiveMode: asb:PEEK_LOCK
+        receiveMode: sb:PEEK_LOCK
     };
 
     log:printInfo("Initializing Asb sender client.");
-    asb:MessageSender topicSender = check new (senderConfig);
+    sb:MessageSender topicSender = check new (senderConfig);
 
     log:printInfo("Initializing Asb receiver client.");
-    asb:MessageReceiver subscriptionReceiver = check new (receiverConfig);
+    sb:MessageReceiver subscriptionReceiver = check new (receiverConfig);
     
     log:printInfo("Sending via Asb sender client.");
     check topicSender->send(message1);
 
     log:printInfo("Receiving from Asb receiver client.");
-    asb:Message|asb:Error? messageReceived = subscriptionReceiver->receive(serverWaitTime);
+    sb:Message|sb:Error? messageReceived = subscriptionReceiver->receive(serverWaitTime);
 
-    if (messageReceived is asb:Message) {
+    if (messageReceived is sb:Message) {
         check subscriptionReceiver->renewLock(messageReceived);
-        asb:Message|asb:Error? messageReceivedAgain = subscriptionReceiver->receive(serverWaitTime);
+        sb:Message|sb:Error? messageReceivedAgain = subscriptionReceiver->receive(serverWaitTime);
         log:printInfo("Renew lock message successful");
     } else if (messageReceived is ()) {
         log:printError("No message in the queue.");

@@ -15,7 +15,7 @@
 // under the License.
 
 import ballerina/log;
-import ballerinax/asb;
+import ballerinax/azure.sb;
 
 // Connection Configurations
 configurable string connectionString = ?;
@@ -32,44 +32,44 @@ public function main() returns error? {
     int timeToLive = 60; // In seconds
     int serverWaitTime = 60; // In seconds
 
-    asb:ApplicationProperties applicationProperties = {
+    sb:ApplicationProperties applicationProperties = {
         properties: {a: "propertyValue1", b: "propertyValue2"}
     };
 
-    asb:Message message1 = {
+    sb:Message message1 = {
         body: byteContent,
-        contentType: asb:TEXT,
+        contentType: sb:TEXT,
         timeToLive: timeToLive,
         applicationProperties: applicationProperties
     };
 
-    asb:ASBServiceSenderConfig senderConfig = {
+    sb:ASBServiceSenderConfig senderConfig = {
         connectionString: connectionString,
-        entityType: asb:QUEUE,
+        entityType: sb:QUEUE,
         topicOrQueueName: queueName
     };
 
-    asb:ASBServiceReceiverConfig receiverConfig = {
+    sb:ASBServiceReceiverConfig receiverConfig = {
         connectionString: connectionString,
         entityConfig: {
             queueName: queueName
         },
-        receiveMode: asb:RECEIVE_AND_DELETE
+        receiveMode: sb:RECEIVE_AND_DELETE
     };
 
     log:printInfo("Initializing Asb sender client.");
-    asb:MessageSender queueSender = check new (senderConfig);
+    sb:MessageSender queueSender = check new (senderConfig);
 
     log:printInfo("Initializing Asb receiver client.");
-    asb:MessageReceiver queueReceiver = check new (receiverConfig);
+    sb:MessageReceiver queueReceiver = check new (receiverConfig);
 
     log:printInfo("Sending via Asb sender client.");
     check queueSender->send(message1);
 
     log:printInfo("Receiving from Asb receiver client.");
-    asb:Message|asb:Error? messageReceived = queueReceiver->receive(serverWaitTime);
+    sb:Message|sb:Error? messageReceived = queueReceiver->receive(serverWaitTime);
 
-    if (messageReceived is asb:Message) {
+    if (messageReceived is sb:Message) {
         log:printInfo("Reading Received Message : " + messageReceived.toString());
     } else if (messageReceived is ()) {
         log:printError("No message in the queue.");

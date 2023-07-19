@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.ballerinax.azure.asb.sender;
+package org.ballerinax.azure.sb.sender;
 
 import com.azure.core.amqp.AmqpRetryOptions;
 import com.azure.messaging.servicebus.ServiceBusClientBuilder;
@@ -37,9 +37,9 @@ import io.ballerina.runtime.api.values.BHandle;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
-import org.ballerinax.azure.asb.util.ASBConstants;
-import org.ballerinax.azure.asb.util.ASBErrorCreator;
-import org.ballerinax.azure.asb.util.ASBUtils;
+import org.ballerinax.azure.sb.util.ASBConstants;
+import org.ballerinax.azure.sb.util.ASBErrorCreator;
+import org.ballerinax.azure.sb.util.ASBUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +50,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
-import static org.ballerinax.azure.asb.util.ASBUtils.getRetryOptions;
+import static org.ballerinax.azure.sb.util.ASBUtils.getRetryOptions;
 
 /**
  * This facilitates the client operations of MessageSender client in Ballerina.

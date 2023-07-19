@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.ballerinax.azure.asb.receiver;
+package org.ballerinax.azure.sb.receiver;
 
 import com.azure.core.amqp.AmqpRetryOptions;
 import com.azure.core.amqp.models.AmqpAnnotatedMessage;
@@ -44,10 +44,10 @@ import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
 import io.ballerina.runtime.api.values.BTypedesc;
-import org.ballerinax.azure.asb.util.ASBConstants;
-import org.ballerinax.azure.asb.util.ASBErrorCreator;
-import org.ballerinax.azure.asb.util.ASBUtils;
-import org.ballerinax.azure.asb.util.ModuleUtils;
+import org.ballerinax.azure.sb.util.ASBConstants;
+import org.ballerinax.azure.sb.util.ASBErrorCreator;
+import org.ballerinax.azure.sb.util.ASBUtils;
+import org.ballerinax.azure.sb.util.ModuleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,33 +59,33 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static io.ballerina.runtime.api.creators.ValueCreator.createRecordValue;
-import static org.ballerinax.azure.asb.util.ASBConstants.APPLICATION_PROPERTY_KEY;
-import static org.ballerinax.azure.asb.util.ASBConstants.BODY;
-import static org.ballerinax.azure.asb.util.ASBConstants.CONTENT_TYPE;
-import static org.ballerinax.azure.asb.util.ASBConstants.CORRELATION_ID;
-import static org.ballerinax.azure.asb.util.ASBConstants.DEAD_LETTER_ERROR_DESCRIPTION;
-import static org.ballerinax.azure.asb.util.ASBConstants.DEAD_LETTER_REASON;
-import static org.ballerinax.azure.asb.util.ASBConstants.DEAD_LETTER_SOURCE;
-import static org.ballerinax.azure.asb.util.ASBConstants.DELIVERY_COUNT;
-import static org.ballerinax.azure.asb.util.ASBConstants.ENQUEUED_SEQUENCE_NUMBER;
-import static org.ballerinax.azure.asb.util.ASBConstants.ENQUEUED_TIME;
-import static org.ballerinax.azure.asb.util.ASBConstants.LABEL;
-import static org.ballerinax.azure.asb.util.ASBConstants.LOCK_TOKEN;
-import static org.ballerinax.azure.asb.util.ASBConstants.MESSAGE_ID;
-import static org.ballerinax.azure.asb.util.ASBConstants.PARTITION_KEY;
-import static org.ballerinax.azure.asb.util.ASBConstants.RECEIVE_AND_DELETE;
-import static org.ballerinax.azure.asb.util.ASBConstants.REPLY_TO;
-import static org.ballerinax.azure.asb.util.ASBConstants.REPLY_TO_SESSION_ID;
-import static org.ballerinax.azure.asb.util.ASBConstants.SEQUENCE_NUMBER;
-import static org.ballerinax.azure.asb.util.ASBConstants.SESSION_ID;
-import static org.ballerinax.azure.asb.util.ASBConstants.STATE;
-import static org.ballerinax.azure.asb.util.ASBConstants.TIME_TO_LIVE;
-import static org.ballerinax.azure.asb.util.ASBConstants.TO;
-import static org.ballerinax.azure.asb.util.ASBUtils.addMessageFieldIfPresent;
-import static org.ballerinax.azure.asb.util.ASBUtils.convertAMQPToJava;
-import static org.ballerinax.azure.asb.util.ASBUtils.convertJavaToBValue;
-import static org.ballerinax.azure.asb.util.ASBUtils.getRetryOptions;
-import static org.ballerinax.azure.asb.util.ASBUtils.getValueWithIntendedType;
+import static org.ballerinax.azure.sb.util.ASBConstants.APPLICATION_PROPERTY_KEY;
+import static org.ballerinax.azure.sb.util.ASBConstants.BODY;
+import static org.ballerinax.azure.sb.util.ASBConstants.CONTENT_TYPE;
+import static org.ballerinax.azure.sb.util.ASBConstants.CORRELATION_ID;
+import static org.ballerinax.azure.sb.util.ASBConstants.DEAD_LETTER_ERROR_DESCRIPTION;
+import static org.ballerinax.azure.sb.util.ASBConstants.DEAD_LETTER_REASON;
+import static org.ballerinax.azure.sb.util.ASBConstants.DEAD_LETTER_SOURCE;
+import static org.ballerinax.azure.sb.util.ASBConstants.DELIVERY_COUNT;
+import static org.ballerinax.azure.sb.util.ASBConstants.ENQUEUED_SEQUENCE_NUMBER;
+import static org.ballerinax.azure.sb.util.ASBConstants.ENQUEUED_TIME;
+import static org.ballerinax.azure.sb.util.ASBConstants.LABEL;
+import static org.ballerinax.azure.sb.util.ASBConstants.LOCK_TOKEN;
+import static org.ballerinax.azure.sb.util.ASBConstants.MESSAGE_ID;
+import static org.ballerinax.azure.sb.util.ASBConstants.PARTITION_KEY;
+import static org.ballerinax.azure.sb.util.ASBConstants.RECEIVE_AND_DELETE;
+import static org.ballerinax.azure.sb.util.ASBConstants.REPLY_TO;
+import static org.ballerinax.azure.sb.util.ASBConstants.REPLY_TO_SESSION_ID;
+import static org.ballerinax.azure.sb.util.ASBConstants.SEQUENCE_NUMBER;
+import static org.ballerinax.azure.sb.util.ASBConstants.SESSION_ID;
+import static org.ballerinax.azure.sb.util.ASBConstants.STATE;
+import static org.ballerinax.azure.sb.util.ASBConstants.TIME_TO_LIVE;
+import static org.ballerinax.azure.sb.util.ASBConstants.TO;
+import static org.ballerinax.azure.sb.util.ASBUtils.addMessageFieldIfPresent;
+import static org.ballerinax.azure.sb.util.ASBUtils.convertAMQPToJava;
+import static org.ballerinax.azure.sb.util.ASBUtils.convertJavaToBValue;
+import static org.ballerinax.azure.sb.util.ASBUtils.getRetryOptions;
+import static org.ballerinax.azure.sb.util.ASBUtils.getValueWithIntendedType;
 
 /**
  * This facilitates the client operations of MessageReceiver client in

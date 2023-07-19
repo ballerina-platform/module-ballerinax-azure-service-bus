@@ -15,7 +15,7 @@
 // under the License.
 
 import ballerina/log;
-import ballerinax/asb;
+import ballerinax/azure.sb;
 
 // Connection Configurations
 configurable string connectionString = ?;
@@ -33,51 +33,51 @@ public function main() returns error? {
     int serverWaitTime = 60; // In seconds
     int maxMessageCount = 2;
 
-    asb:Message message1 = {
+    sb:Message message1 = {
         body: byteContent,
-        contentType: asb:TEXT,
+        contentType: sb:TEXT,
         timeToLive: timeToLive
     };
 
-    asb:Message message2 = {
+    sb:Message message2 = {
         body: byteContent,
-        contentType: asb:TEXT,
+        contentType: sb:TEXT,
         timeToLive: timeToLive
     };
 
-    asb:MessageBatch messages = {
+    sb:MessageBatch messages = {
         messageCount: 2,
         messages: [message1, message2]
     };
 
-    asb:ASBServiceSenderConfig senderConfig = {
+    sb:ASBServiceSenderConfig senderConfig = {
         connectionString: connectionString,
-        entityType: asb:QUEUE,
+        entityType: sb:QUEUE,
         topicOrQueueName: queueName
     };
 
-    asb:ASBServiceReceiverConfig receiverConfig = {
+    sb:ASBServiceReceiverConfig receiverConfig = {
         connectionString: connectionString,
         entityConfig: {
             queueName: queueName
         },
-        receiveMode: asb:RECEIVE_AND_DELETE
+        receiveMode: sb:RECEIVE_AND_DELETE
     };
 
     log:printInfo("Initializing Asb sender client.");
-    asb:MessageSender queueSender = check new (senderConfig);
+    sb:MessageSender queueSender = check new (senderConfig);
 
     log:printInfo("Initializing Asb receiver client.");
-    asb:MessageReceiver queueReceiver = check new (receiverConfig);
+    sb:MessageReceiver queueReceiver = check new (receiverConfig);
 
     log:printInfo("Sending via Asb sender client.");
     check queueSender->sendBatch(messages);
 
     log:printInfo("Receiving from Asb receiver client.");
-    asb:MessageBatch|error? messageReceived = queueReceiver->receiveBatch(maxMessageCount, serverWaitTime);
+    sb:MessageBatch|error? messageReceived = queueReceiver->receiveBatch(maxMessageCount, serverWaitTime);
 
-    if (messageReceived is asb:MessageBatch) {
-        foreach asb:Message message in messageReceived.messages {
+    if (messageReceived is sb:MessageBatch) {
+        foreach sb:Message message in messageReceived.messages {
             if (message.toString() != "") {
                 log:printInfo("Reading Received Message : " + message.toString());
             }

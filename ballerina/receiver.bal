@@ -71,34 +71,34 @@ public isolated client class MessageReceiver {
     # Receive message from queue or subscription.
     # 
     # + serverWaitTime - Specified server wait time in seconds to receive message (optional)
-    # + T - Expected type of the message. This can be either a `asb:Message` or a subtype of it.
-    # + return - A `asb:Message` record if message is received, `()` if no message is in the queue or else an `asb:Error`
+    # + T - Expected type of the message. This can be either a `sb:Message` or a subtype of it.
+    # + return - A `sb:Message` record if message is received, `()` if no message is in the queue or else an `sb:Error`
     #            if failed to receive message
     @display {label: "Receive Message"}
     isolated remote function receive(@display {label: "Server Wait Time"} int? serverWaitTime = 60,
                                      @display {label: "Expected Type"} typedesc<Message> T = <>) 
                              returns @display {label: "Message"} T|Error? = @java:Method {
-        'class: "org.ballerinax.azure.asb.receiver.MessageReceiver"
+        'class: "org.ballerinax.azure.sb.receiver.MessageReceiver"
     } external;
 
     # Receive message payload from queue or subscription.
     #
     # + serverWaitTime - Specified server wait time in seconds to receive message (optional)
     # + T - Expected type of the message. This can be any subtype of `anydata` type
-    # + return - A `asb:Message` record if message is received, `()` if no message is in the queue or else an `asb:Error`
+    # + return - A `sb:Message` record if message is received, `()` if no message is in the queue or else an `sb:Error`
     #            if failed to receive message
     @display {label: "Receive Message Payload"}
     isolated remote function receivePayload(@display {label: "Server Wait Time"} int? serverWaitTime = 60, 
                                             @display {label: "Expected Type"} typedesc<anydata> T = <>)
                                     returns @display {label: "Message Payload"} T|Error = @java:Method {
-        'class: "org.ballerinax.azure.asb.receiver.MessageReceiver"
+        'class: "org.ballerinax.azure.sb.receiver.MessageReceiver"
     } external;
 
     # Receive batch of messages from queue or subscription.
     # 
     # + maxMessageCount - Maximum message count to receive in a batch
     # + serverWaitTime - Specified server wait time in seconds to receive message (optional)
-    # + return - A `asb:MessageBatch` record if batch is received, `()` if no batch is in the queue or else an `asb:Error`
+    # + return - A `sb:MessageBatch` record if batch is received, `()` if no batch is in the queue or else an `sb:Error`
     #            if failed to receive batch
     @display {label: "Receive Batch Message"}
     isolated remote function receiveBatch(@display {label: "Maximum Message Count"} int maxMessageCount, 
@@ -111,8 +111,8 @@ public isolated client class MessageReceiver {
     # Complete message from queue or subscription based on messageLockToken. Declares the message processing to be 
     # successfully completed, removing the message from the queue.
     # 
-    # + message - `asb:Message` record
-    # + return - An `asb:Error` if failed to complete message or else `()`
+    # + message - `sb:Message` record
+    # + return - An `sb:Error` if failed to complete message or else `()`
     @display {label: "Complete Message"}
     isolated remote function complete(@display {label: "Message"} Message message) returns Error? {
         if message?.lockToken.toString() != DEFAULT_MESSAGE_LOCK_TOKEN {
@@ -125,8 +125,8 @@ public isolated client class MessageReceiver {
     # the time being, returning the message immediately back to the queue to be picked up by another (or the same) 
     # receiver.
     # 
-    # + message - `asb:Message` record
-    # + return - An `asb:Error` if failed to abandon message or else `()`
+    # + message - `sb:Message` record
+    # + return - An `sb:Error` if failed to abandon message or else `()`
     @display {label: "Abandon Message"}
     isolated remote function abandon(@display {label: "Message"} Message message) returns Error? {
         if message?.lockToken.toString() != DEFAULT_MESSAGE_LOCK_TOKEN {
@@ -138,10 +138,10 @@ public isolated client class MessageReceiver {
     # Dead-Letter the message & moves the message to the Dead-Letter Queue based on messageLockToken. Transfer 
     # the message from the primary queue into a special "dead-letter sub-queue".
     # 
-    # + message - `asb:Message` record
+    # + message - `sb:Message` record
     # + deadLetterReason - The deadletter reason (optional)
     # + deadLetterErrorDescription - The deadletter error description (optional)
-    # + return - An `asb:Error` if failed to deadletter message or else `()`
+    # + return - An `sb:Error` if failed to deadletter message or else `()`
     @display {label: "Dead Letter Message"}
     isolated remote function deadLetter(@display {label: "Message"} Message message, 
                                         @display {label: "Dead Letter Reason"} string? deadLetterReason = (), 
@@ -157,8 +157,8 @@ public isolated client class MessageReceiver {
     # Defer the message in a Queue or Subscription based on messageLockToken.  It prevents the message from being 
     # directly received from the queue by setting it aside such that it must be received by sequence number.
     # 
-    # + message - `asb:Message` record
-    # + return - An `asb:Error` if failed to defer message or else sequence number
+    # + message - `sb:Message` record
+    # + return - An `sb:Error` if failed to defer message or else sequence number
     @display {label: "Defer Message"}
     isolated remote function defer(@display {label: "Message"} Message message) 
                                    returns @display {label: "Deferred Msg Seq Num"} int|Error {
@@ -172,7 +172,7 @@ public isolated client class MessageReceiver {
     # + sequenceNumber - Unique number assigned to a message by Service Bus. The sequence number is a unique 64-bit
     #                    integer assigned to a message as it is accepted and stored by the broker and functions as
     #                    its true identifier.
-    # + return - An `asb:Error` if failed to receive deferred message, a Message record if successful or else `()`
+    # + return - An `sb:Error` if failed to receive deferred message, a Message record if successful or else `()`
     @display {label: "Receive Deferred Message"}
     isolated remote function receiveDeferred(@display {label: "Deferred Msg Seq Num"} 
                                              int sequenceNumber) 
@@ -183,8 +183,8 @@ public isolated client class MessageReceiver {
 
     # The operation renews lock on a message in a queue or subscription based on messageLockToken.
     # 
-    # + message - `asb:Message` record
-    # + return - An `asb:Error` if failed to renew message or else `()`
+    # + message - `sb:Message` record
+    # + return - An `sb:Error` if failed to renew message or else `()`
     @display {label: "Renew Lock On Message"}
     isolated remote function renewLock(@display {label: "Message"} Message message) returns Error? {
         if message?.lockToken.toString() != DEFAULT_MESSAGE_LOCK_TOKEN {
@@ -195,46 +195,46 @@ public isolated client class MessageReceiver {
 
     # Closes the ASB sender connection.
     #
-    # + return - An `asb:Error` if failed to close connection or else `()`
+    # + return - An `sb:Error` if failed to close connection or else `()`
     @display {label: "Close Receiver Connection"}
     isolated remote function close() returns Error? = @java:Method {
         name: "closeReceiver",
-        'class: "org.ballerinax.azure.asb.receiver.MessageReceiver"
+        'class: "org.ballerinax.azure.sb.receiver.MessageReceiver"
     } external;
 }
 
 isolated function initMessageReceiver(handle connectionString, handle queueName, handle topicName, 
         handle subscriptionName, handle receiveMode, int maxAutoLockRenewDuration, handle isLogActive, AmqpRetryOptions retryOptions) returns handle|Error = @java:Method {
     name: "initializeReceiver",
-    'class: "org.ballerinax.azure.asb.receiver.MessageReceiver"
+    'class: "org.ballerinax.azure.sb.receiver.MessageReceiver"
 } external;
 
 isolated function receiveBatch(MessageReceiver endpointClient, int? maxMessageCount, int? serverWaitTime) 
                                returns MessageBatch|Error? = @java:Method {
-    'class: "org.ballerinax.azure.asb.receiver.MessageReceiver"
+    'class: "org.ballerinax.azure.sb.receiver.MessageReceiver"
 } external;
 
 isolated function complete(MessageReceiver endpointClient, string lockToken) returns Error? = @java:Method {
-    'class: "org.ballerinax.azure.asb.receiver.MessageReceiver"
+    'class: "org.ballerinax.azure.sb.receiver.MessageReceiver"
 } external;
 
 isolated function abandon(MessageReceiver endpointClient, string lockToken) returns Error? = @java:Method {
-    'class: "org.ballerinax.azure.asb.receiver.MessageReceiver"
+    'class: "org.ballerinax.azure.sb.receiver.MessageReceiver"
 } external;
 
 isolated function deadLetter(MessageReceiver endpointClient, string lockToken, string? deadLetterReason, string? deadLetterErrorDescription) returns 
                        Error? = @java:Method {
-    'class: "org.ballerinax.azure.asb.receiver.MessageReceiver"
+    'class: "org.ballerinax.azure.sb.receiver.MessageReceiver"
 } external;
 
 isolated function defer(MessageReceiver endpointClient, string lockToken) returns Error? = @java:Method {
-    'class: "org.ballerinax.azure.asb.receiver.MessageReceiver"
+    'class: "org.ballerinax.azure.sb.receiver.MessageReceiver"
 } external;
 
 isolated function receiveDeferred(MessageReceiver endpointClient, int sequenceNumber) returns Message|Error? = @java:Method {
-    'class: "org.ballerinax.azure.asb.receiver.MessageReceiver"
+    'class: "org.ballerinax.azure.sb.receiver.MessageReceiver"
 } external;
 
 isolated function renewLock(MessageReceiver endpointClient, string lockToken) returns Error? = @java:Method {
-    'class: "org.ballerinax.azure.asb.receiver.MessageReceiver"
+    'class: "org.ballerinax.azure.sb.receiver.MessageReceiver"
 } external;

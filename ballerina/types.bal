@@ -106,7 +106,7 @@ public type ApplicationProperties record {|
     map<anydata> properties?;
 |};
 
-# Configurations used to create an `asb:Connection`.
+# Configurations used to create an `sb:Connection`.
 #
 # + connectionString - Service bus connection string with Shared Access Signatures  
 #                      ConnectionString format: 

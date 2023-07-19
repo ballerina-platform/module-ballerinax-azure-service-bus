@@ -183,4 +183,4 @@ sb:MessageReceiver subscriptionReceiver = check new (receiverConfig);
 
 2. Use `bal run` command to compile and run the Ballerina program.
 
-**[You can find a list of samples here](https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/tree/main/asb-ballerina/samples)**
+**[You can find a list of samples here](https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/tree/main/ballerina/samples)**

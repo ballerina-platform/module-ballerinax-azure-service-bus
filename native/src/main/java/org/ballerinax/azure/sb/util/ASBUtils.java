@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.ballerinax.azure.asb.util;
+package org.ballerinax.azure.sb.util;
 
 import com.azure.core.amqp.AmqpRetryMode;
 import com.azure.core.amqp.AmqpRetryOptions;
@@ -41,7 +41,7 @@ import io.ballerina.runtime.api.values.BTypedesc;
 import org.apache.qpid.proton.amqp.Binary;
 import org.ballerinalang.langlib.value.CloneWithType;
 import org.ballerinalang.langlib.value.FromJsonWithType;
-import org.ballerinax.azure.asb.receiver.MessageReceiver;
+import org.ballerinax.azure.sb.receiver.MessageReceiver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,11 +62,11 @@ import static io.ballerina.runtime.api.TypeTags.STRING_TAG;
 import static io.ballerina.runtime.api.TypeTags.UNION_TAG;
 import static io.ballerina.runtime.api.TypeTags.XML_TAG;
 import static io.ballerina.runtime.api.utils.TypeUtils.getReferredType;
-import static org.ballerinax.azure.asb.util.ASBConstants.DELAY;
-import static org.ballerinax.azure.asb.util.ASBConstants.MAX_DELAY;
-import static org.ballerinax.azure.asb.util.ASBConstants.MAX_RETRIES;
-import static org.ballerinax.azure.asb.util.ASBConstants.RETRY_MODE;
-import static org.ballerinax.azure.asb.util.ASBConstants.TRY_TIMEOUT;
+import static org.ballerinax.azure.sb.util.ASBConstants.DELAY;
+import static org.ballerinax.azure.sb.util.ASBConstants.MAX_DELAY;
+import static org.ballerinax.azure.sb.util.ASBConstants.MAX_RETRIES;
+import static org.ballerinax.azure.sb.util.ASBConstants.RETRY_MODE;
+import static org.ballerinax.azure.sb.util.ASBConstants.TRY_TIMEOUT;
 
 /**
  * Utility class for Azure Service Bus.

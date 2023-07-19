@@ -16,15 +16,15 @@
  * under the License.
  */
 
-package org.ballerinax.azure.asb.util;
+package org.ballerinax.azure.sb.util;
 
 import com.azure.messaging.servicebus.ServiceBusException;
 import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BError;
 
-import static org.ballerinax.azure.asb.util.ASBConstants.ASB_ERROR;
-import static org.ballerinax.azure.asb.util.ModuleUtils.getModule;
+import static org.ballerinax.azure.sb.util.ASBConstants.ASB_ERROR;
+import static org.ballerinax.azure.sb.util.ModuleUtils.getModule;
 
 /**
  * ASB module error related utilities.
