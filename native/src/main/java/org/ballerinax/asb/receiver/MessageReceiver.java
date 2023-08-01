@@ -66,6 +66,7 @@ import static org.ballerinax.asb.util.ASBConstants.CORRELATION_ID;
 import static org.ballerinax.asb.util.ASBConstants.DEAD_LETTER_ERROR_DESCRIPTION;
 import static org.ballerinax.asb.util.ASBConstants.DEAD_LETTER_REASON;
 import static org.ballerinax.asb.util.ASBConstants.DEAD_LETTER_SOURCE;
+import static org.ballerinax.asb.util.ASBConstants.DEFAULT_MESSAGE_LOCK_TOKEN;
 import static org.ballerinax.asb.util.ASBConstants.DELIVERY_COUNT;
 import static org.ballerinax.asb.util.ASBConstants.ENQUEUED_SEQUENCE_NUMBER;
 import static org.ballerinax.asb.util.ASBConstants.ENQUEUED_TIME;
@@ -281,6 +282,7 @@ public class MessageReceiver {
             ServiceBusReceivedMessage message = (ServiceBusReceivedMessage) endpointClient
                     .getNativeData(lockToken.getValue());
             receiver.complete(message);
+            endpointClient.getNativeData().remove(lockToken.getValue());
             LOGGER.debug("Completed the message(Id: " + message.getMessageId() + ") with lockToken " + lockToken);
             return null;
         } catch (BError e) {
@@ -305,6 +307,7 @@ public class MessageReceiver {
             ServiceBusReceivedMessage message = (ServiceBusReceivedMessage) endpointClient
                     .getNativeData(lockToken.getValue());
             receiver.abandon(message);
+            endpointClient.getNativeData().remove(lockToken.getValue());
             LOGGER.debug(String.format("Done abandoning a message(Id: %s) using its lock token from %n%s",
                     message.getMessageId(), receiver.getEntityPath()));
             return null;
@@ -336,6 +339,7 @@ public class MessageReceiver {
                     .setDeadLetterErrorDescription(ASBUtils.convertString(deadLetterErrorDescription));
             options.setDeadLetterReason(ASBUtils.convertString(deadLetterReason));
             receiver.deadLetter(message, options);
+            endpointClient.getNativeData().remove(lockToken.getValue());
             LOGGER.debug(String.format("Done dead-lettering a message(Id: %s) using its lock token from %s",
                     message.getMessageId(), receiver.getEntityPath()));
             return null;
@@ -361,6 +365,7 @@ public class MessageReceiver {
             ServiceBusReceivedMessage message = (ServiceBusReceivedMessage) endpointClient
                     .getNativeData(lockToken.getValue());
             receiver.defer(message);
+            endpointClient.getNativeData().remove(lockToken.getValue());
             LOGGER.debug(String.format("Done deferring a message(Id: %s) using its lock token from %s",
                     message.getMessageId(), receiver.getEntityPath()));
             return null;
@@ -417,6 +422,7 @@ public class MessageReceiver {
                     .getNativeData(lockToken.getValue());
             ServiceBusReceiverClient receiver = getReceiverFromBObject(endpointClient);
             receiver.renewMessageLock(message);
+            endpointClient.getNativeData().remove(lockToken.getValue());
             LOGGER.debug(String.format("Done renewing a message(Id: %s) using its lock token from %s",
                     message.getMessageId(), receiver.getEntityPath()));
             return null;
@@ -471,7 +477,11 @@ public class MessageReceiver {
         } else {
             map.put(BODY, messageBody);
         }
-        endpointClient.addNativeData(message.getLockToken(), message);
+
+        // This is to avoid adding messages to the native data map, if the receive-mode is 'RECEIVE_AND_DELETE'.
+        if (!message.getLockToken().equals(DEFAULT_MESSAGE_LOCK_TOKEN)) {
+            endpointClient.addNativeData(message.getLockToken(), message);
+        }
         return createBRecordValue(map, expectedType);
     }
 
