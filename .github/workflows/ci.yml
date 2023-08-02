@@ -58,7 +58,7 @@ jobs:
         uses: ballerina-platform/ballerina-action/@nightly
         with:
           args:
-            test --code-coverage ./asb-ballerina
+            test --test-report --code-coverage --coverage-format=xml ./asb-ballerina
         env:
           JAVA_HOME: /usr/lib/jvm/default-jvm
           CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
@@ -68,22 +68,8 @@ jobs:
           SUBSCRIPTION_NAME2: ${{ secrets.SUBSCRIPTION_NAME2 }}
           SUBSCRIPTION_NAME3: ${{ secrets.SUBSCRIPTION_NAME3 }}
 
-      # Read the ballerina test results
-      - name: Read Ballerina Test Results
-        id: test_results
-        run: |
-          content=`cat ./asb-ballerina/target/report/test_results.json`                
-          content="${content//'%'/'%25'}"
-          content="${content//$'\n'/'%0A'}"
-          content="${content//$'\r'/'%0D'}"
-          echo "::set-output name=testResultsJson::$content"
-
-      # Print the code coverage information
-      - name: Code Coverage
-        run: |
-          echo "Covered Code Lines : ${{fromJson(steps.test_results.outputs.testResultsJson).coveredLines}}"
-          echo "Total Code Lines : $(expr ${{fromJson(steps.test_results.outputs.testResultsJson).missedLines}} + ${{fromJson(steps.test_results.outputs.testResultsJson).coveredLines}})"
-          echo "Code Coverage Percentage : ${{fromJson(steps.test_results.outputs.testResultsJson).coveragePercentage}}"
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
 
       - name: Alert notifier on failure
         if: failure() && (github.event.action == 'check_connector_for_breaking_changes')
