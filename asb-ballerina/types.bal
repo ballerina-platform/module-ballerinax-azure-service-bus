@@ -244,6 +244,35 @@ public enum ReceiveMode {
     PEEK_LOCK = "PEEKLOCK"
 }
 
+public type NamespaceInfo record {
+    string name?;
+};
+
+public type MessageCountDetails record {
+    float activeMessageCount?;
+    float deadLetterMessageCount?;
+    float scheduledMessageCount?;
+    float transferMessageCount?;
+    float transferDeadLetterMessageCount?;
+};
+
+public type QueueProperties record {|
+    string topicName;
+    string status;
+    string userMetaData;
+|};
+
+public type TopicProperties record {|
+    string topicName;
+    string status;
+    string userMetaData;
+|};
+
+public type SubscriptionProperties record {|
+    string status;
+    string userMetaData;
+|};
+
 # Log levels
 public enum LogLevel {
     @display {label: "DEBUG"}
