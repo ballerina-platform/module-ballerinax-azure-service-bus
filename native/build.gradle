@@ -23,7 +23,7 @@ plugins {
     id 'jacoco'
 }
 
-description = 'Ballerina - Azure-service-bus Native'
+description = 'Ballerina - Azure Service Bus Native'
 
 configurations {
     jacocoRuntime
