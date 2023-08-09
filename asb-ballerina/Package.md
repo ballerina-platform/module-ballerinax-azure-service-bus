@@ -2,16 +2,19 @@ Connects to [Microsoft Azure Service Bus](https://docs.microsoft.com/en-us/java/
 
 ## Package overview
 
-The `ballerinax/asb` is a [Ballerina](https://ballerina.io/) connector for Microsoft Azure Service Bus.
+Azure Service Bus is an asynchronous messaging cloud platform that enables you to send and receive messages between decoupled systems. Microsoft offers this feature as a service, which means that you do not need to host any of your own hardware in order to use it.
 
-This package provides the capability to easily access Microsoft Azure Service Bus to send and receive messages. You can perform operations to send and receive messages from Service Bus queues, topics, and subscriptions, etc.
+Refer to [azure.com](https://azure.microsoft.com/services/service-bus/) to learn more about Service Bus.
+
+The `ballerinax/asb` is a [Ballerina](https://ballerina.io/) connector for Microsoft Azure Service Bus.
+his package offers usage and management capabilities for Azure Service Bus resources, including queues, topics, subscriptions, and rules.
 
 ### Compatibility
 
 |                            | Version               |
 |----------------------------|-----------------------|
 | Ballerina Language         | Swan Lake 2201.3.1    |
-| Azure Service Bus SDK      | 7.13.1                |
+| Azure Service Bus SDK      | 7.14.2                |
 
 ## Report issues
 

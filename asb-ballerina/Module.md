@@ -34,11 +34,6 @@ Before using this connector in your Ballerina application, complete the followin
   have [a service bus namespace](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-create-namespace-portal)
   , learn how to create your Service Bus namespace.
 
-* Create a messaging entity, such as a queue, topic or subscription. If you don't have these items, learn how to
-    * [Create a queue in the Azure portal](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-portal#create-a-queue-in-the-azure-portal)
-    * [Create a topic using the Azure portal](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-topics-subscriptions-portal#create-a-topic-using-the-azure-portal)
-    * [Create subscriptions to the topic](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-topics-subscriptions-portal#create-subscriptions-to-the-topic)
-
 * Obtain tokens
 
   Shared Access Signature (SAS) Authentication Credentials are required to communicate with the Azure Service Bus.

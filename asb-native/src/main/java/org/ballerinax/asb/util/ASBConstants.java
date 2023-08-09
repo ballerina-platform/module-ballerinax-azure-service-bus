@@ -97,4 +97,235 @@ public class ASBConstants {
 
     // Error constant fields
     static final String ASB_ERROR = "Error";
+
+    public static final String SUBSCRIPTION_CREATED_RECORD = "SubscriptionProperties";
+    public static final String TOPIC_CREATED_RECORD = "TopicProperties";
+    public static final String QUEUE_CREATED_RECORD = "QueueProperties";
+
+    // Create Queue Properties record fields : BString
+    public static final BString QUEUE_RECORD_FIELD_AUTO_DELETE_ON_IDLE =
+            StringUtils.fromString("autoDeleteOnIdle");
+    public static final BString QUEUE_RECORD_FIELD_DEFAULT_MESSAGE_TIME_TO_LIVE =
+            StringUtils.fromString("defaultMessageTimeToLive");
+    public static final BString QUEUE_RECORD_FIELD_DUPLICATE_DETECTION_HISTORY_TIME_WINDOW =
+            StringUtils.fromString("duplicateDetectionHistoryTimeWindow");
+    public static final BString QUEUE_RECORD_FIELD_FORWARD_DEAD_LETTERED_MESSAGES_TO =
+            StringUtils.fromString("forwardDeadLetteredMessagesTo");
+    public static final BString QUEUE_RECORD_FIELD_FORWARD_TO =
+            StringUtils.fromString("forwardTo");
+    public static final BString QUEUE_RECORD_FIELD_LOCK_DURATION =
+            StringUtils.fromString("lockDuration");
+    public static final BString QUEUE_RECORD_FIELD_MAX_DELIVERY_COUNT =
+            StringUtils.fromString("maxDeliveryCount");
+    public static final BString QUEUE_RECORD_FIELD_MAX_MESSAGE_SIZE_IN_KILOBYTES =
+            StringUtils.fromString("maxMessageSizeInKilobytes");
+    public static final BString QUEUE_RECORD_FIELD_MAX_SIZE_IN_MEGABYTES =
+            StringUtils.fromString("maxSizeInMegabytes");
+    public static final BString QUEUE_RECORD_FIELD_NAME =
+            StringUtils.fromString("name");
+    public static final BString QUEUE_RECORD_FIELD_STATUS =
+            StringUtils.fromString("status");
+    public static final BString QUEUE_RECORD_FIELD_USER_METADATA =
+            StringUtils.fromString("userMetadata");
+    public static final BString QUEUE_RECORD_FIELD_ENABLE_BATCHED_OPERATIONS =
+            StringUtils.fromString("enableBatchedOperations");
+    public static final BString QUEUE_RECORD_FIELD_DEAD_LETTERING_ON_MESSAGE_EXPIRATION =
+            StringUtils.fromString("deadLetteringOnMessageExpiration");
+    public static final BString QUEUE_RECORD_FIELD_REQUIRES_DUPLICATE_DETECTION =
+            StringUtils.fromString("requiresDuplicateDetection");
+    public static final BString QUEUE_RECORD_FIELD_ENABLE_PARTITIONING =
+            StringUtils.fromString("enablePartitioning");
+    public static final BString QUEUE_RECORD_FIELD_REQUIRE_SESSION =
+            StringUtils.fromString("requiresSession");
+
+    // Create Queue Properties SubField Duration Fields : BString
+    public static final BString DURATION_FIELD_SECONDS = StringUtils.fromString("seconds");
+    public static final BString DURATION_FIELD_NANOSECONDS = StringUtils.fromString("nanoseconds");
+
+    // Queue Properties record fields : String
+    public static final String CREATED_QUEUE_RECORD_FIELD_AUTO_DELETE_ON_IDLE =
+            "autoDeleteOnIdle";
+    public static final String CREATED_QUEUE_RECORD_FIELD_DEFAULT_MESSAGE_TIME_TO_LIVE =
+            "defaultMessageTimeToLive";
+    public static final String CREATED_QUEUE_RECORD_FIELD_DUPLICATE_DETECTION_HISTORY_TIME_WINDOW =
+            "duplicateDetectionHistoryTimeWindow";
+    public static final String CREATED_QUEUE_RECORD_FIELD_FORWARD_DEAD_LETTERED_MESSAGES_TO =
+            "forwardDeadLetteredMessagesTo";
+    public static final String CREATED_QUEUE_RECORD_FIELD_FORWARD_TO =
+            "forwardTo";
+    public static final String CREATED_QUEUE_RECORD_FIELD_MAX_DELIVERY_COUNT =
+            "maxDeliveryCount";
+    public static final String CREATED_QUEUE_RECORD_FIELD_MAX_MESSAGE_SIZE_IN_KILOBYTES =
+            "maxMessageSizeInKilobytes";
+    public static final String CREATED_QUEUE_RECORD_FIELD_MAX_SIZE_IN_MEGABYTES =
+            "maxSizeInMegabytes";
+    public static final String CREATED_QUEUE_RECORD_FIELD_NAME =
+            "name";
+    public static final String CREATED_QUEUE_RECORD_FIELD_STATUS =
+            "status";
+    public static final String CREATED_QUEUE_RECORD_FIELD_USER_METADATA =
+            "userMetadata";
+    public static final String CREATED_QUEUE_RECORD_FIELD_ENABLE_BATCHED_OPERATIONS =
+            "enableBatchedOperations";
+    public static final String CREATED_QUEUE_RECORD_FIELD_REQUIRES_DUPLICATE_DETECTION =
+            "requiresDuplicateDetection";
+    public static final String CREATED_QUEUE_RECORD_FIELD_ENABLE_PARTITIONING =
+            "enablePartitioning";
+    public static final String CREATED_QUEUE_RECORD_FIELD_REQUIRE_SESSION =
+            "requireSession";
+    public static final String CREATED_QUEUE_RECORD_FIELD_LOCK_DURATION =
+            "lockDuration";
+    public static final String CREATED_QUEUE_RECORD_FIELD_DEAD_LETTERING_ON_MESSAGE_EXPIRATION =
+            "deadLetteringOnMessageExpiration";
+
+    // Queue Properties SubField AuthRules record fields : String
+    public static final String CREATED_QUEUE_RECORD_FIELD_AUTHORIZATION_RULE = "AuthorizationRule";
+    public static final String CREATED_QUEUE_RECORD_FIELD_AUTHORIZATION_RULES_CLAIM_TYPE = "claimType";
+    public static final String CREATED_QUEUE_RECORD_FIELD_AUTHORIZATION_RULES_CLAIM_VALUE = "claimValue";
+    public static final String CREATED_QUEUE_RECORD_FIELD_AUTHORIZATION_RULES_ACCESS_RIGHTS = "accessRights";
+    public static final String CREATED_QUEUE_RECORD_FIELD_AUTHORIZATION_RULES_KEY_NAME = "keyName";
+    public static final String CREATED_QUEUE_RECORD_FIELD_AUTHORIZATION_RULES_MODIFIED_AT = "modifiedAt";
+    public static final String CREATED_QUEUE_RECORD_FIELD_AUTHORIZATION_RULES_CREATED_AT = "createdAt";
+    public static final String CREATED_QUEUE_RECORD_FIELD_AUTHORIZATION_RULES_PRIMARY_KEY = "primaryKey";
+    public static final String CREATED_QUEUE_RECORD_FIELD_AUTHORIZATION_RULES_SECONDARY_KEY = "secondaryKey";
+
+    // Queue Properties SubField Duration record fields : String
+    public static final String CREATED_QUEUE_RECORD_FIELD_DURATION = "Duration";
+    public static final String CREATED_QUEUE_RECORD_FIELD_DURATION_SECONDS = "seconds";
+    public static final String CREATED_QUEUE_RECORD_FIELD_DURATION_NANOSECONDS = "nanoseconds";
+
+    //Queue List
+    public static final String LIST_OF_QUEUES = "list";
+    public static final String LIST_OF_QUEUES_RECORD = "QueueList";
+
+    // Topic Options Record Fields to Create a Topic
+    public static final BString TOPIC_RECORD_FIELD_AUTO_DELETE_ON_IDLE =
+            StringUtils.fromString("autoDeleteOnIdle");
+    public static final BString TOPIC_RECORD_FIELD_DEFAULT_MESSAGE_TIME_TO_LIVE =
+            StringUtils.fromString("defaultMessageTimeToLive");
+    public static final BString TOPIC_RECORD_FIELD_DUPLICATE_DETECTION_HISTORY_TIME_WINDOW =
+            StringUtils.fromString("duplicateDetectionHistoryTimeWindow");
+    public static final BString TOPIC_RECORD_FIELD_LOCK_DURATION =
+            StringUtils.fromString("lockDuration");
+    public static final BString TOPIC_RECORD_FIELD_MAX_DELIVERY_COUNT =
+            StringUtils.fromString("maxDeliveryCount");
+    public static final BString TOPIC_RECORD_FIELD_MAX_MESSAGE_SIZE_IN_KILOBYTES =
+            StringUtils.fromString("maxMessageSizeInKilobytes");
+    public static final BString TOPIC_RECORD_FIELD_MAX_SIZE_IN_MEGABYTES =
+            StringUtils.fromString("maxSizeInMegabytes");
+    public static final BString TOPIC_RECORD_FIELD_STATUS =
+            StringUtils.fromString("status");
+    public static final BString TOPIC_RECORD_FIELD_USER_METADATA =
+            StringUtils.fromString("userMetadata");
+    public static final BString TOPIC_RECORD_FIELD_ENABLE_BATCHED_OPERATIONS =
+            StringUtils.fromString("enableBatchedOperations");
+    public static final BString TOPIC_RECORD_FIELD_REQUIRES_DUPLICATE_DETECTION =
+            StringUtils.fromString("requiresDuplicateDetection");
+    public static final BString TOPIC_RECORD_FIELD_ENABLE_PARTITIONING =
+            StringUtils.fromString("enablePartitioning");
+    public static final BString TOPIC_RECORD_FIELD_REQUIRE_SESSION =
+            StringUtils.fromString("requireSession");
+    public static final BString TOPIC_RECORD_FIELD_ENABLE_ORDERING_SUPPORT =
+            StringUtils.fromString("supportOrdering");
+
+    // Created Topic Properties Record Fields
+    public static final String CREATED_TOPIC_RECORD_FIELD_NAME = "name";
+    public static final String CREATED_TOPIC_RECORD_FIELD_AUTHORIZATION_RULES = "authorizationRules";
+    public static final String CREATED_TOPIC_RECORD_FIELD_AUTO_DELETE_ON_IDLE = "autoDeleteOnIdle";
+    public static final String CREATED_TOPIC_RECORD_FIELD_DEFAULT_MESSAGE_TIME_TO_LIVE =
+            "defaultMessageTimeToLive";
+    public static final String CREATED_TOPIC_RECORD_FIELD_DUPLICATE_DETECTION_HISTORY_TIME_WINDOW =
+            "duplicateDetectionHistoryTimeWindow";
+    public static final String CREATED_TOPIC_RECORD_FIELD_MAX_MESSAGE_SIZE_IN_KILOBYTES =
+            "maxMessageSizeInKilobytes";
+    public static final String CREATED_TOPIC_RECORD_FIELD_MAX_SIZE_IN_MEGABYTES = "maxSizeInMegabytes";
+    public static final String CREATED_TOPIC_RECORD_FIELD_STATUS = "status";
+    public static final String CREATED_TOPIC_RECORD_FIELD_USER_METADATA = "userMetadata";
+    public static final String CREATED_TOPIC_RECORD_FIELD_ENABLE_BATCHED_OPERATIONS =
+            "enableBatchedOperations";
+    public static final String CREATED_TOPIC_RECORD_FIELD_REQUIRES_DUPLICATE_DETECTION =
+            "requiresDuplicateDetection";
+    public static final String CREATED_TOPIC_RECORD_FIELD_ENABLE_PARTITIONING = "enablePartitioning";
+    public static final String CREATED_TOPIC_RECORD_FIELD_SUPPORT_ORDERING = "supportOrdering";
+
+    // Topic List
+    public static final String LIST_OF_TOPICS = "list";
+    public static final String LIST_OF_TOPICS_RECORD = "TopicList";
+
+    // Subscription Options Record Fields to Create a Subscription
+    public static final BString SUBSCRIPTION_RECORD_FIELD_AUTO_DELETE_ON_IDLE =
+            StringUtils.fromString("autoDeleteOnIdle");
+    public static final BString SUBSCRIPTION_RECORD_FIELD_DEFAULT_MESSAGE_TIME_TO_LIVE =
+            StringUtils.fromString("defaultMessageTimeToLive");
+    public static final BString SUBSCRIPTION_RECORD_FIELD_FORWARD_DEAD_LETTERED_MESSAGES_TO =
+            StringUtils.fromString("forwardDeadLetteredMessagesTo");
+    public static final BString SUBSCRIPTION_RECORD_FIELD_FORWARD_TO =
+            StringUtils.fromString("forwardTo");
+    public static final BString SUBSCRIPTION_RECORD_FIELD_LOCK_DURATION =
+            StringUtils.fromString("lockDuration");
+    public static final BString SUBSCRIPTION_RECORD_FIELD_MAX_DELIVERY_COUNT =
+            StringUtils.fromString("maxDeliveryCount");
+    public static final BString SUBSCRIPTION_RECORD_FIELD_STATUS =
+            StringUtils.fromString("status");
+    public static final BString SUBSCRIPTION_RECORD_FIELD_ENABLE_BATCHED_OPERATIONS =
+            StringUtils.fromString("enableBatchedOperations");
+    public static final BString SUBSCRIPTION_RECORD_FIELD_DEFAULT_RULE =
+            StringUtils.fromString("defaultRule");
+    public static final BString SUBSCRIPTION_RECORD_FIELD_DEAD_LETTERING_ON_MESSAGE_EXPIRATION =
+            StringUtils.fromString("deadLetteringOnMessageExpiration");
+    public static final BString SUBSCRIPTION_RECORD_FIELD_DEAD_LETTERING_ON_FILTER_EVALUATION_EXCEPTIONS =
+            StringUtils.fromString("deadLetteringOnFilterEvaluationExceptions");
+    public static final BString SUBSCRIPTION_RECORD_FIELD_USER_METADATA =
+            StringUtils.fromString("userMetadata");
+    public static final BString SUBSCRIPTION_RECORD_FIELD_SESSION_REQUIRED =
+            StringUtils.fromString("requiresSession");
+
+    //Subscription Properties Record Fields
+    public static final String CREATED_SUBSCRIPTION_RECORD_FIELD_AUTO_DELETE_ON_IDLE =
+            "autoDeleteOnIdle";
+    public static final String CREATED_SUBSCRIPTION_RECORD_FIELD_DEFAULT_MESSAGE_TIME_TO_LIVE =
+            "defaultMessageTimeToLive";
+    public static final String CREATED_SUBSCRIPTION_RECORD_FIELD_FORWARD_DEAD_LETTERED_MESSAGES_TO =
+            "forwardDeadLetteredMessagesTo";
+    public static final String CREATED_SUBSCRIPTION_RECORD_FIELD_FORWARD_TO =
+            "forwardTo";
+    public static final String CREATED_SUBSCRIPTION_RECORD_FIELD_LOCK_DURATION =
+            "lockDuration";
+    public static final String CREATED_SUBSCRIPTION_RECORD_FIELD_MAX_DELIVERY_COUNT =
+            "maxDeliveryCount";
+    public static final String CREATED_SUBSCRIPTION_RECORD_FIELD_STATUS =
+            "status";
+    public static final String CREATED_SUBSCRIPTION_RECORD_FIELD_SUBSCRIPTION_NAME =
+            "subscriptionName";
+    public static final String CREATED_SUBSCRIPTION_RECORD_FIELD_TOPIC_NAME =
+            "topicName";
+    public static final String CREATED_SUBSCRIPTION_RECORD_FIELD_USER_METADATA =
+            "userMetadata";
+    public static final String CREATED_SUBSCRIPTION_RECORD_FIELD_ENABLE_BATCHED_OPERATIONS =
+            "enableBatchedOperations";
+    public static final String CREATED_SUBSCRIPTION_RECORD_FIELD_DEAD_LETTERING_ON_MESSAGE_EXPIRATION =
+            "deadLetteringOnMessageExpiration";
+    public static final String CREATED_SUBSCRIPTION_RECORD_FIELD_DEAD_LETTERING_ON_FILTER_EVALUATION_EXCEPTIONS =
+            "deadLetteringOnFilterEvaluationExceptions";
+    public static final String CREATED_SUBSCRIPTION_RECORD_FIELD_SESSION_REQUIRED =
+            "requiresSession";
+    // Subscription List
+    public static final String LIST_OF_SUBSCRIPTIONS = "list";
+    public static final String LIST_OF_SUBSCRIPTIONS_RECORD = "SubscriptionList";
+
+    // Rule Options Record Fields to Create a Rule
+    public static final BString RECORD_FIELD_SQL_RULE = StringUtils.fromString("rule");
+    public static final BString RECORD_FIELD_ACTION = StringUtils.fromString("action");
+    public static final BString RECORD_FIELD_FILTER = StringUtils.fromString("filter");
+
+    // Rule Properties Record Fields
+    public static final String CREATED_RULE_RECORD = "RuleProperties";
+    public static final String CREATED_RULE_RECORD_FIELD_NAME = "name";
+    public static final String CREATED_RULE_RECORD_FIELD = "SqlRule";
+    public static final String CREATED_RULE_RECORD_FIELD_TYPE_NAME = "rule";
+    public static final String CREATED_RULE_RECORD_FIELD_ACTION = "action";
+    public static final String CREATED_RULE_RECORD_FIELD_FILTER = "filter";
+    // Rule List
+    public static final String LIST_OF_RULES = "list";
+    public static final String LIST_OF_RULES_RECORD = "RuleList";
 }
