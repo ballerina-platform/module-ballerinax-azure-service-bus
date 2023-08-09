@@ -305,7 +305,7 @@ public class MessageReceiver {
             ServiceBusReceivedMessage message = (ServiceBusReceivedMessage) endpointClient
                     .getNativeData(lockToken.getValue());
             receiver.abandon(message);
-            LOGGER.debug(String.format("Done abandoning a message(Id: %s) using its lock token from \n%s",
+            LOGGER.debug(String.format("Done abandoning a message(Id: %s) using its lock token from %n%s",
                     message.getMessageId(), receiver.getEntityPath()));
             return null;
         } catch (BError e) {
