@@ -43,6 +43,7 @@ import org.ballerinax.asb.util.ASBUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -240,9 +241,9 @@ public class MessageSender {
         byte[] byteArray;
         Type type = TypeUtils.getType(messageBody);
         if (type.getTag() == TypeTags.STRING_TAG) {
-            byteArray = ((BString) messageBody).getValue().getBytes();
+            byteArray = ((BString) messageBody).getValue().getBytes(StandardCharsets.UTF_8);
         } else if (type.getTag() == TypeTags.INT_TAG) {
-            byteArray = Integer.toString((int) messageBody).getBytes();
+            byteArray = Integer.toString((int) messageBody).getBytes(StandardCharsets.UTF_8);
         } else {
             byteArray = ((BArray) messageBody).getBytes();
         }

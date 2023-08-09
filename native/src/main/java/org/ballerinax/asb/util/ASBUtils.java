@@ -89,9 +89,6 @@ public class ASBUtils {
                 Object value = map.get(aKey);
                 String classType = value.getClass().getName();
                 switch (classType) {
-                    case "java.lang.String":
-                        envMap.put(StringUtils.fromString(aKey.toString()), StringUtils.fromString(value.toString()));
-                        break;
                     case "java.lang.Integer":
                         envMap.put(StringUtils.fromString(aKey.toString()), (Integer) value);
                         break;
@@ -165,11 +162,8 @@ public class ASBUtils {
                 classType = value.getClass().getName();
                 key = aKey.toString();
                 switch (classType) {
-                    case "BmpStringValue":
-                        returnMap.put(key, value.toString());
-                        break;
                     case "java.lang.Long":
-                        returnMap.put(key, value);
+                        returnMap.put(key, (Long) value);
                         break;
                     case "java.lang.Integer":
                         returnMap.put(key, (Integer) value);
@@ -364,24 +358,27 @@ public class ASBUtils {
         return intendedValue;
     }
 
-    private static boolean hasStringType(UnionType type) {
-        return type.getMemberTypes().stream().anyMatch(memberType -> memberType.getTag() == STRING_TAG);
-    }
-
     /**
      * Checks whether the given type is a union type of two member types, including the nil type.
      *
      * @param type Type to be checked
      * @return True if the given type is a union type of two member types, including nil type.
      */
-    private static boolean isSupportedUnionType(Type type) {
-        return type.getTag() == UNION_TAG
-                && ((UnionType) type).getMemberTypes().size() == 2
-                && ((UnionType) type).getMemberTypes().stream().anyMatch(memberType -> memberType.getTag() == NULL_TAG);
-    }
+        private static boolean isSupportedUnionType(Type type) {
+            if (type.getTag() != UNION_TAG) {
+                return false;
+            }
+            UnionType unionType = (UnionType) type;
+            return unionType.getMemberTypes().size() == 2
+                    && unionType.getMemberTypes().stream().anyMatch(memberType -> memberType.getTag() == NULL_TAG);
+        }
 
     public static Type getExpectedTypeFromNilableType(Type type) {
-        return ((UnionType) type).getMemberTypes().stream()
+        if (!(type instanceof UnionType)) {
+            return null;
+        }
+        UnionType unionType = (UnionType) type;
+        return unionType.getMemberTypes().stream()
                 .filter(memberType -> memberType.getTag() != NULL_TAG)
                 .findFirst()
                 .orElse(null);
