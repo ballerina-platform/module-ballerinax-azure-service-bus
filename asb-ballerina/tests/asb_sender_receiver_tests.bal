@@ -36,7 +36,6 @@ json jsonContent = {name: "wso2", color: "orange", price: 5.36d};
 byte[] byteContentFromJson = jsonContent.toJsonString().toBytes();
 xml xmlContent = xml `<name>wso2</name>`;
 
-
 map<anydata> properties = {a: "propertyValue1", b: "propertyValue2", c: 1, d: "true", f: 1.345, s: false, k: 1020202, g: jsonContent};
 int timeToLive = 60; // In seconds
 int serverWaitTime = 60; // In seconds
@@ -77,9 +76,10 @@ ASBServiceReceiverConfig receiverConfig = {
     },
     receiveMode: PEEK_LOCK
 };
+
 @test:Config {
     groups: ["asb_sender_receiver"],
-    dependsOn: [testQueueExists,testCreateTopicOperation],
+    dependsOn: [testCreateSubscription],
     enable: true
 }
 function testSendAndReceiveMessageFromQueueOperation() returns error? {
@@ -183,7 +183,7 @@ function testSendAndReceiveMessagePayloadFromQueueOperation() returns error? {
 
 @test:Config {
     groups: ["asb_sender_receiver"],
-    dependsOn: [testSendAndReceiveMessageFromQueueOperation],
+    dependsOn: [testSendAndReceiveMessagePayloadFromQueueOperation],
     enable: true
 }
 function testSendAndReceiveBatchFromQueueOperation() returns error? {
@@ -387,10 +387,11 @@ function testDeferMessageFromQueueOperation() returns error? {
     log:printInfo("Closing Asb receiver client.");
     check messageReceiver->close();
 }
+
 @test:Config {
     groups: ["asb_sender_receiver"],
     dependsOn: [testDeferMessageFromQueueOperation],
-    enable: false
+    enable: true
 }
 function testSendAndReceiveMessageFromSubscriptionOperation() returns error? {
     log:printInfo("[[testSendAndReceiveMessageFromSubscriptionOperation]]");
@@ -432,7 +433,7 @@ function testSendAndReceiveMessageFromSubscriptionOperation() returns error? {
 
 @test:Config {
     groups: ["asb_sender_receiver"],
-    dependsOn: [testDeferMessageFromQueueOperation],
+    dependsOn: [testSendAndReceiveMessageFromSubscriptionOperation],
     enable: true
 }
 function testSendAndReceiveBatchFromSubscriptionOperation() returns error? {
@@ -630,10 +631,10 @@ function testDeferMessageFromSubscriptionOperation() returns error? {
 @test:Config {
     groups: ["asb_sender_receiver"],
     dependsOn: [testDeferMessageFromSubscriptionOperation],
-    enable: false
+    enable: true
 }
 function testMessageScheduling() returns error? {
-
+    log:printInfo("[[testMessageScheduling]]");
     MessageSender topicSender;
     MessageReceiver subscriptionReceiver;
 
@@ -678,6 +679,7 @@ function testMessageScheduling() returns error? {
         return error("Error while executing test testMessageScheduling", e);
     }
 }
+
 @test:AfterEach
 function afterEach() {
     // Restore sender and receiver configurations after each test, as they are modified by some of the tests.

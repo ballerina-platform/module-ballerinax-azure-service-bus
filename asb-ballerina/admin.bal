@@ -58,7 +58,7 @@ public isolated client class ASBAdministration {
     # + topicOptions - Topic options to update the topic.This should be a record of type UpdateTopicOptions
     # + return - Topic properties(Type of asb:TopicProperies) or error
     @display {label: "Update Topics"}
-    isolated remote function updateTopic(@display {label: "Topic"} string topicName, @display {label: "Update Topic Options"} UpdateTopicOptions topicOptions) returns TopicProperties|Error? =@java:Method {
+    isolated remote function updateTopic(@display {label: "Topic"} string topicName, @display {label: "Update Topic Options"} *UpdateTopicOptions topicOptions) returns TopicProperties|Error? =@java:Method {
         'class: "org.ballerinax.asb.admin.ASBAdministration"
     } external;
     # List the topics.
@@ -102,7 +102,7 @@ public isolated client class ASBAdministration {
     # + subscriptionOptions - Subscription options to update the subscription.This should be a record of type UpdateSubscriptionOptions.
     # + return - Subscription properties(Type of asb:SubscriptionProperies) or error
     @display {label: "Update Subscription"}
-    isolated remote function updateSubscription(@display {label: "Topic"} string topicName, @display {label: "Subscription"} string subscriptionName, @display {label: "Update Subscription Options"} UpdateSubscriptionOptions subscriptionOptions) returns SubscriptionProperties|Error? =@java:Method {
+    isolated remote function updateSubscription(@display {label: "Topic"} string topicName, @display {label: "Subscription"} string subscriptionName, @display {label: "Update Subscription Options"} *UpdateSubscriptionOptions subscriptionOptions) returns SubscriptionProperties|Error? =@java:Method {
         'class: "org.ballerinax.asb.admin.ASBAdministration"
     } external;
     # List the subscriptions.
@@ -168,7 +168,7 @@ public isolated client class ASBAdministration {
     # + ruleOptions - Rule options to update the rule.This should be a record of type UpdateRuleOptions
     # + return - Rule properties(Type of asb:RuleProperies) or error
     @display {label: "Update Rule"}
-    isolated remote function updateRule(@display {label: "Topic"} string topicName, @display {label: "Subscription"} string subscriptionName, @display {label: "Rule"} string ruleName, @display {label: "Update Rule Options"} UpdateRuleOptions ruleOptions) returns RuleProperties|Error? =@java:Method {
+    isolated remote function updateRule(@display {label: "Topic"} string topicName, @display {label: "Subscription"} string subscriptionName, @display {label: "Rule"} string ruleName, @display {label: "Update Rule Options"} *UpdateRuleOptions ruleOptions) returns RuleProperties|Error? =@java:Method {
         'class: "org.ballerinax.asb.admin.ASBAdministration"
     } external;
     # List the rules.
@@ -213,7 +213,7 @@ public isolated client class ASBAdministration {
     # + queueOptions - Queue options to update the queue.This should be a record of type UpdateQueueOptions
     # + return - Queue properties(Type of asb:QueueProperties) or error
     @display {label: "Update Queue"}
-    isolated remote function updateQueue(@display {label: "Queue"} string queueName, @display {label: "Update Queue Options"} UpdateQueueOptions queueOptions) returns QueueProperties|Error? =@java:Method {
+    isolated remote function updateQueue(@display {label: "Queue"} string queueName, @display {label: "Update Queue Options"} *UpdateQueueOptions queueOptions) returns QueueProperties|Error? =@java:Method {
         'class: "org.ballerinax.asb.admin.ASBAdministration"
     } external;
     # List the queues.
