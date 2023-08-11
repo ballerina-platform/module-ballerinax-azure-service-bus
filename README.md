@@ -2,6 +2,8 @@ Ballerina Azure Service Bus Connector
 ===================
 
 [![Build](https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/workflows/CI/badge.svg)](https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/actions?query=workflow%3ACI)
+[![codecov](https://codecov.io/gh/ballerina-platform/module-ballerinax-azure-service-bus/branch/main/graph/badge.svg)](https://codecov.io/gh/ballerina-platform/module-ballerinax-azure-service-bus)
+[![Trivy](https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/actions/workflows/trivy-scan.yml/badge.svg)](https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/actions/workflows/trivy-scan.yml)
 [![GitHub Last Commit](https://img.shields.io/github/last-commit/ballerina-platform/module-ballerinax-azure-service-bus.svg)](https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/commits/master)
 [![GraalVM Check](https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/actions/workflows/build-with-bal-test-native.yml/badge.svg)](https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/actions/workflows/build-with-bal-test-native.yml)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
@@ -18,7 +20,7 @@ from subscription, etc.
 
 For more information, go to the module(s).
 
-- [asb](asb-ballerina/Module.md)
+- [asb](ballerina/Module.md)
 
 ## Building from the source
 
@@ -44,14 +46,14 @@ Execute the commands below to build from the source.
 ```
 
 2. To build the Ballerina package:
-   Change the current directory to the asb-ballerina home directory and execute the following command.
+   Change the current directory to the ballerina home directory and execute the following command.
 
 ```shell script
     bal pack
 ```
 
 3. To run the tests after build:
-   Change the current directory to the asb-ballerina home directory and execute the following command.
+   Change the current directory to the ballerina home directory and execute the following command.
 
 ```shell script
     bal test

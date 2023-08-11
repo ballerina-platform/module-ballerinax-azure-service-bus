@@ -1,9 +1,4 @@
-# This is a basic workflow to help you get started with Actions
-
 name: CI
-
-# Controls when the action will run.
-# Triggers the workflow on push.
 on:
   push:
     branches-ignore:
@@ -13,16 +8,11 @@ on:
     types:
       check_connector_for_breaking_changes
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
       # Set up Java Environment
@@ -30,6 +20,12 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
+
+      # Setup Ballerina Environment
+      - name: Set Up Ballerina
+        uses: ballerina-platform/setup-ballerina@v1.1.0
+        with:
+          version: latest
 
       # Grant execute permission to the gradlew script
       - name: Grant execute permission for gradlew
@@ -42,23 +38,17 @@ jobs:
           packagePAT: ${{ secrets.BALLERINA_BOT_TOKEN }}
           JAVA_OPTS: -DBALLERINA_DEV_COMPILE_BALLERINA_ORG=true
         run: |
-          ./gradlew build
-        
+          ./gradlew build -x test
+
       # Build Ballerina Project
       - name: Ballerina Build
-        uses: ballerina-platform/ballerina-action/@nightly
-        with:
-          args:
-            pack ./asb-ballerina
+        run: bal pack ./ballerina
         env:
           JAVA_HOME: /usr/lib/jvm/default-jvm
       
       # Test Ballerina Project
       - name: Ballerina Test
-        uses: ballerina-platform/ballerina-action/@nightly
-        with:
-          args:
-            test --code-coverage ./asb-ballerina
+        run: bal test --test-report --code-coverage --coverage-format=xml ./ballerina
         env:
           JAVA_HOME: /usr/lib/jvm/default-jvm
           CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
@@ -68,22 +58,8 @@ jobs:
           SUBSCRIPTION_NAME2: ${{ secrets.SUBSCRIPTION_NAME2 }}
           SUBSCRIPTION_NAME3: ${{ secrets.SUBSCRIPTION_NAME3 }}
 
-      # Read the ballerina test results
-      - name: Read Ballerina Test Results
-        id: test_results
-        run: |
-          content=`cat ./asb-ballerina/target/report/test_results.json`                
-          content="${content//'%'/'%25'}"
-          content="${content//$'\n'/'%0A'}"
-          content="${content//$'\r'/'%0D'}"
-          echo "::set-output name=testResultsJson::$content"
-
-      # Print the code coverage information
-      - name: Code Coverage
-        run: |
-          echo "Covered Code Lines : ${{fromJson(steps.test_results.outputs.testResultsJson).coveredLines}}"
-          echo "Total Code Lines : $(expr ${{fromJson(steps.test_results.outputs.testResultsJson).missedLines}} + ${{fromJson(steps.test_results.outputs.testResultsJson).coveredLines}})"
-          echo "Code Coverage Percentage : ${{fromJson(steps.test_results.outputs.testResultsJson).coveragePercentage}}"
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
 
       - name: Alert notifier on failure
         if: failure() && (github.event.action == 'check_connector_for_breaking_changes')

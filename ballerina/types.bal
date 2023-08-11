@@ -109,18 +109,18 @@ public type ApplicationProperties record {|
 # Configurations used to create an `asb:Connection`.
 #
 # + connectionString - Service bus connection string with Shared Access Signatures  
-# ConnectionString format: 
-# Endpoint=sb://namespace_DNS_Name;EntityPath=EVENT_HUB_NAME;
-# SharedAccessKeyName=SHARED_ACCESS_KEY_NAME;SharedAccessKey=SHARED_ACCESS_KEY or  
-# Endpoint=sb://namespace_DNS_Name;EntityPath=EVENT_HUB_NAME;
-# SharedAccessSignatureToken=SHARED_ACCESS_SIGNATURE_TOKEN 
-# + entityConfig - This field holds the configuration details of either a topic or a queue. The type of the entity is 
-# determined by the entityType field. The actual configuration details are stored in either a 
-# TopicSubsConfig or a QueueConfig record  
+#                      ConnectionString format:
+#                      Endpoint=sb://namespace_DNS_Name;EntityPath=EVENT_HUB_NAME;
+#                      SharedAccessKeyName=SHARED_ACCESS_KEY_NAME;SharedAccessKey=SHARED_ACCESS_KEY or
+#                      Endpoint=sb://namespace_DNS_Name;EntityPath=EVENT_HUB_NAME;
+#                      SharedAccessSignatureToken=SHARED_ACCESS_SIGNATURE_TOKEN
+# + entityConfig -  This field holds the configuration details of either a topic or a queue. The type of the entity is
+#                   determined by the entityType field. The actual configuration details are stored in either a
+#                   TopicSubsConfig or a QueueConfig record
 # + receiveMode - This field holds the receive modes(RECEIVE_AND_DELETE/PEEK_LOCK) for the connection. The receive mode determines how messages are 
 # retrieved from the entity. The default value is PEEK_LOCK  
 # + maxAutoLockRenewDuration - Max lock renewal duration under PEEK_LOCK mode in seconds. Setting to 0 disables auto-renewal. 
-# For RECEIVE_AND_DELETE mode, auto-renewal is disabled. Default 300 seconds.
+#                              For RECEIVE_AND_DELETE mode, auto-renewal is disabled. Default 300 seconds.
 # + amqpRetryOptions - Retry configurations related to underlying AMQP message receiver
 @display {label: "Receiver Connection Config"}
 public type ASBServiceReceiverConfig record {
@@ -204,7 +204,7 @@ public type QueueConfig record {
 # Holds the configuration details needed to create a sender connection to Azure Service Bus
 #
 # + entityType - An enumeration value of type EntityType, which specifies whether the connection is for a topic or a queue. 
-# The valid values are TOPIC and QUEUE  
+#                The valid values are TOPIC and QUEUE
 # + topicOrQueueName - A string field that holds the name of the topic or queue
 # + connectionString - A string field that holds the Service Bus connection string with Shared Access Signatures.
 # + amqpRetryOptions - Retry configurations related to underlying AMQP message sender
@@ -227,8 +227,6 @@ public type CustomConfiguration record {
     @display {label: "Log Level"}
     LogLevel logLevel = OFF;
 };
-
-
 
 # Message entity types
 public enum EntityType {
@@ -271,14 +269,14 @@ public type SqlRule record {
     string action;
 };
 # Create Rule Options
-# 
+#
 # + rule - Represents a SQL filter which is a composition of an expression and an action that is executed in the pub/sub pipeline.
 public type CreateRuleOptions record {
     SqlRule rule?;
 };
 
 # Rule Properties
-# 
+#
 # + rule - Represents a SQL filter which is a composition of an expression and an action that is executed in the pub/sub pipeline.
 # + name - The name of the rule.
 public type RuleProperties record {
@@ -287,21 +285,21 @@ public type RuleProperties record {
 };
 
 # Update Rule Options
-#   
+#
 # + rule - Represents a SQL filter which is a composition of an expression and an action that is executed in the pub/sub pipeline.
 public type UpdateRuleOptions record {
     SqlRule rule?;
 };
 
 # Rule List
-#   
+#
 # + list - The list of rules.
 public type RuleList record {
     RuleProperties[] list;
 };
 ############################################################
 # Create Subscription Options
-# 
+#
 # + autoDeleteOnIdle - ISO 8601 timeSpan idle interval after which the subscription is automatically deleted.
 # + enableBatchedOperations - Value that indicates whether server-side batched operations are enabled.
 # + deadLetteringOnMessageExpiration - Value that indicates whether this subscription has dead letter support when a message expires.
@@ -339,9 +337,9 @@ public type CreateSubscriptionOptions record {
     EntityStatus status?;
     @display {label:"User Metadata"}
     string userMetadata?;
-}; 
+};
 # SubscriptionProperties
-# 
+#
 # + autoDeleteOnIdle - ISO 8601 timeSpan idle interval after which the subscription is automatically deleted.
 # + defaultMessageTimeToLive - ISO 8601 default message timespan to live value.
 # + forwardDeadLetteredMessagesTo - The name of the recipient entity to which all the messages sent to the subscription are forwarded to.
@@ -387,7 +385,7 @@ public type SubscriptionProperties record {
     boolean requiresSession;
 };
 # Update Subscription Options
-# 
+#
 # + autoDeleteOnIdle - ISO 8601 timeSpan idle interval after which the subscription is automatically deleted.
 # + defaultMessageTimeToLive - ISO 8601 default message timespan to live value.
 # + deadLetteringOnMessageExpiration - Value that indicates whether this subscription has dead letter support when a message expires.
@@ -424,16 +422,16 @@ public type UpdateSubscriptionOptions record {
     string userMetadata?;
 };
 # Subscription List
-# 
+#
 # + list - The list of subscriptions.
 public type SubscriptionList record {
     SubscriptionProperties[] list;
 };
-# 
+#
 ############################################################
-# 
+#
 # TopicProperties
-# 
+#
 # + name - The name of the topic to create.
 # + authorizationRules - Authorization rules for resource.
 # + autoDeleteOnIdle - ISO 8601 timeSpan idle interval after which the queue is automatically deleted. The minimum duration is 5 minutes.
@@ -477,7 +475,7 @@ public type TopicProperties record {
 };
 
 # Create Topic Options
-# 
+#
 # + autoDeleteOnIdle - ISO 8601 timeSpan idle interval after which the queue is automatically deleted. The minimum duration is 5 minutes.
 # + defaultMessageTimeToLive - ISO 8601 default message timespan to live value. This is the duration after which the message expires, starting from when the message is sent to Service Bus.
 # + duplicateDetectionHistoryTimeWindow - ISO 8601 timeSpan structure that defines the duration of the duplicate detection history. The default value is 10 minutes.
@@ -526,7 +524,7 @@ public type CreateTopicOptions record {
     boolean supportOrdering?;
 };
 # Upadate Topic Propertise
-# 
+#
 # + autoDeleteOnIdle - ISO 8601 timeSpan idle interval after which the queue is automatically deleted. The minimum duration is 5 minutes.
 # + defaultMessageTimeToLive - ISO 8601 default message timespan to live value. This is the duration after which the message expires, starting from when the message is sent to Service Bus.
 # + duplicateDetectionHistoryTimeWindow - ISO 8601 timeSpan structure that defines the duration of the duplicate detection history. The default value is 10 minutes.
@@ -572,7 +570,7 @@ public type UpdateTopicOptions record {
     boolean supportOrdering?;
 };
 # Topic List
-# 
+#
 # + list - The list of topics.
 public type TopicList record {
     TopicProperties[] list;
@@ -580,7 +578,7 @@ public type TopicList record {
 
 ############################################################
 # # QueueProperties
-# 
+#
 # + authorizationRules - Authorization rules for resource.
 # + autoDeleteOnIdle - ISO 8601 timeSpan idle interval after which the queue is automatically deleted. The minimum duration is 5 minutes.
 # + defaultMessageTimeToLive - ISO 8601 default message timespan to live value. This is the duration after which the message expires, starting from when the message is sent to Service Bus.
@@ -638,7 +636,7 @@ public type QueueProperties record {
     boolean requiresSession;
 };
 # Create Queue Options
-# 
+#
 # + autoDeleteOnIdle - ISO 8601 timeSpan idle interval after which the queue is automatically deleted. The minimum duration is 5 minutes.
 # + defaultMessageTimeToLive - ISO 8601 default message timespan to live value. This is the duration after which the message expires, starting from when the message is sent to Service Bus.
 # + duplicateDetectionHistoryTimeWindow - ISO 8601 timeSpan structure that defines the duration of the duplicate detection history. The default value is 10 minutes.
@@ -690,7 +688,7 @@ public type CreateQueueOptions record {
     boolean requiresSession?;
 };
 # Update Queue Options
-# 
+#
 # + autoDeleteOnIdle - ISO 8601 timeSpan idle interval after which the queue is automatically deleted. The minimum duration is 5 minutes.
 # + defaultMessageTimeToLive - ISO 8601 default message timespan to live value. This is the duration after which the message expires, starting from when the message is sent to Service Bus.
 # + duplicateDetectionHistoryTimeWindow - ISO 8601 timeSpan structure that defines the duration of the duplicate detection history. The default value is 10 minutes.
@@ -742,13 +740,13 @@ public type UpdateQueueOptions record {
     boolean requiresSession?;
 };
 # Queue List
-# 
+#
 # + list - The list of queues.
 public type QueueList record {
     QueueProperties[] list;
 };
 # Duration
-# 
+#
 # + seconds - Seconds
 # + nanoseconds - Nanoseconds
 public type Duration record {
@@ -818,6 +816,3 @@ public enum EntityStatus {
     @display {label: "UNKNOWN"}
     UNKNOWN = "Unknown"
 };
-
-
-

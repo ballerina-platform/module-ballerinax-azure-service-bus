@@ -17,6 +17,7 @@
  */
 
 package org.ballerinax.asb.util;
+
 import com.azure.core.amqp.AmqpRetryMode;
 import com.azure.core.amqp.AmqpRetryOptions;
 import com.azure.messaging.servicebus.administration.models.CreateQueueOptions;
@@ -63,7 +64,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-
 import static io.ballerina.runtime.api.TypeTags.ANYDATA_TAG;
 import static io.ballerina.runtime.api.TypeTags.ARRAY_TAG;
 import static io.ballerina.runtime.api.TypeTags.BYTE_TAG;
@@ -73,6 +73,11 @@ import static io.ballerina.runtime.api.TypeTags.STRING_TAG;
 import static io.ballerina.runtime.api.TypeTags.UNION_TAG;
 import static io.ballerina.runtime.api.TypeTags.XML_TAG;
 import static io.ballerina.runtime.api.utils.TypeUtils.getReferredType;
+import static org.ballerinax.asb.util.ASBConstants.DELAY;
+import static org.ballerinax.asb.util.ASBConstants.MAX_DELAY;
+import static org.ballerinax.asb.util.ASBConstants.MAX_RETRIES;
+import static org.ballerinax.asb.util.ASBConstants.RETRY_MODE;
+import static org.ballerinax.asb.util.ASBConstants.TRY_TIMEOUT;
 
 /**
  * Utility class for Azure Service Bus.
@@ -95,9 +100,6 @@ public class ASBUtils {
                 Object value = map.get(aKey);
                 String classType = value.getClass().getName();
                 switch (classType) {
-                    case "java.lang.String":
-                        envMap.put(StringUtils.fromString(aKey.toString()), StringUtils.fromString(value.toString()));
-                        break;
                     case "java.lang.Integer":
                         envMap.put(StringUtils.fromString(aKey.toString()), (Integer) value);
                         break;
@@ -171,11 +173,8 @@ public class ASBUtils {
                 classType = value.getClass().getName();
                 key = aKey.toString();
                 switch (classType) {
-                    case "BmpStringValue":
-                        returnMap.put(key, value.toString());
-                        break;
                     case "java.lang.Long":
-                        returnMap.put(key, value);
+                        returnMap.put(key, (Long) value);
                         break;
                     case "java.lang.Integer":
                         returnMap.put(key, (Integer) value);
@@ -223,11 +222,11 @@ public class ASBUtils {
     }
 
     public static AmqpRetryOptions getRetryOptions(BMap<BString, Object> retryConfigs) {
-        Long maxRetries = retryConfigs.getIntValue(ASBConstants.MAX_RETRIES);
-        BigDecimal delayConfig = ((BDecimal) retryConfigs.get(ASBConstants.DELAY)).decimalValue();
-        BigDecimal maxDelay = ((BDecimal) retryConfigs.get(ASBConstants.MAX_DELAY)).decimalValue();
-        BigDecimal tryTimeout = ((BDecimal) retryConfigs.get(ASBConstants.TRY_TIMEOUT)).decimalValue();
-        String retryMode = retryConfigs.getStringValue(ASBConstants.RETRY_MODE).getValue();
+        Long maxRetries = retryConfigs.getIntValue(MAX_RETRIES);
+        BigDecimal delayConfig = ((BDecimal) retryConfigs.get(DELAY)).decimalValue();
+        BigDecimal maxDelay = ((BDecimal) retryConfigs.get(MAX_DELAY)).decimalValue();
+        BigDecimal tryTimeout = ((BDecimal) retryConfigs.get(TRY_TIMEOUT)).decimalValue();
+        String retryMode = retryConfigs.getStringValue(RETRY_MODE).getValue();
         return new AmqpRetryOptions()
                 .setMaxRetries(maxRetries.intValue())
                 .setDelay(Duration.ofSeconds(delayConfig.intValue()))
@@ -235,6 +234,7 @@ public class ASBUtils {
                 .setTryTimeout(Duration.ofSeconds(tryTimeout.intValue()))
                 .setMode(AmqpRetryMode.valueOf(retryMode));
     }
+
     public static RecordType getRecordType(BTypedesc bTypedesc) {
         RecordType recordType;
         if (bTypedesc.getDescribingType().isReadOnly()) {
@@ -856,24 +856,27 @@ public class ASBUtils {
         return intendedValue;
     }
 
-    private static boolean hasStringType(UnionType type) {
-        return type.getMemberTypes().stream().anyMatch(memberType -> memberType.getTag() == STRING_TAG);
-    }
-
     /**
      * Checks whether the given type is a union type of two member types, including the nil type.
      *
      * @param type Type to be checked
      * @return True if the given type is a union type of two member types, including nil type.
      */
-    private static boolean isSupportedUnionType(Type type) {
-        return type.getTag() == UNION_TAG
-                && ((UnionType) type).getMemberTypes().size() == 2
-                && ((UnionType) type).getMemberTypes().stream().anyMatch(memberType -> memberType.getTag() == NULL_TAG);
-    }
+        private static boolean isSupportedUnionType(Type type) {
+            if (type.getTag() != UNION_TAG) {
+                return false;
+            }
+            UnionType unionType = (UnionType) type;
+            return unionType.getMemberTypes().size() == 2
+                    && unionType.getMemberTypes().stream().anyMatch(memberType -> memberType.getTag() == NULL_TAG);
+        }
 
     public static Type getExpectedTypeFromNilableType(Type type) {
-        return ((UnionType) type).getMemberTypes().stream()
+        if (!(type instanceof UnionType)) {
+            return null;
+        }
+        UnionType unionType = (UnionType) type;
+        return unionType.getMemberTypes().stream()
                 .filter(memberType -> memberType.getTag() != NULL_TAG)
                 .findFirst()
                 .orElse(null);
