@@ -105,6 +105,7 @@ public class ASBAdministration {
                 topicProp = clientEp.createTopic(topicName.toString(),
                         ASBUtils.getCreateTopicPropertiesFromBObject(topicProperties));
             }
+            LOGGER.debug("Created topic successfully with name: " + topicProp.getName());
             return constructTopicCreatedRecord(topicProp);
         } catch (BError e) {
             return ASBErrorCreator.fromBError(e);
@@ -125,6 +126,7 @@ public class ASBAdministration {
         ServiceBusAdministrationClient clientEp = getAdminFromBObject(adminClient);
         try {
             TopicProperties topicProp = clientEp.getTopic(topicName.toString());
+            LOGGER.debug("Retrieved topic successfully with name: " + topicProp.getName());
             return constructTopicCreatedRecord(topicProp);
         } catch (BError e) {
             return ASBErrorCreator.fromBError(e);
@@ -150,6 +152,7 @@ public class ASBAdministration {
             TopicProperties topicProp = clientEp.getTopic(topicName.toString());
             TopicProperties updatedTopicProps = clientEp.updateTopic(
                     ASBUtils.getUpdatedTopicPropertiesFromBObject(topicProperties, topicProp));
+            LOGGER.debug("Updated topic successfully with name: " + updatedTopicProps.getName());
             return constructTopicCreatedRecord(updatedTopicProps);
         } catch (BError e) {
             return ASBErrorCreator.fromBError(e);
@@ -172,6 +175,7 @@ public class ASBAdministration {
         ServiceBusAdministrationClient clientEp = getAdminFromBObject(adminClient);
         try {
             PagedIterable<TopicProperties> topicProp = clientEp.listTopics();
+            LOGGER.debug("Retrieved all topics successfully");
             return constructTopicPropertiesArray(topicProp);
         } catch (BError e) {
             return ASBErrorCreator.fromBError(e);
@@ -210,6 +214,7 @@ public class ASBAdministration {
         ServiceBusAdministrationClient clientEp = getAdminFromBObject(adminClient);
         try {
             clientEp.deleteTopic(topicName.toString());
+            LOGGER.debug("Deleted topic successfully with name: " + topicName);
         } catch (BError e) {
             return ASBErrorCreator.fromBError(e);
         } catch (ServiceBusException e) {
@@ -264,6 +269,7 @@ public class ASBAdministration {
                 subscriptionProps = clientEp.createSubscription(topicName.toString(), subscriptionName.toString(),
                         ASBUtils.getCreateSubscriptionPropertiesFromBObject(subscriptionProperties));
             }
+            LOGGER.debug("Created subscription successfully with name: " + subscriptionProps.getSubscriptionName());
             return constructSubscriptionCreatedRecord(subscriptionProps);
         } catch (BError e) {
             return ASBErrorCreator.fromBError(e);
@@ -286,6 +292,7 @@ public class ASBAdministration {
         try {
             SubscriptionProperties subscriptionProps = clientEp.getSubscription(topicName.toString(),
                     subscriptionName.toString());
+            LOGGER.debug("Retrieved subscription successfully with name: " + subscriptionProps.getSubscriptionName());
             return constructSubscriptionCreatedRecord(subscriptionProps);
         } catch (BError e) {
             return ASBErrorCreator.fromBError(e);
@@ -312,6 +319,8 @@ public class ASBAdministration {
                     subscriptionName.toString());
             SubscriptionProperties updatedSubscriptionProps = clientEp.updateSubscription(
                     ASBUtils.getUpdatedSubscriptionPropertiesFromBObject(subscriptionProperties, subscriptionProps));
+            LOGGER.debug("Updated subscription successfully with name: " +
+                    updatedSubscriptionProps.getSubscriptionName() + "in topic: " + topicName);
             return constructSubscriptionCreatedRecord(updatedSubscriptionProps);
         } catch (BError e) {
             return ASBErrorCreator.fromBError(e);
@@ -334,6 +343,7 @@ public class ASBAdministration {
         ServiceBusAdministrationClient clientEp = getAdminFromBObject(adminClient);
         try {
             PagedIterable<SubscriptionProperties> subscriptionProp = clientEp.listSubscriptions(topicName.toString());
+            LOGGER.debug("Retrieved all subscriptions successfully");
             return constructSubscriptionPropertiesArray(subscriptionProp);
         } catch (BError e) {
             return ASBErrorCreator.fromBError(e);
@@ -374,6 +384,8 @@ public class ASBAdministration {
         ServiceBusAdministrationClient clientEp = getAdminFromBObject(adminClient);
         try {
             clientEp.deleteSubscription(topicName.toString(), subscriptionName.toString());
+            LOGGER.debug("Deleted subscription successfully with name: " + subscriptionName + "in topic: "
+                    + topicName);
         } catch (BError e) {
             return ASBErrorCreator.fromBError(e);
         } catch (ServiceBusException e) {
@@ -429,6 +441,8 @@ public class ASBAdministration {
                 ruleProp = clientEp.createRule(topicName.toString(), ruleName.toString(), subscriptionName.toString(),
                         ASBUtils.getCreateRulePropertiesFromBObject(ruleProperties));
             }
+            LOGGER.debug("Created rule successfully with name: " + ruleProp.getName() + "in subscription: "
+                    + subscriptionName + "in topic: " + topicName);
             return constructRuleCreatedRecord(ruleProp);
         } catch (BError e) {
             return ASBErrorCreator.fromBError(e);
@@ -451,6 +465,8 @@ public class ASBAdministration {
         try {
             RuleProperties ruleProp = clientEp.getRule(topicName.toString(), subscriptionName.toString(),
                     ruleName.toString());
+            LOGGER.debug("Retrieved rule successfully with name: " + ruleProp.getName() + "in subscription: "
+                    + subscriptionName + "in topic: " + topicName);
             return constructRuleCreatedRecord(ruleProp);
         } catch (BError e) {
             return ASBErrorCreator.fromBError(e);
@@ -480,6 +496,8 @@ public class ASBAdministration {
             RuleProperties updatedRuleProperties = clientEp.updateRule(topicName.toString(),
                     subscriptionName.toString(),
                     ASBUtils.getUpdatedRulePropertiesFromBObject(updateRuleProperties, currentRuleProperties));
+            LOGGER.debug("Updated rule successfully with name: " + updatedRuleProperties.getName() + "in subscription: "
+                    + subscriptionName + "in topic: " + topicName);
             return constructRuleCreatedRecord(updatedRuleProperties);
         } catch (BError e) {
             return ASBErrorCreator.fromBError(e);
@@ -503,6 +521,7 @@ public class ASBAdministration {
         try {
             PagedIterable<RuleProperties> ruleProp = clientEp.listRules(topicName.toString(),
                     subscriptionName.toString());
+            LOGGER.debug("Retrieved all rules successfully");
             return constructRulePropertiesArray(ruleProp);
         } catch (BError e) {
             return ASBErrorCreator.fromBError(e);
@@ -543,6 +562,8 @@ public class ASBAdministration {
         ServiceBusAdministrationClient clientEp = getAdminFromBObject(adminClient);
         try {
             clientEp.deleteRule(topicName.toString(), subscriptionName.toString(), ruleName.toString());
+            LOGGER.debug("Deleted rule successfully with name: " + ruleName + "in subscription: " + subscriptionName
+                    + "in topic: " + topicName);
             return null;
         } catch (BError e) {
             return ASBErrorCreator.fromBError(e);
@@ -570,6 +591,7 @@ public class ASBAdministration {
                 queueProp = clientEp.createQueue(queueName.toString(),
                         ASBUtils.getQueuePropertiesFromBObject(queueProperties));
             }
+            LOGGER.debug("Created queue successfully with name: " + queueProp.getName());
             return constructQueueCreatedRecord(queueProp);
         } catch (BError e) {
             return ASBErrorCreator.fromBError(e);
@@ -591,6 +613,7 @@ public class ASBAdministration {
         ServiceBusAdministrationClient clientEp = getAdminFromBObject(adminClient);
         try {
             QueueProperties queueProp = clientEp.getQueue(queueName.toString());
+            LOGGER.debug("Retrieved queue successfully with name: " + queueProp.getName());
             return constructQueueCreatedRecord(queueProp);
         } catch (BError e) {
             return ASBErrorCreator.fromBError(e);
@@ -614,6 +637,7 @@ public class ASBAdministration {
             QueueProperties queueProp = clientEp.getQueue(queueName.toString());
             QueueProperties updatedQueueProps = clientEp.updateQueue(
                     ASBUtils.getUpdatedQueuePropertiesFromBObject(queueProperties, queueProp));
+            LOGGER.debug("Updated queue successfully with name: " + updatedQueueProps.getName());
             return constructQueueCreatedRecord(updatedQueueProps);
         } catch (BError e) {
             return ASBErrorCreator.fromBError(e);
@@ -636,6 +660,7 @@ public class ASBAdministration {
         ServiceBusAdministrationClient clientEp = getAdminFromBObject(adminClient);
         try {
             PagedIterable<QueueProperties> queueProp = clientEp.listQueues();
+            LOGGER.debug("Retrieved all queues successfully");
             return constructQueuePropertiesArray(queueProp);
         } catch (BError e) {
             return ASBErrorCreator.fromBError(e);
@@ -673,6 +698,7 @@ public class ASBAdministration {
         ServiceBusAdministrationClient clientEp = getAdminFromBObject(adminClient);
         try {
             clientEp.deleteQueue(queueName.toString());
+            LOGGER.debug("Deleted queue successfully with name: " + queueName);
             return null;
         } catch (BError e) {
             return ASBErrorCreator.fromBError(e);
