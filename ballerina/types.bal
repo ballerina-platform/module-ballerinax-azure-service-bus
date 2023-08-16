@@ -180,7 +180,7 @@ public enum AmqpRetryMode {
     EXPONENTIAL
 };
 
-# This record holds the configuration details of a topic and its associated subscription in Azure Service Bus
+# This record holds the configuration details of a topic and its associated subscription in Azure Service Bus.
 #
 # + topicName - A string field that holds the name of the topic  
 # + subscriptionName - A string field that holds the name of the subscription associated with the topic
@@ -192,7 +192,7 @@ public type TopicSubsConfig record {
     string subscriptionName;
 };
 
-# This record holds the configuration details of a queue in Azure Service Bus
+# This record holds the configuration details of a queue in Azure Service Bus.
 #
 # + queueName - A string field that holds the name of the queue
 @display {label: "Queue Configurations"}
@@ -201,7 +201,7 @@ public type QueueConfig record {
     string queueName;
 };
 
-# Holds the configuration details needed to create a sender connection to Azure Service Bus
+# Holds the configuration details needed to create a sender connection to Azure Service Bus.
 #
 # + entityType - An enumeration value of type EntityType, which specifies whether the connection is for a topic or a queue. 
 # The valid values are TOPIC and QUEUE
@@ -220,7 +220,7 @@ public type ASBServiceSenderConfig record {
     AmqpRetryOptions amqpRetryOptions = {};
 };
 
-# Represents Custom configurations for the ASB connector
+# Represents Custom configurations for the ASB connector.
 #
 # + logLevel - Enables the connector debug log prints (log4j log levels), default: OFF
 public type CustomConfiguration record {
@@ -260,9 +260,9 @@ public enum LogLevel {
     OFF
 }
 
-# SQL Rule
+# SQL Rule.
 #
-# + filter - Represents a filter which is a composition of an expression and an action that is executed in the pub/sub pipeline.
+# + filter - Represents a filter which is a composition of an expression and an action that is executed in the pub/sub pipeline
 # + action - Represents set of actions written in Sql language-based syntax
 @display {label: "SQL Rule"}
 public type SqlRule record {
@@ -270,54 +270,54 @@ public type SqlRule record {
     string action;
 };
 
-# Create Rule Options
+# Create Rule Options.
 #
-# + rule - Represents a SQL filter which is a composition of an expression and an action that is executed in the pub/sub pipeline.
+# + rule - Represents a SQL filter which is a composition of an expression and an action that is executed in the pub/sub pipeline
 @display {label: "Create Rule Options"}
 public type CreateRuleOptions record {
     SqlRule rule?;
 };
 
-# Rule Properties
+# Rule Properties.
 #
-# + rule - Represents a SQL filter which is a composition of an expression and an action that is executed in the pub/sub pipeline.
-# + name - The name of the rule.
+# + rule - Represents a SQL filter which is a composition of an expression and an action that is executed in the pub/sub pipeline
+# + name - The name of the rule
 @display {label: "Rule Properties"}
 public type RuleProperties record {
     SqlRule rule;
     string name;
 };
 
-# Update Rule Options
+# Update Rule Options.
 #
-# + rule - Represents a SQL filter which is a composition of an expression and an action that is executed in the pub/sub pipeline.
+# + rule - Represents a SQL filter which is a composition of an expression and an action that is executed in the pub/sub pipeline
 @display {label: "Update Rule Options"}
 public type UpdateRuleOptions record {
     SqlRule rule?;
 };
 
-# Rule List
+# Rule List.
 #
-# + list - The list of rules.
+# + list - The list of rules
 @display {label: "Rule List"}
 public type RuleList record {
     RuleProperties[] list;
 };
 
-# Create Subscription Options
+# Create Subscription Options.
 #
-# + autoDeleteOnIdle - ISO 8601 timeSpan idle interval after which the subscription is automatically deleted.
-# + enableBatchedOperations - Value that indicates whether server-side batched operations are enabled.
-# + deadLetteringOnMessageExpiration - Value that indicates whether this subscription has dead letter support when a message expires.
-# + defaultMessageTimeToLive - ISO 8601 default message timespan to live value.
-# + deadLetteringOnFilterEvaluationExceptions - Value that indicates whether this subscription has dead letter support when a message expires.
-# + forwardDeadLetteredMessagesTo - The name of the recipient entity to which all the messages sent to the subscription are forwarded to.
-# + forwardTo - The name of the recipient entity to which all the messages sent to the subscription are forwarded to.
-# + lockDuration - ISO 8601 timeSpan structure that defines the duration of the duplicate detection history. The default value is 10 minutes.
-# + maxDeliveryCount - The maximum delivery count. A message is automatically deadlettered after this number of deliveries. Default value is 10.
-# + requiresSession - A value that indicates whether the queue supports the concept of sessions.
-# + status - Enumerates the possible values for the status of a messaging entity.
-# + userMetadata - Metadata associated with the subscription.
+# + autoDeleteOnIdle - ISO 8601 timeSpan idle interval after which the subscription is automatically deleted
+# + enableBatchedOperations - Value that indicates whether server-side batched operations are enabled
+# + deadLetteringOnMessageExpiration - Value that indicates whether this subscription has dead letter support when a message expires
+# + defaultMessageTimeToLive - ISO 8601 default message timespan to live value
+# + deadLetteringOnFilterEvaluationExceptions - Value that indicates whether this subscription has dead letter support when a message expires
+# + forwardDeadLetteredMessagesTo - The name of the recipient entity to which all the messages sent to the subscription are forwarded to
+# + forwardTo - The name of the recipient entity to which all the messages sent to the subscription are forwarded to
+# + lockDuration - ISO 8601 timeSpan structure that defines the duration of the duplicate detection history. The default value is 10 minutes
+# + maxDeliveryCount - The maximum delivery count. A message is automatically deadlettered after this number of deliveries. Default value is 10
+# + requiresSession - A value that indicates whether the queue supports the concept of sessions
+# + status - Enumerates the possible values for the status of a messaging entity
+# + userMetadata - Metadata associated with the subscription
 @display {label: "Create Subscription Options"}
 public type CreateSubscriptionOptions record {
     @display {label: "Auto Delete On Idle"}
@@ -346,22 +346,22 @@ public type CreateSubscriptionOptions record {
     string userMetadata?;
 };
 
-# SubscriptionProperties
+# SubscriptionProperties.
 #
-# + autoDeleteOnIdle - ISO 8601 timeSpan idle interval after which the subscription is automatically deleted.
-# + defaultMessageTimeToLive - ISO 8601 default message timespan to live value.
-# + forwardDeadLetteredMessagesTo - The name of the recipient entity to which all the messages sent to the subscription are forwarded to.
-# + forwardTo - The name of the recipient entity to which all the messages sent to the subscription are forwarded to.
-# + lockDuration - ISO 8601 timeSpan structure that defines the duration of the duplicate detection history. The default value is 10 minutes.
-# + maxDeliveryCount - The maximum delivery count. A message is automatically deadlettered after this number of deliveries. Default value is 10.
-# + status - Enumerates the possible values for the status of a messaging entity.
-# + subscriptionName - The name of the subscription.
-# + topicName - The name of the topic under which subscription exists.
-# + userMetadata - Metadata associated with the subscription.
-# + enableBatchedOperations - Value that indicates whether server-side batched operations are enabled.
-# + deadLetteringOnFilterEvaluationExceptions - A value that indicates whether this subscription has dead letter support when a message expires.
-# + deadLetteringOnMessageExpiration - A value that indicates whether this subscription has dead letter support when a message expires.
-# + requiresSession - A value that indicates whether the queue supports the concept of sessions.
+# + autoDeleteOnIdle - ISO 8601 timeSpan idle interval after which the subscription is automatically deleted
+# + defaultMessageTimeToLive - ISO 8601 default message timespan to live value
+# + forwardDeadLetteredMessagesTo - The name of the recipient entity to which all the messages sent to the subscription are forwarded to
+# + forwardTo - The name of the recipient entity to which all the messages sent to the subscription are forwarded to
+# + lockDuration - ISO 8601 timeSpan structure that defines the duration of the duplicate detection history. The default value is 10 minutes
+# + maxDeliveryCount - The maximum delivery count. A message is automatically deadlettered after this number of deliveries. Default value is 10
+# + status - Enumerates the possible values for the status of a messaging entity
+# + subscriptionName - The name of the subscription
+# + topicName - The name of the topic under which subscription exists
+# + userMetadata - Metadata associated with the subscription
+# + enableBatchedOperations - Value that indicates whether server-side batched operations are enabled
+# + deadLetteringOnFilterEvaluationExceptions - A value that indicates whether this subscription has dead letter support when a message expires
+# + deadLetteringOnMessageExpiration - A value that indicates whether this subscription has dead letter support when a message expires
+# + requiresSession - A value that indicates whether the queue supports the concept of sessions
 @display {label: "Subscription Properties"}
 public type SubscriptionProperties record {
     @display {label: "Auto Delete On Idle"}
@@ -394,19 +394,19 @@ public type SubscriptionProperties record {
     boolean requiresSession;
 };
 
-# Update Subscription Options
+# Update Subscription Options.
 #
-# + autoDeleteOnIdle - ISO 8601 timeSpan idle interval after which the subscription is automatically deleted.
-# + defaultMessageTimeToLive - ISO 8601 default message timespan to live value.
-# + deadLetteringOnMessageExpiration - Value that indicates whether this subscription has dead letter support when a message expires.
-# + deadLetteringOnFilterEvaluationExceptions - Value that indicates whether this subscription has dead letter support when a message expires.
-# + enableBatchedOperations - Value that indicates whether server-side batched operations are enabled.
-# + forwardDeadLetteredMessagesTo - The name of the recipient entity to which all the messages sent to the subscription are forwarded to.
-# + forwardTo - The name of the recipient entity to which all the messages sent to the subscription are forwarded to.
-# + lockDuration - ISO 8601 timeSpan structure that defines the duration of the duplicate detection history. The default value is 10 minutes.
-# + maxDeliveryCount - The maximum delivery count. A message is automatically deadlettered after this number of deliveries. Default value is 10.
-# + status - Enumerates the possible values for the status of a messaging entity.
-# + userMetadata - Metadata associated with the subscription.
+# + autoDeleteOnIdle - ISO 8601 timeSpan idle interval after which the subscription is automatically deleted
+# + defaultMessageTimeToLive - ISO 8601 default message timespan to live value
+# + deadLetteringOnMessageExpiration - Value that indicates whether this subscription has dead letter support when a message expires
+# + deadLetteringOnFilterEvaluationExceptions - Value that indicates whether this subscription has dead letter support when a message expires
+# + enableBatchedOperations - Value that indicates whether server-side batched operations are enabled
+# + forwardDeadLetteredMessagesTo - The name of the recipient entity to which all the messages sent to the subscription are forwarded to
+# + forwardTo - The name of the recipient entity to which all the messages sent to the subscription are forwarded to
+# + lockDuration - ISO 8601 timeSpan structure that defines the duration of the duplicate detection history. The default value is 10 minutes
+# + maxDeliveryCount - The maximum delivery count. A message is automatically deadlettered after this number of deliveries. Default value is 10
+# + status - Enumerates the possible values for the status of a messaging entity
+# + userMetadata - Metadata associated with the subscription
 @display {label: "Update Subscription Options"}
 public type UpdateSubscriptionOptions record {
     @display {label: "Auto Delete On Idle"}
@@ -433,29 +433,29 @@ public type UpdateSubscriptionOptions record {
     string userMetadata?;
 };
 
-# Subscription List
+# Subscription List.
 #
-# + list - The list of subscriptions.
+# + list - The list of subscriptions
 @display {label: "Subscription List"}
 public type SubscriptionList record {
     SubscriptionProperties[] list;
 };
 
-# TopicProperties
+# TopicProperties.
 #
-# + name - The name of the topic to create.
-# + authorizationRules - Authorization rules for resource.
-# + autoDeleteOnIdle - ISO 8601 timeSpan idle interval after which the queue is automatically deleted. The minimum duration is 5 minutes.
+# + name - The name of the topic to create
+# + authorizationRules - Authorization rules for resource
+# + autoDeleteOnIdle - ISO 8601 timeSpan idle interval after which the queue is automatically deleted. The minimum duration is 5 minutes
 # + defaultMessageTimeToLive - ISO 8601 default message timespan to live value. This is the duration after which the message expires, starting from when the message is sent to Service Bus.
 # + duplicateDetectionHistoryTimeWindow - ISO 8601 timeSpan structure that defines the duration of the duplicate detection history. The default value is 10 minutes.
 # + maxMessageSizeInKilobytes - The maximum size of the queue in megabytes, which is the size of memory allocated for the queue.
 # + maxSizeInMegabytes - The maximum size of the queue in megabytes, which is the size of memory allocated for the queue.
-# + status - Enumerates the possible values for the status of a messaging entity.
-# + userMetadata - Metadata associated with the queue.
-# + enableBatchedOperations - Value that indicates whether server-side batched operations are enabled.
-# + requiresDuplicateDetection - Value indicating if this queue requires duplicate detection.
-# + enablePartitioning - Value that indicates whether the queue is to be partitioned across multiple message brokers.
-# + supportOrdering - Defines whether ordering needs to be maintained.
+# + status - Enumerates the possible values for the status of a messaging entity
+# + userMetadata - Metadata associated with the queue
+# + enableBatchedOperations - Value that indicates whether server-side batched operations are enabled
+# + requiresDuplicateDetection - Value indicating if this queue requires duplicate detection
+# + enablePartitioning - Value that indicates whether the queue is to be partitioned across multiple message brokers
+# + supportOrdering - Defines whether ordering needs to be maintained
 @display {label: "Topic Properties"}
 public type TopicProperties record {
     @display {label: "Name"}
@@ -486,23 +486,23 @@ public type TopicProperties record {
     boolean supportOrdering;
 };
 
-# Create Topic Options
+# Create Topic Options.
 #
-# + autoDeleteOnIdle - ISO 8601 timeSpan idle interval after which the queue is automatically deleted. The minimum duration is 5 minutes.
+# + autoDeleteOnIdle - ISO 8601 timeSpan idle interval after which the queue is automatically deleted. The minimum duration is 5 minutes
 # + defaultMessageTimeToLive - ISO 8601 default message timespan to live value. This is the duration after which the message expires, starting from when the message is sent to Service Bus.
 # + duplicateDetectionHistoryTimeWindow - ISO 8601 timeSpan structure that defines the duration of the duplicate detection history. The default value is 10 minutes.
 # + lockDuration - ISO 8601 timespan duration of a peek-lock; that is, the amount of time that the message is locked for other receivers. The maximum value for LockDuration is 5 minutes; the default value is 1 minute.
 # + maxDeliveryCount - The maximum delivery count. A message is automatically deadlettered after this number of deliveries. Default value is 10.
-# + maxMessageSizeInKilobytes - The maximum size of the queue in megabytes, which is the size of memory allocated for the queue.
-# + maxSizeInMegabytes - The maximum size of the queue in megabytes, which is the size of memory allocated for the queue.
-# + status - Enumerates the possible values for the status of a messaging entity.
-# + userMetadata - Metadata associated with the queue.
-# + enableBatchedOperations - Value that indicates whether server-side batched operations are enabled.
-# + deadLetteringOnMessageExpiration - Value that indicates whether this queue has dead letter support when a message expires.
-# + requiresDuplicateDetection - Value indicating if this queue requires duplicate detection.
-# + enablePartitioning - Value that indicates whether the queue is to be partitioned across multiple message brokers.
-# + requiresSession - Value that indicates whether the queue supports the concept of sessions.
-# + supportOrdering - Defines whether ordering needs to be maintained.
+# + maxMessageSizeInKilobytes - The maximum size of the queue in megabytes, which is the size of memory allocated for the queue
+# + maxSizeInMegabytes - The maximum size of the queue in megabytes, which is the size of memory allocated for the queue
+# + status - Enumerates the possible values for the status of a messaging entity
+# + userMetadata - Metadata associated with the queue
+# + enableBatchedOperations - Value that indicates whether server-side batched operations are enabled
+# + deadLetteringOnMessageExpiration - Value that indicates whether this queue has dead letter support when a message expires
+# + requiresDuplicateDetection - Value indicating if this queue requires duplicate detection
+# + enablePartitioning - Value that indicates whether the queue is to be partitioned across multiple message brokers
+# + requiresSession - Value that indicates whether the queue supports the concept of sessions
+# + supportOrdering - Defines whether ordering needs to be maintained
 @display {label: "Create Topic Options"}
 public type CreateTopicOptions record {
     @display {label: "Auto Delete On Idle"}
@@ -537,22 +537,22 @@ public type CreateTopicOptions record {
     boolean supportOrdering?;
 };
 
-# Upadate Topic Propertise
+# Upadate Topic Propertise.
 #
 # + autoDeleteOnIdle - ISO 8601 timeSpan idle interval after which the queue is automatically deleted. The minimum duration is 5 minutes.
 # + defaultMessageTimeToLive - ISO 8601 default message timespan to live value. This is the duration after which the message expires, starting from when the message is sent to Service Bus.
 # + duplicateDetectionHistoryTimeWindow - ISO 8601 timeSpan structure that defines the duration of the duplicate detection history. The default value is 10 minutes.
 # + maxDeliveryCount - The maximum delivery count. A message is automatically deadlettered after this number of deliveries. Default value is 10.
-# + maxMessageSizeInKilobytes - The maximum size of the queue in megabytes, which is the size of memory allocated for the queue.
-# + maxSizeInMegabytes - The maximum size of the queue in megabytes, which is the size of memory allocated for the queue.
-# + status - Enumerates the possible values for the status of a messaging entity.
-# + userMetadata - Metadata associated with the queue.
-# + enableBatchedOperations - Value that indicates whether server-side batched operations are enabled.
-# + deadLetteringOnMessageExpiration - Value that indicates whether this queue has dead letter support when a message expires.
-# + requiresDuplicateDetection - Value indicating if this queue requires duplicate detection.
-# + enablePartitioning - Value that indicates whether the queue is to be partitioned across multiple message brokers.
-# + requiresSession - Value that indicates whether the queue supports the concept of sessions.
-# + supportOrdering - Defines whether ordering needs to be maintained.
+# + maxMessageSizeInKilobytes - The maximum size of the queue in megabytes, which is the size of memory allocated for the queue
+# + maxSizeInMegabytes - The maximum size of the queue in megabytes, which is the size of memory allocated for the queue
+# + status - Enumerates the possible values for the status of a messaging entity
+# + userMetadata - Metadata associated with the queue
+# + enableBatchedOperations - Value that indicates whether server-side batched operations are enabled
+# + deadLetteringOnMessageExpiration - Value that indicates whether this queue has dead letter support when a message expires
+# + requiresDuplicateDetection - Value indicating if this queue requires duplicate detection
+# + enablePartitioning - Value that indicates whether the queue is to be partitioned across multiple message brokers
+# + requiresSession - Value that indicates whether the queue supports the concept of sessions
+# + supportOrdering - Defines whether ordering needs to be maintained
 @display {label: "Update Topic Options"}
 public type UpdateTopicOptions record {
     @display {label: "Auto Delete On Idle"}
@@ -593,9 +593,9 @@ public type TopicList record {
     TopicProperties[] list;
 };
 
-# # QueueProperties
+# # QueueProperties.
 #
-# + authorizationRules - Authorization rules for resource.
+# + authorizationRules - Authorization rules for resource
 # + autoDeleteOnIdle - ISO 8601 timeSpan idle interval after which the queue is automatically deleted. The minimum duration is 5 minutes.
 # + defaultMessageTimeToLive - ISO 8601 default message timespan to live value. This is the duration after which the message expires, starting from when the message is sent to Service Bus.
 # + duplicateDetectionHistoryTimeWindow - ISO 8601 timeSpan structure that defines the duration of the duplicate detection history. The default value is 10 minutes.
@@ -603,16 +603,16 @@ public type TopicList record {
 # + forwardTo - The name of the recipient entity to which all the messages sent to the queue are forwarded to.
 # + lockDuration - ISO 8601 timespan duration of a peek-lock; that is, the amount of time that the message is locked for other receivers. The maximum value for LockDuration is 5 minutes; the default value is 1 minute.
 # + maxDeliveryCount - The maximum delivery count. A message is automatically deadlettered after this number of deliveries. Default value is 10.
-# + maxMessageSizeInKilobytes - The maximum size of the queue in megabytes, which is the size of memory allocated for the queue.
-# + maxSizeInMegabytes - The maximum size of the queue in megabytes, which is the size of memory allocated for the queue.
-# + name - The name of the queue to create.
-# + status - Enumerates the possible values for the status of a messaging entity.
-# + userMetadata - Metadata associated with the queue.
-# + enableBatchedOperations - Value that indicates whether server-side batched operations are enabled.
-# + deadLetteringOnMessageExpiration - Value that indicates whether this queue has dead letter support when a message expires.
-# + requiresDuplicateDetection - Value indicating if this queue requires duplicate detection.
-# + enablePartitioning - Value that indicates whether the queue is to be partitioned across multiple message brokers.
-# + requiresSession - Value that indicates whether the queue supports the concept of sessions.
+# + maxMessageSizeInKilobytes - The maximum size of the queue in megabytes, which is the size of memory allocated for the queue
+# + maxSizeInMegabytes - The maximum size of the queue in megabytes, which is the size of memory allocated for the queue
+# + name - The name of the queue to create
+# + status - Enumerates the possible values for the status of a messaging entity
+# + userMetadata - Metadata associated with the queue
+# + enableBatchedOperations - Value that indicates whether server-side batched operations are enabled
+# + deadLetteringOnMessageExpiration - Value that indicates whether this queue has dead letter support when a message expires
+# + requiresDuplicateDetection - Value indicating if this queue requires duplicate detection
+# + enablePartitioning - Value that indicates whether the queue is to be partitioned across multiple message brokers
+# + requiresSession - Value that indicates whether the queue supports the concept of sessions
 @display {label: "Queue Properties"}
 public type QueueProperties record {
     @display {label: "Authorization Rules"}
@@ -653,24 +653,24 @@ public type QueueProperties record {
     boolean requiresSession;
 };
 
-# Create Queue Options
+# Create Queue Options.
 #
 # + autoDeleteOnIdle - ISO 8601 timeSpan idle interval after which the queue is automatically deleted. The minimum duration is 5 minutes.
 # + defaultMessageTimeToLive - ISO 8601 default message timespan to live value. This is the duration after which the message expires, starting from when the message is sent to Service Bus.
 # + duplicateDetectionHistoryTimeWindow - ISO 8601 timeSpan structure that defines the duration of the duplicate detection history. The default value is 10 minutes.
 # + forwardDeadLetteredMessagesTo - The name of the recipient entity to which all the dead-lettered messages of this subscription are forwarded to.
-# + forwardTo - The name of the recipient entity to which all the messages sent to the queue are forwarded to.
+# + forwardTo - The name of the recipient entity to which all the messages sent to the queue are forwarded to
 # + lockDuration - ISO 8601 timespan duration of a peek-lock; that is, the amount of time that the message is locked for other receivers. The maximum value for LockDuration is 5 minutes; the default value is 1 minute.
 # + maxDeliveryCount - The maximum delivery count. A message is automatically deadlettered after this number of deliveries. Default value is 10.
-# + maxMessageSizeInKilobytes - The maximum size of the queue in megabytes, which is the size of memory allocated for the queue.
-# + maxSizeInMegabytes - The maximum size of the queue in megabytes, which is the size of memory allocated for the queue.
-# + status - Enumerates the possible values for the status of a messaging entity.
-# + userMetadata - Metadata associated with the queue.
-# + enableBatchedOperations - Value that indicates whether server-side batched operations are enabled.
-# + deadLetteringOnMessageExpiration - Value that indicates whether this queue has dead letter support when a message expires.
-# + requiresDuplicateDetection - Value indicating if this queue requires duplicate detection.
-# + enablePartitioning - Value that indicates whether the queue is to be partitioned across multiple message brokers.
-# + requiresSession - Value that indicates whether the queue supports the concept of sessions.
+# + maxMessageSizeInKilobytes - The maximum size of the queue in megabytes, which is the size of memory allocated for the queue
+# + maxSizeInMegabytes - The maximum size of the queue in megabytes, which is the size of memory allocated for the queue
+# + status - Enumerates the possible values for the status of a messaging entity
+# + userMetadata - Metadata associated with the queue
+# + enableBatchedOperations - Value that indicates whether server-side batched operations are enabled
+# + deadLetteringOnMessageExpiration - Value that indicates whether this queue has dead letter support when a message expires
+# + requiresDuplicateDetection - Value indicating if this queue requires duplicate detection
+# + enablePartitioning - Value that indicates whether the queue is to be partitioned across multiple message brokers
+# + requiresSession - Value that indicates whether the queue supports the concept of sessions
 @display {label: "Create Queue Options"}
 public type CreateQueueOptions record {
     @display {label: "Auto Delete On Idle"}
@@ -707,24 +707,24 @@ public type CreateQueueOptions record {
     boolean requiresSession?;
 };
 
-# Update Queue Options
+# Update Queue Options.
 #
 # + autoDeleteOnIdle - ISO 8601 timeSpan idle interval after which the queue is automatically deleted. The minimum duration is 5 minutes.
 # + defaultMessageTimeToLive - ISO 8601 default message timespan to live value. This is the duration after which the message expires, starting from when the message is sent to Service Bus.
 # + duplicateDetectionHistoryTimeWindow - ISO 8601 timeSpan structure that defines the duration of the duplicate detection history. The default value is 10 minutes.
 # + forwardDeadLetteredMessagesTo - The name of the recipient entity to which all the dead-lettered messages of this subscription are forwarded to.
-# + forwardTo - The name of the recipient entity to which all the messages sent to the queue are forwarded to.
+# + forwardTo - The name of the recipient entity to which all the messages sent to the queue are forwarded to
 # + lockDuration - ISO 8601 timespan duration of a peek-lock; that is, the amount of time that the message is locked for other receivers. The maximum value for LockDuration is 5 minutes; the default value is 1 minute.
 # + maxDeliveryCount - The maximum delivery count. A message is automatically deadlettered after this number of deliveries. Default value is 10.
-# + maxMessageSizeInKilobytes - The maximum size of the queue in megabytes, which is the size of memory allocated for the queue.
-# + maxSizeInMegabytes - The maximum size of the queue in megabytes, which is the size of memory allocated for the queue.
-# + status - Enumerates the possible values for the status of a messaging entity.
-# + userMetadata - Metadata associated with the queue.
-# + enableBatchedOperations - Value that indicates whether server-side batched operations are enabled.
-# + deadLetteringOnMessageExpiration - Value that indicates whether this queue has dead letter support when a message expires.
-# + requiresDuplicateDetection - Value indicating if this queue requires duplicate detection.
-# + enablePartitioning - Value that indicates whether the queue is to be partitioned across multiple message brokers.
-# + requiresSession - Value that indicates whether the queue supports the concept of sessions.
+# + maxMessageSizeInKilobytes - The maximum size of the queue in megabytes, which is the size of memory allocated for the queue
+# + maxSizeInMegabytes - The maximum size of the queue in megabytes, which is the size of memory allocated for the queue
+# + status - Enumerates the possible values for the status of a messaging entity
+# + userMetadata - Metadata associated with the queue
+# + enableBatchedOperations - Value that indicates whether server-side batched operations are enabled
+# + deadLetteringOnMessageExpiration - Value that indicates whether this queue has dead letter support when a message expires
+# + requiresDuplicateDetection - Value indicating if this queue requires duplicate detection
+# + enablePartitioning - Value that indicates whether the queue is to be partitioned across multiple message brokers
+# + requiresSession - Value that indicates whether the queue supports the concept of sessions
 @display {label: "Update Queue Options"}
 public type UpdateQueueOptions record {
     @display {label: "Auto Delete On Idle"}
@@ -761,15 +761,15 @@ public type UpdateQueueOptions record {
     boolean requiresSession?;
 };
 
-# Queue List
+# Queue List.
 #
-# + list - The list of queues.
+# + list - The list of queues
 @display {label: "Queue List"}
 public type QueueList record {
     QueueProperties[] list;
 };
 
-# Duration
+# Duration.
 #
 # + seconds - Seconds
 # + nanoseconds - Nanoseconds
@@ -781,16 +781,16 @@ public type Duration record {
     int nanoseconds = 0;
 };
 
-# AuthorizationRule
+# AuthorizationRule.
 #
-# + accessRights - The rights associated with the rule.
-# + claimType - The type of the claim.
-# + claimValue - The value of the claim.
-# + createdAt - The exact time the rule was created.
-# + keyName - The name of the key that was used.
-# + modifiedAt - The exact time the rule was modified.
-# + primaryKey - The primary key associated with the rule.
-# + secondaryKey - The secondary key associated with the rule.
+# + accessRights - The rights associated with the rule
+# + claimType - The type of the claim
+# + claimValue - The value of the claim
+# + createdAt - The exact time the rule was created
+# + keyName - The name of the key that was used
+# + modifiedAt - The exact time the rule was modified
+# + primaryKey - The primary key associated with the rule
+# + secondaryKey - The secondary key associated with the rule
 @display {label: "Authorization Rule"}
 public type AuthorizationRule record {
     @display {label: "Access Rights"}
