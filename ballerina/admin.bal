@@ -23,7 +23,7 @@ public isolated client class Administrator {
 
     final handle adminHandle;
 
-    #initialize the Azure Service Bus Admin client.
+    # initialize the Azure Service Bus Admin client.
     # Create an [Azure account](https://docs.microsoft.com/en-us/learn/modules/create-an-azure-account/) and
     # obtain tokens following [this guide](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-portal#get-the-connection-string).
     # Configure the connection string to have the [required permission](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-sas).
