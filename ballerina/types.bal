@@ -259,11 +259,12 @@ public enum LogLevel {
     @display {label: "OFF"}
     OFF
 }
-############################################################
+
 # SQL Rule
 #
 # + filter - Represents a filter which is a composition of an expression and an action that is executed in the pub/sub pipeline.
 # + action - Represents set of actions written in Sql language-based syntax
+@display {label: "SQL Rule"}
 public type SqlRule record {
     string filter;
     string action;
@@ -271,6 +272,7 @@ public type SqlRule record {
 # Create Rule Options
 #
 # + rule - Represents a SQL filter which is a composition of an expression and an action that is executed in the pub/sub pipeline.
+@display {label: "Create Rule Options"}
 public type CreateRuleOptions record {
     SqlRule rule?;
 };
@@ -279,6 +281,7 @@ public type CreateRuleOptions record {
 #
 # + rule - Represents a SQL filter which is a composition of an expression and an action that is executed in the pub/sub pipeline.
 # + name - The name of the rule.
+@display {label: "Rule Properties"}
 public type RuleProperties record {
     SqlRule rule;
     string name;
@@ -287,6 +290,7 @@ public type RuleProperties record {
 # Update Rule Options
 #
 # + rule - Represents a SQL filter which is a composition of an expression and an action that is executed in the pub/sub pipeline.
+@display {label: "Update Rule Options"}
 public type UpdateRuleOptions record {
     SqlRule rule?;
 };
@@ -294,10 +298,11 @@ public type UpdateRuleOptions record {
 # Rule List
 #
 # + list - The list of rules.
+@display {label: "Rule List"}
 public type RuleList record {
     RuleProperties[] list;
 };
-############################################################
+
 # Create Subscription Options
 #
 # + autoDeleteOnIdle - ISO 8601 timeSpan idle interval after which the subscription is automatically deleted.
@@ -312,6 +317,7 @@ public type RuleList record {
 # + requiresSession - A value that indicates whether the queue supports the concept of sessions.
 # + status - Enumerates the possible values for the status of a messaging entity.
 # + userMetadata - Metadata associated with the subscription.
+@display {label: "Create Subscription Options"}
 public type CreateSubscriptionOptions record {
     @display {label:"Auto Delete On Idle"}
     Duration autoDeleteOnIdle?;
@@ -338,6 +344,7 @@ public type CreateSubscriptionOptions record {
     @display {label:"User Metadata"}
     string userMetadata?;
 };
+
 # SubscriptionProperties
 #
 # + autoDeleteOnIdle - ISO 8601 timeSpan idle interval after which the subscription is automatically deleted.
@@ -354,6 +361,7 @@ public type CreateSubscriptionOptions record {
 # + deadLetteringOnFilterEvaluationExceptions - A value that indicates whether this subscription has dead letter support when a message expires.
 # + deadLetteringOnMessageExpiration - A value that indicates whether this subscription has dead letter support when a message expires.
 # + requiresSession - A value that indicates whether the queue supports the concept of sessions.
+@display {label:"Subscription Properties"}
 public type SubscriptionProperties record {
     @display {label:"Auto Delete On Idle"}
     Duration autoDeleteOnIdle;
@@ -384,6 +392,7 @@ public type SubscriptionProperties record {
     @display {label:"Requires Session"}
     boolean requiresSession;
 };
+
 # Update Subscription Options
 #
 # + autoDeleteOnIdle - ISO 8601 timeSpan idle interval after which the subscription is automatically deleted.
@@ -397,6 +406,7 @@ public type SubscriptionProperties record {
 # + maxDeliveryCount - The maximum delivery count. A message is automatically deadlettered after this number of deliveries. Default value is 10.
 # + status - Enumerates the possible values for the status of a messaging entity.
 # + userMetadata - Metadata associated with the subscription.
+@display {label:"Update Subscription Options"}
 public type UpdateSubscriptionOptions record {
     @display {label:"Auto Delete On Idle"}
     Duration autoDeleteOnIdle?;
@@ -421,15 +431,15 @@ public type UpdateSubscriptionOptions record {
     @display {label:"User Metadata"}
     string userMetadata?;
 };
+
 # Subscription List
 #
 # + list - The list of subscriptions.
+@display {label:"Subscription List"}
 public type SubscriptionList record {
     SubscriptionProperties[] list;
 };
-#
-############################################################
-#
+
 # TopicProperties
 #
 # + name - The name of the topic to create.
@@ -445,6 +455,7 @@ public type SubscriptionList record {
 # + requiresDuplicateDetection - Value indicating if this queue requires duplicate detection.
 # + enablePartitioning - Value that indicates whether the queue is to be partitioned across multiple message brokers.
 # + supportOrdering - Defines whether ordering needs to be maintained.
+@display {label:"Topic Properties"}
 public type TopicProperties record {
     @display {label:"Name"}
     string name;
@@ -491,6 +502,7 @@ public type TopicProperties record {
 # + enablePartitioning - Value that indicates whether the queue is to be partitioned across multiple message brokers.
 # + requiresSession - Value that indicates whether the queue supports the concept of sessions.
 # + supportOrdering - Defines whether ordering needs to be maintained.
+@display {label:"Create Topic Options"}
 public type CreateTopicOptions record {
     @display {label:"Auto Delete On Idle"}
     Duration autoDeleteOnIdle?;
@@ -523,6 +535,7 @@ public type CreateTopicOptions record {
     @display {label:"Support Ordering"}
     boolean supportOrdering?;
 };
+
 # Upadate Topic Propertise
 #
 # + autoDeleteOnIdle - ISO 8601 timeSpan idle interval after which the queue is automatically deleted. The minimum duration is 5 minutes.
@@ -539,6 +552,7 @@ public type CreateTopicOptions record {
 # + enablePartitioning - Value that indicates whether the queue is to be partitioned across multiple message brokers.
 # + requiresSession - Value that indicates whether the queue supports the concept of sessions.
 # + supportOrdering - Defines whether ordering needs to be maintained.
+@display {label:"Update Topic Options"}
 public type UpdateTopicOptions record {
     @display {label:"Auto Delete On Idle"}
     Duration autoDeleteOnIdle?;
@@ -569,14 +583,15 @@ public type UpdateTopicOptions record {
     @display {label:"Support Ordering"}
     boolean supportOrdering?;
 };
+
 # Topic List
 #
 # + list - The list of topics.
+@display {label:"Topic List"}
 public type TopicList record {
     TopicProperties[] list;
 };
 
-############################################################
 # # QueueProperties
 #
 # + authorizationRules - Authorization rules for resource.
@@ -597,6 +612,7 @@ public type TopicList record {
 # + requiresDuplicateDetection - Value indicating if this queue requires duplicate detection.
 # + enablePartitioning - Value that indicates whether the queue is to be partitioned across multiple message brokers.
 # + requiresSession - Value that indicates whether the queue supports the concept of sessions.
+@display {label:"Queue Properties"}
 public type QueueProperties record {
     @display {label:"Authorization Rules"}
     AuthorizationRule[] authorizationRules;
@@ -635,6 +651,7 @@ public type QueueProperties record {
     @display {label:"Requires Session"}
     boolean requiresSession;
 };
+
 # Create Queue Options
 #
 # + autoDeleteOnIdle - ISO 8601 timeSpan idle interval after which the queue is automatically deleted. The minimum duration is 5 minutes.
@@ -653,6 +670,7 @@ public type QueueProperties record {
 # + requiresDuplicateDetection - Value indicating if this queue requires duplicate detection.
 # + enablePartitioning - Value that indicates whether the queue is to be partitioned across multiple message brokers.
 # + requiresSession - Value that indicates whether the queue supports the concept of sessions.
+@display {label:"Create Queue Options"}
 public type CreateQueueOptions record {
     @display {label:"Auto Delete On Idle"}
     Duration autoDeleteOnIdle?;
@@ -687,6 +705,7 @@ public type CreateQueueOptions record {
     @display {label:"Requires Session"}
     boolean requiresSession?;
 };
+
 # Update Queue Options
 #
 # + autoDeleteOnIdle - ISO 8601 timeSpan idle interval after which the queue is automatically deleted. The minimum duration is 5 minutes.
@@ -705,6 +724,7 @@ public type CreateQueueOptions record {
 # + requiresDuplicateDetection - Value indicating if this queue requires duplicate detection.
 # + enablePartitioning - Value that indicates whether the queue is to be partitioned across multiple message brokers.
 # + requiresSession - Value that indicates whether the queue supports the concept of sessions.
+@display {label:"Update Queue Options"}
 public type UpdateQueueOptions record {
     @display {label:"Auto Delete On Idle"}
     Duration autoDeleteOnIdle?;
@@ -739,16 +759,20 @@ public type UpdateQueueOptions record {
     @display {label:"Requires Session"}
     boolean requiresSession?;
 };
+
 # Queue List
 #
 # + list - The list of queues.
+@display {label:"Queue List"}
 public type QueueList record {
     QueueProperties[] list;
 };
+
 # Duration
 #
 # + seconds - Seconds
 # + nanoseconds - Nanoseconds
+@display {label:"Duration"}
 public type Duration record {
     @display {label:"Seconds"}
     int seconds=0;
@@ -766,6 +790,7 @@ public type Duration record {
 # + modifiedAt - The exact time the rule was modified.
 # + primaryKey - The primary key associated with the rule.
 # + secondaryKey - The secondary key associated with the rule.
+@display {label:"Authorization Rule"}
 public type AuthorizationRule record {
     @display {label:"Access Rights"}
     AccessRight[] accessRights;
@@ -786,6 +811,7 @@ public type AuthorizationRule record {
 };
 
 # Access rights
+@display {label: "Access Rights"}
 public enum AccessRight {
     @display {label: "MANAGE"}
     MANAGE = "MANAGE",
@@ -796,6 +822,7 @@ public enum AccessRight {
 };
 
 # Entity status
+@display {label: "Entity Status"}
 public enum EntityStatus {
     @display {label: "ACTIVE"}
     ACTIVE = "Active",
