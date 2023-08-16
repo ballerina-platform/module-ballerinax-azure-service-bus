@@ -183,7 +183,7 @@ function testQueueExists() returns error? {
     Administrator adminClient = check new (connectionString);
     boolean? queueExists = check adminClient->queueExists(testQueue1);
     if queueExists is boolean {
-        test:assertTrue(queueExists,msg = "Queue exists failed.");
+        test:assertTrue(queueExists, msg = "Queue exists failed.");
     } else {
         test:assertFail("Queue exists failed.");
     }
@@ -456,7 +456,7 @@ function testGetQueue() returns error? {
 
 @test:Config {
     groups: ["asb_admin"],
-    dependsOn: [testCreateQueue,testMessageScheduling],
+    dependsOn: [testCreateQueue, testMessageScheduling],
     enable: true
 }
 function testUpdateQueue() returns error? {
@@ -634,7 +634,7 @@ function testGetTopic() returns error? {
 
 @test:Config {
     groups: ["asb_admin"],
-    dependsOn: [testGetTopic,testMessageScheduling],
+    dependsOn: [testGetTopic, testMessageScheduling],
     enable: true
 }
 function testUpdateTopic() returns error? {
@@ -1053,7 +1053,7 @@ function testRuleList() returns error? {
 
 @test:Config {
     groups: ["asb_admin"],
-    dependsOn: [testCreateRuleWithOptions,testMessageScheduling,updateSubscriptionWithInclusionParameters, updateQueueWithInclusionParameters,testInvalidConnectionString],
+    dependsOn: [testCreateRuleWithOptions, testMessageScheduling, updateSubscriptionWithInclusionParameters, updateQueueWithInclusionParameters, testInvalidConnectionString],
     enable: true
 }
 function testDeleteRule() returns error? {

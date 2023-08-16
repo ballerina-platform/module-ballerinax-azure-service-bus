@@ -57,7 +57,7 @@ public function main() returns error? {
         enablePartitioning = false,
         requiresSession = false
     );
-    if queue is asb:QueueProperties) {
+    if queue is asb:QueueProperties {
         log:printInfo(queue.toString());
     } else {
         log:printError(queue.toString());

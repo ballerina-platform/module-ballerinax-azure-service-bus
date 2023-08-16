@@ -47,8 +47,8 @@ public function main() returns error? {
         autoDeleteOnIdle = deletion,
         defaultMessageTimeToLive = ttl,
         duplicateDetectionHistoryTimeWindow = dupdue,
-        forwardDeadLetteredMessagesTo = "forwardedQueue", //Should be a valid queue name
-        forwardTo = "forwardedQueue", //Should be a valid queue name
+        forwardDeadLetteredMessagesTo = "forwardedQueue",  //Should be a valid queue name
+        forwardTo = "forwardedQueue",  //Should be a valid queue name
         lockDuration = lockDue,
         maxDeliveryCount = 10,
         maxSizeInMegabytes = 1024,

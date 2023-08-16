@@ -109,18 +109,18 @@ public type ApplicationProperties record {|
 # Configurations used to create an `asb:Connection`.
 #
 # + connectionString - Service bus connection string with Shared Access Signatures  
-#                      ConnectionString format:
-#                      Endpoint=sb://namespace_DNS_Name;EntityPath=EVENT_HUB_NAME;
-#                      SharedAccessKeyName=SHARED_ACCESS_KEY_NAME;SharedAccessKey=SHARED_ACCESS_KEY or
-#                      Endpoint=sb://namespace_DNS_Name;EntityPath=EVENT_HUB_NAME;
-#                      SharedAccessSignatureToken=SHARED_ACCESS_SIGNATURE_TOKEN
-# + entityConfig -  This field holds the configuration details of either a topic or a queue. The type of the entity is
-#                   determined by the entityType field. The actual configuration details are stored in either a
-#                   TopicSubsConfig or a QueueConfig record
+# ConnectionString format:
+# Endpoint=sb://namespace_DNS_Name;EntityPath=EVENT_HUB_NAME;
+# SharedAccessKeyName=SHARED_ACCESS_KEY_NAME;SharedAccessKey=SHARED_ACCESS_KEY or
+# Endpoint=sb://namespace_DNS_Name;EntityPath=EVENT_HUB_NAME;
+# SharedAccessSignatureToken=SHARED_ACCESS_SIGNATURE_TOKEN
+# + entityConfig - This field holds the configuration details of either a topic or a queue. The type of the entity is
+# determined by the entityType field. The actual configuration details are stored in either a
+# TopicSubsConfig or a QueueConfig record
 # + receiveMode - This field holds the receive modes(RECEIVE_AND_DELETE/PEEK_LOCK) for the connection. The receive mode determines how messages are 
 # retrieved from the entity. The default value is PEEK_LOCK  
 # + maxAutoLockRenewDuration - Max lock renewal duration under PEEK_LOCK mode in seconds. Setting to 0 disables auto-renewal. 
-#                              For RECEIVE_AND_DELETE mode, auto-renewal is disabled. Default 300 seconds.
+# For RECEIVE_AND_DELETE mode, auto-renewal is disabled. Default 300 seconds.
 # + amqpRetryOptions - Retry configurations related to underlying AMQP message receiver
 @display {label: "Receiver Connection Config"}
 public type ASBServiceReceiverConfig record {
@@ -204,7 +204,7 @@ public type QueueConfig record {
 # Holds the configuration details needed to create a sender connection to Azure Service Bus
 #
 # + entityType - An enumeration value of type EntityType, which specifies whether the connection is for a topic or a queue. 
-#                The valid values are TOPIC and QUEUE
+# The valid values are TOPIC and QUEUE
 # + topicOrQueueName - A string field that holds the name of the topic or queue
 # + connectionString - A string field that holds the Service Bus connection string with Shared Access Signatures.
 # + amqpRetryOptions - Retry configurations related to underlying AMQP message sender
@@ -269,6 +269,7 @@ public type SqlRule record {
     string filter;
     string action;
 };
+
 # Create Rule Options
 #
 # + rule - Represents a SQL filter which is a composition of an expression and an action that is executed in the pub/sub pipeline.
@@ -319,29 +320,29 @@ public type RuleList record {
 # + userMetadata - Metadata associated with the subscription.
 @display {label: "Create Subscription Options"}
 public type CreateSubscriptionOptions record {
-    @display {label:"Auto Delete On Idle"}
+    @display {label: "Auto Delete On Idle"}
     Duration autoDeleteOnIdle?;
-    @display {label:"Enable Batched Operations"}
+    @display {label: "Enable Batched Operations"}
     boolean enableBatchedOperations?;
-    @display {label:"Dead Lettering On Message Expiration"}
+    @display {label: "Dead Lettering On Message Expiration"}
     boolean deadLetteringOnMessageExpiration?;
-    @display {label:"Default Message Time To Live"}
+    @display {label: "Default Message Time To Live"}
     Duration defaultMessageTimeToLive?;
-    @display {label:"Dead Lettering On Filter Evaluation Exceptions"}
+    @display {label: "Dead Lettering On Filter Evaluation Exceptions"}
     boolean deadLetteringOnFilterEvaluationExceptions?;
-    @display {label:"Forward Dead Lettered Messages To"}
+    @display {label: "Forward Dead Lettered Messages To"}
     string forwardDeadLetteredMessagesTo?;
-    @display {label:"Forward To"}
+    @display {label: "Forward To"}
     string forwardTo?;
-    @display {label:"Lock Duration"}
+    @display {label: "Lock Duration"}
     Duration lockDuration?;
-    @display {label:"Max Delivery Count"}
+    @display {label: "Max Delivery Count"}
     int maxDeliveryCount?;
-    @display {label:"Requires Session"}
+    @display {label: "Requires Session"}
     boolean requiresSession?;
-    @display {label:"Status"}
+    @display {label: "Status"}
     EntityStatus status?;
-    @display {label:"User Metadata"}
+    @display {label: "User Metadata"}
     string userMetadata?;
 };
 
@@ -361,35 +362,35 @@ public type CreateSubscriptionOptions record {
 # + deadLetteringOnFilterEvaluationExceptions - A value that indicates whether this subscription has dead letter support when a message expires.
 # + deadLetteringOnMessageExpiration - A value that indicates whether this subscription has dead letter support when a message expires.
 # + requiresSession - A value that indicates whether the queue supports the concept of sessions.
-@display {label:"Subscription Properties"}
+@display {label: "Subscription Properties"}
 public type SubscriptionProperties record {
-    @display {label:"Auto Delete On Idle"}
+    @display {label: "Auto Delete On Idle"}
     Duration autoDeleteOnIdle;
-    @display {label:"Default Message Time To Live"}
+    @display {label: "Default Message Time To Live"}
     Duration defaultMessageTimeToLive;
-    @display {label:"Forward Dead Lettered Messages To"}
+    @display {label: "Forward Dead Lettered Messages To"}
     string forwardDeadLetteredMessagesTo;
-    @display {label:"Forward To"}
+    @display {label: "Forward To"}
     string forwardTo;
-    @display {label:"Lock Duration"}
+    @display {label: "Lock Duration"}
     Duration lockDuration;
-    @display {label:"Max Delivery Count"}
+    @display {label: "Max Delivery Count"}
     int maxDeliveryCount;
-    @display {label:"Status"}
+    @display {label: "Status"}
     EntityStatus status;
-    @display {label:"Subscription Name"}
+    @display {label: "Subscription Name"}
     string subscriptionName;
-    @display {label:"Topic Name"}
+    @display {label: "Topic Name"}
     string topicName;
-    @display {label:"User Metadata"}
+    @display {label: "User Metadata"}
     string userMetadata;
-    @display {label:"Enable Batched Operations"}
+    @display {label: "Enable Batched Operations"}
     boolean enableBatchedOperations;
-    @display {label:"Dead Lettering On Filter Evaluation Exceptions"}
+    @display {label: "Dead Lettering On Filter Evaluation Exceptions"}
     boolean deadLetteringOnFilterEvaluationExceptions;
-    @display {label:"Dead Lettering On Message Expiration"}
+    @display {label: "Dead Lettering On Message Expiration"}
     boolean deadLetteringOnMessageExpiration;
-    @display {label:"Requires Session"}
+    @display {label: "Requires Session"}
     boolean requiresSession;
 };
 
@@ -406,36 +407,36 @@ public type SubscriptionProperties record {
 # + maxDeliveryCount - The maximum delivery count. A message is automatically deadlettered after this number of deliveries. Default value is 10.
 # + status - Enumerates the possible values for the status of a messaging entity.
 # + userMetadata - Metadata associated with the subscription.
-@display {label:"Update Subscription Options"}
+@display {label: "Update Subscription Options"}
 public type UpdateSubscriptionOptions record {
-    @display {label:"Auto Delete On Idle"}
+    @display {label: "Auto Delete On Idle"}
     Duration autoDeleteOnIdle?;
-    @display {label:"Default Message Time To Live"}
+    @display {label: "Default Message Time To Live"}
     Duration defaultMessageTimeToLive?;
-    @display {label:"Dead Lettering On Message Expiration"}
+    @display {label: "Dead Lettering On Message Expiration"}
     boolean deadLetteringOnMessageExpiration?;
-    @display {label:"Dead Lettering On Filter Evaluation Exceptions"}
+    @display {label: "Dead Lettering On Filter Evaluation Exceptions"}
     boolean deadLetteringOnFilterEvaluationExceptions?;
-    @display {label:"Enable Batched Operations"}
+    @display {label: "Enable Batched Operations"}
     boolean enableBatchedOperations?;
-    @display {label:"Forward Dead Lettered Messages To"}
+    @display {label: "Forward Dead Lettered Messages To"}
     string forwardDeadLetteredMessagesTo?;
-    @display {label:"Forward To"}
+    @display {label: "Forward To"}
     string forwardTo?;
-    @display {label:"Lock Duration"}
+    @display {label: "Lock Duration"}
     Duration lockDuration?;
-    @display {label:"Max Delivery Count"}
+    @display {label: "Max Delivery Count"}
     int maxDeliveryCount?;
-    @display {label:"Status"}
+    @display {label: "Status"}
     EntityStatus status?;
-    @display {label:"User Metadata"}
+    @display {label: "User Metadata"}
     string userMetadata?;
 };
 
 # Subscription List
 #
 # + list - The list of subscriptions.
-@display {label:"Subscription List"}
+@display {label: "Subscription List"}
 public type SubscriptionList record {
     SubscriptionProperties[] list;
 };
@@ -455,33 +456,33 @@ public type SubscriptionList record {
 # + requiresDuplicateDetection - Value indicating if this queue requires duplicate detection.
 # + enablePartitioning - Value that indicates whether the queue is to be partitioned across multiple message brokers.
 # + supportOrdering - Defines whether ordering needs to be maintained.
-@display {label:"Topic Properties"}
+@display {label: "Topic Properties"}
 public type TopicProperties record {
-    @display {label:"Name"}
+    @display {label: "Name"}
     string name;
-    @display {label:"Authorization Rules"}
+    @display {label: "Authorization Rules"}
     AuthorizationRule[] authorizationRules;
-    @display {label:"Auto Delete On Idle"}
+    @display {label: "Auto Delete On Idle"}
     Duration autoDeleteOnIdle;
-    @display {label:"Default Message Time To Live"}
+    @display {label: "Default Message Time To Live"}
     Duration defaultMessageTimeToLive;
-    @display {label:"Duplicate Detection History Time Window"}
+    @display {label: "Duplicate Detection History Time Window"}
     Duration duplicateDetectionHistoryTimeWindow;
-    @display {label:"Max Message Size In Kilobytes"}
+    @display {label: "Max Message Size In Kilobytes"}
     int maxMessageSizeInKilobytes;
-    @display {label:"Max Size In Megabytes"}
+    @display {label: "Max Size In Megabytes"}
     int maxSizeInMegabytes;
-    @display {label:"Status"}
+    @display {label: "Status"}
     EntityStatus status;
-    @display {label:"User Metadata"}
+    @display {label: "User Metadata"}
     string userMetadata;
-    @display {label:"Enable Batched Operations"}
+    @display {label: "Enable Batched Operations"}
     boolean enableBatchedOperations;
-    @display {label:"Requires Duplicate Detection"}
+    @display {label: "Requires Duplicate Detection"}
     boolean requiresDuplicateDetection;
-    @display {label:"Enable Partitioning"}
+    @display {label: "Enable Partitioning"}
     boolean enablePartitioning;
-    @display {label:"Support Ordering"}
+    @display {label: "Support Ordering"}
     boolean supportOrdering;
 };
 
@@ -502,37 +503,37 @@ public type TopicProperties record {
 # + enablePartitioning - Value that indicates whether the queue is to be partitioned across multiple message brokers.
 # + requiresSession - Value that indicates whether the queue supports the concept of sessions.
 # + supportOrdering - Defines whether ordering needs to be maintained.
-@display {label:"Create Topic Options"}
+@display {label: "Create Topic Options"}
 public type CreateTopicOptions record {
-    @display {label:"Auto Delete On Idle"}
+    @display {label: "Auto Delete On Idle"}
     Duration autoDeleteOnIdle?;
-    @display {label:"Default Message Time To Live"}
+    @display {label: "Default Message Time To Live"}
     Duration defaultMessageTimeToLive?;
-    @display {label:"Duplicate Detection History Time Window"}
+    @display {label: "Duplicate Detection History Time Window"}
     Duration duplicateDetectionHistoryTimeWindow?;
-    @display {label:"Lock Duration"}
+    @display {label: "Lock Duration"}
     Duration lockDuration?;
-    @display {label:"Max Delivery Count"}
+    @display {label: "Max Delivery Count"}
     int maxDeliveryCount?;
-    @display {label:"Max Message Size In Kilobytes"}
+    @display {label: "Max Message Size In Kilobytes"}
     int maxMessageSizeInKilobytes?;
-    @display {label:"Max Size In Megabytes"}
+    @display {label: "Max Size In Megabytes"}
     int maxSizeInMegabytes?;
-    @display {label:"Status"}
+    @display {label: "Status"}
     EntityStatus status?;
-    @display {label:"User Metadata"}
+    @display {label: "User Metadata"}
     string userMetadata?;
-    @display {label:"Enable Batched Operations"}
+    @display {label: "Enable Batched Operations"}
     boolean enableBatchedOperations?;
-    @display {label:"Dead Lettering On Message Expiration"}
+    @display {label: "Dead Lettering On Message Expiration"}
     boolean deadLetteringOnMessageExpiration?;
-    @display {label:"Requires Duplicate Detection"}
+    @display {label: "Requires Duplicate Detection"}
     boolean requiresDuplicateDetection?;
-    @display {label:"Enable Partitioning"}
+    @display {label: "Enable Partitioning"}
     boolean enablePartitioning?;
-    @display {label:"Requires Session"}
+    @display {label: "Requires Session"}
     boolean requiresSession?;
-    @display {label:"Support Ordering"}
+    @display {label: "Support Ordering"}
     boolean supportOrdering?;
 };
 
@@ -552,42 +553,42 @@ public type CreateTopicOptions record {
 # + enablePartitioning - Value that indicates whether the queue is to be partitioned across multiple message brokers.
 # + requiresSession - Value that indicates whether the queue supports the concept of sessions.
 # + supportOrdering - Defines whether ordering needs to be maintained.
-@display {label:"Update Topic Options"}
+@display {label: "Update Topic Options"}
 public type UpdateTopicOptions record {
-    @display {label:"Auto Delete On Idle"}
+    @display {label: "Auto Delete On Idle"}
     Duration autoDeleteOnIdle?;
-    @display {label:"Default Message Time To Live"}
+    @display {label: "Default Message Time To Live"}
     Duration defaultMessageTimeToLive?;
-    @display {label:"Duplicate Detection History Time Window"}
+    @display {label: "Duplicate Detection History Time Window"}
     Duration duplicateDetectionHistoryTimeWindow?;
-    @display {label:"Max Delivery Count"}
+    @display {label: "Max Delivery Count"}
     int maxDeliveryCount?;
-    @display {label:"Max Message Size In Kilobytes"}
+    @display {label: "Max Message Size In Kilobytes"}
     int maxMessageSizeInKilobytes?;
-    @display {label:"Max Size In Megabytes"}
+    @display {label: "Max Size In Megabytes"}
     int maxSizeInMegabytes?;
-    @display {label:"Status"}
+    @display {label: "Status"}
     EntityStatus status?;
-    @display {label:"User Metadata"}
+    @display {label: "User Metadata"}
     string userMetadata?;
-    @display {label:"Enable Batched Operations"}
+    @display {label: "Enable Batched Operations"}
     boolean enableBatchedOperations?;
-    @display {label:"Dead Lettering On Message Expiration"}
+    @display {label: "Dead Lettering On Message Expiration"}
     boolean deadLetteringOnMessageExpiration?;
-    @display {label:"Requires Duplicate Detection"}
+    @display {label: "Requires Duplicate Detection"}
     boolean requiresDuplicateDetection?;
-    @display {label:"Enable Partitioning"}
+    @display {label: "Enable Partitioning"}
     boolean enablePartitioning?;
-    @display {label:"Requires Session"}
+    @display {label: "Requires Session"}
     boolean requiresSession?;
-    @display {label:"Support Ordering"}
+    @display {label: "Support Ordering"}
     boolean supportOrdering?;
 };
 
 # Topic List
 #
 # + list - The list of topics.
-@display {label:"Topic List"}
+@display {label: "Topic List"}
 public type TopicList record {
     TopicProperties[] list;
 };
@@ -612,43 +613,43 @@ public type TopicList record {
 # + requiresDuplicateDetection - Value indicating if this queue requires duplicate detection.
 # + enablePartitioning - Value that indicates whether the queue is to be partitioned across multiple message brokers.
 # + requiresSession - Value that indicates whether the queue supports the concept of sessions.
-@display {label:"Queue Properties"}
+@display {label: "Queue Properties"}
 public type QueueProperties record {
-    @display {label:"Authorization Rules"}
+    @display {label: "Authorization Rules"}
     AuthorizationRule[] authorizationRules;
-    @display {label:"Auto Delete On Idle"}
+    @display {label: "Auto Delete On Idle"}
     Duration autoDeleteOnIdle;
-    @display {label:"Default Message Time To Live"}
+    @display {label: "Default Message Time To Live"}
     Duration defaultMessageTimeToLive;
-    @display {label:"Duplicate Detection History Time Window"}
+    @display {label: "Duplicate Detection History Time Window"}
     Duration duplicateDetectionHistoryTimeWindow;
-    @display {label:"Forward Dead Lettered Messages To"}
+    @display {label: "Forward Dead Lettered Messages To"}
     string forwardDeadLetteredMessagesTo;
-    @display {label:"Forward To"}
+    @display {label: "Forward To"}
     string forwardTo;
-    @display {label:"Lock Duration"}
+    @display {label: "Lock Duration"}
     Duration lockDuration;
-    @display {label:"Max Delivery Count"}
+    @display {label: "Max Delivery Count"}
     int maxDeliveryCount;
-    @display {label:"Max Message Size In Kilobytes"}
+    @display {label: "Max Message Size In Kilobytes"}
     int maxMessageSizeInKilobytes;
-    @display {label:"Max Size In Megabytes"}
+    @display {label: "Max Size In Megabytes"}
     int maxSizeInMegabytes;
-    @display {label:"Name"}
+    @display {label: "Name"}
     string name;
-    @display {label:"Status"}
+    @display {label: "Status"}
     EntityStatus status;
-    @display {label:"User Metadata"}
+    @display {label: "User Metadata"}
     string userMetadata;
-    @display {label:"Enable Batched Operations"}
+    @display {label: "Enable Batched Operations"}
     boolean enableBatchedOperations;
-    @display {label:"Dead Lettering On Message Expiration"}
+    @display {label: "Dead Lettering On Message Expiration"}
     boolean deadLetteringOnMessageExpiration;
-    @display {label:"Requires Duplicate Detection"}
+    @display {label: "Requires Duplicate Detection"}
     boolean requiresDuplicateDetection;
-    @display {label:"Enable Partitioning"}
+    @display {label: "Enable Partitioning"}
     boolean enablePartitioning;
-    @display {label:"Requires Session"}
+    @display {label: "Requires Session"}
     boolean requiresSession;
 };
 
@@ -670,39 +671,39 @@ public type QueueProperties record {
 # + requiresDuplicateDetection - Value indicating if this queue requires duplicate detection.
 # + enablePartitioning - Value that indicates whether the queue is to be partitioned across multiple message brokers.
 # + requiresSession - Value that indicates whether the queue supports the concept of sessions.
-@display {label:"Create Queue Options"}
+@display {label: "Create Queue Options"}
 public type CreateQueueOptions record {
-    @display {label:"Auto Delete On Idle"}
+    @display {label: "Auto Delete On Idle"}
     Duration autoDeleteOnIdle?;
-    @display {label:"Default Message Time To Live"}
+    @display {label: "Default Message Time To Live"}
     Duration defaultMessageTimeToLive?;
-    @display {label:"Duplicate Detection History Time Window"}
+    @display {label: "Duplicate Detection History Time Window"}
     Duration duplicateDetectionHistoryTimeWindow?;
-    @display {label:"Forward Dead Lettered Messages To"}
+    @display {label: "Forward Dead Lettered Messages To"}
     string forwardDeadLetteredMessagesTo?;
-    @display {label:"Forward To"}
+    @display {label: "Forward To"}
     string forwardTo?;
-    @display {label:"Lock Duration"}
+    @display {label: "Lock Duration"}
     Duration lockDuration?;
-    @display {label:"Max Delivery Count"}
+    @display {label: "Max Delivery Count"}
     int maxDeliveryCount?;
-    @display {label:"Max Message Size In Kilobytes"}
+    @display {label: "Max Message Size In Kilobytes"}
     int maxMessageSizeInKilobytes?;
-    @display {label:"Max Size In Megabytes"}
+    @display {label: "Max Size In Megabytes"}
     int maxSizeInMegabytes?;
-    @display {label:"Status"}
+    @display {label: "Status"}
     EntityStatus status?;
-    @display {label:"User Metadata"}
+    @display {label: "User Metadata"}
     string userMetadata?;
-    @display {label:"Enable Batched Operations"}
+    @display {label: "Enable Batched Operations"}
     boolean enableBatchedOperations?;
-    @display {label:"Dead Lettering On Message Expiration"}
+    @display {label: "Dead Lettering On Message Expiration"}
     boolean deadLetteringOnMessageExpiration?;
-    @display {label:"Requires Duplicate Detection"}
+    @display {label: "Requires Duplicate Detection"}
     boolean requiresDuplicateDetection?;
-    @display {label:"Enable Partitioning"}
+    @display {label: "Enable Partitioning"}
     boolean enablePartitioning?;
-    @display {label:"Requires Session"}
+    @display {label: "Requires Session"}
     boolean requiresSession?;
 };
 
@@ -724,46 +725,46 @@ public type CreateQueueOptions record {
 # + requiresDuplicateDetection - Value indicating if this queue requires duplicate detection.
 # + enablePartitioning - Value that indicates whether the queue is to be partitioned across multiple message brokers.
 # + requiresSession - Value that indicates whether the queue supports the concept of sessions.
-@display {label:"Update Queue Options"}
+@display {label: "Update Queue Options"}
 public type UpdateQueueOptions record {
-    @display {label:"Auto Delete On Idle"}
+    @display {label: "Auto Delete On Idle"}
     Duration autoDeleteOnIdle?;
-    @display {label:"Default Message Time To Live"}
+    @display {label: "Default Message Time To Live"}
     Duration defaultMessageTimeToLive?;
-    @display {label:"Duplicate Detection History Time Window"}
+    @display {label: "Duplicate Detection History Time Window"}
     Duration duplicateDetectionHistoryTimeWindow?;
-    @display {label:"Forward Dead Lettered Messages To"}
+    @display {label: "Forward Dead Lettered Messages To"}
     string forwardDeadLetteredMessagesTo?;
-    @display {label:"Forward To"}
+    @display {label: "Forward To"}
     string forwardTo?;
-    @display {label:"Lock Duration"}
+    @display {label: "Lock Duration"}
     Duration lockDuration?;
-    @display {label:"Max Delivery Count"}
+    @display {label: "Max Delivery Count"}
     int maxDeliveryCount?;
-    @display {label:"Max Message Size In Kilobytes"}
+    @display {label: "Max Message Size In Kilobytes"}
     int maxMessageSizeInKilobytes?;
-    @display {label:"Max Size In Megabytes"}
+    @display {label: "Max Size In Megabytes"}
     int maxSizeInMegabytes?;
-    @display {label:"Status"}
+    @display {label: "Status"}
     EntityStatus status?;
-    @display {label:"User Metadata"}
+    @display {label: "User Metadata"}
     string userMetadata?;
-    @display {label:"Enable Batched Operations"}
+    @display {label: "Enable Batched Operations"}
     boolean enableBatchedOperations?;
-    @display {label:"Dead Lettering On Message Expiration"}
+    @display {label: "Dead Lettering On Message Expiration"}
     boolean deadLetteringOnMessageExpiration?;
-    @display {label:"Requires Duplicate Detection"}
+    @display {label: "Requires Duplicate Detection"}
     boolean requiresDuplicateDetection?;
-    @display {label:"Enable Partitioning"}
+    @display {label: "Enable Partitioning"}
     boolean enablePartitioning?;
-    @display {label:"Requires Session"}
+    @display {label: "Requires Session"}
     boolean requiresSession?;
 };
 
 # Queue List
 #
 # + list - The list of queues.
-@display {label:"Queue List"}
+@display {label: "Queue List"}
 public type QueueList record {
     QueueProperties[] list;
 };
@@ -772,12 +773,12 @@ public type QueueList record {
 #
 # + seconds - Seconds
 # + nanoseconds - Nanoseconds
-@display {label:"Duration"}
+@display {label: "Duration"}
 public type Duration record {
-    @display {label:"Seconds"}
-    int seconds=0;
-    @display {label:"Nano Seconds"}
-    int nanoseconds=0;
+    @display {label: "Seconds"}
+    int seconds = 0;
+    @display {label: "Nano Seconds"}
+    int nanoseconds = 0;
 };
 
 # AuthorizationRule
@@ -790,23 +791,23 @@ public type Duration record {
 # + modifiedAt - The exact time the rule was modified.
 # + primaryKey - The primary key associated with the rule.
 # + secondaryKey - The secondary key associated with the rule.
-@display {label:"Authorization Rule"}
+@display {label: "Authorization Rule"}
 public type AuthorizationRule record {
-    @display {label:"Access Rights"}
+    @display {label: "Access Rights"}
     AccessRight[] accessRights;
-    @display {label:"Claim Type"}
+    @display {label: "Claim Type"}
     string claimType;
-    @display {label:"Claim Value"}
+    @display {label: "Claim Value"}
     string claimValue;
-    @display {label:"Created At"}
+    @display {label: "Created At"}
     string createdAt;
-    @display {label:"Key Name"}
+    @display {label: "Key Name"}
     string keyName;
-    @display {label:"Modified At"}
+    @display {label: "Modified At"}
     string modifiedAt;
-    @display {label:"Primary Key"}
+    @display {label: "Primary Key"}
     string primaryKey;
-    @display {label:"Secondary Key"}
+    @display {label: "Secondary Key"}
     string secondaryKey;
 };
 
