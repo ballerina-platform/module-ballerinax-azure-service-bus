@@ -24,8 +24,8 @@ configurable string connectionString = ?;
 // list queues in a service bus namespace.
 public function main() returns error? {
     log:printInfo("Initializing Asb admin client...");
-    asb:Administrator Administrator = check new (connectionString);
-    asb:QueueList? queues = check Administrator->listQueues();
+    asb:Administrator adminClient = check new (connectionString);
+    asb:QueueList? queues = check adminClient->listQueues();
     if queues is asb:QueueList {
         log:printInfo(queues.toString());
     } else {

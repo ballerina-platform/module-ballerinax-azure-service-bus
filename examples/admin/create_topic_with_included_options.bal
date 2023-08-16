@@ -42,8 +42,8 @@ configurable string connectionString = ?;
 // create a  topic with given configurations in Azure Service Bus.
 public function main() returns error? {
     log:printInfo("Initializing Asb admin client...");
-    asb:Administrator Administrator = check new (connectionString);
-    asb:TopicProperties? topic = check Administrator->createTopic("test-topic",
+    asb:Administrator adminClient = check new (connectionString);
+    asb:TopicProperties? topic = check adminClient->createTopic("test-topic",
         autoDeleteOnIdle = deletion,
         defaultMessageTimeToLive = ttl,
         duplicateDetectionHistoryTimeWindow = dupdue,

@@ -24,8 +24,8 @@ configurable string connectionString = ?;
 // create a queue in the service bus.
 public function main() returns error? {
     log:printInfo("Initializing Asb admin client...");
-    asb:Administrator Administrator = check new (connectionString);
-    asb:QueueProperties? queue = check Administrator->createQueue("test-queue");
+    asb:Administrator adminClient = check new (connectionString);
+    asb:QueueProperties? queue = check adminClient->createQueue("test-queue");
     if queue is asb:QueueProperties {
         log:printInfo(queue.toString());
     } else {

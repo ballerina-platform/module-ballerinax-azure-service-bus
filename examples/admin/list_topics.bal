@@ -24,8 +24,8 @@ configurable string connectionString = ?;
 // retrieve the list of topics in a service bus namespace.
 public function main() returns error? {
     log:printInfo("Initializing Asb admin client...");
-    asb:Administrator Administrator = check new (connectionString);
-    asb:TopicList? topics = check Administrator->listTopics();
+    asb:Administrator adminClient  = check new (connectionString);
+    asb:TopicList? topics = check adminClient->listTopics();
     if topics is asb:TopicList {
         log:printInfo("Topic list retrieved successfully");
         log:printInfo("Topic list : " + topics.list.toString());

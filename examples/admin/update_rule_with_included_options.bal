@@ -29,8 +29,8 @@ configurable string connectionString = ?;
 // update a rule in a subscription.
 public function main() returns error? {
     log:printInfo("Initializing Asb admin client...");
-    asb:Administrator Administrator = check new (connectionString);
-    asb:RuleProperties? rule = check Administrator->updateRule("test-topic", "test-subscription", "test-rule", RULE);
+    asb:Administrator adminClient = check new (connectionString);
+    asb:RuleProperties? rule = check adminClient->updateRule("test-topic", "test-subscription", "test-rule", RULE);
     if rule is asb:RuleProperties {
         log:printInfo(rule.toString());
     } else {

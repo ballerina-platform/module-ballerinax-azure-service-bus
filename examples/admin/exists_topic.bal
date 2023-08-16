@@ -24,8 +24,8 @@ configurable string connectionString = ?;
 // check whether a topic exists in the service bus namespace.
 public function main() returns error? {
     log:printInfo("Initializing Asb admin client...");
-    asb:Administrator Administrator = check new (connectionString);
-    boolean? topicExists = check Administrator->topicExists("test-topic");
+    asb:Administrator adminClient = check new (connectionString);
+    boolean? topicExists = check adminClient->topicExists("test-topic");
     if topicExists is boolean {
         log:printInfo("Topic exists: " + topicExists.toString());
     } else {

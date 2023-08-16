@@ -24,8 +24,8 @@ configurable string connectionString = ?;
 // retrieve the list of subscriptions for a given topic.
 public function main() returns error? {
     log:printInfo("Initializing Asb admin client...");
-    asb:Administrator Administrator = check new (connectionString);
-    asb:SubscriptionList? subs = check Administrator->listSubscriptions("test-topic");
+    asb:Administrator adminClient  = check new (connectionString);
+    asb:SubscriptionList? subs = check adminClient->listSubscriptions("test-topic");
     if subs is asb:SubscriptionList {
         log:printInfo("Subscription list retrieved successfully");
         log:printInfo("Subscription list : " + subs.list.toString());

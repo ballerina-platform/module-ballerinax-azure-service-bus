@@ -24,8 +24,8 @@ configurable string connectionString = ?;
 // delete a subscription from a topic.
 public function main() returns error? {
     log:printInfo("Initializing Asb admin client.");
-    asb:Administrator Administrator = check new (connectionString);
-    asb:Error? result = check Administrator->deleteSubscription("test-topic", "test-subscription");
+    asb:Administrator adminClient = check new (connectionString);
+    asb:Error? result = check adminClient->deleteSubscription("test-topic", "test-subscription");
     if result is asb:Error {
         log:printError(result.toString());
     } else {
