@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
  *
- * WSO2 Inc. licenses this file to you under the Apache License,
+ * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,8 +15,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.ballerinax.asb.admin;
 
+package org.ballerinax.asb.admin;
 
 import com.azure.core.exception.HttpResponseException;
 import com.azure.core.http.rest.PagedIterable;
@@ -65,8 +65,8 @@ import static io.ballerina.runtime.api.creators.ValueCreator.createRecordValue;
 /**
  * This facilitates the client operations of ASB Administrator client in Ballerina.
  */
-public class ASBAdministration {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ASBAdministration.class);
+public class AdminClient {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AdminClient.class);
     /**
      * Parameterized constructor for ASB Administrator (ServiceBusAdminClient).
      *
