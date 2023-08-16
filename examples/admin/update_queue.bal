@@ -58,8 +58,8 @@ configurable string connectionString = ?;
 // update a queue in the service bus.
 public function main() returns error? {
     log:printInfo("Initializing Asb admin client...");
-    asb:AdminClient adminClient = check new (connectionString);
-    asb:QueueProperties? queue = check adminClient->updateQueue("test-queue", queueConfig);
+    asb:Administrator Administrator = check new (connectionString);
+    asb:QueueProperties? queue = check Administrator->updateQueue("test-queue", queueConfig);
     if (queue is asb:QueueProperties) {
         log:printInfo(queue.toString());
     } else {

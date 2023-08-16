@@ -24,8 +24,8 @@ configurable string connectionString = ?;
 // check whether a subscription exists in a topic.
 public function main() returns error? {
     log:printInfo("Initializing Asb admin client...");
-    asb:AdminClient adminClient = check new (connectionString);
-    boolean? subscriptionExists = check adminClient->subscriptionExists("test-topic", "test-subscription");
+    asb:Administrator Administrator = check new (connectionString);
+    boolean? subscriptionExists = check Administrator->subscriptionExists("test-topic", "test-subscription");
     if (subscriptionExists is boolean) {
         log:printInfo("Sub exists: " + subscriptionExists.toString());
     } else {

@@ -42,8 +42,8 @@ configurable string connectionString = ?;
 // update a topic in the service bus.
 public function main() returns error? {
     log:printInfo("Initializing Asb admin client...");
-    asb:AdminClient adminClient = check new (connectionString);
-    asb:TopicProperties? topic = check adminClient->updateTopic("test-topic",
+    asb:Administrator Administrator = check new (connectionString);
+    asb:TopicProperties? topic = check Administrator->updateTopic("test-topic",
         defaultMessageTimeToLive = ttl,
         duplicateDetectionHistoryTimeWindow = dupdue,
         maxSizeInMegabytes = 1024,

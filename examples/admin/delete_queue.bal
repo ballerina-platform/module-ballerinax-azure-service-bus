@@ -24,8 +24,8 @@ configurable string connectionString = ?;
 // delete a queue from the service bus.
 public function main() returns error? {
     log:printInfo("Initializing Asb admin client.");
-    asb:AdminClient adminClient = check new (connectionString);
-    asb:Error? result = check adminClient->deleteQueue("test-queue");
+    asb:Administrator Administrator = check new (connectionString);
+    asb:Error? result = check Administrator->deleteQueue("test-queue");
     if (result is asb:Error) {
         log:printError(result.toString());
     } else {

@@ -24,8 +24,8 @@ configurable string connectionString = ?;
 // get a subscription from a topic.
 public function main() returns error? {
     log:printInfo("Initializing Asb admin client...");
-    asb:AdminClient adminClient = check new (connectionString);
-    asb:SubscriptionProperties? sub = check adminClient->getSubscription("test-topic", "test-subscription");
+    asb:Administrator Administrator = check new (connectionString);
+    asb:SubscriptionProperties? sub = check Administrator->getSubscription("test-topic", "test-subscription");
     if (sub is asb:SubscriptionProperties) {
         log:printInfo(sub.toString());
     } else {

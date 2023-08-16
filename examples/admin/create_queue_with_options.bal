@@ -60,8 +60,8 @@ asb:CreateQueueOptions queueConfig = {
 
 public function main() returns error? {
     log:printInfo("Initializing Asb admin client...");
-    asb:AdminClient adminClient = check new (connectionString);
-    asb:QueueProperties? queue = check adminClient->createQueue("test-queue", queueConfig);
+    asb:Administrator Administrator = check new (connectionString);
+    asb:QueueProperties? queue = check Administrator->createQueue("test-queue", queueConfig);
     if (queue is asb:QueueProperties) {
         log:printInfo(queue.toString());
     } else {

@@ -24,8 +24,8 @@ configurable string connectionString = ?;
 // check whether a queue exists in the service bus namespace.
 public function main() returns error? {
     log:printInfo("Initializing Asb admin client...");
-    asb:AdminClient adminClient = check new (connectionString);
-    boolean? queueExists = check adminClient->queueExists("test-queue");
+    asb:Administrator Administrator = check new (connectionString);
+    boolean? queueExists = check Administrator->queueExists("test-queue");
     if (queueExists is boolean) {
         log:printInfo("Queue exists: " + queueExists.toString());
     } else {

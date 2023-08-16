@@ -49,12 +49,12 @@ int invalidRuleNameErrorPrefixLength = invalidRuleNameErrorPrefix.length();
 function testCreateQTSR() returns error? {
     log:printInfo("[[testCreateQueue/Topic/Subscription/Rule]]");
     log:printInfo("Initializing Asb admin client.");
-    AdminClient adminClient = check new (connectionString);
+    Administrator Administrator = check new (connectionString);
 
-    TopicProperties? topicProp = check adminClient->createTopic(testTopic3);
-    QueueProperties? queueProp = check adminClient->createQueue(testQueue3);
-    SubscriptionProperties? subProp = check adminClient->createSubscription(testTopic3, testSubscription3);
-    RuleProperties? ruleProp = check adminClient->createRule(testTopic3, testSubscription3, testRule3);
+    TopicProperties? topicProp = check Administrator->createTopic(testTopic3);
+    QueueProperties? queueProp = check Administrator->createQueue(testQueue3);
+    SubscriptionProperties? subProp = check Administrator->createSubscription(testTopic3, testSubscription3);
+    RuleProperties? ruleProp = check Administrator->createRule(testTopic3, testSubscription3, testRule3);
     if (topicProp is TopicProperties && queueProp is QueueProperties && subProp is SubscriptionProperties && ruleProp is RuleProperties) {
         log:printInfo("Topic, Queue, Subscription and Rule created successfully.");
     } else {
@@ -71,8 +71,8 @@ function testDuplicateTopicCreation() returns error? {
     log:printInfo("[[testDuplicateTopicCreation]]");
 
     log:printInfo("Initializing Asb admin client.");
-    AdminClient adminClient = check new (connectionString);
-    TopicProperties|Error? failedReq = adminClient->createTopic(testTopic3);
+    Administrator Administrator = check new (connectionString);
+    TopicProperties|Error? failedReq = Administrator->createTopic(testTopic3);
     test:assertTrue(failedReq is Error, msg = "Duplicate creation failed.");
     test:assertEquals((<Error>failedReq).message().substring(0, duplicateTopicQueueErrorPrefixLength), duplicateTopicQueueErrorPrefix);
 }
@@ -86,9 +86,9 @@ function testDuplicateQueueCreation() returns error? {
     log:printInfo("[[testDuplicateQueueCreation]]");
 
     log:printInfo("Initializing Asb admin client.");
-    AdminClient adminClient = check new (connectionString);
+    Administrator Administrator = check new (connectionString);
 
-    QueueProperties|Error? failedReq = adminClient->createQueue(testQueue3);
+    QueueProperties|Error? failedReq = Administrator->createQueue(testQueue3);
     test:assertTrue(failedReq is Error, msg = "Duplicate creation failed.");
     test:assertEquals((<Error>failedReq).message().substring(0, duplicateTopicQueueErrorPrefixLength), duplicateTopicQueueErrorPrefix);
 }
@@ -102,9 +102,9 @@ function testDuplicateSubscriptionCreation() returns error? {
     log:printInfo("[[testDuplicateSubscriptionCreation]]");
 
     log:printInfo("Initializing Asb admin client.");
-    AdminClient adminClient = check new (connectionString);
+    Administrator Administrator = check new (connectionString);
 
-    SubscriptionProperties|Error? failedReq = adminClient->createSubscription(testTopic3, testSubscription3);
+    SubscriptionProperties|Error? failedReq = Administrator->createSubscription(testTopic3, testSubscription3);
     test:assertTrue(failedReq is Error, msg = "Duplicate creation failed.");
     test:assertEquals((<Error>failedReq).message().substring(0, duplicateSubscriptionErrorPrefixLength), duplicateSubscriptionErrorPrefix);
 
@@ -119,9 +119,9 @@ function testDuplicateRuleCreation() returns error? {
     log:printInfo("[[testDuplicateRuleCreation]]");
 
     log:printInfo("Initializing Asb admin client.");
-    AdminClient adminClient = check new (connectionString);
+    Administrator Administrator = check new (connectionString);
 
-    RuleProperties|Error? failedReq = adminClient->createRule(testTopic3, testSubscription3, testRule3);
+    RuleProperties|Error? failedReq = Administrator->createRule(testTopic3, testSubscription3, testRule3);
     test:assertTrue(failedReq is Error, msg = "Duplicate creation failed.");
     test:assertEquals((<Error>failedReq).message().substring(0, duplicateRuleErrorPrefixLength), duplicateRuleErrorPrefix);
 
@@ -135,9 +135,9 @@ function testGetNonExistingTopic() returns error? {
     log:printInfo("[[testGetNonExistingTopic]]");
 
     log:printInfo("Initializing Asb admin client.");
-    AdminClient adminClient = check new (connectionString);
+    Administrator Administrator = check new (connectionString);
 
-    TopicProperties|Error? failedReq = adminClient->getTopic(nonExistingName);
+    TopicProperties|Error? failedReq = Administrator->getTopic(nonExistingName);
     test:assertTrue(failedReq is Error, msg = "Get non existing topic failed.");
     test:assertEquals((<Error>failedReq).toString(), nonExistingTopicError);
 }
@@ -150,9 +150,9 @@ function testGetNonExistingQueue() returns error? {
     log:printInfo("[[testGetNonExistingQueue]]");
 
     log:printInfo("Initializing Asb admin client.");
-    AdminClient adminClient = check new (connectionString);
+    Administrator Administrator = check new (connectionString);
 
-    QueueProperties|Error? failedReq = adminClient->getQueue(nonExistingName);
+    QueueProperties|Error? failedReq = Administrator->getQueue(nonExistingName);
     test:assertTrue(failedReq is Error, msg = "Get non existing queue failed.");
     test:assertEquals((<Error>failedReq).toString(), nonExistingQueueError);
 }
@@ -166,9 +166,9 @@ function testGetNonExistingSubscription() returns error? {
     log:printInfo("[[testGetNonExistingSubscription]]");
 
     log:printInfo("Initializing Asb admin client.");
-    AdminClient adminClient = check new (connectionString);
+    Administrator Administrator = check new (connectionString);
 
-    SubscriptionProperties|Error? failedReq = adminClient->getSubscription(testTopic3, nonExistingName);
+    SubscriptionProperties|Error? failedReq = Administrator->getSubscription(testTopic3, nonExistingName);
     test:assertTrue(failedReq is Error, msg = "Get non existing subscription failed.");
     test:assertEquals((<Error>failedReq).message().substring(0, nonExistingSubscriptionErrorPrefixLength), nonExistingSubscriptionErrorPrefix);
 }
@@ -182,9 +182,9 @@ function testGetNonExistingRule() returns error? {
     log:printInfo("[[testGetNonExistingRule]]");
 
     log:printInfo("Initializing Asb admin client.");
-    AdminClient adminClient = check new (connectionString);
+    Administrator Administrator = check new (connectionString);
 
-    RuleProperties|Error? failedReq = adminClient->getRule(testTopic3, testSubscription3, nonExistingName);
+    RuleProperties|Error? failedReq = Administrator->getRule(testTopic3, testSubscription3, nonExistingName);
     test:assertTrue(failedReq is Error, msg = "Get non existing rule failed.");
     test:assertEquals((<Error>failedReq).toString().substring(0, nonExistingRuleErrorPrefixLength), nonExistingRuleErrorPrefix);
 }
@@ -197,9 +197,9 @@ function testCreateInvalidTopic() returns error? {
     log:printInfo("[[testCreateInvalidTopic]]");
 
     log:printInfo("Initializing Asb admin client.");
-    AdminClient adminClient = check new (connectionString);
+    Administrator Administrator = check new (connectionString);
 
-    TopicProperties|Error? failedReq = adminClient->createTopic(invalidName);
+    TopicProperties|Error? failedReq = Administrator->createTopic(invalidName);
     test:assertTrue(failedReq is Error, msg = "Create invalid topic failed.");
     test:assertEquals((<Error>failedReq).message().substring(0, invalidNameErrorPrefixLength), invalidNameErrorPrefix);
 }
@@ -212,9 +212,9 @@ function testCreateInvalidQueue() returns error? {
     log:printInfo("[[testCreateInvalidQueue]]");
 
     log:printInfo("Initializing Asb admin client.");
-    AdminClient adminClient = check new (connectionString);
+    Administrator Administrator = check new (connectionString);
 
-    QueueProperties|Error? failedReq = adminClient->createQueue(invalidName);
+    QueueProperties|Error? failedReq = Administrator->createQueue(invalidName);
     test:assertTrue(failedReq is Error, msg = "Create invalid queue failed.");
     test:assertEquals((<Error>failedReq).message().substring(0, invalidNameErrorPrefixLength), invalidNameErrorPrefix);
 }
@@ -228,9 +228,9 @@ function testCreateInvalidSubscription() returns error? {
     log:printInfo("[[testCreateInvalidSubscription]]");
 
     log:printInfo("Initializing Asb admin client.");
-    AdminClient adminClient = check new (connectionString);
+    Administrator Administrator = check new (connectionString);
 
-    SubscriptionProperties|Error? failedReq = adminClient->createSubscription(testTopic3, invalidName);
+    SubscriptionProperties|Error? failedReq = Administrator->createSubscription(testTopic3, invalidName);
     test:assertTrue(failedReq is Error, msg = "Create invalid subscription failed.");
     test:assertEquals((<Error>failedReq).message().substring(0, invalidSubscriptionNameErrorPrefixLength), invalidSubscriptionNameErrorPrefix);
 }
@@ -244,9 +244,9 @@ function testCreateInvalidRule() returns error? {
     log:printInfo("[[testCreateInvalidRule]]");
 
     log:printInfo("Initializing Asb admin client.");
-    AdminClient adminClient = check new (connectionString);
+    Administrator Administrator = check new (connectionString);
 
-    RuleProperties|Error? failedReq = adminClient->createRule(testTopic3, testSubscription3, invalidName);
+    RuleProperties|Error? failedReq = Administrator->createRule(testTopic3, testSubscription3, invalidName);
     test:assertTrue(failedReq is Error, msg = "Create invalid rule failed.");
     test:assertEquals((<Error>failedReq).message().substring(0, invalidRuleNameErrorPrefixLength), invalidRuleNameErrorPrefix);
 }
@@ -260,9 +260,9 @@ function testDeleteQTSR() returns error? {
     log:printInfo("[[testDeleteQueue/Topic/Subscription/Rule]]");
 
     log:printInfo("Initializing Asb admin client.");
-    AdminClient adminClient = check new (connectionString);
+    Administrator Administrator = check new (connectionString);
 
-    check adminClient->deleteTopic(testTopic3);
-    check adminClient->deleteQueue(testQueue3);
+    check Administrator->deleteTopic(testTopic3);
+    check Administrator->deleteQueue(testQueue3);
     log:printInfo("Topic, Queue, Subscription and Rule deleted successfully.");
 }

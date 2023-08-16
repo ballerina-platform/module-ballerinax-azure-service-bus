@@ -24,8 +24,8 @@ configurable string connectionString = ?;
 // delete a rule from a subscription.
 public function main() returns error? {
     log:printInfo("Initializing Asb admin client.");
-    asb:AdminClient adminClient = check new (connectionString);
-    asb:Error? result = check adminClient->deleteRule("test-topic", "test-subscription", "test-rule");
+    asb:Administrator Administrator = check new (connectionString);
+    asb:Error? result = check Administrator->deleteRule("test-topic", "test-subscription", "test-rule");
     if (result is asb:Error) {
         log:printError(result.toString());
     } else {

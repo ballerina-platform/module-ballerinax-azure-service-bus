@@ -58,8 +58,8 @@ configurable string connectionString = ?;
 // create a subscription in a topic.
 public function main() returns error? {
     log:printInfo("Initializing Asb admin client...");
-    asb:AdminClient adminClient = check new (connectionString);
-    asb:TopicProperties? topic = check adminClient->createTopic("test-topic", queueConfig);
+    asb:Administrator Administrator = check new (connectionString);
+    asb:TopicProperties? topic = check Administrator->createTopic("test-topic", queueConfig);
     if (topic is asb:TopicProperties) {
         log:printInfo(topic.toString());
     } else {

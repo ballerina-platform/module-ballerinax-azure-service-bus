@@ -38,8 +38,8 @@ configurable string connectionString = ?;
 // update a subscription in a topic.
 public function main() returns error? {
     log:printInfo("Initializing Asb admin client...");
-    asb:AdminClient adminClient = check new (connectionString);
-    asb:SubscriptionProperties? sub = check adminClient->updateSubscription("test-topic", "test-subscription",
+    asb:Administrator Administrator = check new (connectionString);
+    asb:SubscriptionProperties? sub = check Administrator->updateSubscription("test-topic", "test-subscription",
         defaultMessageTimeToLive = ttl,
         deadLetteringOnMessageExpiration = false,
         enableBatchedOperations = false,
