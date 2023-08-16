@@ -26,7 +26,7 @@ public function main() returns error? {
     log:printInfo("Initializing Asb admin client...");
     asb:Administrator Administrator = check new (connectionString);
     asb:QueueList? queues = check Administrator->listQueues();
-    if (queues is asb:QueueList) {
+    if queues is asb:QueueList {
         log:printInfo(queues.toString());
     } else {
         log:printError("Error while listing queues.");

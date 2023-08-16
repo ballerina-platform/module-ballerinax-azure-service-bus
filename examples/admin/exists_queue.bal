@@ -26,7 +26,7 @@ public function main() returns error? {
     log:printInfo("Initializing Asb admin client...");
     asb:Administrator Administrator = check new (connectionString);
     boolean? queueExists = check Administrator->queueExists("test-queue");
-    if (queueExists is boolean) {
+    if queueExists is boolean {
         log:printInfo("Queue exists: " + queueExists.toString());
     } else {
         log:printError("Queue exists failed.");

@@ -57,12 +57,11 @@ asb:CreateQueueOptions queueConfig = {
 
 // This sample demonstrates a scenario where azure service bus connecter is used to 
 // create a queue in azure service bus. 
-
 public function main() returns error? {
     log:printInfo("Initializing Asb admin client...");
     asb:Administrator Administrator = check new (connectionString);
     asb:QueueProperties? queue = check Administrator->createQueue("test-queue", queueConfig);
-    if (queue is asb:QueueProperties) {
+    if queue is asb:QueueProperties {
         log:printInfo(queue.toString());
     } else {
         log:printError(queue.toString());

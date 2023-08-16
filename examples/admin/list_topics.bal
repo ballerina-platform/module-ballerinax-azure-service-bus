@@ -26,7 +26,7 @@ public function main() returns error? {
     log:printInfo("Initializing Asb admin client...");
     asb:Administrator Administrator = check new (connectionString);
     asb:TopicList? topics = check Administrator->listTopics();
-    if (topics is asb:TopicList) {
+    if topics is asb:TopicList {
         log:printInfo("Topic list retrieved successfully");
         log:printInfo("Topic list : " + topics.list.toString());
     } else {

@@ -56,7 +56,7 @@ public function main() returns error? {
         status = asb:ACTIVE,
         userMetadata = userMetaData
         );
-    if (sub is asb:SubscriptionProperties) {
+    if sub is asb:SubscriptionProperties {
         log:printInfo(sub.toString());
     } else {
         log:printError(sub.toString());

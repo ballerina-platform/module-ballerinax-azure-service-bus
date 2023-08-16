@@ -33,7 +33,7 @@ public function main() returns error? {
     log:printInfo("Initializing Asb admin client...");
     asb:Administrator Administrator = check new (connectionString);
     asb:RuleProperties? rule = check Administrator->createRule("test-topic", "test-subscription", "test-rule", ruleConfig);
-    if (rule is asb:RuleProperties) {
+    if rule is asb:RuleProperties {
         log:printInfo(rule.toString());
     } else {
         log:printError(rule.toString());

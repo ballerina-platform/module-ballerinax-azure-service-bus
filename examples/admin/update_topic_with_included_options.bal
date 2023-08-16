@@ -51,7 +51,7 @@ public function main() returns error? {
         userMetadata = userMetaData,
         supportOrdering = true
         );
-    if (topic is asb:TopicProperties) {
+    if topic is asb:TopicProperties {
         log:printInfo(topic.toString());
     } else {
         log:printError(topic.toString());

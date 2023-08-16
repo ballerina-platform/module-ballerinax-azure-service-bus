@@ -26,7 +26,7 @@ public function main() returns error? {
     log:printInfo("Initializing Asb admin client...");
     asb:Administrator Administrator = check new (connectionString);
     boolean? subscriptionExists = check Administrator->subscriptionExists("test-topic", "test-subscription");
-    if (subscriptionExists is boolean) {
+    if subscriptionExists is boolean {
         log:printInfo("Sub exists: " + subscriptionExists.toString());
     } else {
         log:printError("Sub exists failed.");

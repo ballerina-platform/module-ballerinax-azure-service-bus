@@ -61,12 +61,13 @@ import java.util.Map;
 
 import static io.ballerina.runtime.api.creators.ValueCreator.createRecordValue;
 
-
 /**
  * This facilitates the client operations of ASB Administrator client in Ballerina.
  */
 public class Administrator {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(Administrator.class);
+
     /**
      * Parameterized constructor for ASB Administrator (ServiceBusAdministrator).
      *
@@ -87,12 +88,13 @@ public class Administrator {
             return ASBErrorCreator.fromUnhandledException(e);
         }
     }
+
     /**
      * Create a Topic in Azure Service Bus.
      *
      * @param administratorClient Azure Service Bus Administrator Client
-     * @param topicName nameof the topic
-     * @param topicProperties properties of the Topic (Requires TopicProperties object)
+     * @param topicName           nameof the topic
+     * @param topicProperties     properties of the Topic (Requires TopicProperties object)
      * @return topicProperties
      */
     public static Object createTopic(BObject administratorClient, BString topicName,
@@ -100,7 +102,7 @@ public class Administrator {
         ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
         TopicProperties topicProp;
         try {
-        if (topicProperties == null) {
+            if (topicProperties == null) {
                 topicProp = clientEp.createTopic(topicName.toString());
             } else {
                 topicProp = clientEp.createTopic(topicName.toString(),
@@ -116,11 +118,12 @@ public class Administrator {
             return ASBErrorCreator.fromUnhandledException(e);
         }
     }
+
     /**
      * Get a Topic in Azure Service Bus.
      *
      * @param administratorClient Azure Service Bus Administrator Client
-     * @param topicName nameof the topic
+     * @param topicName           nameof the topic
      * @return topicProperties
      */
     public static Object getTopic(BObject administratorClient, BString topicName) {
@@ -139,12 +142,13 @@ public class Administrator {
             return ASBErrorCreator.fromUnhandledException(e);
         }
     }
+
     /**
      * Update a Topic in Azure Service Bus.
      *
      * @param administratorClient Azure Service Bus Administrator Client
-     * @param topicName nameof the topic
-     * @param topicProperties properties of the Topic (Requires TopicProperties object)
+     * @param topicName           nameof the topic
+     * @param topicProperties     properties of the Topic (Requires TopicProperties object)
      * @return topicProperties
      */
     public static Object updateTopic(BObject administratorClient, BString topicName,
@@ -167,6 +171,7 @@ public class Administrator {
         }
 
     }
+
     /**
      * Get all Topics in Azure Service Bus.
      *
@@ -190,6 +195,7 @@ public class Administrator {
 
         }
     }
+
     private static BMap<BString, Object> constructTopicPropertiesArray(PagedIterable<TopicProperties> topicProp) {
         LinkedList<Object> topicList = new LinkedList<>();
         for (TopicProperties topicProperties : topicProp) {
@@ -205,11 +211,12 @@ public class Administrator {
         map.put(ASBConstants.LIST_OF_TOPICS, ValueCreator.createArrayValue(topicList.toArray(), sourceArrayType));
         return createRecordValue(ModuleUtils.getModule(), ASBConstants.LIST_OF_TOPICS_RECORD, map);
     }
+
     /**
      * Delete a Topic in Azure Service Bus.
      *
      * @param administratorClient Azure Service Bus Administrator Client
-     * @param topicName name of the topic
+     * @param topicName           name of the topic
      * @return null
      */
     public static Object deleteTopic(BObject administratorClient, BString topicName) {
@@ -226,11 +233,12 @@ public class Administrator {
         }
         return null;
     }
+
     /**
      * Check whether a Topic exists in Azure Service Bus.
      *
      * @param administratorClient Azure Service Bus Administrator Client
-     * @param topicName name of the Topic
+     * @param topicName           name of the Topic
      * @return null
      */
     public static Object topicExists(BObject administratorClient, BString topicName) {
@@ -250,18 +258,19 @@ public class Administrator {
             return ASBErrorCreator.fromUnhandledException(e);
         }
     }
+
     /**
      * Create a Subscription in Azure Service Bus.
      *
-     * @param administratorClient Azure Service Bus Administrator Client
-     * @param topicName name of the Topic
-     * @param subscriptionName name of the Subscription
+     * @param administratorClient    Azure Service Bus Administrator Client
+     * @param topicName              name of the Topic
+     * @param subscriptionName       name of the Subscription
      * @param subscriptionProperties properties of the Subscription (Requires SubscriptionProperties object)
      * @return subscriptionProperties
      */
     public static Object createSubscription(BObject administratorClient,
-                                                           BString topicName, BString subscriptionName,
-                                                           BMap<BString, Object> subscriptionProperties) {
+                                            BString topicName, BString subscriptionName,
+                                            BMap<BString, Object> subscriptionProperties) {
         ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
         SubscriptionProperties subscriptionProps;
         try {
@@ -281,12 +290,13 @@ public class Administrator {
             return ASBErrorCreator.fromUnhandledException(e);
         }
     }
+
     /**
      * Get a Subscription in Azure Service Bus.
      *
      * @param administratorClient Azure Service Bus Administrator Client
-     * @param topicName name of the Topic
-     * @param subscriptionName name of the Subscription
+     * @param topicName           name of the Topic
+     * @param subscriptionName    name of the Subscription
      * @return subscriptionProperties
      */
     public static Object getSubscription(BObject administratorClient, BString topicName, BString subscriptionName) {
@@ -304,12 +314,13 @@ public class Administrator {
             return ASBErrorCreator.fromUnhandledException(e);
         }
     }
+
     /**
      * Update a Subscription in Azure Service Bus.
      *
-     * @param administratorClient Azure Service Bus Administrator Client
-     * @param topicName name of the Topic
-     * @param subscriptionName name of the Subscription
+     * @param administratorClient    Azure Service Bus Administrator Client
+     * @param topicName              name of the Topic
+     * @param subscriptionName       name of the Subscription
      * @param subscriptionProperties properties of the Subscription (Requires SubscriptionProperties object)
      * @return subscriptionProperties
      */
@@ -334,11 +345,12 @@ public class Administrator {
             return ASBErrorCreator.fromUnhandledException(e);
         }
     }
+
     /**
      * Get all Subscriptions in Azure Service Bus.
      *
      * @param administratorClient Azure Service Bus Administrator Client
-     * @param topicName name of the Topic
+     * @param topicName           name of the Topic
      * @return subscriptionProperties
      */
     public static Object listSubscriptions(BObject administratorClient, BString topicName) {
@@ -357,6 +369,7 @@ public class Administrator {
             return ASBErrorCreator.fromUnhandledException(e);
         }
     }
+
     private static BMap<BString, Object> constructSubscriptionPropertiesArray(
             PagedIterable<SubscriptionProperties> subscriptionProp) {
         LinkedList<Object> subscriptionList = new LinkedList<>();
@@ -374,12 +387,13 @@ public class Administrator {
                 sourceArrayType));
         return createRecordValue(ModuleUtils.getModule(), ASBConstants.LIST_OF_SUBSCRIPTIONS_RECORD, map);
     }
+
     /**
      * Delete a Subscription in Azure Service Bus.
      *
      * @param administratorClient Azure Service Bus Administrator Client
-     * @param topicName name of the Topic
-     * @param subscriptionName name of the Subscription
+     * @param topicName           name of the Topic
+     * @param subscriptionName    name of the Subscription
      * @return null
      */
     public static Object deleteSubscription(BObject administratorClient, BString topicName, BString subscriptionName) {
@@ -397,12 +411,13 @@ public class Administrator {
         }
         return null;
     }
+
     /**
      * Check whether a Subscription exists in Azure Service Bus.
      *
      * @param administratorClient Azure Service Bus Administrator Client
-     * @param topicName name of the Topic
-     * @param subscriptionName name of the Subscription
+     * @param topicName           name of the Topic
+     * @param subscriptionName    name of the Subscription
      * @return null
      */
     public static Object subscriptionExists(BObject administratorClient, BString topicName, BString subscriptionName) {
@@ -422,18 +437,20 @@ public class Administrator {
             return ASBErrorCreator.fromUnhandledException(e);
         }
     }
+
     /**
      * Create a Rule with properties in Azure Service Bus.
+     *
      * @param administratorClient Azure Service Bus Administrator Client
-     * @param topicName name of the Topic
-     * @param subscriptionName name of the Subscription
-     * @param ruleName name of the Rule
-     * @param ruleProperties properties of the Rule (Requires RuleProperties object)
+     * @param topicName           name of the Topic
+     * @param subscriptionName    name of the Subscription
+     * @param ruleName            name of the Rule
+     * @param ruleProperties      properties of the Rule (Requires RuleProperties object)
      * @return ruleProperties object
      */
     public static Object createRule(BObject administratorClient,
-                                                   BString topicName, BString subscriptionName, BString ruleName,
-                                                   BMap<BString, Object> ruleProperties) {
+                                    BString topicName, BString subscriptionName, BString ruleName,
+                                    BMap<BString, Object> ruleProperties) {
         ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
         RuleProperties ruleProp;
         try {
@@ -454,12 +471,14 @@ public class Administrator {
             return ASBErrorCreator.fromUnhandledException(e);
         }
     }
+
     /**
      * Get a Rule in Azure Service Bus.
+     *
      * @param administratorClient Azure Service Bus Administrator Client
-     * @param topicName name of the Topic
-     * @param subscriptionName name of the Subscription
-     * @param ruleName name of the Rule
+     * @param topicName           name of the Topic
+     * @param subscriptionName    name of the Subscription
+     * @param ruleName            name of the Rule
      * @return ruleProperties object
      */
     public static Object getRule(BObject administratorClient, BString topicName, BString subscriptionName,
@@ -481,12 +500,14 @@ public class Administrator {
             return ASBErrorCreator.fromUnhandledException(e);
         }
     }
+
     /**
      * Update a Rule in Azure Service Bus.
-     * @param administratorClient Azure Service Bus Administrator Client
-     * @param topicName name of the Topic
-     * @param subscriptionName name of the Subscription
-     * @param ruleName name of the Rule
+     *
+     * @param administratorClient  Azure Service Bus Administrator Client
+     * @param topicName            name of the Topic
+     * @param subscriptionName     name of the Subscription
+     * @param ruleName             name of the Rule
      * @param updateRuleProperties properties of the Rule (Requires RuleProperties object)
      * @return ruleProperties object
      */
@@ -513,11 +534,13 @@ public class Administrator {
             return ASBErrorCreator.fromUnhandledException(e);
         }
     }
+
     /**
      * Get all Rules in Azure Service Bus.
+     *
      * @param administratorClient Azure Service Bus Administrator Client
-     * @param topicName name of the Topic
-     * @param subscriptionName name of the Subscription
+     * @param topicName           name of the Topic
+     * @param subscriptionName    name of the Subscription
      * @return ruleProperties object
      */
     public static Object listRules(BObject administratorClient, BString topicName, BString subscriptionName) {
@@ -538,6 +561,7 @@ public class Administrator {
             return ASBErrorCreator.fromUnhandledException(e);
         }
     }
+
     private static BMap<BString, Object> constructRulePropertiesArray(PagedIterable<RuleProperties> ruleProp) {
         LinkedList<Object> ruleList = new LinkedList<>();
         for (RuleProperties ruleProperties : ruleProp) {
@@ -553,12 +577,14 @@ public class Administrator {
         map.put(ASBConstants.LIST_OF_RULES, ValueCreator.createArrayValue(ruleList.toArray(), sourceArrayType));
         return createRecordValue(ModuleUtils.getModule(), ASBConstants.LIST_OF_RULES_RECORD, map);
     }
+
     /**
      * Delete a Rule in Azure Service Bus.
+     *
      * @param administratorClient Azure Service Bus Administrator Client
-     * @param topicName name of the Topic
-     * @param subscriptionName name of the Subscription
-     * @param ruleName name of the Rule
+     * @param topicName           name of the Topic
+     * @param subscriptionName    name of the Subscription
+     * @param ruleName            name of the Rule
      * @return null
      */
     public static Object deleteRule(BObject administratorClient, BString topicName,
@@ -577,15 +603,17 @@ public class Administrator {
             return ASBErrorCreator.fromUnhandledException(e);
         }
     }
+
     /**
      * Create a Queue with properties in Azure Service Bus.
+     *
      * @param administratorClient Azure Service Bus Administrator Client
-     * @param queueName name of the Queue
-     * @param queueProperties properties of the Queue (Requires QueueProperties object)
+     * @param queueName           name of the Queue
+     * @param queueProperties     properties of the Queue (Requires QueueProperties object)
      * @return queueProperties object
      */
     public static Object createQueue(BObject administratorClient,
-                                                   BString queueName, BMap<BString, Object> queueProperties) {
+                                     BString queueName, BMap<BString, Object> queueProperties) {
         ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
         try {
             QueueProperties queueProp;
@@ -610,7 +638,7 @@ public class Administrator {
      * Get a Queue in Azure Service Bus.
      *
      * @param administratorClient Azure Service Bus Administrator Client
-     * @param queueName name of the Queue
+     * @param queueName           name of the Queue
      * @return queueProperties object
      */
     public static Object getQueue(BObject administratorClient, BString queueName) {
@@ -627,12 +655,13 @@ public class Administrator {
             return ASBErrorCreator.fromUnhandledException(e);
         }
     }
+
     /**
      * Update a Queue in Azure Service Bus.
      *
      * @param administratorClient Azure Service Bus Administrator Client
-     * @param queueName name of the Queue
-     * @param queueProperties properties of the Queue (Requires QueueProperties object)
+     * @param queueName           name of the Queue
+     * @param queueProperties     properties of the Queue (Requires QueueProperties object)
      * @return queueProperties object
      */
     public static Object updateQueue(BObject administratorClient, BString queueName,
@@ -655,6 +684,7 @@ public class Administrator {
 
         }
     }
+
     /**
      * Get all Queues in Azure Service Bus.
      *
@@ -677,6 +707,7 @@ public class Administrator {
             return ASBErrorCreator.fromUnhandledException(e);
         }
     }
+
     private static BMap<BString, Object> constructQueuePropertiesArray(PagedIterable<QueueProperties> queueProp) {
         LinkedList<Object> queueList = new LinkedList<>();
         for (QueueProperties queueProperties : queueProp) {
@@ -692,11 +723,12 @@ public class Administrator {
         map.put(ASBConstants.LIST_OF_QUEUES, ValueCreator.createArrayValue(queueList.toArray(), sourceArrayType));
         return createRecordValue(ModuleUtils.getModule(), ASBConstants.LIST_OF_QUEUES_RECORD, map);
     }
+
     /**
      * Delete a Queue in Azure Service Bus.
      *
      * @param administratorClient Azure Service Bus Administrator Client
-     * @param queueName name of the Queue
+     * @param queueName           name of the Queue
      * @return null
      */
     public static Object deleteQueue(BObject administratorClient, BString queueName) {
@@ -713,11 +745,12 @@ public class Administrator {
             return ASBErrorCreator.fromUnhandledException(e);
         }
     }
+
     /**
      * Check whether a Queue exists in Azure Service Bus.
      *
      * @param administratorClient Azure Service Bus Administrator Client
-     * @param queueName name of the Queue
+     * @param queueName           name of the Queue
      * @return null
      */
     public static Object queueExists(BObject administratorClient, BString queueName) {
@@ -737,16 +770,19 @@ public class Administrator {
             return ASBErrorCreator.fromUnhandledException(e);
         }
     }
+
     private static BMap<BString, Object> constructRuleCreatedRecord(RuleProperties properties) {
         Map<String, Object> map = populateRuleOptionalFieldsMap(properties);
         return ValueCreator.createRecordValue(ModuleUtils.getModule(),
                 ASBConstants.CREATED_RULE_RECORD, map);
     }
+
     private static BMap<BString, Object> constructQueueCreatedRecord(QueueProperties properties) {
         Map<String, Object> map = populateQueueOptionalFieldsMap(properties);
         return ValueCreator.createRecordValue(ModuleUtils.getModule(),
                 ASBConstants.QUEUE_CREATED_RECORD, map);
     }
+
     private static Map<String, Object> populateTopicOptionalFieldsMap(TopicProperties properties) {
         Map<String, Object> map = new HashMap<>();
         ASBUtils.addFieldIfPresent(map, ASBConstants.CREATED_TOPIC_RECORD_FIELD_NAME
@@ -776,9 +812,9 @@ public class Administrator {
         ASBUtils.addFieldIfPresent(map, ASBConstants.CREATED_TOPIC_RECORD_FIELD_AUTHORIZATION_RULES
                 , constructAuthorizationRuleArray(properties.getAuthorizationRules()));
 
-
         return map;
     }
+
     private static Map<String, Object> populateRuleOptionalFieldsMap(RuleProperties properties) {
         Map<String, Object> map = new HashMap<>();
         ASBUtils.addFieldIfPresent(map, ASBConstants.CREATED_RULE_RECORD_FIELD_NAME,
@@ -787,16 +823,19 @@ public class Administrator {
                 , formRule(properties.getAction(), properties.getFilter()));
         return map;
     }
+
     private static BMap<BString, Object> constructSubscriptionCreatedRecord(SubscriptionProperties properties) {
         Map<String, Object> map = populateSubscriptionOptionalFieldsMap(properties);
         return ValueCreator.createRecordValue(ModuleUtils.getModule(),
                 ASBConstants.SUBSCRIPTION_CREATED_RECORD, map);
     }
+
     private static BMap<BString, Object> constructTopicCreatedRecord(TopicProperties properties) {
         Map<String, Object> map = populateTopicOptionalFieldsMap(properties);
         return ValueCreator.createRecordValue(ModuleUtils.getModule(),
                 ASBConstants.TOPIC_CREATED_RECORD, map);
     }
+
     private static Map<String, Object> populateSubscriptionOptionalFieldsMap(SubscriptionProperties properties) {
         Map<String, Object> map = new HashMap<>();
         ASBUtils.addFieldIfPresent(map, ASBConstants.CREATED_SUBSCRIPTION_RECORD_FIELD_AUTO_DELETE_ON_IDLE,
@@ -832,6 +871,7 @@ public class Administrator {
                 properties.isDeadLetteringOnFilterEvaluationExceptions());
         return map;
     }
+
     private static Map<String, Object> populateQueueOptionalFieldsMap(QueueProperties properties) {
         Map<String, Object> map = new HashMap<>();
         ASBUtils.addFieldIfPresent(map, ASBConstants.CREATED_QUEUE_RECORD_FIELD_NAME,
@@ -867,15 +907,17 @@ public class Administrator {
         ASBUtils.addFieldIfPresent(map, ASBConstants.CREATED_QUEUE_RECORD_FIELD_REQUIRE_SESSION,
                 properties.isSessionRequired());
         ASBUtils.addFieldIfPresent(map, ASBConstants.CREATED_QUEUE_RECORD_FIELD_LOCK_DURATION,
-                        fromDuration(properties.getLockDuration()));
+                fromDuration(properties.getLockDuration()));
         ASBUtils.addFieldIfPresent(map, ASBConstants.CREATED_QUEUE_RECORD_FIELD_DEAD_LETTERING_ON_MESSAGE_EXPIRATION,
                 properties.isDeadLetteringOnMessageExpiration());
         return map;
     }
+
     private static ServiceBusAdministrationClient getAdminFromBObject(BObject adminObject) {
         BHandle adminHandle = (BHandle) adminObject.get(StringUtils.fromString("adminHandle"));
         return (ServiceBusAdministrationClient) adminHandle.getValue();
     }
+
     private static BMap<BString, Object> fromDuration(Duration duration) {
         BMap<BString, Object> durationRecord = ValueCreator.createRecordValue(ModuleUtils.getModule(),
                 ASBConstants.CREATED_QUEUE_RECORD_FIELD_DURATION);
@@ -885,6 +927,7 @@ public class Administrator {
                 duration.getNano());
         return durationRecord;
     }
+
     private static BMap<BString, Object> formRule(RuleAction action, RuleFilter filter) {
         BMap<BString, Object> ruleRecord = ValueCreator.createRecordValue(ModuleUtils.getModule(),
                 ASBConstants.CREATED_RULE_RECORD_FIELD);
@@ -907,6 +950,7 @@ public class Administrator {
         }
         return ruleRecord;
     }
+
     private static BArray constructAuthorizationRuleArray(List<AuthorizationRule> authorizationRules) {
         BMap<BString, Object> authRulesRecord = ValueCreator.createRecordValue(ModuleUtils.getModule(),
                 ASBConstants.CREATED_QUEUE_RECORD_FIELD_AUTHORIZATION_RULE);
@@ -916,33 +960,34 @@ public class Administrator {
             BMap<BString, Object> authorizationRuleRecord = ValueCreator.createRecordValue(ModuleUtils.getModule(),
                     ASBConstants.CREATED_QUEUE_RECORD_FIELD_AUTHORIZATION_RULE);
             authorizationRuleRecord.put(StringUtils.fromString(
-                    ASBConstants.CREATED_QUEUE_RECORD_FIELD_AUTHORIZATION_RULES_CLAIM_TYPE),
+                            ASBConstants.CREATED_QUEUE_RECORD_FIELD_AUTHORIZATION_RULES_CLAIM_TYPE),
                     StringUtils.fromString(authorizationRule.getClaimType()));
             authorizationRuleRecord.put(StringUtils.fromString(
-                    ASBConstants.CREATED_QUEUE_RECORD_FIELD_AUTHORIZATION_RULES_CLAIM_VALUE),
+                            ASBConstants.CREATED_QUEUE_RECORD_FIELD_AUTHORIZATION_RULES_CLAIM_VALUE),
                     StringUtils.fromString(authorizationRule.getClaimValue()));
             authorizationRuleRecord.put(StringUtils.fromString(
-                    ASBConstants.CREATED_QUEUE_RECORD_FIELD_AUTHORIZATION_RULES_ACCESS_RIGHTS),
+                            ASBConstants.CREATED_QUEUE_RECORD_FIELD_AUTHORIZATION_RULES_ACCESS_RIGHTS),
                     constructAccessRightsArray(authorizationRule.getAccessRights()));
             authorizationRuleRecord.put(StringUtils.fromString(
-                    ASBConstants.CREATED_QUEUE_RECORD_FIELD_AUTHORIZATION_RULES_KEY_NAME),
+                            ASBConstants.CREATED_QUEUE_RECORD_FIELD_AUTHORIZATION_RULES_KEY_NAME),
                     StringUtils.fromString(authorizationRule.getKeyName()));
             authorizationRuleRecord.put(StringUtils.fromString(
-                    ASBConstants.CREATED_QUEUE_RECORD_FIELD_AUTHORIZATION_RULES_MODIFIED_AT),
+                            ASBConstants.CREATED_QUEUE_RECORD_FIELD_AUTHORIZATION_RULES_MODIFIED_AT),
                     StringUtils.fromString(authorizationRule.getModifiedAt().toString()));
             authorizationRuleRecord.put(StringUtils.fromString(
-                    ASBConstants.CREATED_QUEUE_RECORD_FIELD_AUTHORIZATION_RULES_CREATED_AT),
+                            ASBConstants.CREATED_QUEUE_RECORD_FIELD_AUTHORIZATION_RULES_CREATED_AT),
                     StringUtils.fromString(authorizationRule.getCreatedAt().toString()));
             authorizationRuleRecord.put(StringUtils.fromString(
-                    ASBConstants.CREATED_QUEUE_RECORD_FIELD_AUTHORIZATION_RULES_PRIMARY_KEY),
+                            ASBConstants.CREATED_QUEUE_RECORD_FIELD_AUTHORIZATION_RULES_PRIMARY_KEY),
                     StringUtils.fromString(authorizationRule.getPrimaryKey()));
             authorizationRuleRecord.put(StringUtils.fromString(
-                    ASBConstants.CREATED_QUEUE_RECORD_FIELD_AUTHORIZATION_RULES_SECONDARY_KEY),
+                            ASBConstants.CREATED_QUEUE_RECORD_FIELD_AUTHORIZATION_RULES_SECONDARY_KEY),
                     StringUtils.fromString(authorizationRule.getSecondaryKey()));
             authorizationRuleArray.append(authorizationRuleRecord);
         }
         return authorizationRuleArray;
     }
+
     private static BArray constructAccessRightsArray(List<AccessRights> accessRights) {
         BArray accessRightsArray = ValueCreator.createArrayValue(
                 TypeCreator.createArrayType(PredefinedTypes.TYPE_STRING));

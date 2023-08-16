@@ -1,18 +1,18 @@
-// // Copyright (c) 2021 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
-// //
-// // WSO2 Inc. licenses this file to you under the Apache License,
-// // Version 2.0 (the "License"); you may not use this file except
-// // in compliance with the License.
-// // You may obtain a copy of the License at
-// //
-// // http://www.apache.org/licenses/LICENSE-2.0
-// //
-// // Unless required by applicable law or agreed to in writing,
-// // software distributed under the License is distributed on an
-// // "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// // KIND, either express or implied.  See the License for the
-// // specific language governing permissions and limitations
-// // under the License.
+// Copyright (c) 2023 WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
+//
+// WSO2 LLC. licenses this file to you under the Apache License,
+// Version 2.0 (the "License"); you may not use this file except
+// in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
 
 import ballerina/log;
 import ballerina/os;
@@ -163,9 +163,9 @@ UpdateRuleOptions updateRuleConfig = {
 function testCreateQueue() returns error? {
     log:printInfo("[[testCreateQueue]]");
     log:printInfo("Initializing Asb admin client.");
-    Administrator Administrator = check new (connectionString);
-    QueueProperties? queueProp = check Administrator->createQueue(testQueue1);
-    if (queueProp is QueueProperties) {
+    Administrator adminClient = check new (connectionString);
+    QueueProperties? queueProp = check adminClient->createQueue(testQueue1);
+    if queueProp is QueueProperties {
         log:printInfo("Queue created successfully.");
     } else {
         test:assertFail("Queue creation failed.");
@@ -180,10 +180,10 @@ function testCreateQueue() returns error? {
 function testQueueExists() returns error? {
     log:printInfo("[[testQueueExists]]");
     log:printInfo("Initializing Asb admin client.");
-    Administrator Administrator = check new (connectionString);
-    boolean? queueExists = check Administrator->queueExists(testQueue1);
-    if (queueExists is boolean) {
-        test:assertEquals(queueExists, true, msg = "Queue exists failed.");
+    Administrator adminClient = check new (connectionString);
+    boolean? queueExists = check adminClient->queueExists(testQueue1);
+    if queueExists is boolean {
+        test:assertTrue(queueExists,msg = "Queue exists failed.");
     } else {
         test:assertFail("Queue exists failed.");
     }
@@ -197,9 +197,9 @@ function testCreateTopicOperation() returns error? {
     log:printInfo("[[testCreateTopicOperation]]");
 
     log:printInfo("Initializing Asb admin client.");
-    Administrator Administrator = check new (connectionString);
-    TopicProperties? topicProp = check Administrator->createTopic(testTopic1);
-    if (topicProp is TopicProperties) {
+    Administrator adminClient = check new (connectionString);
+    TopicProperties? topicProp = check adminClient->createTopic(testTopic1);
+    if topicProp is TopicProperties {
         log:printInfo("Topic created successfully.");
     } else {
         test:assertFail("Topic creation failed.");
@@ -214,10 +214,10 @@ function testCreateTopicOperation() returns error? {
 function testTopicExists() returns error? {
     log:printInfo("[[testTopicExists]]");
     log:printInfo("Initializing Asb admin client.");
-    Administrator Administrator = check new (connectionString);
-    boolean? topicExists = check Administrator->topicExists(testTopic1);
-    if (topicExists is boolean) {
-        test:assertEquals(topicExists, true, msg = "Topic creation failed.");
+    Administrator adminClient = check new (connectionString);
+    boolean? topicExists = check adminClient->topicExists(testTopic1);
+    if topicExists is boolean {
+        test:assertTrue(topicExists, msg = "Topic creation failed.");
     } else {
         test:assertFail("Topic exists failed.");
     }
@@ -231,9 +231,9 @@ function testTopicExists() returns error? {
 function testCreateSubscription() returns error? {
     log:printInfo("[[testCreateSubscription]]");
     log:printInfo("Initializing Asb admin client.");
-    Administrator Administrator = check new (connectionString);
-    SubscriptionProperties? subscriptionProp = check Administrator->createSubscription(testTopic1, testSubscription1);
-    if (subscriptionProp is SubscriptionProperties) {
+    Administrator adminClient = check new (connectionString);
+    SubscriptionProperties? subscriptionProp = check adminClient->createSubscription(testTopic1, testSubscription1);
+    if subscriptionProp is SubscriptionProperties {
         log:printInfo("Subscription created successfully.");
         test:assertEquals(subscriptionProp.status, "Active", msg = "Subscription creation failed.");
     } else {
@@ -249,10 +249,10 @@ function testCreateSubscription() returns error? {
 function testSubscriptionExists() returns error? {
     log:printInfo("[[testSubscriptionExists]]");
     log:printInfo("Initializing Asb admin client.");
-    Administrator Administrator = check new (connectionString);
-    boolean? subscriptionExists = check Administrator->subscriptionExists(testTopic1, testSubscription1);
-    if (subscriptionExists is boolean) {
-        test:assertEquals(subscriptionExists, true, msg = "Subscription exists failed.");
+    Administrator adminClient = check new (connectionString);
+    boolean? subscriptionExists = check adminClient->subscriptionExists(testTopic1, testSubscription1);
+    if subscriptionExists is boolean {
+        test:assertTrue(subscriptionExists, msg = "Subscription exists failed.");
     } else {
         test:assertFail("Subscription exists failed.");
     }
@@ -266,9 +266,9 @@ function testSubscriptionExists() returns error? {
 function testCreateRule() returns error? {
     log:printInfo("[[testCreateRule]]");
     log:printInfo("Initializing Asb admin client.");
-    Administrator Administrator = check new (connectionString);
-    RuleProperties? ruleProp = check Administrator->createRule(testTopic1, testSubscription1, testRule1);
-    if (ruleProp is RuleProperties) {
+    Administrator adminClient = check new (connectionString);
+    RuleProperties? ruleProp = check adminClient->createRule(testTopic1, testSubscription1, testRule1);
+    if ruleProp is RuleProperties {
         log:printInfo("Rule created successfully.");
         test:assertEquals(ruleProp.name, testRule1, msg = "Rule creation failed.");
     } else {
@@ -284,9 +284,9 @@ function testCreateRule() returns error? {
 function testCreateWithOptionQueue() returns error? {
     log:printInfo("[[testCreateWithOptionQueue]]");
     log:printInfo("Initializing Asb admin client.");
-    Administrator Administrator = check new (connectionString);
-    QueueProperties? queueProp = check Administrator->createQueue(testQueue2, queueConfig);
-    if (queueProp is QueueProperties) {
+    Administrator adminClient = check new (connectionString);
+    QueueProperties? queueProp = check adminClient->createQueue(testQueue2, queueConfig);
+    if queueProp is QueueProperties {
         log:printInfo(queueProp.toString());
         test:assertEquals(queueProp.name, testQueue2, msg = "Queue creation failed. wrong name");
         //test:assertEquals(queueProp.autoDeleteOnIdle, queueConfig.autoDeleteOnIdle, msg = "Queue creation failed. wrong autoDeleteOnIdle");
@@ -324,8 +324,8 @@ function testCreateWithOptionQueue() returns error? {
 function createQueueWithInclusionParameters() returns error? {
     log:printInfo("[[createQueueWithInclusionParameters]]");
     log:printInfo("Initializing Asb admin client.");
-    Administrator Administrator = check new (connectionString);
-    QueueProperties? queueProp = check Administrator->createQueue(testQueue4,
+    Administrator adminClient = check new (connectionString);
+    QueueProperties? queueProp = check adminClient->createQueue(testQueue4,
                                 deadLetteringOnMessageExpiration = true,
                                 defaultMessageTimeToLive = ttl,
                                 duplicateDetectionHistoryTimeWindow = dupdue,
@@ -337,7 +337,7 @@ function createQueueWithInclusionParameters() returns error? {
                                 requiresSession = false,
                                 status = ACTIVE,
                                 userMetadata = userMetaData);
-    if (queueProp is QueueProperties) {
+    if queueProp is QueueProperties {
         log:printInfo(queueProp.toString());
         test:assertEquals(queueProp.name, testQueue4, msg = "Queue creation failed. wrong name");
         test:assertEquals(queueProp.deadLetteringOnMessageExpiration, true,
@@ -376,8 +376,8 @@ function createQueueWithInclusionParameters() returns error? {
 function updateQueueWithInclusionParameters() returns error? {
     log:printInfo("[[updateQueueWithInclusionParameters]]");
     log:printInfo("Initializing Asb admin client.");
-    Administrator Administrator = check new (connectionString);
-    QueueProperties? queueProp = check Administrator->updateQueue(testQueue4,
+    Administrator adminClient = check new (connectionString);
+    QueueProperties? queueProp = check adminClient->updateQueue(testQueue4,
                                 deadLetteringOnMessageExpiration = false,
                                 defaultMessageTimeToLive = ttl,
                                 duplicateDetectionHistoryTimeWindow = dupdue,
@@ -387,7 +387,7 @@ function updateQueueWithInclusionParameters() returns error? {
                                 maxDeliveryCount = 10,
                                 status = ACTIVE,
                                 userMetadata = userMetaData);
-    if (queueProp is QueueProperties) {
+    if queueProp is QueueProperties {
         log:printInfo(queueProp.toString());
         test:assertEquals(queueProp.name, testQueue4, msg = "Queue creation failed. wrong name");
         test:assertEquals(queueProp.deadLetteringOnMessageExpiration, false,
@@ -422,9 +422,9 @@ function updateQueueWithInclusionParameters() returns error? {
 function testGetQueue() returns error? {
     log:printInfo("[[testCreateWithOptionQueue]]");
     log:printInfo("Initializing Asb admin client.");
-    Administrator Administrator = check new (connectionString);
-    QueueProperties? queueProp = check Administrator->getQueue(testQueue2);
-    if (queueProp is QueueProperties) {
+    Administrator adminClient = check new (connectionString);
+    QueueProperties? queueProp = check adminClient->getQueue(testQueue2);
+    if queueProp is QueueProperties {
         log:printInfo(queueProp.toString());
         test:assertEquals(queueProp.name, testQueue2, msg = "Queue creation failed. wrong name");
         //test:assertEquals(queueProp.autoDeleteOnIdle, queueConfig.autoDeleteOnIdle, msg = "Queue creation failed. wrong autoDeleteOnIdle");
@@ -462,9 +462,9 @@ function testGetQueue() returns error? {
 function testUpdateQueue() returns error? {
     log:printInfo("[[testUpdateQueue]]");
     log:printInfo("Initializing Asb admin client.");
-    Administrator Administrator = check new (connectionString);
-    QueueProperties? queueProp = check Administrator->updateQueue(testQueue1, updateQueueConfig);
-    if (queueProp is QueueProperties) {
+    Administrator adminClient = check new (connectionString);
+    QueueProperties? queueProp = check adminClient->updateQueue(testQueue1, updateQueueConfig);
+    if queueProp is QueueProperties {
         log:printInfo(queueProp.toString());
         test:assertEquals(queueProp.name, testQueue1, msg = "Queue creation failed. wrong name");
         //test:assertEquals(queueProp.autoDeleteOnIdle, queueConfig.autoDeleteOnIdle, msg = "Queue creation failed. wrong autoDeleteOnIdle");
@@ -500,9 +500,9 @@ function testUpdateQueue() returns error? {
 function testCreateWithOptionTopic() returns error? {
     log:printInfo("[[testCreateWithOptionTopic]]");
     log:printInfo("Initializing Asb admin client.");
-    Administrator Administrator = check new (connectionString);
-    TopicProperties? topicProp = check Administrator->createTopic(testTopic2, topicConfig);
-    if (topicProp is TopicProperties) {
+    Administrator adminClient = check new (connectionString);
+    TopicProperties? topicProp = check adminClient->createTopic(testTopic2, topicConfig);
+    if topicProp is TopicProperties {
         log:printInfo(topicProp.toString());
         test:assertEquals(topicProp.name, testTopic2, msg = "Topic creation failed. wrong name");
         test:assertEquals(topicProp.autoDeleteOnIdle.seconds, topicConfig.autoDeleteOnIdle?.seconds, msg = "Topic creation failed. wrong autoDeleteOnIdle");
@@ -533,8 +533,8 @@ function testCreateWithOptionTopic() returns error? {
 function createTopicWithInclusionParameters() returns error? {
     log:printInfo("[[createTopicWithInclusionParameters]]");
     log:printInfo("Initializing Asb admin client.");
-    Administrator Administrator = check new (connectionString);
-    TopicProperties? topicProp = check Administrator->createTopic(testTopic4,
+    Administrator adminClient = check new (connectionString);
+    TopicProperties? topicProp = check adminClient->createTopic(testTopic4,
                                 defaultMessageTimeToLive = ttl,
                                 duplicateDetectionHistoryTimeWindow = dupdue,
                                 enableBatchedOperations = true,
@@ -544,7 +544,7 @@ function createTopicWithInclusionParameters() returns error? {
                                 status = ACTIVE,
                                 userMetadata = userMetaData,
                                 supportOrdering = false);
-    if (topicProp is TopicProperties) {
+    if topicProp is TopicProperties {
         log:printInfo(topicProp.toString());
         test:assertEquals(topicProp.name, testTopic4, msg = "Topic creation failed. wrong name");
         test:assertEquals(topicProp.enableBatchedOperations, true,
@@ -574,15 +574,15 @@ function createTopicWithInclusionParameters() returns error? {
 function updateTopicWithInclusionParameters() returns error? {
     log:printInfo("[[updateTopicWithInclusionParameters]]");
     log:printInfo("Initializing Asb admin client.");
-    Administrator Administrator = check new (connectionString);
-    TopicProperties? topicProp = check Administrator->updateTopic(testTopic4,
+    Administrator adminClient = check new (connectionString);
+    TopicProperties? topicProp = check adminClient->updateTopic(testTopic4,
                                 defaultMessageTimeToLive = ttl,
                                 duplicateDetectionHistoryTimeWindow = dupdue,
                                 maxSizeInMegabytes = 1024,
                                 status = ACTIVE,
                                 userMetadata = userMetaData,
                                 supportOrdering = true);
-    if (topicProp is TopicProperties) {
+    if topicProp is TopicProperties {
         log:printInfo(topicProp.toString());
         test:assertEquals(topicProp.name, testTopic4, msg = "Topic update failed. wrong name");
         test:assertEquals(topicProp.maxSizeInMegabytes, 1024, msg = "Topic update failed. wrong maxSizeInMegabytes");
@@ -607,9 +607,9 @@ function updateTopicWithInclusionParameters() returns error? {
 function testGetTopic() returns error? {
     log:printInfo("[[testGetTopic]]");
     log:printInfo("Initializing Asb admin client.");
-    Administrator Administrator = check new (connectionString);
-    TopicProperties? topicProp = check Administrator->getTopic(testTopic2);
-    if (topicProp is TopicProperties) {
+    Administrator adminClient = check new (connectionString);
+    TopicProperties? topicProp = check adminClient->getTopic(testTopic2);
+    if topicProp is TopicProperties {
         log:printInfo(topicProp.toString());
         test:assertEquals(topicProp.name, testTopic2, msg = "Topic creation failed. wrong name");
         test:assertEquals(topicProp.autoDeleteOnIdle.seconds, topicConfig.autoDeleteOnIdle?.seconds, msg = "Topic creation failed. wrong autoDeleteOnIdle");
@@ -640,9 +640,9 @@ function testGetTopic() returns error? {
 function testUpdateTopic() returns error? {
     log:printInfo("[[testUpdateTopic]]");
     log:printInfo("Initializing Asb admin client.");
-    Administrator Administrator = check new (connectionString);
-    TopicProperties? topicProp = check Administrator->updateTopic(testTopic2, updateTopicConfig);
-    if (topicProp is TopicProperties) {
+    Administrator adminClient = check new (connectionString);
+    TopicProperties? topicProp = check adminClient->updateTopic(testTopic2, updateTopicConfig);
+    if topicProp is TopicProperties {
         log:printInfo(topicProp.toString());
         test:assertEquals(topicProp.name, testTopic2, msg = "Topic creation failed. wrong name");
         test:assertEquals(topicProp.autoDeleteOnIdle.seconds, topicConfig.autoDeleteOnIdle?.seconds, msg = "Topic creation failed. wrong autoDeleteOnIdle");
@@ -673,10 +673,10 @@ function testUpdateTopic() returns error? {
 function testTopicList() returns error? {
     log:printInfo("[[testTopicList]]");
     log:printInfo("Initializing Asb admin client.");
-    Administrator Administrator = check new (connectionString);
-    TopicList? topicProp = check Administrator->listTopics();
-    if (topicProp is TopicList) {
-        if (topicProp.list.length() >= 1) {
+    Administrator adminClient = check new (connectionString);
+    TopicList? topicProp = check adminClient->listTopics();
+    if topicProp is TopicList {
+        if topicProp.list.length() >= 1 {
             log:printInfo(topicProp.toString());
             log:printInfo("Topic list successfully.");
         } else {
@@ -696,9 +696,9 @@ function testCreateSubscriptionWithOption() returns error?
 {
     log:printInfo("[[testCreateSubscriptionWithOption]]");
     log:printInfo("Initializing Asb admin client.");
-    Administrator Administrator = check new (connectionString);
-    SubscriptionProperties? subscriptionProp = check Administrator->createSubscription(testTopic1, testSubscription2, subConfig);
-    if (subscriptionProp is SubscriptionProperties) {
+    Administrator adminClient = check new (connectionString);
+    SubscriptionProperties? subscriptionProp = check adminClient->createSubscription(testTopic1, testSubscription2, subConfig);
+    if subscriptionProp is SubscriptionProperties {
         log:printInfo(subscriptionProp.toString());
         test:assertEquals(subscriptionProp.subscriptionName, testSubscription2, msg = "Subscription creation failed. wrong name");
         test:assertEquals(subscriptionProp.topicName, testTopic1, msg = "Subscription creation failed. wrong topic");
@@ -732,8 +732,8 @@ function testCreateSubscriptionWithOption() returns error?
 function createSubscriptionWithInclusionParameters() returns error? {
     log:printInfo("[[createSubscriptionWithInclusionParameters]]");
     log:printInfo("Initializing Asb admin client.");
-    Administrator Administrator = check new (connectionString);
-    SubscriptionProperties? subProp = check Administrator->createSubscription(testTopic4, testSubscription4,
+    Administrator adminClient = check new (connectionString);
+    SubscriptionProperties? subProp = check adminClient->createSubscription(testTopic4, testSubscription4,
                                 defaultMessageTimeToLive = ttl,
                                 deadLetteringOnMessageExpiration = true,
                                 enableBatchedOperations = true,
@@ -744,7 +744,7 @@ function createSubscriptionWithInclusionParameters() returns error? {
                                 requiresSession = false,
                                 status = ACTIVE,
                                 userMetadata = userMetaData);
-    if (subProp is CreateSubscriptionOptions) {
+    if subProp is CreateSubscriptionOptions {
         log:printInfo(subProp.toString());
         test:assertEquals(subProp.subscriptionName, testSubscription4, msg = "Subscription creation failed. wrong name");
         test:assertEquals(subProp.topicName, testTopic4, msg = "Subscription creation failed. wrong topic");
@@ -782,8 +782,8 @@ function createSubscriptionWithInclusionParameters() returns error? {
 function updateSubscriptionWithInclusionParameters() returns error? {
     log:printInfo("[[updateSubscriptionWithInclusionParameters]]");
     log:printInfo("Initializing Asb admin client.");
-    Administrator Administrator = check new (connectionString);
-    SubscriptionProperties? subProp = check Administrator->updateSubscription(testTopic4, testSubscription4,
+    Administrator adminClient = check new (connectionString);
+    SubscriptionProperties? subProp = check adminClient->updateSubscription(testTopic4, testSubscription4,
                                 defaultMessageTimeToLive = ttl,
                                 deadLetteringOnMessageExpiration = false,
                                 enableBatchedOperations = false,
@@ -793,7 +793,7 @@ function updateSubscriptionWithInclusionParameters() returns error? {
                                 maxDeliveryCount = 10,
                                 status = ACTIVE
                                 );
-    if (subProp is CreateSubscriptionOptions) {
+    if subProp is CreateSubscriptionOptions {
         log:printInfo(subProp.toString());
         test:assertEquals(subProp.subscriptionName, testSubscription4, msg = "Subscription creation failed. wrong name");
         test:assertEquals(subProp.topicName, testTopic4, msg = "Subscription creation failed. wrong topic");
@@ -829,15 +829,15 @@ function updateSubscriptionWithInclusionParameters() returns error? {
 function deleteTopicAndQueue() returns error? {
     log:printInfo("[[deleteTopicAndQueue]]");
     log:printInfo("Initializing Asb admin client.");
-    Administrator Administrator = check new (connectionString);
-    error? e = Administrator->deleteTopic(testTopic4);
-    if (e is error) {
+    Administrator adminClient = check new (connectionString);
+    error? e = adminClient->deleteTopic(testTopic4);
+    if e is error {
         test:assertFail("Topic deletion failed.");
     } else {
         log:printInfo("Topic deleted successfully.");
     }
-    e = Administrator->deleteQueue(testQueue4);
-    if (e is error) {
+    e = adminClient->deleteQueue(testQueue4);
+    if e is error {
         test:assertFail("Queue deletion failed.");
     } else {
         log:printInfo("Queue deleted successfully.");
@@ -852,9 +852,9 @@ function deleteTopicAndQueue() returns error? {
 function testGetSubscription() returns error? {
     log:printInfo("[[testGetSubscription]]");
     log:printInfo("Initializing Asb admin client.");
-    Administrator Administrator = check new (connectionString);
-    SubscriptionProperties? subscriptionProp = check Administrator->getSubscription(testTopic1, testSubscription2);
-    if (subscriptionProp is SubscriptionProperties) {
+    Administrator adminClient = check new (connectionString);
+    SubscriptionProperties? subscriptionProp = check adminClient->getSubscription(testTopic1, testSubscription2);
+    if subscriptionProp is SubscriptionProperties {
         log:printInfo(subscriptionProp.toString());
         test:assertEquals(subscriptionProp.subscriptionName, testSubscription2, msg = "Subscription creation failed. wrong name");
         test:assertEquals(subscriptionProp.topicName, testTopic1, msg = "Subscription creation failed. wrong topic");
@@ -888,9 +888,9 @@ function testGetSubscription() returns error? {
 function testUpdateSubscription() returns error? {
     log:printInfo("[[testUpdateSubscription]]");
     log:printInfo("Initializing Asb admin client.");
-    Administrator Administrator = check new (connectionString);
-    SubscriptionProperties? subscriptionProp = check Administrator->updateSubscription(testTopic1, testSubscription1, updateSubConfig);
-    if (subscriptionProp is SubscriptionProperties) {
+    Administrator adminClient = check new (connectionString);
+    SubscriptionProperties? subscriptionProp = check adminClient->updateSubscription(testTopic1, testSubscription1, updateSubConfig);
+    if subscriptionProp is SubscriptionProperties {
         test:assertEquals(subscriptionProp.subscriptionName, testSubscription1, msg = "Subscription creation failed. wrong name");
         test:assertEquals(subscriptionProp.topicName, testTopic1, msg = "Subscription creation failed. wrong topic");
         //test:assertEquals(subscriptionProp.autoDeleteOnIdle.seconds, subConfig.autoDeleteOnIdle?.seconds, msg = "Subscription creation failed. wrong autoDeleteOnIdle");
@@ -920,10 +920,10 @@ function testUpdateSubscription() returns error? {
 function testSubscriptionList() returns error? {
     log:printInfo("[[testSubscriptionList]]");
     log:printInfo("Initializing Asb admin client.");
-    Administrator Administrator = check new (connectionString);
-    SubscriptionList? subscriptionProp = check Administrator->listSubscriptions(testTopic1);
-    if (subscriptionProp is SubscriptionList) {
-        if (subscriptionProp.list.length() >= 2) {
+    Administrator adminClient = check new (connectionString);
+    SubscriptionList? subscriptionProp = check adminClient->listSubscriptions(testTopic1);
+    if subscriptionProp is SubscriptionList {
+        if subscriptionProp.list.length() >= 2 {
             log:printInfo(subscriptionProp.toString());
             log:printInfo("Subscription list successfully.");
         } else {
@@ -942,9 +942,9 @@ function testSubscriptionList() returns error? {
 function testCreateRuleWithOptions() returns error? {
     log:printInfo("[[testCreateRuleWithOptions]]");
     log:printInfo("Initializing Asb admin client.");
-    Administrator Administrator = check new (connectionString);
-    RuleProperties? ruleProp = check Administrator->createRule(testTopic1, testSubscription1, testRule2, ruleConfig);
-    if (ruleProp is RuleProperties) {
+    Administrator adminClient = check new (connectionString);
+    RuleProperties? ruleProp = check adminClient->createRule(testTopic1, testSubscription1, testRule2, ruleConfig);
+    if ruleProp is RuleProperties {
         log:printInfo("Rule created successfully.");
         test:assertEquals(ruleProp.name, testRule2, msg = "Rule creation failed.");
         test:assertEquals(ruleProp.rule.filter, "1=1", msg = "Rule creation failed.");
@@ -961,9 +961,9 @@ function testCreateRuleWithOptions() returns error? {
 function createRuleWithInclusionParameters() returns error? {
     log:printInfo("[[createRuleWithInclusionParameters]]");
     log:printInfo("Initializing Asb admin client.");
-    Administrator Administrator = check new (connectionString);
-    RuleProperties? ruleProp = check Administrator->createRule(testTopic4, testSubscription4, testRule4, rule);
-    if (ruleProp is RuleProperties) {
+    Administrator adminClient = check new (connectionString);
+    RuleProperties? ruleProp = check adminClient->createRule(testTopic4, testSubscription4, testRule4, rule);
+    if ruleProp is RuleProperties {
         log:printInfo("Rule created successfully.");
         test:assertEquals(ruleProp.name, testRule4, msg = "Rule creation failed.");
         test:assertEquals(ruleProp.rule.filter, "1=1", msg = "Rule creation failed.");
@@ -980,9 +980,9 @@ function createRuleWithInclusionParameters() returns error? {
 function updateRuleWithInclusionParameters() returns error? {
     log:printInfo("[[updateRuleWithInclusionParameters]]");
     log:printInfo("Initializing Asb admin client.");
-    Administrator Administrator = check new (connectionString);
-    RuleProperties? ruleProp = check Administrator->updateRule(testTopic4, testSubscription4, testRule4, rule);
-    if (ruleProp is RuleProperties) {
+    Administrator adminClient = check new (connectionString);
+    RuleProperties? ruleProp = check adminClient->updateRule(testTopic4, testSubscription4, testRule4, rule);
+    if ruleProp is RuleProperties {
         log:printInfo("Rule created successfully.");
         test:assertEquals(ruleProp.name, testRule4, msg = "Rule creation failed.");
         test:assertEquals(ruleProp.rule.filter, "1=1", msg = "Rule creation failed.");
@@ -999,9 +999,9 @@ function updateRuleWithInclusionParameters() returns error? {
 function testGetRule() returns error? {
     log:printInfo("[[testGetRule]]");
     log:printInfo("Initializing Asb admin client.");
-    Administrator Administrator = check new (connectionString);
-    RuleProperties? ruleProp = check Administrator->getRule(testTopic1, testSubscription1, testRule2);
-    if (ruleProp is RuleProperties) {
+    Administrator adminClient = check new (connectionString);
+    RuleProperties? ruleProp = check adminClient->getRule(testTopic1, testSubscription1, testRule2);
+    if ruleProp is RuleProperties {
         log:printInfo("Rule created successfully.");
         test:assertEquals(ruleProp.name, testRule2, msg = "Rule creation failed.");
         test:assertEquals(ruleProp.rule.filter, "1=1", msg = "Rule creation failed.");
@@ -1018,9 +1018,9 @@ function testGetRule() returns error? {
 function testUpdateRule() returns error? {
     log:printInfo("[[testUpdateRule]]");
     log:printInfo("Initializing Asb admin client.");
-    Administrator Administrator = check new (connectionString);
-    RuleProperties? ruleProp = check Administrator->updateRule(testTopic1, testSubscription1, testRule1, updateRuleConfig);
-    if (ruleProp is RuleProperties) {
+    Administrator adminClient = check new (connectionString);
+    RuleProperties? ruleProp = check adminClient->updateRule(testTopic1, testSubscription1, testRule1, updateRuleConfig);
+    if ruleProp is RuleProperties {
         log:printInfo("Rule created successfully.");
         test:assertEquals(ruleProp.name, testRule1, msg = "Rule creation failed.");
         test:assertEquals(ruleProp.rule.filter, "1=1", msg = "Rule creation failed.");
@@ -1037,10 +1037,10 @@ function testUpdateRule() returns error? {
 function testRuleList() returns error? {
     log:printInfo("[[testRuleList]]");
     log:printInfo("Initializing Asb admin client.");
-    Administrator Administrator = check new (connectionString);
-    RuleList? ruleProp = check Administrator->listRules(testTopic1, testSubscription1);
-    if (ruleProp is RuleList) {
-        if (ruleProp.list.length() >= 2) {
+    Administrator adminClient = check new (connectionString);
+    RuleList? ruleProp = check adminClient->listRules(testTopic1, testSubscription1);
+    if ruleProp is RuleList {
+        if ruleProp.list.length() >= 2 {
             log:printInfo(ruleProp.toString());
             log:printInfo("Rule list successfully.");
         } else {
@@ -1059,13 +1059,13 @@ function testRuleList() returns error? {
 function testDeleteRule() returns error? {
     log:printInfo("[[testDeleteRule]]");
     log:printInfo("Initializing Asb admin client.");
-    Administrator Administrator = check new (connectionString);
-    Error? result = check Administrator->deleteRule(testTopic1, testSubscription1, testRule1);
-    if (result is Error) {
+    Administrator adminClient = check new (connectionString);
+    Error? result = check adminClient->deleteRule(testTopic1, testSubscription1, testRule1);
+    if result is Error {
         test:assertFail("Rule deletion failed.");
     }
-    result = check Administrator->deleteRule(testTopic1, testSubscription1, testRule2);
-    if (result is Error) {
+    result = check adminClient->deleteRule(testTopic1, testSubscription1, testRule2);
+    if result is Error {
         test:assertFail("Rule deletion failed.");
     }
 }
@@ -1078,13 +1078,13 @@ function testDeleteRule() returns error? {
 function testDeleteSubscription() returns error? {
     log:printInfo("[[testDeleteSubscriptionWithOption]]");
     log:printInfo("Initializing Asb admin client.");
-    Administrator Administrator = check new (connectionString);
-    Error? result = check Administrator->deleteSubscription(testTopic1, testSubscription1);
-    if (result is Error) {
+    Administrator adminClient = check new (connectionString);
+    Error? result = check adminClient->deleteSubscription(testTopic1, testSubscription1);
+    if result is Error {
         test:assertFail("Subscription deletion failed.");
     }
-    result = check Administrator->deleteSubscription(testTopic1, testSubscription2);
-    if (result is Error) {
+    result = check adminClient->deleteSubscription(testTopic1, testSubscription2);
+    if result is Error {
         test:assertFail("Subscription deletion failed.");
     }
 }
@@ -1097,13 +1097,13 @@ function testDeleteSubscription() returns error? {
 function testDeleteQueue() returns error? {
     log:printInfo("[[testDeleteQueue]]");
     log:printInfo("Initializing Asb admin client.");
-    Administrator Administrator = check new (connectionString);
-    Error? result = check Administrator->deleteQueue(testQueue2);
-    if (result is Error) {
+    Administrator adminClient = check new (connectionString);
+    Error? result = check adminClient->deleteQueue(testQueue2);
+    if result is Error {
         test:assertFail("Queue deletion failed.");
     }
-    result = check Administrator->deleteQueue(testQueue1);
-    if (result is Error) {
+    result = check adminClient->deleteQueue(testQueue1);
+    if result is Error {
         test:assertFail("Queue deletion failed.");
     }
 }
@@ -1116,13 +1116,13 @@ function testDeleteQueue() returns error? {
 function testDeleteTopic() returns error? {
     log:printInfo("[[testDeleteTopic]]");
     log:printInfo("Initializing Asb admin client.");
-    Administrator Administrator = check new (connectionString);
-    Error? result = check Administrator->deleteTopic(testTopic1);
-    if (result is Error) {
+    Administrator adminClient = check new (connectionString);
+    Error? result = check adminClient->deleteTopic(testTopic1);
+    if result is Error {
         test:assertFail("Topic deletion failed.");
     }
-    result = check Administrator->deleteTopic(testTopic2);
-    if (result is Error) {
+    result = check adminClient->deleteTopic(testTopic2);
+    if result is Error {
         test:assertFail("Topic deletion failed.");
     }
 }

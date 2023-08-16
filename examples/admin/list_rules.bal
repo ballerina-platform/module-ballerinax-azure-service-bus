@@ -26,7 +26,7 @@ public function main() returns error? {
     log:printInfo("Initializing Asb admin client...");
     asb:Administrator Administrator = check new (connectionString);
     asb:RuleList? rules = check Administrator->listRules("test-topic", "test-subscription");
-    if (rules is asb:RuleList) {
+    if rules is asb:RuleList {
         log:printInfo(rules.toString());
     } else {
         log:printError("Error while listing rules.");

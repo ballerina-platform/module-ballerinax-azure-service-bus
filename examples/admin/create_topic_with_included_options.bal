@@ -39,7 +39,7 @@ string userMetaData = "Test User Meta Data";
 configurable string connectionString = ?;
 
 // This sample demonstrates a scenario where azure service bus connecter is used to 
-// create a subscription in a topic.
+// create a  topic with given configurations in Azure Service Bus.
 public function main() returns error? {
     log:printInfo("Initializing Asb admin client...");
     asb:Administrator Administrator = check new (connectionString);
@@ -59,7 +59,7 @@ public function main() returns error? {
         requiresSession = false,
         deadLetteringOnMessageExpiration = true
     );
-    if (topic is asb:TopicProperties) {
+    if topic is asb:TopicProperties {
         log:printInfo(topic.toString());
     } else {
         log:printError(topic.toString());

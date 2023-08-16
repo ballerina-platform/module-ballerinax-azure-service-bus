@@ -39,7 +39,7 @@ string userMetaData = "Test User Meta Data";
 configurable string connectionString = ?;
 
 // This sample demonstrates a scenario where azure service bus connecter is used to 
-// update a queue in the service bus.
+// update a queue in the azure service bus.
 public function main() returns error? {
     log:printInfo("Initializing Asb admin client...");
     asb:Administrator Administrator = check new (connectionString);
@@ -57,7 +57,7 @@ public function main() returns error? {
         enablePartitioning = false,
         requiresSession = false
     );
-    if (queue is asb:QueueProperties) {
+    if queue is asb:QueueProperties) {
         log:printInfo(queue.toString());
     } else {
         log:printError(queue.toString());

@@ -34,6 +34,7 @@ asb:Duration lockDue = {
     nanoseconds: 200
 };
 string userMetaData = "Test User Meta Data";
+
 asb:CreateQueueOptions queueConfig = {
     autoDeleteOnIdle: deletion,
     defaultMessageTimeToLive: ttl,
@@ -55,12 +56,12 @@ asb:CreateQueueOptions queueConfig = {
 configurable string connectionString = ?;
 
 // This sample demonstrates a scenario where azure service bus connecter is used to 
-// create a subscription in a topic.
+// create a topic with the given configurations.
 public function main() returns error? {
     log:printInfo("Initializing Asb admin client...");
     asb:Administrator Administrator = check new (connectionString);
     asb:TopicProperties? topic = check Administrator->createTopic("test-topic", queueConfig);
-    if (topic is asb:TopicProperties) {
+    if topic is asb:TopicProperties {
         log:printInfo(topic.toString());
     } else {
         log:printError(topic.toString());

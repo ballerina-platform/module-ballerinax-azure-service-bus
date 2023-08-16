@@ -49,7 +49,7 @@ public function main() returns error? {
         maxDeliveryCount = 10,
         status = asb:ACTIVE
     );
-    if (sub is asb:SubscriptionProperties) {
+    if sub is asb:SubscriptionProperties {
         log:printInfo(sub.toString());
     } else {
         log:printError(sub.toString());

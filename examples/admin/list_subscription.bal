@@ -26,7 +26,7 @@ public function main() returns error? {
     log:printInfo("Initializing Asb admin client...");
     asb:Administrator Administrator = check new (connectionString);
     asb:SubscriptionList? subs = check Administrator->listSubscriptions("test-topic");
-    if (subs is asb:SubscriptionList) {
+    if subs is asb:SubscriptionList {
         log:printInfo("Subscription list retrieved successfully");
         log:printInfo("Subscription list : " + subs.list.toString());
     } else {

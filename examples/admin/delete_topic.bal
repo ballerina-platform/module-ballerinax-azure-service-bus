@@ -21,12 +21,12 @@ import ballerinax/asb;
 configurable string connectionString = ?;
 
 // This sample demonstrates a scenario where azure service bus connecter is used to 
-// delete a subscription from a topic.
+// delete a topic in a service bus instance.
 public function main() returns error? {
     log:printInfo("Initializing Asb admin client.");
     asb:Administrator Administrator = check new (connectionString);
     asb:Error? result = check Administrator->deleteSubscription("test-topic", "test-subscription");
-    if (result is asb:Error) {
+    if result is asb:Error {
         log:printError(result.toString());
     } else {
         log:printInfo("Topic deleted successfully.");
