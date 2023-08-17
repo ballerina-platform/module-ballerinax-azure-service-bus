@@ -93,7 +93,7 @@ public class Administrator {
      * Create a Topic in Azure Service Bus.
      *
      * @param administratorClient Azure Service Bus Administrator Client
-     * @param topicName           nameof the topic
+     * @param topicName           name of the topic
      * @param topicProperties     properties of the Topic (Requires TopicProperties object)
      * @return topicProperties
      */
@@ -123,7 +123,7 @@ public class Administrator {
      * Get a Topic in Azure Service Bus.
      *
      * @param administratorClient Azure Service Bus Administrator Client
-     * @param topicName           nameof the topic
+     * @param topicName           name of the topic
      * @return topicProperties
      */
     public static Object getTopic(BObject administratorClient, BString topicName) {
@@ -147,7 +147,7 @@ public class Administrator {
      * Update a Topic in Azure Service Bus.
      *
      * @param administratorClient Azure Service Bus Administrator Client
-     * @param topicName           nameof the topic
+     * @param topicName           name of the topic
      * @param topicProperties     properties of the Topic (Requires TopicProperties object)
      * @return topicProperties
      */
