@@ -28,7 +28,7 @@ configurable string queueName = ?;
 public function main() returns error? {
 
     // Input values
-    string stringContent = "This is My Message Body"; 
+    string stringContent = "This is My Message Body";
     byte[] byteContent = stringContent.toBytes();
     int timeToLive = 60; // In seconds
     int serverWaitTime = 60; // In seconds
@@ -73,7 +73,7 @@ public function main() returns error? {
     if (messageReceived is asb:Message) {
         int sequenceNumber = check queueReceiver->defer(messageReceived);
         log:printInfo("Defer message successful");
-        asb:Message|error? messageReceivedAgain = 
+        asb:Message|error? messageReceivedAgain =
             check queueReceiver->receiveDeferred(sequenceNumber);
         if (messageReceivedAgain is asb:Message) {
             log:printInfo("Reading Deferred Message : " + messageReceivedAgain.toString());
@@ -89,4 +89,4 @@ public function main() returns error? {
 
     log:printInfo("Closing Asb receiver client.");
     check queueReceiver->close();
-}    
+}

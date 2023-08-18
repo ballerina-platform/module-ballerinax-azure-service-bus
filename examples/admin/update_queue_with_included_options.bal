@@ -42,7 +42,7 @@ configurable string connectionString = ?;
 // update a queue in the azure service bus.
 public function main() returns error? {
     log:printInfo("Initializing Asb admin client...");
-    asb:Administrator adminClient  = check new (connectionString);
+    asb:Administrator adminClient = check new (connectionString);
     asb:QueueProperties? queue = check adminClient->updateQueue("test-queue",
         autoDeleteOnIdle = deletion,
         defaultMessageTimeToLive = ttl,

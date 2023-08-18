@@ -34,7 +34,7 @@ configurable string subscriptionName = ?;
 public function main() returns error? {
 
     // Input values
-    string stringContent = "This is My Message Body"; 
+    string stringContent = "This is My Message Body";
     byte[] byteContent = stringContent.toBytes();
     int timeToLive = 60; // In seconds
     int serverWaitTime = 60; // In seconds
@@ -70,7 +70,7 @@ public function main() returns error? {
 
     log:printInfo("Initializing Asb receiver client.");
     asb:MessageReceiver subscriptionReceiver = check new (receiverConfig);
-    
+
     log:printInfo("Sending via Asb sender client.");
     check topicSender->send(message1);
 
@@ -92,4 +92,4 @@ public function main() returns error? {
 
     log:printInfo("Closing Asb receiver client.");
     check subscriptionReceiver->close();
-}    
+}

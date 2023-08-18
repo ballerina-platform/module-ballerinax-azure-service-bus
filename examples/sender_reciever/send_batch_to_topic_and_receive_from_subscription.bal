@@ -29,7 +29,7 @@ configurable string subscriptionName = ?;
 public function main() returns error? {
 
     // Input values
-    string stringContent = "This is My Message Body"; 
+    string stringContent = "This is My Message Body";
     byte[] byteContent = stringContent.toBytes();
     map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
     int timeToLive = 60; // In seconds
@@ -97,4 +97,4 @@ public function main() returns error? {
 
     log:printInfo("Closing Asb receiver client.");
     check subscriptionReceiver->close();
-}    
+}
