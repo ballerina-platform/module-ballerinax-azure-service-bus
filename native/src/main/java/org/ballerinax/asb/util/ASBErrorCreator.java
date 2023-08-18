@@ -17,7 +17,7 @@
  */
 
 package org.ballerinax.asb.util;
-
+import com.azure.core.exception.HttpResponseException;
 import com.azure.messaging.servicebus.ServiceBusException;
 import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.utils.StringUtils;
@@ -32,26 +32,26 @@ import static org.ballerinax.asb.util.ModuleUtils.getModule;
  * @since 4.0.0
  */
 public class ASBErrorCreator {
-
     public static final String ASB_ERROR_PREFIX = "ASB Error: ";
+    public static final String ASB_HTTP_ERROR_PREFIX = "Error occurred while processing request, Status Code:";
     public static final String UNHANDLED_ERROR_PREFIX = "Error occurred while processing request: ";
-
+    public static final int CLIENT_INVOCATION_ERROR = 10001;
     public static BError fromASBException(ServiceBusException e) {
         return fromJavaException(ASB_ERROR_PREFIX + e.getReason().toString(), e);
     }
-
+    public static BError fromASBHttpResponseException(HttpResponseException e) {
+        return fromBError(ASB_HTTP_ERROR_PREFIX + e.getResponse().getStatusCode(),
+                ErrorCreator.createError(e.fillInStackTrace()));
+    }
     public static BError fromUnhandledException(Exception e) {
         return fromJavaException(UNHANDLED_ERROR_PREFIX + e.getMessage(), e);
     }
-
     public static BError fromBError(BError error) {
         return fromBError(error.getMessage(), error.getCause());
     }
-
     public static BError fromBError(String message, BError cause) {
         return ErrorCreator.createDistinctError(ASB_ERROR, getModule(), StringUtils.fromString(message), cause);
     }
-
     private static BError fromJavaException(String message, Throwable cause) {
         return fromBError(message, ErrorCreator.createError(cause));
     }

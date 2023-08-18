@@ -1,6 +1,6 @@
-// Copyright (c) 2021 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+// Copyright (c) 2023 WSO2 LLC. (http://www.wso2.org).
 //
-// WSO2 Inc. licenses this file to you under the Apache License,
+// WSO2 LLC. licenses this file to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file except
 // in compliance with the License.
 // You may obtain a copy of the License at
@@ -23,13 +23,13 @@ configurable string topicName = ?;
 configurable string subscriptionName = ?;
 
 // This sample demonstrates a scneario where azure service bus connecter is used to 
-// send a message to a topic using topic sender, receive that message using subscription receiver with PEEKLOCK mode, 
-// then move the message in a DLQ (dead letter queue)
-// After moving to DLQ, we cannot receive that message from the receiver.
+// send a message to a topic using message sender, 
+// receive a messsage from a subcription using subscription receiver with RECEIVEANDDELETE mode
+// so that the message will be deleted from the queue just after receiving.
 public function main() returns error? {
 
     // Input values
-    string stringContent = "This is My Message Body"; 
+    string stringContent = "This is My Message Body";
     byte[] byteContent = stringContent.toBytes();
     int timeToLive = 60; // In seconds
     int serverWaitTime = 60; // In seconds
@@ -57,7 +57,7 @@ public function main() returns error? {
             topicName: topicName,
             subscriptionName: subscriptionName
         },
-        receiveMode: asb:PEEK_LOCK
+        receiveMode: asb:RECEIVE_AND_DELETE
     };
 
     log:printInfo("Initializing Asb sender client.");
@@ -73,13 +73,7 @@ public function main() returns error? {
     asb:Message|error? messageReceived = subscriptionReceiver->receive(serverWaitTime);
 
     if (messageReceived is asb:Message) {
-        check subscriptionReceiver->deadLetter(messageReceived);
-        asb:Message|error? messageReceivedAgain = subscriptionReceiver->receive(serverWaitTime);
-        if (messageReceivedAgain is ()) {
-            log:printInfo("Deadletter message successful");
-        } else {
-            log:printError("Deadletter message not succesful.");
-        }
+        log:printInfo("Reading Received Message : " + messageReceived.toString());
     } else if (messageReceived is ()) {
         log:printError("No message in the subscription.");
     } else {
@@ -91,4 +85,4 @@ public function main() returns error? {
 
     log:printInfo("Closing Asb receiver client.");
     check subscriptionReceiver->close();
-}    
+}

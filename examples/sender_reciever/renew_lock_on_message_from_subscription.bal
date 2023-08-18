@@ -1,6 +1,6 @@
-// Copyright (c) 2021 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+// Copyright (c) 2023 WSO2 LLC. (http://www.wso2.org).
 //
-// WSO2 Inc. licenses this file to you under the Apache License,
+// WSO2 LLC. licenses this file to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file except
 // in compliance with the License.
 // You may obtain a copy of the License at
@@ -19,10 +19,11 @@ import ballerinax/asb;
 
 // Connection Configurations
 configurable string connectionString = ?;
-configurable string queueName = ?;
+configurable string topicName = ?;
+configurable string subscriptionName = ?;
 
 // This sample demonstrates a scneario where azure service bus listener is used to
-// send a message to a queue using message sender, receive that message using message receiver with PEEKLOCK mode, 
+// send a message to a topic using topic sender, receive that message using subscription receiver with PEEKLOCK mode, 
 // then renews the lock on the message. 
 //
 // (The lock will be renewed based on the setting specified on the entity. 
@@ -33,7 +34,7 @@ configurable string queueName = ?;
 public function main() returns error? {
 
     // Input values
-    string stringContent = "This is My Message Body"; 
+    string stringContent = "This is My Message Body";
     byte[] byteContent = stringContent.toBytes();
     int timeToLive = 60; // In seconds
     int serverWaitTime = 60; // In seconds
@@ -51,32 +52,34 @@ public function main() returns error? {
 
     asb:ASBServiceSenderConfig senderConfig = {
         connectionString: connectionString,
-        entityType: asb:QUEUE,
-        topicOrQueueName: queueName
+        entityType: asb:TOPIC,
+        topicOrQueueName: topicName
     };
 
     asb:ASBServiceReceiverConfig receiverConfig = {
         connectionString: connectionString,
         entityConfig: {
-            queueName: queueName
+            topicName: topicName,
+            subscriptionName: subscriptionName
         },
         receiveMode: asb:PEEK_LOCK
     };
 
     log:printInfo("Initializing Asb sender client.");
-    asb:MessageSender queueSender = check new (senderConfig);
+    asb:MessageSender topicSender = check new (senderConfig);
 
     log:printInfo("Initializing Asb receiver client.");
-    asb:MessageReceiver queueReceiver = check new (receiverConfig);
+    asb:MessageReceiver subscriptionReceiver = check new (receiverConfig);
 
     log:printInfo("Sending via Asb sender client.");
-    check queueSender->send(message1);
+    check topicSender->send(message1);
 
     log:printInfo("Receiving from Asb receiver client.");
-    asb:Message|error? messageReceived = queueReceiver->receive(serverWaitTime);
+    asb:Message|asb:Error? messageReceived = subscriptionReceiver->receive(serverWaitTime);
 
     if (messageReceived is asb:Message) {
-        check queueReceiver->renewLock(messageReceived);
+        check subscriptionReceiver->renewLock(messageReceived);
+        asb:Message|asb:Error? messageReceivedAgain = subscriptionReceiver->receive(serverWaitTime);
         log:printInfo("Renew lock message successful");
     } else if (messageReceived is ()) {
         log:printError("No message in the queue.");
@@ -85,8 +88,8 @@ public function main() returns error? {
     }
 
     log:printInfo("Closing Asb sender client.");
-    check queueSender->close();
+    check topicSender->close();
 
     log:printInfo("Closing Asb receiver client.");
-    check queueReceiver->close();
-}    
+    check subscriptionReceiver->close();
+}

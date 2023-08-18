@@ -1,6 +1,6 @@
-// Copyright (c) 2021 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+// Copyright (c) 2023 WSO2 LLC. (http://www.wso2.org).
 //
-// WSO2 Inc. licenses this file to you under the Apache License,
+// WSO2 LLC. licenses this file to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file except
 // in compliance with the License.
 // You may obtain a copy of the License at
@@ -15,16 +15,8 @@
 // under the License.
 
 import ballerina/log;
-import ballerina/os;
 import ballerina/test;
 import ballerina/time;
-
-// Connection Configurations
-configurable string connectionString = os:getEnv("CONNECTION_STRING");
-configurable string queueName = "myqueue";
-configurable string topicName = "mytopic";
-configurable string subscriptionName1 = "mysubscription1";
-string subscriptionPath1 = subscriptionName1;
 
 type Order record {
     string color;
@@ -74,19 +66,20 @@ MessageBatch messages = {
 ASBServiceSenderConfig senderConfig = {
     connectionString: connectionString,
     entityType: QUEUE,
-    topicOrQueueName: queueName
+    topicOrQueueName: testQueue1
 };
 
 ASBServiceReceiverConfig receiverConfig = {
     connectionString: connectionString,
     entityConfig: {
-        queueName: queueName
+        queueName: testQueue1
     },
     receiveMode: PEEK_LOCK
 };
 
 @test:Config {
-    groups: ["asb"],
+    groups: ["asb_sender_receiver"],
+    dependsOn: [testCreateSubscription],
     enable: true
 }
 function testSendAndReceiveMessageFromQueueOperation() returns error? {
@@ -123,7 +116,7 @@ function testSendAndReceiveMessageFromQueueOperation() returns error? {
 }
 
 @test:Config {
-    groups: ["asb"],
+    groups: ["asb_sender_receiver"],
     dependsOn: [testSendAndReceiveMessageFromQueueOperation],
     enable: true
 }
@@ -189,8 +182,8 @@ function testSendAndReceiveMessagePayloadFromQueueOperation() returns error? {
 }
 
 @test:Config {
-    groups: ["asb"],
-    dependsOn: [testSendAndReceiveMessageFromQueueOperation],
+    groups: ["asb_sender_receiver"],
+    dependsOn: [testSendAndReceiveMessagePayloadFromQueueOperation],
     enable: true
 }
 function testSendAndReceiveBatchFromQueueOperation() returns error? {
@@ -235,7 +228,7 @@ function testSendAndReceiveBatchFromQueueOperation() returns error? {
 }
 
 @test:Config {
-    groups: ["asb"],
+    groups: ["asb_sender_receiver"],
     dependsOn: [testSendAndReceiveBatchFromQueueOperation],
     enable: true
 }
@@ -274,7 +267,7 @@ function testCompleteMessageFromQueueOperation() returns error? {
 }
 
 @test:Config {
-    groups: ["asb"],
+    groups: ["asb_sender_receiver"],
     dependsOn: [testCompleteMessageFromQueueOperation],
     enable: true
 }
@@ -318,7 +311,7 @@ function testAbandonMessageFromQueueOperation() returns error? {
 }
 
 @test:Config {
-    groups: ["asb"],
+    groups: ["asb_sender_receiver"],
     dependsOn: [testAbandonMessageFromQueueOperation],
     enable: true
 }
@@ -354,7 +347,7 @@ function testDeadletterMessageFromQueueOperation() returns error? {
 }
 
 @test:Config {
-    groups: ["asb"],
+    groups: ["asb_sender_receiver"],
     dependsOn: [testDeadletterMessageFromQueueOperation],
     enable: true
 }
@@ -396,7 +389,7 @@ function testDeferMessageFromQueueOperation() returns error? {
 }
 
 @test:Config {
-    groups: ["asb"],
+    groups: ["asb_sender_receiver"],
     dependsOn: [testDeferMessageFromQueueOperation],
     enable: true
 }
@@ -404,13 +397,13 @@ function testSendAndReceiveMessageFromSubscriptionOperation() returns error? {
     log:printInfo("[[testSendAndReceiveMessageFromSubscriptionOperation]]");
 
     log:printInfo("Initializing Asb sender client.");
-    senderConfig.topicOrQueueName = topicName;
+    senderConfig.topicOrQueueName = testTopic1;
     MessageSender topicSender = check new (senderConfig);
 
     log:printInfo("Initializing Asb receiver client.");
     receiverConfig.entityConfig = {
-        topicName: topicName,
-        subscriptionName: subscriptionName1
+        topicName: testTopic1,
+        subscriptionName: testSubscription1
     };
     receiverConfig.receiveMode = RECEIVE_AND_DELETE;
     MessageReceiver subscriptionReceiver = check new (receiverConfig);
@@ -439,7 +432,7 @@ function testSendAndReceiveMessageFromSubscriptionOperation() returns error? {
 }
 
 @test:Config {
-    groups: ["asb"],
+    groups: ["asb_sender_receiver"],
     dependsOn: [testSendAndReceiveMessageFromSubscriptionOperation],
     enable: true
 }
@@ -479,7 +472,7 @@ function testSendAndReceiveBatchFromSubscriptionOperation() returns error? {
 }
 
 @test:Config {
-    groups: ["asb"],
+    groups: ["asb_sender_receiver"],
     dependsOn: [testSendAndReceiveBatchFromSubscriptionOperation],
     enable: true
 }
@@ -516,7 +509,7 @@ function testCompleteMessageFromSubscriptionOperation() returns error? {
 }
 
 @test:Config {
-    groups: ["asb"],
+    groups: ["asb_sender_receiver"],
     dependsOn: [testCompleteMessageFromSubscriptionOperation],
     enable: true
 }
@@ -558,7 +551,7 @@ function testAbandonMessageFromSubscriptionOperation() returns error? {
 }
 
 @test:Config {
-    groups: ["asb"],
+    groups: ["asb_sender_receiver"],
     dependsOn: [testAbandonMessageFromSubscriptionOperation],
     enable: true
 }
@@ -594,7 +587,7 @@ function testDeadletterMessageFromSubscriptionOperation() returns error? {
 }
 
 @test:Config {
-    groups: ["asb"],
+    groups: ["asb_sender_receiver"],
     dependsOn: [testDeadletterMessageFromSubscriptionOperation],
     enable: true
 }
@@ -636,25 +629,25 @@ function testDeferMessageFromSubscriptionOperation() returns error? {
 }
 
 @test:Config {
-    groups: ["asb"],
+    groups: ["asb_sender_receiver"],
     dependsOn: [testDeferMessageFromSubscriptionOperation],
     enable: true
 }
 function testMessageScheduling() returns error? {
-
+    log:printInfo("[[testMessageScheduling]]");
     MessageSender topicSender;
     MessageReceiver subscriptionReceiver;
 
     do {
 
         log:printInfo("Initializing Asb sender client.");
-        senderConfig.topicOrQueueName = topicName;
+        senderConfig.topicOrQueueName = testTopic1;
         topicSender = check new (senderConfig);
 
         log:printInfo("Initializing Asb receiver client.");
         receiverConfig.entityConfig = {
-            topicName: topicName,
-            subscriptionName: subscriptionName1
+            topicName: testTopic1,
+            subscriptionName: testSubscription1
         };
         receiverConfig.receiveMode = RECEIVE_AND_DELETE;
         subscriptionReceiver = check new (receiverConfig);
@@ -680,13 +673,9 @@ function testMessageScheduling() returns error? {
         }
     } on fail error e {
         log:printInfo("Closing Asb sender client.");
-        if (topicSender is MessageSender) {
-            check topicSender->close();
-        }
+        check topicSender->close();
         log:printInfo("Closing Asb receiver client.");
-        if (subscriptionReceiver is MessageReceiver) {
-            check subscriptionReceiver->close();
-        }
+        check subscriptionReceiver->close();
         return error("Error while executing test testMessageScheduling", e);
     }
 }
@@ -697,13 +686,13 @@ function afterEach() {
     senderConfig = {
         connectionString: connectionString,
         entityType: QUEUE,
-        topicOrQueueName: queueName
+        topicOrQueueName: testQueue1
     };
 
     receiverConfig = {
         connectionString: connectionString,
         entityConfig: {
-            queueName: queueName
+            queueName: testQueue1
         },
         receiveMode: PEEK_LOCK
     };

@@ -1,4 +1,4 @@
-// Copyright (c) 2023 WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
+// Copyright (c) 2023 WSO2 LLC. (http://www.wso2.org).
 //
 // WSO2 LLC. licenses this file to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file except
@@ -18,7 +18,8 @@ import ballerina/log;
 import ballerina/test;
 
 @test:Config {
-    groups: ["asb_negative"]
+    groups: ["asb_sender_receiver_negative"],
+    dependsOn: [testCreateQueue, testCreateTopicOperation, testCreateSubscription]
 }
 function testReceivePayloadWithIncorrectExpectedType() returns error? {
     log:printInfo("[[testReceivePayloadWithIncorrectExpectedType]]");
@@ -48,7 +49,8 @@ function testReceivePayloadWithIncorrectExpectedType() returns error? {
 }
 
 @test:Config {
-    groups: ["asb_negative"]
+    groups: ["asb_sender_receiver_negative"],
+    dependsOn: [testReceivePayloadWithIncorrectExpectedType]
 }
 function testReceivePayloadWithUnsupportedUnionExpectedType() returns error? {
     log:printInfo("[[testReceivePayloadWithUnsupportedUnionExpectedType]]");
@@ -77,7 +79,8 @@ function testReceivePayloadWithUnsupportedUnionExpectedType() returns error? {
 }
 
 @test:Config {
-    groups: ["asb_negative"]
+    groups: ["asb_sender_receiver_negative"],
+    dependsOn: [testReceivePayloadWithUnsupportedUnionExpectedType]
 }
 function testSendToInvalidTopic() returns error? {
     log:printInfo("[[testSendToInvalidTopic]]");
@@ -95,7 +98,8 @@ function testSendToInvalidTopic() returns error? {
 }
 
 @test:Config {
-    groups: ["asb_negative"]
+    groups: ["asb_sender_receiver_negative"],
+    dependsOn: [testSendToInvalidTopic]
 }
 function testReceiveFromInvalidQueue() returns error? {
     log:printInfo("[[testReceiveFromInvalidQueue]]");
@@ -113,7 +117,8 @@ function testReceiveFromInvalidQueue() returns error? {
 }
 
 @test:Config {
-    groups: ["asb_negative"]
+    groups: ["asb_sender_receiver_negative"],
+    dependsOn: [testReceiveFromInvalidQueue]
 }
 function testInvalidConnectionString() returns error? {
     log:printInfo("[[testInvalidConnectionString]]");

@@ -1,6 +1,6 @@
-// Copyright (c) 2021 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+// Copyright (c) 2023 WSO2 LLC. (http://www.wso2.org).
 //
-// WSO2 Inc. licenses this file to you under the Apache License,
+// WSO2 LLC. licenses this file to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file except
 // in compliance with the License.
 // You may obtain a copy of the License at
@@ -18,16 +18,20 @@ import ballerina/log;
 import ballerinax/asb;
 
 // Connection Configurations
+
 configurable string connectionString = ?;
-configurable string queueName = ?;
+configurable string topicName = ?;
+configurable string subscriptionName1 = ?;
 
 // This sample demonstrates a scneario where azure service bus connecter is used to 
-// send a message to a queue using message sender, receive a messsage using message receiver with RECEIVEANDDELETE mode
-// so that the message will be deleted from the queue just after receiving.
+// send a message to a topic using topic sender, receive that message using subscription receiver with PEEKLOCK mode, 
+// abadon that message (discards the message and relinquishes the message lock ownership),
+// finally complete the processing of message using complete function of the caller. 
+// After this point, we cannot futher perform operations on message.
 public function main() returns error? {
 
     // Input values
-    string stringContent = "This is My Message Body"; 
+    string stringContent = "This is My Message Body";
     byte[] byteContent = stringContent.toBytes();
     int timeToLive = 60; // In seconds
     int serverWaitTime = 60; // In seconds
@@ -45,41 +49,49 @@ public function main() returns error? {
 
     asb:ASBServiceSenderConfig senderConfig = {
         connectionString: connectionString,
-        entityType: asb:QUEUE,
-        topicOrQueueName: queueName
+        entityType: asb:TOPIC,
+        topicOrQueueName: topicName
     };
 
     asb:ASBServiceReceiverConfig receiverConfig = {
         connectionString: connectionString,
         entityConfig: {
-            queueName: queueName
+            topicName: topicName,
+            subscriptionName: subscriptionName1
         },
-        receiveMode: asb:RECEIVE_AND_DELETE
+        receiveMode: asb:PEEK_LOCK
     };
 
     log:printInfo("Initializing Asb sender client.");
-    asb:MessageSender queueSender = check new (senderConfig);
+    asb:MessageSender topicSender = check new (senderConfig);
 
     log:printInfo("Initializing Asb receiver client.");
-    asb:MessageReceiver queueReceiver = check new (receiverConfig);
+    asb:MessageReceiver subscriptionReceiver = check new (receiverConfig);
 
     log:printInfo("Sending via Asb sender client.");
-    check queueSender->send(message1);
+    check topicSender->send(message1);
 
     log:printInfo("Receiving from Asb receiver client.");
-    asb:Message|asb:Error? messageReceived = queueReceiver->receive(serverWaitTime);
+    asb:Message|error? messageReceived = subscriptionReceiver->receive(serverWaitTime);
 
     if (messageReceived is asb:Message) {
-        log:printInfo("Reading Received Message : " + messageReceived.toString());
+        check subscriptionReceiver->abandon(messageReceived);
+        asb:Message|error? messageReceivedAgain = subscriptionReceiver->receive(serverWaitTime);
+        if (messageReceivedAgain is asb:Message) {
+            check subscriptionReceiver->complete(messageReceivedAgain);
+            log:printInfo("Abandon message successful");
+        } else {
+            log:printError("Abandon message not succesful.");
+        }
     } else if (messageReceived is ()) {
-        log:printError("No message in the queue.");
+        log:printError("No message in the subscription.");
     } else {
         log:printError("Receiving message via Asb receiver connection failed.");
     }
 
     log:printInfo("Closing Asb sender client.");
-    check queueSender->close();
+    check topicSender->close();
 
     log:printInfo("Closing Asb receiver client.");
-    check queueReceiver->close();
-}    
+    check subscriptionReceiver->close();
+}

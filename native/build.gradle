@@ -115,7 +115,7 @@ jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     dependsOn configurations.dist
     from { configurations.dist.collect { it.isDirectory() ? it : zipTree(it) } } {
-        exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA', 'io/netty/**', 'com/google/gson/**',
+        exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA', 'com/google/gson/**',
                 'org/slf4j/**', 'org/apache/commons/lang3/**', 'com/ctc/wstx/**', 'org/codehaus/**'
     }
 }

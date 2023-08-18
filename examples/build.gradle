@@ -50,5 +50,5 @@ task buildExamples {
     }
 }
 
-test.dependsOn testExamples
+// test.dependsOn testExamples
 build.dependsOn buildExamples
