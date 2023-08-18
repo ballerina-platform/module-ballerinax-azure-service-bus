@@ -192,7 +192,6 @@ public class Administrator {
             return ASBErrorCreator.fromASBException(e);
         } catch (Exception e) {
             return ASBErrorCreator.fromUnhandledException(e);
-
         }
     }
 
@@ -785,32 +784,32 @@ public class Administrator {
 
     private static Map<String, Object> populateTopicOptionalFieldsMap(TopicProperties properties) {
         Map<String, Object> map = new HashMap<>();
-        ASBUtils.addFieldIfPresent(map, ASBConstants.CREATED_TOPIC_RECORD_FIELD_NAME
-                , StringUtils.fromString(properties.getName()));
-        ASBUtils.addFieldIfPresent(map, ASBConstants.CREATED_TOPIC_RECORD_FIELD_STATUS
-                , StringUtils.fromString(properties.getStatus().toString()));
-        ASBUtils.addFieldIfPresent(map, ASBConstants.CREATED_TOPIC_RECORD_FIELD_USER_METADATA
-                , StringUtils.fromString(properties.getUserMetadata()));
-        ASBUtils.addFieldIfPresent(map, ASBConstants.CREATED_TOPIC_RECORD_FIELD_AUTO_DELETE_ON_IDLE
-                , fromDuration(properties.getAutoDeleteOnIdle()));
-        ASBUtils.addFieldIfPresent(map, ASBConstants.CREATED_TOPIC_RECORD_FIELD_DEFAULT_MESSAGE_TIME_TO_LIVE
-                , fromDuration(properties.getDefaultMessageTimeToLive()));
-        ASBUtils.addFieldIfPresent(map, ASBConstants.CREATED_TOPIC_RECORD_FIELD_DUPLICATE_DETECTION_HISTORY_TIME_WINDOW
-                , fromDuration(properties.getDuplicateDetectionHistoryTimeWindow()));
-        ASBUtils.addFieldIfPresent(map, ASBConstants.CREATED_TOPIC_RECORD_FIELD_ENABLE_BATCHED_OPERATIONS
-                , properties.isBatchedOperationsEnabled());
-        ASBUtils.addFieldIfPresent(map, ASBConstants.CREATED_TOPIC_RECORD_FIELD_ENABLE_PARTITIONING
-                , properties.isPartitioningEnabled());
-        ASBUtils.addFieldIfPresent(map, ASBConstants.CREATED_TOPIC_RECORD_FIELD_SUPPORT_ORDERING
-                , properties.isOrderingSupported());
-        ASBUtils.addFieldIfPresent(map, ASBConstants.CREATED_TOPIC_RECORD_FIELD_REQUIRES_DUPLICATE_DETECTION
-                , properties.isDuplicateDetectionRequired());
-        ASBUtils.addFieldIfPresent(map, ASBConstants.CREATED_TOPIC_RECORD_FIELD_MAX_SIZE_IN_MEGABYTES
-                , properties.getMaxSizeInMegabytes());
-        ASBUtils.addFieldIfPresent(map, ASBConstants.CREATED_TOPIC_RECORD_FIELD_MAX_MESSAGE_SIZE_IN_KILOBYTES
-                , properties.getMaxMessageSizeInKilobytes());
-        ASBUtils.addFieldIfPresent(map, ASBConstants.CREATED_TOPIC_RECORD_FIELD_AUTHORIZATION_RULES
-                , constructAuthorizationRuleArray(properties.getAuthorizationRules()));
+        ASBUtils.addFieldIfPresent(map, ASBConstants.CREATED_TOPIC_RECORD_FIELD_NAME,
+                StringUtils.fromString(properties.getName()));
+        ASBUtils.addFieldIfPresent(map, ASBConstants.CREATED_TOPIC_RECORD_FIELD_STATUS,
+                StringUtils.fromString(properties.getStatus().toString()));
+        ASBUtils.addFieldIfPresent(map, ASBConstants.CREATED_TOPIC_RECORD_FIELD_USER_METADATA,
+                StringUtils.fromString(properties.getUserMetadata()));
+        ASBUtils.addFieldIfPresent(map, ASBConstants.CREATED_TOPIC_RECORD_FIELD_AUTO_DELETE_ON_IDLE,
+                fromDuration(properties.getAutoDeleteOnIdle()));
+        ASBUtils.addFieldIfPresent(map, ASBConstants.CREATED_TOPIC_RECORD_FIELD_DEFAULT_MESSAGE_TIME_TO_LIVE,
+                fromDuration(properties.getDefaultMessageTimeToLive()));
+        ASBUtils.addFieldIfPresent(map, ASBConstants.CREATED_TOPIC_RECORD_FIELD_DUPLICATE_DETECTION_HISTORY_TIME_WINDOW,
+                fromDuration(properties.getDuplicateDetectionHistoryTimeWindow()));
+        ASBUtils.addFieldIfPresent(map, ASBConstants.CREATED_TOPIC_RECORD_FIELD_ENABLE_BATCHED_OPERATIONS,
+                properties.isBatchedOperationsEnabled());
+        ASBUtils.addFieldIfPresent(map, ASBConstants.CREATED_TOPIC_RECORD_FIELD_ENABLE_PARTITIONING,
+                properties.isPartitioningEnabled());
+        ASBUtils.addFieldIfPresent(map, ASBConstants.CREATED_TOPIC_RECORD_FIELD_SUPPORT_ORDERING,
+                properties.isOrderingSupported());
+        ASBUtils.addFieldIfPresent(map, ASBConstants.CREATED_TOPIC_RECORD_FIELD_REQUIRES_DUPLICATE_DETECTION,
+                properties.isDuplicateDetectionRequired());
+        ASBUtils.addFieldIfPresent(map, ASBConstants.CREATED_TOPIC_RECORD_FIELD_MAX_SIZE_IN_MEGABYTES,
+                properties.getMaxSizeInMegabytes());
+        ASBUtils.addFieldIfPresent(map, ASBConstants.CREATED_TOPIC_RECORD_FIELD_MAX_MESSAGE_SIZE_IN_KILOBYTES,
+                properties.getMaxMessageSizeInKilobytes());
+        ASBUtils.addFieldIfPresent(map, ASBConstants.CREATED_TOPIC_RECORD_FIELD_AUTHORIZATION_RULES,
+                constructAuthorizationRuleArray(properties.getAuthorizationRules()));
 
         return map;
     }
@@ -819,8 +818,8 @@ public class Administrator {
         Map<String, Object> map = new HashMap<>();
         ASBUtils.addFieldIfPresent(map, ASBConstants.CREATED_RULE_RECORD_FIELD_NAME,
                 StringUtils.fromString(properties.getName()));
-        ASBUtils.addFieldIfPresent(map, ASBConstants.CREATED_RULE_RECORD_FIELD_TYPE_NAME
-                , formRule(properties.getAction(), properties.getFilter()));
+        ASBUtils.addFieldIfPresent(map, ASBConstants.CREATED_RULE_RECORD_FIELD_TYPE_NAME,
+                formRule(properties.getAction(), properties.getFilter()));
         return map;
     }
 
