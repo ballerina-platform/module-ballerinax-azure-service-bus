@@ -21,7 +21,7 @@ import ballerinax/asb;
 configurable string connectionString = ?;
 
 // This sample demonstrates a scenario where azure service bus connecter is used to 
-// retrieve a rule from a subscription
+// retrieve a rule from a subscription.
 public function main() returns error? {
     log:printInfo("Initializing Asb admin client...");
     asb:Administrator adminClient = check new (connectionString);
