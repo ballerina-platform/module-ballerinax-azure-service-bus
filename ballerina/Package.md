@@ -7,7 +7,7 @@ Azure Service Bus is an asynchronous messaging cloud platform that enables you t
 Refer to [azure.com](https://azure.microsoft.com/services/service-bus/) to learn more about Service Bus.
 
 The `ballerinax/asb` is a [Ballerina](https://ballerina.io/) connector for Microsoft Azure Service Bus.
-his package offers usage and management capabilities for Azure Service Bus resources, including queues, topics, subscriptions, and rules.
+This package offers usage and management capabilities for Azure Service Bus resources, including queues, topics, subscriptions, and rules.
 
 ### Compatibility
 
