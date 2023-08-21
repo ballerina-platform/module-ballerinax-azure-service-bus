@@ -25,7 +25,7 @@ configurable string connectionString = ?;
 public function main() returns error? {
     log:printInfo("Initializing Asb admin client.");
     asb:Administrator adminClient = check new (connectionString);
-    asb:Error? result = check adminClient->deleteSubscription("test-topic", "test-subscription");
+    asb:Error? result = check adminClient->deleteTopic("test-topic");
     if result is asb:Error {
         log:printError(result.toString());
     } else {
