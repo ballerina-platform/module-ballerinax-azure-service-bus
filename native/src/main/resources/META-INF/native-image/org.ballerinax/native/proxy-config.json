@@ -1,0 +1,7 @@
+[
+  {
+    "interfaces": [
+      "com.azure.messaging.servicebus.administration.implementation.EntitiesImpl$EntitiesService"
+    ]
+  }
+]
