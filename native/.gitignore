@@ -25,9 +25,6 @@ hs_err_pid*
 ballerina.conf
 Config.toml
 
-#json files created inside resources folder
-**/resources
-
 # IDEA file
 .idea
 
