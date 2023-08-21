@@ -1,5 +1,93 @@
 [
   {
+    "name": "com.azure.core.amqp.implementation.AmqpChannelProcessor",
+    "fields": [
+      {
+        "name": "upstream"
+      }
+    ]
+  },
+  {
+    "name": "com.azure.core.amqp.models.CbsAuthorizationType",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.azure.core.http.HttpHeaderName",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.azure.core.http.netty.implementation.AzureSdkHandler",
+    "methods": [
+      {
+        "name": "channelRead",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.lang.Object"
+        ]
+      },
+      {
+        "name": "channelReadComplete",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext"
+        ]
+      },
+      {
+        "name": "write",
+        "parameterTypes": [
+          "io.netty.channel.ChannelHandlerContext",
+          "java.lang.Object",
+          "io.netty.channel.ChannelPromise"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "com.azure.core.util.ExpandableStringEnum",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "methods": [
+      {
+        "name": "toString",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.azure.core.util.Header",
+    "fields": [
+      {
+        "name": "cachedStringValue"
+      }
+    ]
+  },
+  {
+    "name": "com.azure.core.util.QueryParameter",
+    "fields": [
+      {
+        "name": "cachedStringValue"
+      }
+    ]
+  },
+  {
+    "name": "com.azure.messaging.servicebus.ServiceBusErrorSource",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
     "name": "com.azure.messaging.servicebus.ServiceBusFailureReason",
     "methods": [
       {
@@ -7,5 +95,479 @@
         "parameterTypes": []
       }
     ]
+  },
+  {
+    "name": "com.azure.messaging.servicebus.SynchronousMessageSubscriber",
+    "fields": [
+      {
+        "name": "requested"
+      },
+      {
+        "name": "upstream"
+      }
+    ]
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.AuthorizationRuleImpl",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.AuthorizationRuleImpl$RightsWrapper",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.CreateQueueBodyContentImpl",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.CreateQueueBodyImpl",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.CreateRuleBodyContentImpl",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.CreateRuleBodyImpl",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.CreateSubscriptionBodyContentImpl",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.CreateSubscriptionBodyImpl",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.CreateTopicBodyContentImpl",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.CreateTopicBodyImpl",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.EmptyRuleActionImpl",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.EntityAvailabilityStatusImpl",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      },
+      {
+        "name": "fromString",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.KeyValueImpl",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.MessageCountDetailsImpl",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.QueueDescriptionEntryContentImpl",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.QueueDescriptionEntryImpl",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.QueueDescriptionImpl",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.QueueDescriptionImpl$AuthorizationRulesWrapper",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.ResponseAuthorImpl",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.ResponseLinkImpl",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.RuleActionImpl",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.RuleDescriptionEntryContentImpl",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.RuleDescriptionEntryImpl",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.RuleDescriptionFeedImpl",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.RuleDescriptionImpl",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.RuleFilterImpl",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.ServiceBusManagementError",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.ServiceBusManagementErrorException",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "java.lang.String",
+          "com.azure.core.http.HttpResponse",
+          "com.azure.messaging.servicebus.administration.implementation.models.ServiceBusManagementError"
+        ]
+      },
+      {
+        "name": "getValue",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.SqlFilterImpl",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.SqlFilterImpl$ParametersWrapper",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.SqlRuleActionImpl",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.SqlRuleActionImpl$ParametersWrapper",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.SubscriptionDescriptionEntryContentImpl",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.SubscriptionDescriptionEntryImpl",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.SubscriptionDescriptionFeedImpl",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.SubscriptionDescriptionImpl",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.TitleImpl",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.TopicDescriptionEntryContentImpl",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.TopicDescriptionEntryImpl",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.TopicDescriptionImpl",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.TopicDescriptionImpl$AuthorizationRulesWrapper",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.implementation.models.TrueFilterImpl",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.models.AccessRights",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.models.EntityStatus",
+    "allDeclaredFields": true,
+    "queryAllDeclaredMethods": true,
+    "queryAllDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      },
+      {
+        "name": "fromString",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.models.QueueProperties"
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.models.RuleProperties"
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.models.SubscriptionProperties"
+  },
+  {
+    "name": "com.azure.messaging.servicebus.administration.models.TopicProperties"
+  },
+  {
+    "name": "com.azure.messaging.servicebus.implementation.ServiceBusReceiveLinkProcessor",
+    "fields": [
+      {
+        "name": "requested"
+      },
+      {
+        "name": "upstream"
+      }
+    ]
+  },
+  {
+    "name": "com.azure.xml.XmlSerializable"
   }
 ]

@@ -1,0 +1,16 @@
+{
+  "resources": {
+    "includes": [
+      {
+        "pattern": "\\QMETA-INF/services/com.azure.core.http.HttpClientProvider\\E"
+      },
+      {
+        "pattern": "\\Qazure-core.properties\\E"
+      },
+      {
+        "pattern": "\\Qazure-messaging-servicebus.properties\\E"
+      }
+    ]
+  },
+  "bundles": []
+}
