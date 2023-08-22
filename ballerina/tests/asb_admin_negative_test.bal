@@ -23,16 +23,16 @@ string invalidName = "#TEST";
 string testSubscription3 = "subscription3";
 string testRule3 = "rule3";
 string testQueue3 = "queue3";
-string duplicateTopicQueueErrorPrefix = string `Error occurred while processing request: Status code 409, "<Error><Code>409</Code><Detail>SubCode=40900. Conflict. You're requesting an operation that isn't allowed in the resource's current state. To know more visit https://aka.ms/sbResourceMgrExceptions.`;
-string duplicateSubscriptionErrorPrefix = string `Error occurred while processing request: Status code 409, "<Error><Code>409</Code><Detail>The messaging entity '`;
-string duplicateRuleErrorPrefix = string `Error occurred while processing request: Status code 409, "<Error><Code>409</Code><Detail>The messaging entity `;
+string duplicateTopicQueueErrorPrefix = string `Error occurred while processing request: SubCode=40900. Conflict. You're requesting an operation that isn't allowed in the resource's current state. To know more visit https://aka.ms/sbResourceMgrExceptions.`;
+string duplicateSubscriptionErrorPrefix = string `Error occurred while processing request: The messaging entity`;
+string duplicateRuleErrorPrefix = string `Error occurred while processing request: The messaging entity`;
 string nonExistingQueueError = string `error("Error occurred while processing request: Queue '${nonExistingName}' does not exist.",error("com.azure.core.exception.ResourceNotFoundException: Queue '${nonExistingName}' does not exist."))`;
 string nonExistingTopicError = string `error("Error occurred while processing request, Status Code:200",error("com.azure.core.exception.ResourceNotFoundException: Topic '${nonExistingName}' does not exist."))`;
-string nonExistingSubscriptionErrorPrefix = string `Error occurred while processing request: Status code 404, "<Error><Code>404</Code><Detail>Entity`;
-string nonExistingRuleErrorPrefix = string `error("Error occurred while processing request, Status Code:404",error("com.azure.messaging.servicebus.administration.implementation.models.ServiceBusManagementErrorException: Status code 404, "<Error><Code>404</Code><Detail>Entity`;
-string invalidNameErrorPrefix = string `Error occurred while processing request: Status code 400, "<Error><Code>400</Code><Detail>SubCode=40000. 'https://`;
-string invalidSubscriptionNameErrorPrefix = string `Error occurred while processing request: Status code 400, "<Error><Code>400</Code><Detail>'sb://`;
-string invalidRuleNameErrorPrefix = string `Error occurred while processing request: Status code 400, "<Error><Code>400</Code><Detail>'sb://`;
+string nonExistingSubscriptionErrorPrefix = string `Error occurred while processing request: Entity `;
+string nonExistingRuleErrorPrefix = string `error("Error occurred while processing request, Status Code:404",error("com.azure.core.exception.ResourceNotFoundException: Entity 'ballerina-asb:Topic:${testTopic3}|${testSubscription3}|${nonExistingName}' was not found. To know more visit https://aka.ms/sbResourceMgrExceptions.`;
+string invalidNameErrorPrefix = string `Error occurred while processing request: SubCode=40000.`;
+string invalidSubscriptionNameErrorPrefix = string `Error occurred while processing request:`;
+string invalidRuleNameErrorPrefix = string `Error occurred while processing request: 'sb://`;
 
 @test:Config {
     groups: ["asb_admin_negative"],
