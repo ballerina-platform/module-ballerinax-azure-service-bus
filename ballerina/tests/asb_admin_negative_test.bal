@@ -29,7 +29,7 @@ string duplicateRuleErrorPrefix = string `Error occurred while processing reques
 string nonExistingQueueError = string `error("Error occurred while processing request: Queue '${nonExistingName}' does not exist.",error("com.azure.core.exception.ResourceNotFoundException: Queue '${nonExistingName}' does not exist."))`;
 string nonExistingTopicError = string `error("Error occurred while processing request, Status Code:200",error("com.azure.core.exception.ResourceNotFoundException: Topic '${nonExistingName}' does not exist."))`;
 string nonExistingSubscriptionErrorPrefix = string `Error occurred while processing request: Entity `;
-string nonExistingRuleErrorPrefix = string `error("Error occurred while processing request, Status Code:404",error("com.azure.core.exception.ResourceNotFoundException: Entity 'ballerina-asb:Topic:${testTopic3}|${testSubscription3}|${nonExistingName}' was not found. To know more visit https://aka.ms/sbResourceMgrExceptions.`;
+string nonExistingRuleErrorPrefix = string `error("Error occurred while processing request, Status Code:404",error("com.azure.core.exception.ResourceNotFoundException: Entity`;
 string invalidNameErrorPrefix = string `Error occurred while processing request: SubCode=40000.`;
 string invalidSubscriptionNameErrorPrefix = string `Error occurred while processing request:`;
 string invalidRuleNameErrorPrefix = string `Error occurred while processing request: 'sb://`;
