@@ -1,6 +1,6 @@
-// Copyright (c) 2021 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+// Copyright (c) 2023 WSO2 LLC. (http://www.wso2.org).
 //
-// WSO2 Inc. licenses this file to you under the Apache License,
+// WSO2 LLS. licenses this file to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file except
 // in compliance with the License.
 // You may obtain a copy of the License at
@@ -23,33 +23,27 @@ configurable string topicName = ?;
 configurable string subscriptionName = ?;
 
 // This sample demonstrates a scneario where azure service bus connecter is used to 
-// send a batch of messages to a topic using topic sender, 
-// receive batch of messsages from a subscription using subscription receiver with RECEIVEANDDELETE mode
-// (message will be deleted from the queue just after received).
+// send a message to a topic using message sender, 
+// receive a messsage from a subcription using subscription receiver with PEEK_LOCK mode
+// then move the message in a dead letter subscription
+// After moving to dead letter subscription,dead letter message will be received using receive(deadLettered = true)
 public function main() returns error? {
 
     // Input values
-    string stringContent = "This is My Message Body"; 
+    string stringContent = "This is My Message Body";
     byte[] byteContent = stringContent.toBytes();
     int timeToLive = 60; // In seconds
     int serverWaitTime = 60; // In seconds
-    int maxMessageCount = 2;
+
+    asb:ApplicationProperties applicationProperties = {
+        properties: {a: "propertyValue1", b: "propertyValue2"}
+    };
 
     asb:Message message1 = {
         body: byteContent,
         contentType: asb:TEXT,
-        timeToLive: timeToLive
-    };
-
-    asb:Message message2 = {
-        body: byteContent,
-        contentType: asb:TEXT,
-        timeToLive: timeToLive
-    };
-
-    asb:MessageBatch messages = {
-        messageCount: 2,
-        messages: [message1, message2]
+        timeToLive: timeToLive,
+        applicationProperties: applicationProperties
     };
 
     asb:ASBServiceSenderConfig senderConfig = {
@@ -64,7 +58,7 @@ public function main() returns error? {
             topicName: topicName,
             subscriptionName: subscriptionName
         },
-        receiveMode: asb:RECEIVE_AND_DELETE
+        receiveMode: asb:PEEK_LOCK
     };
 
     log:printInfo("Initializing Asb sender client.");
@@ -74,19 +68,26 @@ public function main() returns error? {
     asb:MessageReceiver subscriptionReceiver = check new (receiverConfig);
 
     log:printInfo("Sending via Asb sender client.");
-    check topicSender->sendBatch(messages);
+    check topicSender->send(message1);
 
     log:printInfo("Receiving from Asb receiver client.");
-    asb:MessageBatch|error? messageReceived = subscriptionReceiver->receiveBatch(maxMessageCount, serverWaitTime);
+    asb:Message|error? messageReceived = subscriptionReceiver->receive(serverWaitTime);
 
-    if (messageReceived is asb:MessageBatch) {
-        foreach asb:Message message in messageReceived.messages {
-            if (message.toString() != "") {
-                log:printInfo("Reading Received Message : " + message.toString());
-            }
+    if (messageReceived is asb:Message) {
+        check subscriptionReceiver->deadLetter(messageReceived);
+        asb:Message|error? messageReceivedFromDLQ = subscriptionReceiver->receive(serverWaitTime, deadLettered = true);
+
+        if (messageReceivedFromDLQ is asb:Message) {
+            log:printInfo("Message received from DLQ.");
+            string message_str = check string:fromBytes(<byte[]>messageReceivedFromDLQ.body);
+            log:printInfo("DLQ Message content: " + message_str);
+        } else if (messageReceivedFromDLQ is ()) {
+            log:printError("No message in the queue.");
+        } else {
+            log:printError("Receiving message via Asb receiver connection failed.");
         }
     } else if (messageReceived is ()) {
-        log:printError("No message in the subscription.");
+        log:printError("No message in the queue.");
     } else {
         log:printError("Receiving message via Asb receiver connection failed.");
     }
@@ -96,4 +97,4 @@ public function main() returns error? {
 
     log:printInfo("Closing Asb receiver client.");
     check subscriptionReceiver->close();
-}    
+}
