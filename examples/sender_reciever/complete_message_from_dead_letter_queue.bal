@@ -90,7 +90,7 @@ public function main() returns error? {
 
             //Complete the DLQ Message
             log:printInfo("Completing the DLQ message.");
-            check queueReceiver->complete(messageReceivedFromDLQ, deadLettered = true);
+            check queueReceiver->complete(messageReceivedFromDLQ);
 
             //Receive the message from DLQ after complete
             log:printInfo("Receiving from DLQ via Asb receiver client after complete.");
@@ -98,9 +98,8 @@ public function main() returns error? {
             if (checkReceivingDLQAfterComplete is asb:Message) { //if there are any messages in the DLQ
                 log:printInfo("Message received from DLQ.");
                 message_id = checkReceivingDLQAfterComplete.messageId;
-                string source = checkReceivingDLQAfterComplete.deadLetterSource;
                 if (message_id is string) {
-                    log:printInfo("DLQ Top Message ID: " + message_id + source);
+                    log:printInfo("DLQ Top Message ID: " + message_id);
                 }
             } else if (checkReceivingDLQAfterComplete is ()) { //if there are no messages in the DLQ
                 log:printError("No message in the deadletter queue.");
