@@ -1,6 +1,6 @@
-// Copyright (c) 2023 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+// Copyright (c) 2023 WSO2 LLC. (http://www.wso2.org).
 //
-// WSO2 Inc. licenses this file to you under the Apache License,
+// WSO2 LLC. licenses this file to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file except
 // in compliance with the License.
 // You may obtain a copy of the License at
@@ -40,16 +40,15 @@ string userMetaData = "Test User Meta Data";
 
 // This sample demonstrates a scenario where azure service bus connecter is used to 
 // create a queue in azure service bus. 
-
 public function main() returns error? {
     log:printInfo("Initializing Asb admin client...");
-    asb:ASBAdministration adminClient = check new (connectionString);
+    asb:Administrator adminClient = check new (connectionString);
     asb:QueueProperties? queue = check adminClient->createQueue("test-queue",
         autoDeleteOnIdle = deletion,
         defaultMessageTimeToLive = ttl,
         duplicateDetectionHistoryTimeWindow = dupdue,
-        forwardDeadLetteredMessagesTo = "forwardedQueue", //Should be a valid queue name
-        forwardTo = "forwardedQueue", //Should be a valid queue name
+        forwardDeadLetteredMessagesTo = "forwardedQueue",  //Should be a valid queue name
+        forwardTo = "forwardedQueue",  //Should be a valid queue name
         lockDuration = lockDue,
         maxDeliveryCount = 10,
         maxSizeInMegabytes = 1024,
@@ -59,7 +58,7 @@ public function main() returns error? {
         enablePartitioning = false,
         requiresSession = false,
         userMetadata = userMetaData);
-    if (queue is asb:QueueProperties) {
+    if queue is asb:QueueProperties {
         log:printInfo(queue.toString());
     } else {
         log:printError(queue.toString());

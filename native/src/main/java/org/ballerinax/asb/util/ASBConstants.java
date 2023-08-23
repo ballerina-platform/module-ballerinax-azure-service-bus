@@ -83,6 +83,7 @@ public class ASBConstants {
     public static final String APPLICATION_PROPERTIES = "properties";
 
     public static final int DEFAULT_TIME_TO_LIVE = 60; // In seconds
+    public static final String DEFAULT_MESSAGE_LOCK_TOKEN = "00000000-0000-0000-0000-000000000000";
 
     // listener constant fields
     public static final String CONSUMER_SERVICES = "consumer_services";

@@ -452,7 +452,7 @@ public class ASBUtils {
             ruleProp.setAction(new SqlRuleAction(
                     ruleConfig.getStringValue(ASBConstants.RECORD_FIELD_ACTION).getValue()));
         }
-        if (ruleConfig.containsKey(ASBConstants.RECORD_FIELD_ACTION)) {
+        if (ruleConfig.containsKey(ASBConstants.RECORD_FIELD_FILTER)) {
             ruleProp.setFilter(new SqlRuleFilter(
                     ruleConfig.getStringValue(ASBConstants.RECORD_FIELD_FILTER).getValue()));
         }

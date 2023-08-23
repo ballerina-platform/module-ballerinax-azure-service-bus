@@ -1,6 +1,6 @@
-// Copyright (c) 2023 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+// Copyright (c) 2023 WSO2 LLC. (http://www.wso2.org).
 //
-// WSO2 Inc. licenses this file to you under the Apache License,
+// WSO2 LLC. licenses this file to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file except
 // in compliance with the License.
 // You may obtain a copy of the License at
@@ -12,6 +12,7 @@
 // "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
+// under the License.
 
 import ballerina/log;
 import ballerinax/asb;
@@ -33,7 +34,8 @@ asb:Duration lockDue = {
     nanoseconds: 200
 };
 string userMetaData = "Test User Meta Data";
-asb:CreateQueueOptions queueConfig = {
+
+asb:CreateTopicOptions topicConfig = {
     autoDeleteOnIdle: deletion,
     defaultMessageTimeToLive: ttl,
     duplicateDetectionHistoryTimeWindow: dupdue,
@@ -54,12 +56,12 @@ asb:CreateQueueOptions queueConfig = {
 configurable string connectionString = ?;
 
 // This sample demonstrates a scenario where azure service bus connecter is used to 
-// create a subscription in a topic.
+// create a topic with the given configurations.
 public function main() returns error? {
     log:printInfo("Initializing Asb admin client...");
-    asb:ASBAdministration adminClient = check new (connectionString);
-    asb:TopicProperties? topic = check adminClient->createTopic("test-topic", queueConfig);
-    if (topic is asb:TopicProperties) {
+    asb:Administrator adminClient = check new (connectionString);
+    asb:TopicProperties? topic = check adminClient->createTopic("test-topic", topicConfig);
+    if topic is asb:TopicProperties {
         log:printInfo(topic.toString());
     } else {
         log:printError(topic.toString());

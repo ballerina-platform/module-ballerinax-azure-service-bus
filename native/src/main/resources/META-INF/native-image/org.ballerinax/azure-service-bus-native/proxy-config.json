@@ -1,0 +1,27 @@
+[
+  {
+    "interfaces": [
+      "com.azure.messaging.servicebus.administration.implementation.EntitiesImpl$EntitiesService"
+    ]
+  },
+  {
+    "interfaces": [
+      "com.azure.messaging.servicebus.administration.implementation.NamespacesImpl$NamespacesService"
+    ]
+  },
+  {
+    "interfaces": [
+      "com.azure.messaging.servicebus.administration.implementation.RulesImpl$RulesService"
+    ]
+  },
+  {
+    "interfaces": [
+      "com.azure.messaging.servicebus.administration.implementation.ServiceBusManagementClientImpl$ServiceBusManagementClientService"
+    ]
+  },
+  {
+    "interfaces": [
+      "com.azure.messaging.servicebus.administration.implementation.SubscriptionsImpl$SubscriptionsService"
+    ]
+  }
+]
