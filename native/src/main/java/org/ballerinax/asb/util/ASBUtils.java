@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
  *
- * WSO2 Inc. licenses this file to you under the Apache License,
+ * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
  * You may obtain a copy of the License at
@@ -254,65 +254,65 @@ public class ASBUtils {
      */
     public static CreateSubscriptionOptions getCreateSubscriptionPropertiesFromBObject(BMap<BString, Object>
                                                                                                subscriptionConfig) {
-            CreateSubscriptionOptions subscriptionOptions = new CreateSubscriptionOptions();
-            if (subscriptionConfig.containsKey(ASBConstants.SUBSCRIPTION_RECORD_FIELD_AUTO_DELETE_ON_IDLE)) {
-                subscriptionOptions.setAutoDeleteOnIdle(
-                        getDurationFromBObject(subscriptionConfig.getMapValue(
-                                ASBConstants.SUBSCRIPTION_RECORD_FIELD_AUTO_DELETE_ON_IDLE)));
-            }
-            if (subscriptionConfig.containsKey(ASBConstants.SUBSCRIPTION_RECORD_FIELD_DEFAULT_MESSAGE_TIME_TO_LIVE)) {
-                subscriptionOptions.setDefaultMessageTimeToLive(
-                        getDurationFromBObject(subscriptionConfig.getMapValue(
-                                ASBConstants.SUBSCRIPTION_RECORD_FIELD_DEFAULT_MESSAGE_TIME_TO_LIVE)));
-            }
-            if (subscriptionConfig.containsKey(
-                    ASBConstants.SUBSCRIPTION_RECORD_FIELD_DEAD_LETTERING_ON_MESSAGE_EXPIRATION)) {
-                subscriptionOptions.setDeadLetteringOnMessageExpiration(
-                        subscriptionConfig.getBooleanValue(
-                                ASBConstants.SUBSCRIPTION_RECORD_FIELD_DEAD_LETTERING_ON_MESSAGE_EXPIRATION));
-            }
-            if (subscriptionConfig.containsKey(ASBConstants.SUBSCRIPTION_RECORD_FIELD_ENABLE_BATCHED_OPERATIONS)) {
-                subscriptionOptions.setBatchedOperationsEnabled(
-                        subscriptionConfig.getBooleanValue(
-                                ASBConstants.SUBSCRIPTION_RECORD_FIELD_ENABLE_BATCHED_OPERATIONS));
-            }
-            if (subscriptionConfig.containsKey(
-                    ASBConstants.SUBSCRIPTION_RECORD_FIELD_FORWARD_DEAD_LETTERED_MESSAGES_TO)) {
-                subscriptionOptions.setForwardDeadLetteredMessagesTo(
-                        subscriptionConfig.getStringValue(
-                                ASBConstants.SUBSCRIPTION_RECORD_FIELD_FORWARD_DEAD_LETTERED_MESSAGES_TO).getValue());
-            }
-            if (subscriptionConfig.containsKey(ASBConstants.SUBSCRIPTION_RECORD_FIELD_FORWARD_TO)) {
-                subscriptionOptions.setForwardTo(
-                        subscriptionConfig.getStringValue(
-                                ASBConstants.SUBSCRIPTION_RECORD_FIELD_FORWARD_TO).getValue());
-            }
-            if (subscriptionConfig.containsKey(ASBConstants.SUBSCRIPTION_RECORD_FIELD_LOCK_DURATION)) {
-                subscriptionOptions.setLockDuration(
-                        getDurationFromBObject(subscriptionConfig.getMapValue(
-                                ASBConstants.SUBSCRIPTION_RECORD_FIELD_LOCK_DURATION)));
-            }
-            if (subscriptionConfig.containsKey(ASBConstants.SUBSCRIPTION_RECORD_FIELD_MAX_DELIVERY_COUNT)) {
-                subscriptionOptions.setMaxDeliveryCount(
-                        subscriptionConfig.getIntValue(
-                                ASBConstants.SUBSCRIPTION_RECORD_FIELD_MAX_DELIVERY_COUNT).intValue());
-            }
-            if (subscriptionConfig.containsKey(ASBConstants.SUBSCRIPTION_RECORD_FIELD_STATUS)) {
-                subscriptionOptions.setStatus(EntityStatus.fromString(
-                        subscriptionConfig.getStringValue(
-                                ASBConstants.SUBSCRIPTION_RECORD_FIELD_STATUS).getValue()));
-            }
-            if (subscriptionConfig.containsKey(ASBConstants.SUBSCRIPTION_RECORD_FIELD_USER_METADATA)) {
-                subscriptionOptions.setUserMetadata(
-                        subscriptionConfig.getStringValue(
-                                ASBConstants.SUBSCRIPTION_RECORD_FIELD_USER_METADATA).getValue());
-            }
-            if (subscriptionConfig.containsKey(ASBConstants.SUBSCRIPTION_RECORD_FIELD_SESSION_REQUIRED)) {
-                subscriptionOptions.setSessionRequired(
-                        subscriptionConfig.getBooleanValue(
-                                ASBConstants.SUBSCRIPTION_RECORD_FIELD_SESSION_REQUIRED));
-            }
-            return subscriptionOptions;
+        CreateSubscriptionOptions subscriptionOptions = new CreateSubscriptionOptions();
+        if (subscriptionConfig.containsKey(ASBConstants.SUBSCRIPTION_RECORD_FIELD_AUTO_DELETE_ON_IDLE)) {
+            subscriptionOptions.setAutoDeleteOnIdle(
+                    getDurationFromBObject(subscriptionConfig.getMapValue(
+                            ASBConstants.SUBSCRIPTION_RECORD_FIELD_AUTO_DELETE_ON_IDLE)));
+        }
+        if (subscriptionConfig.containsKey(ASBConstants.SUBSCRIPTION_RECORD_FIELD_DEFAULT_MESSAGE_TIME_TO_LIVE)) {
+            subscriptionOptions.setDefaultMessageTimeToLive(
+                    getDurationFromBObject(subscriptionConfig.getMapValue(
+                            ASBConstants.SUBSCRIPTION_RECORD_FIELD_DEFAULT_MESSAGE_TIME_TO_LIVE)));
+        }
+        if (subscriptionConfig.containsKey(
+                ASBConstants.SUBSCRIPTION_RECORD_FIELD_DEAD_LETTERING_ON_MESSAGE_EXPIRATION)) {
+            subscriptionOptions.setDeadLetteringOnMessageExpiration(
+                    subscriptionConfig.getBooleanValue(
+                            ASBConstants.SUBSCRIPTION_RECORD_FIELD_DEAD_LETTERING_ON_MESSAGE_EXPIRATION));
+        }
+        if (subscriptionConfig.containsKey(ASBConstants.SUBSCRIPTION_RECORD_FIELD_ENABLE_BATCHED_OPERATIONS)) {
+            subscriptionOptions.setBatchedOperationsEnabled(
+                    subscriptionConfig.getBooleanValue(
+                            ASBConstants.SUBSCRIPTION_RECORD_FIELD_ENABLE_BATCHED_OPERATIONS));
+        }
+        if (subscriptionConfig.containsKey(
+                ASBConstants.SUBSCRIPTION_RECORD_FIELD_FORWARD_DEAD_LETTERED_MESSAGES_TO)) {
+            subscriptionOptions.setForwardDeadLetteredMessagesTo(
+                    subscriptionConfig.getStringValue(
+                            ASBConstants.SUBSCRIPTION_RECORD_FIELD_FORWARD_DEAD_LETTERED_MESSAGES_TO).getValue());
+        }
+        if (subscriptionConfig.containsKey(ASBConstants.SUBSCRIPTION_RECORD_FIELD_FORWARD_TO)) {
+            subscriptionOptions.setForwardTo(
+                    subscriptionConfig.getStringValue(
+                            ASBConstants.SUBSCRIPTION_RECORD_FIELD_FORWARD_TO).getValue());
+        }
+        if (subscriptionConfig.containsKey(ASBConstants.SUBSCRIPTION_RECORD_FIELD_LOCK_DURATION)) {
+            subscriptionOptions.setLockDuration(
+                    getDurationFromBObject(subscriptionConfig.getMapValue(
+                            ASBConstants.SUBSCRIPTION_RECORD_FIELD_LOCK_DURATION)));
+        }
+        if (subscriptionConfig.containsKey(ASBConstants.SUBSCRIPTION_RECORD_FIELD_MAX_DELIVERY_COUNT)) {
+            subscriptionOptions.setMaxDeliveryCount(
+                    subscriptionConfig.getIntValue(
+                            ASBConstants.SUBSCRIPTION_RECORD_FIELD_MAX_DELIVERY_COUNT).intValue());
+        }
+        if (subscriptionConfig.containsKey(ASBConstants.SUBSCRIPTION_RECORD_FIELD_STATUS)) {
+            subscriptionOptions.setStatus(EntityStatus.fromString(
+                    subscriptionConfig.getStringValue(
+                            ASBConstants.SUBSCRIPTION_RECORD_FIELD_STATUS).getValue()));
+        }
+        if (subscriptionConfig.containsKey(ASBConstants.SUBSCRIPTION_RECORD_FIELD_USER_METADATA)) {
+            subscriptionOptions.setUserMetadata(
+                    subscriptionConfig.getStringValue(
+                            ASBConstants.SUBSCRIPTION_RECORD_FIELD_USER_METADATA).getValue());
+        }
+        if (subscriptionConfig.containsKey(ASBConstants.SUBSCRIPTION_RECORD_FIELD_SESSION_REQUIRED)) {
+            subscriptionOptions.setSessionRequired(
+                    subscriptionConfig.getBooleanValue(
+                            ASBConstants.SUBSCRIPTION_RECORD_FIELD_SESSION_REQUIRED));
+        }
+        return subscriptionOptions;
     }
 
     /**
@@ -321,7 +321,7 @@ public class ASBUtils {
      * @param topicConfig BMap containing the updated topic configurations.
      * @return TopicProperties object.
      */
-    public static TopicProperties getUpdatedTopicPropertiesFromBObject(BMap<BString, Object> topicConfig ,
+    public static TopicProperties getUpdatedTopicPropertiesFromBObject(BMap<BString, Object> topicConfig,
                                                                        TopicProperties topicProperties) {
         if (topicConfig.containsKey(ASBConstants.TOPIC_RECORD_FIELD_AUTO_DELETE_ON_IDLE)) {
             topicProperties.setAutoDeleteOnIdle(
@@ -378,7 +378,7 @@ public class ASBUtils {
      * @return subscriptionProperties object.
      */
     public static SubscriptionProperties getUpdatedSubscriptionPropertiesFromBObject(
-            BMap<BString, Object> subscriptionConfig , SubscriptionProperties subscriptionProperties) {
+            BMap<BString, Object> subscriptionConfig, SubscriptionProperties subscriptionProperties) {
         if (subscriptionConfig.containsKey(ASBConstants.SUBSCRIPTION_RECORD_FIELD_AUTO_DELETE_ON_IDLE)) {
             subscriptionProperties.setAutoDeleteOnIdle(
                     getDurationFromBObject(subscriptionConfig.getMapValue(
@@ -446,7 +446,7 @@ public class ASBUtils {
      * @param ruleConfig BMap containing the queue configurations.
      * @return RuleProperties object.
      */
-    public static RuleProperties getUpdatedRulePropertiesFromBObject(BMap<BString, Object> ruleConfig ,
+    public static RuleProperties getUpdatedRulePropertiesFromBObject(BMap<BString, Object> ruleConfig,
                                                                      RuleProperties ruleProp) {
         if (ruleConfig.containsKey(ASBConstants.RECORD_FIELD_ACTION)) {
             ruleProp.setAction(new SqlRuleAction(
@@ -465,7 +465,7 @@ public class ASBUtils {
      * @param queueConfig BMap containing the queue configurations.
      * @return QueueProperties object.
      */
-    public static QueueProperties getUpdatedQueuePropertiesFromBObject(BMap<BString, Object> queueConfig ,
+    public static QueueProperties getUpdatedQueuePropertiesFromBObject(BMap<BString, Object> queueConfig,
                                                                        QueueProperties updateQueueOptions) {
         if (queueConfig.containsKey(ASBConstants.QUEUE_RECORD_FIELD_FORWARD_TO)) {
             updateQueueOptions.setForwardTo(
@@ -537,6 +537,7 @@ public class ASBUtils {
 
     /**
      * Get Create Topic Properties from BMap.
+     *
      * @param topicConfig BMap containing the topic configurations.
      * @return CreateTopicOptions object.
      */
@@ -612,6 +613,7 @@ public class ASBUtils {
 
     /**
      * Get QueueProperties from BMap.
+     *
      * @param queueConfig BMap containing the queue configurations.
      * @return CreateQueueOptions object.
      */
@@ -702,6 +704,7 @@ public class ASBUtils {
 
     /**
      * Get CreateRuleProperties from BMap.
+     *
      * @param ruleConfig BMap containing the rule configurations.
      * @return CreateRuleOptions object.
      */
@@ -723,8 +726,10 @@ public class ASBUtils {
         }
         return createRuleOptions;
     }
-/**
+
+    /**
      * Get Duration from BMap.
+     *
      * @param durationConfig BMap containing the duration configurations.
      * @return Duration object.
      */
@@ -733,6 +738,7 @@ public class ASBUtils {
         long nanoseconds = durationConfig.getIntValue(ASBConstants.DURATION_FIELD_NANOSECONDS);
         return Duration.ofSeconds(seconds).plusNanos(nanoseconds);
     }
+
     /**
      * Converts AMPQ Body value to Java objects.
      *
@@ -862,14 +868,14 @@ public class ASBUtils {
      * @param type Type to be checked
      * @return True if the given type is a union type of two member types, including nil type.
      */
-        private static boolean isSupportedUnionType(Type type) {
-            if (type.getTag() != UNION_TAG) {
-                return false;
-            }
-            UnionType unionType = (UnionType) type;
-            return unionType.getMemberTypes().size() == 2
-                    && unionType.getMemberTypes().stream().anyMatch(memberType -> memberType.getTag() == NULL_TAG);
+    private static boolean isSupportedUnionType(Type type) {
+        if (type.getTag() != UNION_TAG) {
+            return false;
         }
+        UnionType unionType = (UnionType) type;
+        return unionType.getMemberTypes().size() == 2
+                && unionType.getMemberTypes().stream().anyMatch(memberType -> memberType.getTag() == NULL_TAG);
+    }
 
     public static Type getExpectedTypeFromNilableType(Type type) {
         if (!(type instanceof UnionType)) {
@@ -899,6 +905,7 @@ public class ASBUtils {
             map.put(key, receivedProperty);
         }
     }
+
     public static void addFieldIfPresent(Map<String, Object> map, String key, Object receivedProperty) {
         if (receivedProperty != null) {
             map.put(key, receivedProperty);
