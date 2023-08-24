@@ -80,7 +80,7 @@ public function main() returns error? {
 
     if messageReceived is asb:MessageBatch {
         foreach asb:Message message in messageReceived.messages {
-            if message.toString( != "") {
+            if message.toString() != ""{
                 log:printInfo("Reading Received Message : " + message.toString());
                 // Dead-lettering the received message
                 check queueReceiver->deadLetter(message);
@@ -97,7 +97,7 @@ public function main() returns error? {
 
     if receivedDeadletterMessages is asb:MessageBatch {
         foreach asb:Message message in receivedDeadletterMessages.messages {
-            if message.toString( != "") {
+            if message.toString() != "" {
                 log:printInfo("Reading Received Dead-Letter Message : " + message.toString());
             }
         }

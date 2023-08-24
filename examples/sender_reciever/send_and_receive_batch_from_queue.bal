@@ -78,7 +78,7 @@ public function main() returns error? {
 
     if messageReceived is asb:MessageBatch {
         foreach asb:Message message in messageReceived.messages {
-            if message.toString( != "") {
+            if message.toString() != "" {
                 log:printInfo("Reading Received Message : " + message.toString());
             }
         }
