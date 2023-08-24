@@ -77,11 +77,15 @@ public function main() returns error? {
     log:printInfo("Receiving from Asb receiver client.");
     asb:Message|asb:Error? messageReceived = subscriptionReceiver->receive(serverWaitTime);
 
-    if (messageReceived is asb:Message) {
+    if messageReceived is asb:Message {
         check subscriptionReceiver->renewLock(messageReceived);
         asb:Message|asb:Error? messageReceivedAgain = subscriptionReceiver->receive(serverWaitTime);
-        log:printInfo("Renew lock message successful");
-    } else if (messageReceived is ()) {
+        if messageReceivedAgain is asb:Message {
+            log:printInfo("Message received again after renewing lock.");
+        } else {
+            log:printError("Receiving message via Asb receiver connection failed.");
+        }
+    } else if messageReceived is () {
         log:printError("No message in the queue.");
     } else {
         log:printError("Receiving message via Asb receiver connection failed.");

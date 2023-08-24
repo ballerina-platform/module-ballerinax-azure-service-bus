@@ -76,13 +76,13 @@ public function main() returns error? {
     log:printInfo("Receiving from Asb receiver client.");
     asb:MessageBatch|error? messageReceived = queueReceiver->receiveBatch(maxMessageCount, serverWaitTime);
 
-    if (messageReceived is asb:MessageBatch) {
+    if messageReceived is asb:MessageBatch {
         foreach asb:Message message in messageReceived.messages {
-            if (message.toString() != "") {
+            if message.toString( != "") {
                 log:printInfo("Reading Received Message : " + message.toString());
             }
         }
-    } else if (messageReceived is ()) {
+    } else if messageReceived is () {
         log:printError("No message in the queue.");
     } else {
         log:printError("Receiving message via Asb receiver connection failed.");

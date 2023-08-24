@@ -71,7 +71,7 @@ public function main() returns error? {
     log:printInfo("Receiving from Asb receiver client.");
     asb:Message|error? messageReceived = queueReceiver->receive(serverWaitTime);
 
-    if (messageReceived is asb:Message) {
+    if messageReceived is asb:Message {
 
         //deadLetter the message
         check queueReceiver->deadLetter(messageReceived);
@@ -79,12 +79,12 @@ public function main() returns error? {
         //get message from DLQ
         log:printInfo("Receiving from DLQ via Asb receiver client.");
         asb:Message|error? messageReceivedFromDLQ = queueReceiver->receive(serverWaitTime, deadLettered = true);
-        if (messageReceivedFromDLQ is asb:Message) {
+        if messageReceivedFromDLQ is asb:Message {
 
             //Check whether the message received from DLQ
             log:printInfo("Message received from DLQ.");
             string? message_id = messageReceivedFromDLQ.messageId;
-            if (message_id is string) {
+            if message_id is string {
                 log:printInfo("DLQ Top Message ID: " + message_id);
             }
 
@@ -95,23 +95,23 @@ public function main() returns error? {
             //Receive the message from DLQ after complete
             log:printInfo("Receiving from DLQ via Asb receiver client after complete.");
             asb:Message|error? checkReceivingDLQAfterComplete = queueReceiver->receive(serverWaitTime, deadLettered = true);
-            if (checkReceivingDLQAfterComplete is asb:Message) { //if there are any messages in the DLQ
+            if checkReceivingDLQAfterComplete is asb:Message { //if there are any messages in the DLQ
                 log:printInfo("Message received from DLQ.");
                 message_id = checkReceivingDLQAfterComplete.messageId;
-                if (message_id is string) {
+                if message_id is string {
                     log:printInfo("DLQ Top Message ID: " + message_id);
                 }
-            } else if (checkReceivingDLQAfterComplete is ()) { //if there are no messages in the DLQ
+            } else if checkReceivingDLQAfterComplete is () { //if there are no messages in the DLQ
                 log:printError("No message in the deadletter queue.");
             } else {
                 log:printError("Receiving message via Asb receiver connection failed.");
             }
-        } else if (messageReceivedFromDLQ is ()) {
+        } else if messageReceivedFromDLQ is () {
             log:printError("No message in the DLQ.");
         } else {
             log:printError("Receiving message via ASBReceiver:DLQ connection failed.");
         }
-    } else if (messageReceived is ()) {
+    } else if messageReceived is () {
         log:printError("No message in the queue.");
     } else {
         log:printError("Receiving message via Asb receiver connection failed.");

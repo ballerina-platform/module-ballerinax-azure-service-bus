@@ -70,20 +70,20 @@ public function main() returns error? {
     log:printInfo("Receiving from Asb receiver client.");
     asb:Message|error? messageReceived = queueReceiver->receive(serverWaitTime);
 
-    if (messageReceived is asb:Message) {
+    if messageReceived is asb:Message {
         check queueReceiver->deadLetter(messageReceived);
         asb:Message|error? messageReceivedFromDLQ = queueReceiver->receive(serverWaitTime, deadLettered = true);
 
-        if (messageReceivedFromDLQ is asb:Message) {
+        if messageReceivedFromDLQ is asb:Message {
             log:printInfo("Message received from DLQ.");
             string message_str = check string:fromBytes(<byte[]>messageReceivedFromDLQ.body);
             log:printInfo("DLQ Message content: " + message_str);
-        } else if (messageReceivedFromDLQ is ()) {
+        } else if messageReceivedFromDLQ is () {
             log:printError("No message in the queue.");
         } else {
             log:printError("Receiving message via Asb receiver connection failed.");
         }
-    } else if (messageReceived is ()) {
+    } else if messageReceived is () {
         log:printError("No message in the queue.");
     } else {
         log:printError("Receiving message via Asb receiver connection failed.");
