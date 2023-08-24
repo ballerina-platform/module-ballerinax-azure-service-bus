@@ -72,10 +72,10 @@ public function main() returns error? {
     log:printInfo("Receiving from Asb receiver client.");
     asb:Message|error? messageReceived = subscriptionReceiver->receive(serverWaitTime);
 
-    if (messageReceived is asb:Message) {
+    if messageReceived is asb:Message {
         check subscriptionReceiver->complete(messageReceived);
         log:printInfo("Complete message successful");
-    } else if (messageReceived is ()) {
+    } else if messageReceived is () {
         log:printError("No message in the subscription.");
     } else {
         log:printError("Receiving message via Asb receiver connection failed.");

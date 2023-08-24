@@ -75,10 +75,10 @@ public function main() returns error? {
     log:printInfo("Receiving from Asb receiver client.");
     asb:Message|error? messageReceived = queueReceiver->receive(serverWaitTime);
 
-    if (messageReceived is asb:Message) {
+    if messageReceived is asb:Message {
         check queueReceiver->renewLock(messageReceived);
         log:printInfo("Renew lock message successful");
-    } else if (messageReceived is ()) {
+    } else if messageReceived is () {
         log:printError("No message in the queue.");
     } else {
         log:printError("Receiving message via Asb receiver connection failed.");

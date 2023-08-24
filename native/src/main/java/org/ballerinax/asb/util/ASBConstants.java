@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.org).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -28,6 +28,8 @@ public class ASBConstants {
 
     //Clients
     public static final String RECEIVER_CLIENT = "RECEIVER_CLIENT";
+    public static final String ADMINISTRATOR_CLIENT = "ADMINISTRATOR_CLIENT";
+    public static final String SENDER_CLIENT = "SENDER_CLIENT";
     public static final String DEAD_LETTER_RECEIVER_CLIENT = "DEAD_LETTER_RECEIVER_CLIENT";
 
     //Client Init Data

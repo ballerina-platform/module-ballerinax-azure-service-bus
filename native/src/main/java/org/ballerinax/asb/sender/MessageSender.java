@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.org).
  *
- * WSO2 Inc. licenses this file to you under the Apache License,
+ * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,7 +33,6 @@ import io.ballerina.runtime.api.utils.TypeUtils;
 import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BDecimal;
 import io.ballerina.runtime.api.values.BError;
-import io.ballerina.runtime.api.values.BHandle;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
@@ -67,8 +66,9 @@ public class MessageSender {
      * @param topicOrQueueName Queue/topic name
      * @throws ServiceBusException on failure initiating IMessage Receiver in Azure Service Bus instance.
      */
-    public static Object initializeSender(String connectionString, String entityType, String topicOrQueueName,
-                                          String logLevel, BMap<BString, Object> retryConfigs) {
+    public static Object initializeSender(BObject senderClient, String connectionString, String entityType,
+                                          String topicOrQueueName, String logLevel,
+                                          BMap<BString, Object> retryConfigs) {
         try {
             AmqpRetryOptions retryOptions = getRetryOptions(retryConfigs);
             ServiceBusSenderClientBuilder senderClientBuilder = new ServiceBusClientBuilder()
@@ -81,7 +81,8 @@ public class MessageSender {
                 senderClientBuilder.topicName(topicOrQueueName);
             }
             LOGGER.debug("ServiceBusSenderClient initialized");
-            return senderClientBuilder.buildClient();
+            setClient(senderClient, senderClientBuilder.buildClient());
+            return null;
         } catch (BError e) {
             return ASBErrorCreator.fromBError(e);
         } catch (ServiceBusException e) {
@@ -97,9 +98,9 @@ public class MessageSender {
      * @param message Input message record as a BMap
      * @return An error if failed to send the message
      */
-    public static Object send(BObject endpointClient, BMap<BString, Object> message) {
+    public static Object send(BObject senderClient, BMap<BString, Object> message) {
         try {
-            ServiceBusSenderClient sender = getSenderFromBObject(endpointClient);
+            ServiceBusSenderClient sender = getSenderFromBObject(senderClient);
             ServiceBusMessage messageToSend = constructMessage(message);
             sender.sendMessage(messageToSend);
             if (LOGGER.isDebugEnabled()) {
@@ -123,10 +124,10 @@ public class MessageSender {
      * @param scheduleTime Input schedule time record as a BMap
      * @return An error if failed to send the message
      */
-    public static Object schedule(BObject endpointClient, BMap<BString, Object> message,
+    public static Object schedule(BObject senderClient, BMap<BString, Object> message,
                                   BMap<BString, Object> scheduleTime) {
         try {
-            ServiceBusSenderClient sender = getSenderFromBObject(endpointClient);
+            ServiceBusSenderClient sender = getSenderFromBObject(senderClient);
             ServiceBusMessage messageToSend = constructMessage(message);
             Long sequenceNumber = sender.scheduleMessage(messageToSend, constructOffset(scheduleTime));
             if (LOGGER.isDebugEnabled()) {
@@ -148,9 +149,9 @@ public class MessageSender {
      * @param sequenceNumber The sequence number of the message to cance
      * @return An error if failed to send the message
      */
-    public static Object cancel(BObject endpointClient, long sequenceNumber) {
+    public static Object cancel(BObject senderClient, long sequenceNumber) {
         try {
-            ServiceBusSenderClient sender = getSenderFromBObject(endpointClient);
+            ServiceBusSenderClient sender = getSenderFromBObject(senderClient);
             sender.cancelScheduledMessage(sequenceNumber);
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Successfully cancelled scheduled message with sequenceNumber = " + sequenceNumber);
@@ -173,9 +174,9 @@ public class MessageSender {
      * @param messages Input batch message record as a BMap
      * @return An error if failed send the message.
      */
-    public static Object sendBatch(BObject endpointClient, BMap<BString, Object> messages) {
+    public static Object sendBatch(BObject senderClient, BMap<BString, Object> messages) {
         try {
-            ServiceBusSenderClient sender = getSenderFromBObject(endpointClient);
+            ServiceBusSenderClient sender = getSenderFromBObject(senderClient);
             Map<String, Object> messagesMap = ASBUtils.toObjectMap(messages);
             BArray messageArray = (BArray) messagesMap.get("messages");
             Collection<ServiceBusMessage> messageBatch = new ArrayList<>();
@@ -221,9 +222,9 @@ public class MessageSender {
      *
      * @return @return An error if failed close the sender.
      */
-    public static Object closeSender(BObject endpointClient) {
+    public static Object close(BObject senderClient) {
         try {
-            ServiceBusSenderClient sender = getSenderFromBObject(endpointClient);
+            ServiceBusSenderClient sender = getSenderFromBObject(senderClient);
             sender.close();
             LOGGER.debug("Closed the sender. Identifier=" + sender.getIdentifier());
             return null;
@@ -330,8 +331,11 @@ public class MessageSender {
         return OffsetDateTime.of(year, month, day, hour, minute, seconds, 0, zoneOffset);
     }
 
+    private static void setClient(BObject senderObject, ServiceBusSenderClient client) {
+        senderObject.addNativeData(ASBConstants.SENDER_CLIENT, client);
+    }
+
     private static ServiceBusSenderClient getSenderFromBObject(BObject senderObject) {
-        BHandle senderHandle = (BHandle) senderObject.get(StringUtils.fromString("senderHandle"));
-        return (ServiceBusSenderClient) senderHandle.getValue();
+        return (ServiceBusSenderClient) senderObject.getNativeData(ASBConstants.SENDER_CLIENT);
     }
 }

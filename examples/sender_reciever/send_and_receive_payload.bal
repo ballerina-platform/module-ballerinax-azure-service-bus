@@ -59,7 +59,7 @@ public function main() returns error? {
     byte[]|error? bytePayload = messageReceiver->receivePayload(serverWaitTime);
 
     log:printInfo("Asserting received payloads.");
-    if (bytePayload is byte[]) {
+    if bytePayload is byte[] {
         string stringPayload = check string:fromBytes(bytePayload);
         log:printInfo("Received message: " + stringPayload);
     } else {

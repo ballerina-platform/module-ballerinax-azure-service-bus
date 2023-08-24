@@ -1,6 +1,6 @@
-// Copyright (c) 2021 WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+// Copyright (c) 2023 WSO2 LLC.
 //
-// WSO2 Inc. licenses this file to you under the Apache License,
+// WSO2 LLC. licenses this file to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file except
 // in compliance with the License.
 // You may obtain a copy of the License at
@@ -23,7 +23,6 @@ import ballerina/time;
 public isolated client class MessageSender {
 
     private string connectionString;
-    final handle senderHandle;
     private string topicOrQueueName;
     private string entityType;
     private LogLevel logLevel;
@@ -40,14 +39,9 @@ public isolated client class MessageSender {
         self.topicOrQueueName = config.topicOrQueueName;
         self.entityType = config.entityType;
         self.logLevel = customConfiguration.logLevel;
-        handle|Error initResult = initMessageSender(java:fromString(self.connectionString),
+        check initializeSender(self, java:fromString(self.connectionString),
             java:fromString(self.entityType), java:fromString(self.topicOrQueueName),
             java:fromString(self.logLevel), config.amqpRetryOptions);
-        if (initResult is Error) {
-            return initResult;
-        }
-
-        self.senderHandle = initResult;
     }
 
     # Send message to queue or topic with a message body.
@@ -87,9 +81,9 @@ public isolated client class MessageSender {
     #
     # + sequenceNumber - The sequence number of the message to cancel
     # + return - If the message could not be cancelled
-    isolated remote function cancel(@display {label: "Sequence Number"} int sequenceNumber) returns Error? {
-        return cancel(self, sequenceNumber);
-    }
+    isolated remote function cancel(@display {label: "Sequence Number"} int sequenceNumber) returns Error? = @java:Method {
+        'class: "org.ballerinax.asb.sender.MessageSender"
+    } external;
 
     # Send batch of messages to queue or topic.
     #
@@ -107,32 +101,24 @@ public isolated client class MessageSender {
     #
     # + return - An `asb:Error` if failed to close connection or else `()`
     @display {label: "Close Sender Connection"}
-    isolated remote function close() returns Error? {
-        return closeSender(self);
-    }
+    isolated remote function close() returns Error? = @java:Method {
+        'class: "org.ballerinax.asb.sender.MessageSender"
+    } external;
 }
 
-isolated function initMessageSender(handle connectionString, handle entityType, handle topicOrQueueName, handle isLogEnabled, AmqpRetryOptions retryOptions) returns handle|Error = @java:Method {
-    name: "initializeSender",
+isolated function initializeSender(MessageSender senderClient, handle connectionString, handle entityType, handle topicOrQueueName, handle isLogEnabled, AmqpRetryOptions retryOptions) returns Error? = @java:Method {
     'class: "org.ballerinax.asb.sender.MessageSender"
 } external;
 
-isolated function send(MessageSender endpointClient, Message message) returns Error? = @java:Method {
+isolated function send(MessageSender senderClient, Message message) returns Error? = @java:Method {
     'class: "org.ballerinax.asb.sender.MessageSender"
 } external;
 
-isolated function sendBatch(MessageSender endpointClient, MessageBatch messages) returns Error? = @java:Method {
+isolated function sendBatch(MessageSender senderClient, MessageBatch messages) returns Error? = @java:Method {
     'class: "org.ballerinax.asb.sender.MessageSender"
 } external;
 
-isolated function schedule(MessageSender endpointClient, Message message, time:Civil scheduleTime) returns int|Error = @java:Method {
+isolated function schedule(MessageSender senderClient, Message message, time:Civil scheduleTime) returns int|Error = @java:Method {
     'class: "org.ballerinax.asb.sender.MessageSender"
 } external;
 
-isolated function cancel(MessageSender endpointClient, int sequenceNumber) returns Error? = @java:Method {
-    'class: "org.ballerinax.asb.sender.MessageSender"
-} external;
-
-isolated function closeSender(MessageSender endpointClient) returns Error? = @java:Method {
-    'class: "org.ballerinax.asb.sender.MessageSender"
-} external;

@@ -1,4 +1,3 @@
-
 // Copyright (c) 2023 WSO2 LLC. (http://www.wso2.org).
 //
 // WSO2 LLS. licenses this file to you under the Apache License,
@@ -71,15 +70,15 @@ public function main() returns error? {
     log:printInfo("Receiving from Asb receiver client.");
     asb:Message|error? messageReceived = queueReceiver->receive(serverWaitTime);
 
-    if (messageReceived is asb:Message) {
+    if messageReceived is asb:Message {
         check queueReceiver->deadLetter(messageReceived);
         byte[]|error? bytePayload = queueReceiver->receivePayload(serverWaitTime, deadLettered = true);
-        if (bytePayload is byte[]) {
+        if bytePayload is byte[] {
             log:printInfo("Received message from DLQ: " + bytePayload.toString());
         } else {
             log:printError("Receiving message via Asb receiver connection failed.");
         }
-    } else if (messageReceived is ()) {
+    } else if messageReceived is () {
         log:printError("No message in the queue.");
     } else {
         log:printError("Receiving message via Asb receiver connection failed.");

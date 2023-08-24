@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.org).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -42,7 +42,6 @@ import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.utils.TypeUtils;
 import io.ballerina.runtime.api.values.BArray;
 import io.ballerina.runtime.api.values.BError;
-import io.ballerina.runtime.api.values.BHandle;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
@@ -74,12 +73,13 @@ public class Administrator {
      * @param connectionString Azure service bus connection string
      * @return clientEp Azure Service Bus Administrator instance.
      */
-    public static Object initializeAdmin(String connectionString) {
+    public static Object initializeAdministrator(BObject administratorClient, String connectionString) {
         try {
             ServiceBusAdministrationClientBuilder administratorBuilder = new ServiceBusAdministrationClientBuilder()
                     .connectionString(connectionString);
             LOGGER.debug("ServiceBusAdministrator initialized");
-            return administratorBuilder.buildClient();
+            setClient(administratorClient, administratorBuilder.buildClient());
+            return null;
         } catch (BError e) {
             return ASBErrorCreator.fromBError(e);
         } catch (ServiceBusException e) {
@@ -913,8 +913,7 @@ public class Administrator {
     }
 
     private static ServiceBusAdministrationClient getAdminFromBObject(BObject adminObject) {
-        BHandle adminHandle = (BHandle) adminObject.get(StringUtils.fromString("adminHandle"));
-        return (ServiceBusAdministrationClient) adminHandle.getValue();
+        return (ServiceBusAdministrationClient) adminObject.getNativeData(ASBConstants.ADMINISTRATOR_CLIENT);
     }
 
     private static BMap<BString, Object> fromDuration(Duration duration) {
@@ -985,6 +984,10 @@ public class Administrator {
             authorizationRuleArray.append(authorizationRuleRecord);
         }
         return authorizationRuleArray;
+    }
+
+    private static void setClient(BObject administratorObject, ServiceBusAdministrationClient client) {
+        administratorObject.addNativeData(ASBConstants.ADMINISTRATOR_CLIENT, client);
     }
 
     private static BArray constructAccessRightsArray(List<AccessRights> accessRights) {

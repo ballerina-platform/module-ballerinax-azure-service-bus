@@ -145,7 +145,7 @@ public isolated client class MessageReceiver {
     # + return - An `asb:Error` if failed to deadletter message or else `()`
     @display {label: "Dead Letter Message"}
     isolated remote function deadLetter(@display {label: "Message"} Message message,
-            @display {label: "Dead Letter Reason"} string? deadLetterReason = "MANUALLY_DEADLETTERED",
+            @display {label: "Dead Letter Reason"} string? deadLetterReason = "DEADLETTERED_BY_USER",
             @display {label: "Dead Letter Description"}
                                         string? deadLetterErrorDescription = ()) returns Error? {
         if message?.lockToken.toString() != DEFAULT_MESSAGE_LOCK_TOKEN {

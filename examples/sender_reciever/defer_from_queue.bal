@@ -70,15 +70,15 @@ public function main() returns error? {
     log:printInfo("Receiving from Asb receiver client.");
     asb:Message|error? messageReceived = queueReceiver->receive(serverWaitTime);
 
-    if (messageReceived is asb:Message) {
+    if messageReceived is asb:Message {
         int sequenceNumber = check queueReceiver->defer(messageReceived);
         log:printInfo("Defer message successful");
         asb:Message|error? messageReceivedAgain =
             check queueReceiver->receiveDeferred(sequenceNumber);
-        if (messageReceivedAgain is asb:Message) {
+        if messageReceivedAgain is asb:Message {
             log:printInfo("Reading Deferred Message : " + messageReceivedAgain.toString());
         }
-    } else if (messageReceived is ()) {
+    } else if messageReceived is () {
         log:printError("No message in the queue.");
     } else {
         log:printError("Receiving message via Asb receiver connection failed.");
