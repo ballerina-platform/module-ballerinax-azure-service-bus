@@ -21,8 +21,6 @@ import ballerina/jballerina.java as java;
 @display {label: "Azure Service Bus Administrator", iconPath: "icon.png"}
 public isolated client class Administrator {
 
-    final handle adminHandle;
-
     # Initialize the Azure Service Bus Admin client.
     # Create an [Azure account](https://docs.microsoft.com/en-us/learn/modules/create-an-azure-account/) and
     # obtain tokens following [this guide](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-portal#get-the-connection-string).
@@ -30,11 +28,7 @@ public isolated client class Administrator {
     #
     # + connectionString - Azure Service Bus connection string
     public isolated function init(@display {label: "Azure Service Bus connection string"} string connectionString) returns Error? {
-        handle|Error initResult = initializeAdmin(java:fromString(connectionString));
-        if (initResult is Error) {
-            return initResult;
-        }
-        self.adminHandle = initResult;
+        check initializeAdministrator(self, java:fromString(connectionString));
     }
 
     # Create a topic with the given name or name and options.
@@ -264,6 +258,6 @@ public isolated client class Administrator {
     } external;
 }
 
-isolated function initializeAdmin(handle connectionString) returns handle|Error = @java:Method {
+isolated function initializeAdministrator(Administrator adminClient, handle connectionString) returns Error? = @java:Method {
     'class: "org.ballerinax.asb.admin.Administrator"
 } external;
