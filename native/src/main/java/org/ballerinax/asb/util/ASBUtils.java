@@ -22,6 +22,7 @@ import com.azure.core.amqp.AmqpRetryMode;
 import com.azure.core.amqp.AmqpRetryOptions;
 import com.azure.messaging.servicebus.ServiceBusClientBuilder;
 import com.azure.messaging.servicebus.ServiceBusClientBuilder.ServiceBusReceiverClientBuilder;
+import com.azure.messaging.servicebus.ServiceBusReceiverClient;
 import com.azure.messaging.servicebus.administration.models.CreateQueueOptions;
 import com.azure.messaging.servicebus.administration.models.CreateRuleOptions;
 import com.azure.messaging.servicebus.administration.models.CreateSubscriptionOptions;
@@ -161,90 +162,39 @@ public class ASBUtils {
      * @param subscriptionName         Subscription name.
      * @return ServiceBusReceiverClientBuilder object.
      */
-    public static ServiceBusReceiverClientBuilder receiverBuilder(AmqpRetryOptions retryOptions,
-                                                                  String connectionString,
-                                                                  String queueName,
-                                                                  String receiveMode,
-                                                                  long maxAutoLockRenewDuration,
-                                                                  String topicName,
-                                                                  String subscriptionName) {
+    public static ServiceBusReceiverClient constructReceiverClient(AmqpRetryOptions retryOptions,
+                                                                   String connectionString,
+                                                                   String queueName,
+                                                                   String receiveMode,
+                                                                   long maxAutoLockRenewDuration,
+                                                                   String topicName,
+                                                                   String subscriptionName,
+                                                                   boolean isDeadLetterReceiver) {
         ServiceBusReceiverClientBuilder receiverClientBuilder = new ServiceBusClientBuilder()
                 .connectionString(connectionString)
                 .retryOptions(retryOptions)
                 .receiver();
-        if (!queueName.isEmpty()) {
-            if (Objects.equals(receiveMode, RECEIVE_AND_DELETE)) {
-                receiverClientBuilder.receiveMode(ServiceBusReceiveMode.RECEIVE_AND_DELETE)
-                        .queueName(queueName);
-            } else {
-                receiverClientBuilder.receiveMode(ServiceBusReceiveMode.PEEK_LOCK)
-                        .queueName(queueName)
-                        .maxAutoLockRenewDuration(Duration.ofSeconds(maxAutoLockRenewDuration));
-            }
-        } else if (!subscriptionName.isEmpty() && !topicName.isEmpty()) {
-            if (Objects.equals(receiveMode, RECEIVE_AND_DELETE)) {
-                receiverClientBuilder.receiveMode(ServiceBusReceiveMode.RECEIVE_AND_DELETE)
-                        .topicName(topicName)
-                        .subscriptionName(subscriptionName);
-            } else {
-                receiverClientBuilder.receiveMode(ServiceBusReceiveMode.PEEK_LOCK)
-                        .topicName(topicName)
-                        .subscriptionName(subscriptionName)
-                        .maxAutoLockRenewDuration(Duration.ofSeconds(maxAutoLockRenewDuration));
-            }
-        }
-        return receiverClientBuilder;
-    }
 
-    /**
-     * Build the ServiceBusClientBuilder object.
-     *
-     * @param retryOptions             Retry options.
-     * @param connectionString         Connection string.
-     * @param queueName                Queue name.
-     * @param receiveMode              Receive mode.
-     * @param maxAutoLockRenewDuration Max auto lock renew duration.
-     * @param topicName                Topic name.
-     * @param subscriptionName         Subscription name.
-     * @return ServiceBusReceiverClientBuilder object.
-     */
-    public static ServiceBusReceiverClientBuilder deadLetterReceiverBuilder(AmqpRetryOptions retryOptions,
-                                                                            String connectionString,
-                                                                            String queueName,
-                                                                            String receiveMode,
-                                                                            long maxAutoLockRenewDuration,
-                                                                            String topicName,
-                                                                            String subscriptionName) {
-        ServiceBusReceiverClientBuilder receiverClientBuilder = new ServiceBusClientBuilder()
-                .connectionString(connectionString)
-                .retryOptions(retryOptions)
-                .receiver();
-        if (!queueName.isEmpty()) {
-            if (Objects.equals(receiveMode, RECEIVE_AND_DELETE)) {
-                receiverClientBuilder.receiveMode(ServiceBusReceiveMode.RECEIVE_AND_DELETE)
-                        .queueName(queueName)
-                        .subQueue(SubQueue.DEAD_LETTER_QUEUE);
-            } else {
-                receiverClientBuilder.receiveMode(ServiceBusReceiveMode.PEEK_LOCK)
-                        .queueName(queueName)
-                        .subQueue(SubQueue.DEAD_LETTER_QUEUE)
-                        .maxAutoLockRenewDuration(Duration.ofSeconds(maxAutoLockRenewDuration));
-            }
-        } else if (!subscriptionName.isEmpty() && !topicName.isEmpty()) {
-            if (Objects.equals(receiveMode, RECEIVE_AND_DELETE)) {
-                receiverClientBuilder.receiveMode(ServiceBusReceiveMode.RECEIVE_AND_DELETE)
-                        .topicName(topicName)
-                        .subQueue(SubQueue.DEAD_LETTER_QUEUE)
-                        .subscriptionName(subscriptionName);
-            } else {
-                receiverClientBuilder.receiveMode(ServiceBusReceiveMode.PEEK_LOCK)
-                        .topicName(topicName)
-                        .subscriptionName(subscriptionName)
-                        .subQueue(SubQueue.DEAD_LETTER_QUEUE)
-                        .maxAutoLockRenewDuration(Duration.ofSeconds(maxAutoLockRenewDuration));
-            }
+        ServiceBusReceiveMode mode = Objects.equals(receiveMode, RECEIVE_AND_DELETE)
+                ? ServiceBusReceiveMode.RECEIVE_AND_DELETE
+                : ServiceBusReceiveMode.PEEK_LOCK;
+
+        if (isDeadLetterReceiver) {
+            receiverClientBuilder.subQueue(SubQueue.DEAD_LETTER_QUEUE);
         }
-        return receiverClientBuilder;
+
+        if (!queueName.isEmpty()) {
+            receiverClientBuilder.queueName(queueName);
+        } else if (!subscriptionName.isEmpty() && !topicName.isEmpty()) {
+            receiverClientBuilder.topicName(topicName)
+                    .subscriptionName(subscriptionName);
+        }
+
+        if (mode == ServiceBusReceiveMode.PEEK_LOCK) {
+            receiverClientBuilder.maxAutoLockRenewDuration(Duration.ofSeconds(maxAutoLockRenewDuration));
+        }
+
+        return receiverClientBuilder.receiveMode(mode).buildClient();
     }
 
     /**

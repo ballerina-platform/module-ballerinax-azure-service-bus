@@ -22,7 +22,6 @@ import com.azure.core.amqp.AmqpRetryOptions;
 import com.azure.core.amqp.models.AmqpAnnotatedMessage;
 import com.azure.core.amqp.models.AmqpMessageBodyType;
 import com.azure.core.util.IterableStream;
-import com.azure.messaging.servicebus.ServiceBusClientBuilder.ServiceBusReceiverClientBuilder;
 import com.azure.messaging.servicebus.ServiceBusException;
 import com.azure.messaging.servicebus.ServiceBusReceivedMessage;
 import com.azure.messaging.servicebus.ServiceBusReceiverClient;
@@ -79,12 +78,11 @@ import static org.ballerinax.asb.util.ASBConstants.STATE;
 import static org.ballerinax.asb.util.ASBConstants.TIME_TO_LIVE;
 import static org.ballerinax.asb.util.ASBConstants.TO;
 import static org.ballerinax.asb.util.ASBUtils.addFieldIfPresent;
+import static org.ballerinax.asb.util.ASBUtils.constructReceiverClient;
 import static org.ballerinax.asb.util.ASBUtils.convertAMQPToJava;
 import static org.ballerinax.asb.util.ASBUtils.convertJavaToBValue;
-import static org.ballerinax.asb.util.ASBUtils.deadLetterReceiverBuilder;
 import static org.ballerinax.asb.util.ASBUtils.getRetryOptions;
 import static org.ballerinax.asb.util.ASBUtils.getValueWithIntendedType;
-import static org.ballerinax.asb.util.ASBUtils.receiverBuilder;
 
 /**
  * This facilitates the client operations of MessageReceiver client in
@@ -114,11 +112,12 @@ public class MessageReceiver {
                                             String logLevel, BMap<BString, Object> retryConfigs) {
         try {
             AmqpRetryOptions retryOptions = getRetryOptions(retryConfigs);
-            ServiceBusReceiverClientBuilder receiverClientBuilder = receiverBuilder(retryOptions, connectionString,
-                    queueName, receiveMode, maxAutoLockRenewDuration, topicName, subscriptionName);
+            ServiceBusReceiverClient nativeReceiverClient = constructReceiverClient(retryOptions, connectionString,
+                    queueName, receiveMode, maxAutoLockRenewDuration, topicName, subscriptionName, false);
+            setClientData(receiverClient, connectionString, queueName, topicName, subscriptionName, receiveMode,
+                    maxAutoLockRenewDuration, logLevel, retryConfigs);
+            setClient(receiverClient, nativeReceiverClient, false);
             LOGGER.debug("ServiceBusReceiverClient initialized");
-            setClient(receiverClient, connectionString, queueName, topicName, subscriptionName, receiveMode,
-                    maxAutoLockRenewDuration, logLevel, retryConfigs, receiverClientBuilder.buildClient());
             return null;
         } catch (BError e) {
             return ASBErrorCreator.fromBError(e);
@@ -630,12 +629,12 @@ public class MessageReceiver {
                     (BMap<BString, Object>) receiverObject.getNativeData(ASBConstants.RECEIVER_CLIENT_RETRY_CONFIGS);
             try {
                 AmqpRetryOptions retryOptions = getRetryOptions(retryConfigs);
-                ServiceBusReceiverClientBuilder receiverClientBuilder = deadLetterReceiverBuilder(retryOptions,
+                ServiceBusReceiverClient nativeReceiverClient = constructReceiverClient(retryOptions,
                         connectionString, queueName, receiveMode, maxAutoLockRenewDuration, topicName,
-                        subscriptionName);
+                        subscriptionName, true);
                 LOGGER.debug("ServiceBusReceiverClient initialized");
-                setDeadLetterClient(receiverObject, receiverClientBuilder.buildClient());
-                return receiverObject.getNativeData(ASBConstants.DEAD_LETTER_RECEIVER_CLIENT);
+                setClient(receiverObject, nativeReceiverClient, true);
+                return nativeReceiverClient;
             } catch (BError e) {
                 return ASBErrorCreator.fromBError(e);
             } catch (ServiceBusException e) {
@@ -646,11 +645,10 @@ public class MessageReceiver {
         }
     }
 
-    private static void setClient(BObject receiverObject, String connectionString, String queueName,
-                                  String topicName, String subscriptionName,
-                                  String receiveMode, long maxAutoLockRenewDuration,
-                                  String logLevel, BMap<BString, Object> retryConfigs,
-                                  ServiceBusReceiverClient client) {
+    private static void setClientData(BObject receiverObject, String connectionString, String queueName,
+                                      String topicName, String subscriptionName,
+                                      String receiveMode, long maxAutoLockRenewDuration,
+                                      String logLevel, BMap<BString, Object> retryConfigs) {
         receiverObject.addNativeData(ASBConstants.RECEIVER_CLIENT_CONNECTION_STRING, connectionString);
         receiverObject.addNativeData(ASBConstants.RECEIVER_CLIENT_QUEUE_NAME, queueName);
         receiverObject.addNativeData(ASBConstants.RECEIVER_CLIENT_TOPIC_NAME, topicName);
@@ -660,10 +658,13 @@ public class MessageReceiver {
                 maxAutoLockRenewDuration);
         receiverObject.addNativeData(ASBConstants.RECEIVER_CLIENT_LOG_LEVEL, logLevel);
         receiverObject.addNativeData(ASBConstants.RECEIVER_CLIENT_RETRY_CONFIGS, retryConfigs);
-        receiverObject.addNativeData(ASBConstants.RECEIVER_CLIENT, client);
     }
 
-    private static void setDeadLetterClient(BObject receiverObject, ServiceBusReceiverClient client) {
-        receiverObject.addNativeData(ASBConstants.DEAD_LETTER_RECEIVER_CLIENT, client);
+    private static void setClient(BObject receiverObject, ServiceBusReceiverClient client, boolean isDeadLetter) {
+        if (isDeadLetter) {
+            receiverObject.addNativeData(ASBConstants.DEAD_LETTER_RECEIVER_CLIENT, client);
+        } else {
+            receiverObject.addNativeData(ASBConstants.RECEIVER_CLIENT, client);
+        }
     }
 }
