@@ -22,14 +22,11 @@ import com.azure.core.amqp.AmqpRetryOptions;
 import com.azure.core.amqp.models.AmqpAnnotatedMessage;
 import com.azure.core.amqp.models.AmqpMessageBodyType;
 import com.azure.core.util.IterableStream;
-import com.azure.messaging.servicebus.ServiceBusClientBuilder;
 import com.azure.messaging.servicebus.ServiceBusClientBuilder.ServiceBusReceiverClientBuilder;
 import com.azure.messaging.servicebus.ServiceBusException;
 import com.azure.messaging.servicebus.ServiceBusReceivedMessage;
 import com.azure.messaging.servicebus.ServiceBusReceiverClient;
 import com.azure.messaging.servicebus.models.DeadLetterOptions;
-import com.azure.messaging.servicebus.models.ServiceBusReceiveMode;
-import com.azure.messaging.servicebus.models.SubQueue;
 import io.ballerina.runtime.api.PredefinedTypes;
 import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.creators.TypeCreator;
@@ -55,7 +52,6 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 import static io.ballerina.runtime.api.creators.ValueCreator.createRecordValue;
@@ -75,7 +71,6 @@ import static org.ballerinax.asb.util.ASBConstants.LOCK_TOKEN;
 import static org.ballerinax.asb.util.ASBConstants.MESSAGE_ID;
 import static org.ballerinax.asb.util.ASBConstants.PARTITION_KEY;
 import static org.ballerinax.asb.util.ASBConstants.RECEIVER_CLIENT;
-import static org.ballerinax.asb.util.ASBConstants.RECEIVE_AND_DELETE;
 import static org.ballerinax.asb.util.ASBConstants.REPLY_TO;
 import static org.ballerinax.asb.util.ASBConstants.REPLY_TO_SESSION_ID;
 import static org.ballerinax.asb.util.ASBConstants.SEQUENCE_NUMBER;
@@ -83,11 +78,13 @@ import static org.ballerinax.asb.util.ASBConstants.SESSION_ID;
 import static org.ballerinax.asb.util.ASBConstants.STATE;
 import static org.ballerinax.asb.util.ASBConstants.TIME_TO_LIVE;
 import static org.ballerinax.asb.util.ASBConstants.TO;
-import static org.ballerinax.asb.util.ASBUtils.addMessageFieldIfPresent;
+import static org.ballerinax.asb.util.ASBUtils.addFieldIfPresent;
 import static org.ballerinax.asb.util.ASBUtils.convertAMQPToJava;
 import static org.ballerinax.asb.util.ASBUtils.convertJavaToBValue;
+import static org.ballerinax.asb.util.ASBUtils.deadLetterReceiverBuilder;
 import static org.ballerinax.asb.util.ASBUtils.getRetryOptions;
 import static org.ballerinax.asb.util.ASBUtils.getValueWithIntendedType;
+import static org.ballerinax.asb.util.ASBUtils.receiverBuilder;
 
 /**
  * This facilitates the client operations of MessageReceiver client in
@@ -117,35 +114,11 @@ public class MessageReceiver {
                                             String logLevel, BMap<BString, Object> retryConfigs) {
         try {
             AmqpRetryOptions retryOptions = getRetryOptions(retryConfigs);
-            ServiceBusReceiverClientBuilder receiverClientBuilder = new ServiceBusClientBuilder()
-                    .connectionString(connectionString)
-                    .retryOptions(retryOptions)
-                    .receiver();
-            if (!queueName.isEmpty()) {
-                if (Objects.equals(receiveMode, RECEIVE_AND_DELETE)) {
-                    receiverClientBuilder.receiveMode(ServiceBusReceiveMode.RECEIVE_AND_DELETE)
-                            .queueName(queueName);
-                } else {
-                    receiverClientBuilder.receiveMode(ServiceBusReceiveMode.PEEK_LOCK)
-                            .queueName(queueName)
-                            .maxAutoLockRenewDuration(Duration.ofSeconds(maxAutoLockRenewDuration));
-                }
-            } else if (!subscriptionName.isEmpty() && !topicName.isEmpty()) {
-                if (Objects.equals(receiveMode, RECEIVE_AND_DELETE)) {
-                    receiverClientBuilder.receiveMode(ServiceBusReceiveMode.RECEIVE_AND_DELETE)
-                            .topicName(topicName)
-                            .subscriptionName(subscriptionName);
-                } else {
-                    receiverClientBuilder.receiveMode(ServiceBusReceiveMode.PEEK_LOCK)
-                            .topicName(topicName)
-                            .subscriptionName(subscriptionName)
-                            .maxAutoLockRenewDuration(Duration.ofSeconds(maxAutoLockRenewDuration));
-                }
-            }
+            ServiceBusReceiverClientBuilder receiverClientBuilder = receiverBuilder(retryOptions, connectionString,
+                    queueName, receiveMode, maxAutoLockRenewDuration, topicName, subscriptionName);
             LOGGER.debug("ServiceBusReceiverClient initialized");
-            setInitData(receiverClient, connectionString, queueName, topicName, subscriptionName, receiveMode,
-                    maxAutoLockRenewDuration, logLevel, retryConfigs);
-            setClient(receiverClient, receiverClientBuilder.buildClient());
+            setClient(receiverClient, connectionString, queueName, topicName, subscriptionName, receiveMode,
+                    maxAutoLockRenewDuration, logLevel, retryConfigs, receiverClientBuilder.buildClient());
             return null;
         } catch (BError e) {
             return ASBErrorCreator.fromBError(e);
@@ -512,26 +485,26 @@ public class MessageReceiver {
 
     private static Map<String, Object> populateOptionalFieldsMap(ServiceBusReceivedMessage message) {
         Map<String, Object> map = new HashMap<>();
-        addMessageFieldIfPresent(map, CONTENT_TYPE, message.getContentType());
-        addMessageFieldIfPresent(map, MESSAGE_ID, message.getMessageId());
-        addMessageFieldIfPresent(map, TO, message.getTo());
-        addMessageFieldIfPresent(map, REPLY_TO, message.getReplyTo());
-        addMessageFieldIfPresent(map, REPLY_TO_SESSION_ID, message.getReplyToSessionId());
-        addMessageFieldIfPresent(map, LABEL, message.getSubject());
-        addMessageFieldIfPresent(map, SESSION_ID, message.getSessionId());
-        addMessageFieldIfPresent(map, CORRELATION_ID, message.getCorrelationId());
-        addMessageFieldIfPresent(map, PARTITION_KEY, message.getPartitionKey());
-        addMessageFieldIfPresent(map, TIME_TO_LIVE, message.getTimeToLive().getSeconds());
-        addMessageFieldIfPresent(map, SEQUENCE_NUMBER, message.getSequenceNumber());
-        addMessageFieldIfPresent(map, LOCK_TOKEN, message.getLockToken());
-        addMessageFieldIfPresent(map, DELIVERY_COUNT, message.getDeliveryCount());
-        addMessageFieldIfPresent(map, ENQUEUED_TIME, message.getEnqueuedTime().toString());
-        addMessageFieldIfPresent(map, ENQUEUED_SEQUENCE_NUMBER, message.getEnqueuedSequenceNumber());
-        addMessageFieldIfPresent(map, DEAD_LETTER_ERROR_DESCRIPTION, message.getDeadLetterErrorDescription());
-        addMessageFieldIfPresent(map, DEAD_LETTER_REASON, message.getDeadLetterReason());
-        addMessageFieldIfPresent(map, DEAD_LETTER_SOURCE, message.getDeadLetterSource());
-        addMessageFieldIfPresent(map, STATE, message.getState().toString());
-        addMessageFieldIfPresent(map, APPLICATION_PROPERTY_KEY, getApplicationProperties(message));
+        addFieldIfPresent(map, CONTENT_TYPE, message.getContentType());
+        addFieldIfPresent(map, MESSAGE_ID, message.getMessageId());
+        addFieldIfPresent(map, TO, message.getTo());
+        addFieldIfPresent(map, REPLY_TO, message.getReplyTo());
+        addFieldIfPresent(map, REPLY_TO_SESSION_ID, message.getReplyToSessionId());
+        addFieldIfPresent(map, LABEL, message.getSubject());
+        addFieldIfPresent(map, SESSION_ID, message.getSessionId());
+        addFieldIfPresent(map, CORRELATION_ID, message.getCorrelationId());
+        addFieldIfPresent(map, PARTITION_KEY, message.getPartitionKey());
+        addFieldIfPresent(map, TIME_TO_LIVE, message.getTimeToLive().getSeconds());
+        addFieldIfPresent(map, SEQUENCE_NUMBER, message.getSequenceNumber());
+        addFieldIfPresent(map, LOCK_TOKEN, message.getLockToken());
+        addFieldIfPresent(map, DELIVERY_COUNT, message.getDeliveryCount());
+        addFieldIfPresent(map, ENQUEUED_TIME, message.getEnqueuedTime().toString());
+        addFieldIfPresent(map, ENQUEUED_SEQUENCE_NUMBER, message.getEnqueuedSequenceNumber());
+        addFieldIfPresent(map, DEAD_LETTER_ERROR_DESCRIPTION, message.getDeadLetterErrorDescription());
+        addFieldIfPresent(map, DEAD_LETTER_REASON, message.getDeadLetterReason());
+        addFieldIfPresent(map, DEAD_LETTER_SOURCE, message.getDeadLetterSource());
+        addFieldIfPresent(map, STATE, message.getState().toString());
+        addFieldIfPresent(map, APPLICATION_PROPERTY_KEY, getApplicationProperties(message));
 
         return map;
     }
@@ -657,39 +630,12 @@ public class MessageReceiver {
                     (BMap<BString, Object>) receiverObject.getNativeData(ASBConstants.RECEIVER_CLIENT_RETRY_CONFIGS);
             try {
                 AmqpRetryOptions retryOptions = getRetryOptions(retryConfigs);
-                ServiceBusReceiverClientBuilder receiverClientBuilder = new ServiceBusClientBuilder()
-                        .connectionString(connectionString)
-                        .retryOptions(retryOptions)
-                        .receiver();
-                if (!queueName.isEmpty()) {
-                    if (Objects.equals(receiveMode, RECEIVE_AND_DELETE)) {
-                        receiverClientBuilder.receiveMode(ServiceBusReceiveMode.RECEIVE_AND_DELETE)
-                                .queueName(queueName)
-                                .subQueue(SubQueue.DEAD_LETTER_QUEUE);
-                    } else {
-                        receiverClientBuilder.receiveMode(ServiceBusReceiveMode.PEEK_LOCK)
-                                .queueName(queueName)
-                                .subQueue(SubQueue.DEAD_LETTER_QUEUE)
-                                .maxAutoLockRenewDuration(Duration.ofSeconds(maxAutoLockRenewDuration));
-                    }
-                } else if (!subscriptionName.isEmpty() && !topicName.isEmpty()) {
-                    if (Objects.equals(receiveMode, RECEIVE_AND_DELETE)) {
-                        receiverClientBuilder.receiveMode(ServiceBusReceiveMode.RECEIVE_AND_DELETE)
-                                .topicName(topicName)
-                                .subQueue(SubQueue.DEAD_LETTER_QUEUE)
-                                .subscriptionName(subscriptionName);
-                    } else {
-                        receiverClientBuilder.receiveMode(ServiceBusReceiveMode.PEEK_LOCK)
-                                .topicName(topicName)
-                                .subscriptionName(subscriptionName)
-                                .subQueue(SubQueue.DEAD_LETTER_QUEUE)
-                                .maxAutoLockRenewDuration(Duration.ofSeconds(maxAutoLockRenewDuration));
-                    }
-                }
+                ServiceBusReceiverClientBuilder receiverClientBuilder = deadLetterReceiverBuilder(retryOptions,
+                        connectionString, queueName, receiveMode, maxAutoLockRenewDuration, topicName,
+                        subscriptionName);
                 LOGGER.debug("ServiceBusReceiverClient initialized");
                 setDeadLetterClient(receiverObject, receiverClientBuilder.buildClient());
-                return receiverObject.getNativeData(
-                        ASBConstants.DEAD_LETTER_RECEIVER_CLIENT);
+                return receiverObject.getNativeData(ASBConstants.DEAD_LETTER_RECEIVER_CLIENT);
             } catch (BError e) {
                 return ASBErrorCreator.fromBError(e);
             } catch (ServiceBusException e) {
@@ -700,10 +646,11 @@ public class MessageReceiver {
         }
     }
 
-    private static void setInitData(BObject receiverObject, String connectionString, String queueName,
-                                    String topicName, String subscriptionName,
-                                    String receiveMode, long maxAutoLockRenewDuration,
-                                    String logLevel, BMap<BString, Object> retryConfigs) {
+    private static void setClient(BObject receiverObject, String connectionString, String queueName,
+                                  String topicName, String subscriptionName,
+                                  String receiveMode, long maxAutoLockRenewDuration,
+                                  String logLevel, BMap<BString, Object> retryConfigs,
+                                  ServiceBusReceiverClient client) {
         receiverObject.addNativeData(ASBConstants.RECEIVER_CLIENT_CONNECTION_STRING, connectionString);
         receiverObject.addNativeData(ASBConstants.RECEIVER_CLIENT_QUEUE_NAME, queueName);
         receiverObject.addNativeData(ASBConstants.RECEIVER_CLIENT_TOPIC_NAME, topicName);
@@ -713,9 +660,6 @@ public class MessageReceiver {
                 maxAutoLockRenewDuration);
         receiverObject.addNativeData(ASBConstants.RECEIVER_CLIENT_LOG_LEVEL, logLevel);
         receiverObject.addNativeData(ASBConstants.RECEIVER_CLIENT_RETRY_CONFIGS, retryConfigs);
-    }
-
-    private static void setClient(BObject receiverObject, ServiceBusReceiverClient client) {
         receiverObject.addNativeData(ASBConstants.RECEIVER_CLIENT, client);
     }
 
