@@ -31,7 +31,6 @@ public function main() returns error? {
     // Input values
     string stringContent = "This is My Message Body";
     byte[] byteContent = stringContent.toBytes();
-    map<string> properties = {a: "propertyValue1", b: "propertyValue2"};
     int timeToLive = 60; // In seconds
     int serverWaitTime = 60; // In seconds
     int maxMessageCount = 2;
@@ -82,7 +81,7 @@ public function main() returns error? {
 
     if (messageReceived is asb:MessageBatch) {
         foreach asb:Message message in messageReceived.messages {
-            if (message.toString() != "") {
+            if message.toString() != "" {
                 log:printInfo("Reading Received Message : " + message.toString());
             }
         }

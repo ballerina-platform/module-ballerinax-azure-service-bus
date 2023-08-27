@@ -1,6 +1,6 @@
 // Copyright (c) 2023 WSO2 LLC. (http://www.wso2.org).
 //
-// WSO2 LLC. licenses this file to you under the Apache License,
+// WSO2 LLS. licenses this file to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file except
 // in compliance with the License.
 // You may obtain a copy of the License at
@@ -21,33 +21,14 @@ import ballerinax/asb;
 configurable string connectionString = ?;
 configurable string queueName = ?;
 
-// This sample demonstrates a scneario where azure service bus listener is used to
-// send a message to a queue using message sender, receive that message using message receiver with PEEKLOCK mode, 
-// then renews the lock on the message. 
-//
-// (The lock will be renewed based on the setting specified on the entity. 
-//  When a message is received in PEEKLOCK mode, the message is locked on the server for this receiver instance 
-//  for a duration as specified during the Queue/Subscription creation (LockDuration). 
-//  If processing of the message requires longer than this duration, the lock needs to be renewed. 
-//  For each renewal, the lock is reset to the entity's LockDuration value.)
+// This sample demonstrates a scneario where azure service bus connecter is used to 
+// send a payload to a queue and receive the same payload from the queue.
 public function main() returns error? {
 
     // Input values
     string stringContent = "This is My Message Body";
     byte[] byteContent = stringContent.toBytes();
-    int timeToLive = 60; // In seconds
     int serverWaitTime = 60; // In seconds
-
-    asb:ApplicationProperties applicationProperties = {
-        properties: {a: "propertyValue1", b: "propertyValue2"}
-    };
-
-    asb:Message message1 = {
-        body: byteContent,
-        contentType: asb:TEXT,
-        timeToLive: timeToLive,
-        applicationProperties: applicationProperties
-    };
 
     asb:ASBServiceSenderConfig senderConfig = {
         connectionString: connectionString,
@@ -64,29 +45,30 @@ public function main() returns error? {
     };
 
     log:printInfo("Initializing Asb sender client.");
-    asb:MessageSender queueSender = check new (senderConfig);
+    asb:MessageSender messageSender = check new (senderConfig);
 
     log:printInfo("Initializing Asb receiver client.");
-    asb:MessageReceiver queueReceiver = check new (receiverConfig);
+    asb:MessageReceiver messageReceiver = check new (receiverConfig);
 
+    //Sending payload. payload can be either nil, boolean, int, float, string, json, byte[], xml, map<anydata>, record
     log:printInfo("Sending via Asb sender client.");
-    check queueSender->send(message1);
+    check messageSender->sendPayload(byteContent);
 
+    //Receiving payload. payload can be either nil, boolean, int, float, string, json, byte[], xml, map<anydata>, record
     log:printInfo("Receiving from Asb receiver client.");
-    asb:Message|error? messageReceived = queueReceiver->receive(serverWaitTime);
+    byte[]|error? bytePayload = messageReceiver->receivePayload(serverWaitTime);
 
-    if messageReceived is asb:Message {
-        check queueReceiver->renewLock(messageReceived);
-        log:printInfo("Renew lock message successful");
-    } else if messageReceived is () {
-        log:printError("No message in the queue.");
+    log:printInfo("Asserting received payloads.");
+    if bytePayload is byte[] {
+        string stringPayload = check string:fromBytes(bytePayload);
+        log:printInfo("Received message: " + stringPayload);
     } else {
         log:printError("Receiving message via Asb receiver connection failed.");
     }
 
     log:printInfo("Closing Asb sender client.");
-    check queueSender->close();
+    check messageSender->close();
 
     log:printInfo("Closing Asb receiver client.");
-    check queueReceiver->close();
+    check messageReceiver->close();
 }

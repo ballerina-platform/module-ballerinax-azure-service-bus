@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.org).
  *
- * WSO2 Inc. licenses this file to you under the Apache License,
+ * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,6 +25,22 @@ import io.ballerina.runtime.api.values.BString;
  * Asb Connector Constants.
  */
 public class ASBConstants {
+
+    //Clients
+    public static final String RECEIVER_CLIENT = "RECEIVER_CLIENT";
+    public static final String ADMINISTRATOR_CLIENT = "ADMINISTRATOR_CLIENT";
+    public static final String SENDER_CLIENT = "SENDER_CLIENT";
+    public static final String DEAD_LETTER_RECEIVER_CLIENT = "DEAD_LETTER_RECEIVER_CLIENT";
+
+    //Client Init Data
+    public static final String RECEIVER_CLIENT_CONNECTION_STRING = "CONNECTION_STRING";
+    public static final String RECEIVER_CLIENT_RECEIVE_MODE = "RECEIVE_MODE";
+    public static final String RECEIVER_CLIENT_TOPIC_NAME = "TOPIC_NAME";
+    public static final String RECEIVER_CLIENT_SUBSCRIPTION_NAME = "SUBSCRIPTION_NAME";
+    public static final String RECEIVER_CLIENT_QUEUE_NAME = "QUEUE_NAME";
+    public static final String RECEIVER_CLIENT_MAX_AUTO_LOCK_RENEW_DURATION = "MAX_AUTO_LOCK_RENEW_DURATION";
+    public static final String RECEIVER_CLIENT_LOG_LEVEL = "LOG_LEVEL";
+    public static final String RECEIVER_CLIENT_RETRY_CONFIGS = "RETRY_CONFIGS";
 
     // Message constant fields
     public static final String MESSAGE_RECORD = "Message";

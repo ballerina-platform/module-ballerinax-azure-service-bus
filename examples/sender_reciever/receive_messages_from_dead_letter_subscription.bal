@@ -1,6 +1,6 @@
 // Copyright (c) 2023 WSO2 LLC. (http://www.wso2.org).
 //
-// WSO2 LLC. licenses this file to you under the Apache License,
+// WSO2 LLS. licenses this file to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file except
 // in compliance with the License.
 // You may obtain a copy of the License at
@@ -23,9 +23,10 @@ configurable string topicName = ?;
 configurable string subscriptionName = ?;
 
 // This sample demonstrates a scneario where azure service bus connecter is used to 
-// send a message to a topic using topic sender, receive that message using subscription receiver with PEEKLOCK mode, 
-// then defer that message (Defered message will be not received via receive method)
-// After defering, receive the message using receiveDeferred method providing sequence number.
+// send a message to a topic using message sender, 
+// receive a messsage from a subcription using subscription receiver with PEEK_LOCK mode
+// then move the message in a dead letter subscription
+// After moving to dead letter subscription,dead letter message will be received using receive(deadLettered = true)
 public function main() returns error? {
 
     // Input values
@@ -73,14 +74,20 @@ public function main() returns error? {
     asb:Message|error? messageReceived = subscriptionReceiver->receive(serverWaitTime);
 
     if messageReceived is asb:Message {
-        int sequenceNumber = check subscriptionReceiver->defer(messageReceived);
-        log:printInfo("Defer message successful");
-        asb:Message|error? messageReceivedAgain = subscriptionReceiver->receiveDeferred(sequenceNumber);
-        if messageReceivedAgain is asb:Message {
-            log:printInfo("Reading Deferred Message : " + messageReceivedAgain.toString());
+        check subscriptionReceiver->deadLetter(messageReceived);
+        asb:Message|error? messageReceivedFromDLQ = subscriptionReceiver->receive(serverWaitTime, deadLettered = true);
+
+        if messageReceivedFromDLQ is asb:Message {
+            log:printInfo("Message received from DLQ.");
+            string message_str = check string:fromBytes(<byte[]>messageReceivedFromDLQ.body);
+            log:printInfo("DLQ Message content: " + message_str);
+        } else if messageReceivedFromDLQ is () {
+            log:printError("No message in the queue.");
+        } else {
+            log:printError("Receiving message via Asb receiver connection failed.");
         }
     } else if messageReceived is () {
-        log:printError("No message in the subscription.");
+        log:printError("No message in the queue.");
     } else {
         log:printError("Receiving message via Asb receiver connection failed.");
     }

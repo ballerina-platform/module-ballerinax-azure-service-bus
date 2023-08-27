@@ -1,6 +1,6 @@
 // Copyright (c) 2023 WSO2 LLC. (http://www.wso2.org).
 //
-// WSO2 LLC. licenses this file to you under the Apache License,
+// WSO2 LLS. licenses this file to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file except
 // in compliance with the License.
 // You may obtain a copy of the License at
@@ -21,19 +21,15 @@ import ballerinax/asb;
 configurable string connectionString = ?;
 configurable string queueName = ?;
 
-// This sample demonstrates a scneario where azure service bus listener is used to
+// This sample demonstrates a scneario where azure service bus connecter is used to 
 // send a message to a queue using message sender, receive that message using message receiver with PEEKLOCK mode, 
-// then renews the lock on the message. 
-//
-// (The lock will be renewed based on the setting specified on the entity. 
-//  When a message is received in PEEKLOCK mode, the message is locked on the server for this receiver instance 
-//  for a duration as specified during the Queue/Subscription creation (LockDuration). 
-//  If processing of the message requires longer than this duration, the lock needs to be renewed. 
-//  For each renewal, the lock is reset to the entity's LockDuration value.)
+// then move the message in a DLQ (dead letter queue)
+// After moving to DLQ, recieve the DQL message using receive(deadLettered = true)
+// Then complete the DLQ message and receive the dlq messages again to check whether the message is settled from DLQ
 public function main() returns error? {
 
     // Input values
-    string stringContent = "This is My Message Body";
+    string stringContent = "This is message goes to DLQ.";
     byte[] byteContent = stringContent.toBytes();
     int timeToLive = 60; // In seconds
     int serverWaitTime = 60; // In seconds
@@ -76,8 +72,45 @@ public function main() returns error? {
     asb:Message|error? messageReceived = queueReceiver->receive(serverWaitTime);
 
     if messageReceived is asb:Message {
-        check queueReceiver->renewLock(messageReceived);
-        log:printInfo("Renew lock message successful");
+
+        //deadLetter the message
+        check queueReceiver->deadLetter(messageReceived);
+
+        //get message from DLQ
+        log:printInfo("Receiving from DLQ via Asb receiver client.");
+        asb:Message|error? messageReceivedFromDLQ = queueReceiver->receive(serverWaitTime, deadLettered = true);
+        if messageReceivedFromDLQ is asb:Message {
+
+            //Check whether the message received from DLQ
+            log:printInfo("Message received from DLQ.");
+            string? message_id = messageReceivedFromDLQ.messageId;
+            if message_id is string {
+                log:printInfo("DLQ Top Message ID: " + message_id);
+            }
+
+            //Complete the DLQ Message
+            log:printInfo("Completing the DLQ message.");
+            check queueReceiver->complete(messageReceivedFromDLQ);
+
+            //Receive the message from DLQ after complete
+            log:printInfo("Receiving from DLQ via Asb receiver client after complete.");
+            asb:Message|error? checkReceivingDLQAfterComplete = queueReceiver->receive(serverWaitTime, deadLettered = true);
+            if checkReceivingDLQAfterComplete is asb:Message { //if there are any messages in the DLQ
+                log:printInfo("Message received from DLQ.");
+                message_id = checkReceivingDLQAfterComplete.messageId;
+                if message_id is string {
+                    log:printInfo("DLQ Top Message ID: " + message_id);
+                }
+            } else if checkReceivingDLQAfterComplete is () { //if there are no messages in the DLQ
+                log:printError("No message in the deadletter queue.");
+            } else {
+                log:printError("Receiving message via Asb receiver connection failed.");
+            }
+        } else if messageReceivedFromDLQ is () {
+            log:printError("No message in the DLQ.");
+        } else {
+            log:printError("Receiving message via ASBReceiver:DLQ connection failed.");
+        }
     } else if messageReceived is () {
         log:printError("No message in the queue.");
     } else {

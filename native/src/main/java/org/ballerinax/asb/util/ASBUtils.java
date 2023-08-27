@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2021, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.org).
  *
- * WSO2 Inc. licenses this file to you under the Apache License,
+ * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,6 +20,9 @@ package org.ballerinax.asb.util;
 
 import com.azure.core.amqp.AmqpRetryMode;
 import com.azure.core.amqp.AmqpRetryOptions;
+import com.azure.messaging.servicebus.ServiceBusClientBuilder;
+import com.azure.messaging.servicebus.ServiceBusClientBuilder.ServiceBusReceiverClientBuilder;
+import com.azure.messaging.servicebus.ServiceBusReceiverClient;
 import com.azure.messaging.servicebus.administration.models.CreateQueueOptions;
 import com.azure.messaging.servicebus.administration.models.CreateRuleOptions;
 import com.azure.messaging.servicebus.administration.models.CreateSubscriptionOptions;
@@ -31,6 +34,8 @@ import com.azure.messaging.servicebus.administration.models.SqlRuleAction;
 import com.azure.messaging.servicebus.administration.models.SqlRuleFilter;
 import com.azure.messaging.servicebus.administration.models.SubscriptionProperties;
 import com.azure.messaging.servicebus.administration.models.TopicProperties;
+import com.azure.messaging.servicebus.models.ServiceBusReceiveMode;
+import com.azure.messaging.servicebus.models.SubQueue;
 import io.ballerina.runtime.api.PredefinedTypes;
 import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.creators.TypeCreator;
@@ -76,6 +81,7 @@ import static io.ballerina.runtime.api.utils.TypeUtils.getReferredType;
 import static org.ballerinax.asb.util.ASBConstants.DELAY;
 import static org.ballerinax.asb.util.ASBConstants.MAX_DELAY;
 import static org.ballerinax.asb.util.ASBConstants.MAX_RETRIES;
+import static org.ballerinax.asb.util.ASBConstants.RECEIVE_AND_DELETE;
 import static org.ballerinax.asb.util.ASBConstants.RETRY_MODE;
 import static org.ballerinax.asb.util.ASBConstants.TRY_TIMEOUT;
 
@@ -142,6 +148,53 @@ public class ASBUtils {
      */
     public static String convertString(Object value) {
         return (value == null || Objects.equals(value.toString(), "")) ? null : value.toString();
+    }
+
+    /**
+     * Build the ServiceBusClientBuilder object.
+     *
+     * @param retryOptions             Retry options.
+     * @param connectionString         Connection string.
+     * @param queueName                Queue name.
+     * @param receiveMode              Receive mode.
+     * @param maxAutoLockRenewDuration Max auto lock renew duration.
+     * @param topicName                Topic name.
+     * @param subscriptionName         Subscription name.
+     * @return ServiceBusReceiverClientBuilder object.
+     */
+    public static ServiceBusReceiverClient constructReceiverClient(AmqpRetryOptions retryOptions,
+                                                                   String connectionString,
+                                                                   String queueName,
+                                                                   String receiveMode,
+                                                                   long maxAutoLockRenewDuration,
+                                                                   String topicName,
+                                                                   String subscriptionName,
+                                                                   boolean isDeadLetterReceiver) {
+        ServiceBusReceiverClientBuilder receiverClientBuilder = new ServiceBusClientBuilder()
+                .connectionString(connectionString)
+                .retryOptions(retryOptions)
+                .receiver();
+
+        ServiceBusReceiveMode mode = Objects.equals(receiveMode, RECEIVE_AND_DELETE)
+                ? ServiceBusReceiveMode.RECEIVE_AND_DELETE
+                : ServiceBusReceiveMode.PEEK_LOCK;
+
+        if (isDeadLetterReceiver) {
+            receiverClientBuilder.subQueue(SubQueue.DEAD_LETTER_QUEUE);
+        }
+
+        if (!queueName.isEmpty()) {
+            receiverClientBuilder.queueName(queueName);
+        } else if (!subscriptionName.isEmpty() && !topicName.isEmpty()) {
+            receiverClientBuilder.topicName(topicName)
+                    .subscriptionName(subscriptionName);
+        }
+
+        if (mode == ServiceBusReceiveMode.PEEK_LOCK) {
+            receiverClientBuilder.maxAutoLockRenewDuration(Duration.ofSeconds(maxAutoLockRenewDuration));
+        }
+
+        return receiverClientBuilder.receiveMode(mode).buildClient();
     }
 
     /**
@@ -900,12 +953,6 @@ public class ASBUtils {
      * @param key              Key of the property
      * @param receivedProperty Received property
      */
-    public static void addMessageFieldIfPresent(Map<String, Object> map, String key, Object receivedProperty) {
-        if (receivedProperty != null) {
-            map.put(key, receivedProperty);
-        }
-    }
-
     public static void addFieldIfPresent(Map<String, Object> map, String key, Object receivedProperty) {
         if (receivedProperty != null) {
             map.put(key, receivedProperty);

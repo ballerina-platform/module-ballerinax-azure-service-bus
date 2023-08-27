@@ -1,6 +1,6 @@
 // Copyright (c) 2023 WSO2 LLC. (http://www.wso2.org).
 //
-// WSO2 LLC. licenses this file to you under the Apache License,
+// WSO2 LLS. licenses this file to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file except
 // in compliance with the License.
 // You may obtain a copy of the License at
@@ -19,13 +19,12 @@ import ballerinax/asb;
 
 // Connection Configurations
 configurable string connectionString = ?;
-configurable string topicName = ?;
-configurable string subscriptionName = ?;
+configurable string queueName = ?;
 
 // This sample demonstrates a scneario where azure service bus connecter is used to 
-// send a message to a topic using topic sender, receive that message using subscription receiver with PEEKLOCK mode, 
-// then defer that message (Defered message will be not received via receive method)
-// After defering, receive the message using receiveDeferred method providing sequence number.
+// send a message to a queue using message sender, receive that message using message receiver with PEEKLOCK mode, 
+// then move the message in a DLQ (dead letter queue)
+// After moving to DLQ, recieve the DQL message using receive(deadLettered = true)
 public function main() returns error? {
 
     // Input values
@@ -47,47 +46,52 @@ public function main() returns error? {
 
     asb:ASBServiceSenderConfig senderConfig = {
         connectionString: connectionString,
-        entityType: asb:TOPIC,
-        topicOrQueueName: topicName
+        entityType: asb:QUEUE,
+        topicOrQueueName: queueName
     };
 
     asb:ASBServiceReceiverConfig receiverConfig = {
         connectionString: connectionString,
         entityConfig: {
-            topicName: topicName,
-            subscriptionName: subscriptionName
+            queueName: queueName
         },
         receiveMode: asb:PEEK_LOCK
     };
 
     log:printInfo("Initializing Asb sender client.");
-    asb:MessageSender topicSender = check new (senderConfig);
+    asb:MessageSender queueSender = check new (senderConfig);
 
     log:printInfo("Initializing Asb receiver client.");
-    asb:MessageReceiver subscriptionReceiver = check new (receiverConfig);
+    asb:MessageReceiver queueReceiver = check new (receiverConfig);
 
     log:printInfo("Sending via Asb sender client.");
-    check topicSender->send(message1);
+    check queueSender->send(message1);
 
     log:printInfo("Receiving from Asb receiver client.");
-    asb:Message|error? messageReceived = subscriptionReceiver->receive(serverWaitTime);
+    asb:Message|error? messageReceived = queueReceiver->receive(serverWaitTime);
 
     if messageReceived is asb:Message {
-        int sequenceNumber = check subscriptionReceiver->defer(messageReceived);
-        log:printInfo("Defer message successful");
-        asb:Message|error? messageReceivedAgain = subscriptionReceiver->receiveDeferred(sequenceNumber);
-        if messageReceivedAgain is asb:Message {
-            log:printInfo("Reading Deferred Message : " + messageReceivedAgain.toString());
+        check queueReceiver->deadLetter(messageReceived);
+        asb:Message|error? messageReceivedFromDLQ = queueReceiver->receive(serverWaitTime, deadLettered = true);
+
+        if messageReceivedFromDLQ is asb:Message {
+            log:printInfo("Message received from DLQ.");
+            string message_str = check string:fromBytes(<byte[]>messageReceivedFromDLQ.body);
+            log:printInfo("DLQ Message content: " + message_str);
+        } else if messageReceivedFromDLQ is () {
+            log:printError("No message in the queue.");
+        } else {
+            log:printError("Receiving message via Asb receiver connection failed.");
         }
     } else if messageReceived is () {
-        log:printError("No message in the subscription.");
+        log:printError("No message in the queue.");
     } else {
         log:printError("Receiving message via Asb receiver connection failed.");
     }
 
     log:printInfo("Closing Asb sender client.");
-    check topicSender->close();
+    check queueSender->close();
 
     log:printInfo("Closing Asb receiver client.");
-    check subscriptionReceiver->close();
+    check queueReceiver->close();
 }

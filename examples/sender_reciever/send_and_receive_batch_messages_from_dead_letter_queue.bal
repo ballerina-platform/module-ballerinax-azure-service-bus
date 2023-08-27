@@ -21,15 +21,9 @@ import ballerinax/asb;
 configurable string connectionString = ?;
 configurable string queueName = ?;
 
-// This sample demonstrates a scneario where azure service bus listener is used to
-// send a message to a queue using message sender, receive that message using message receiver with PEEKLOCK mode, 
-// then renews the lock on the message. 
-//
-// (The lock will be renewed based on the setting specified on the entity. 
-//  When a message is received in PEEKLOCK mode, the message is locked on the server for this receiver instance 
-//  for a duration as specified during the Queue/Subscription creation (LockDuration). 
-//  If processing of the message requires longer than this duration, the lock needs to be renewed. 
-//  For each renewal, the lock is reset to the entity's LockDuration value.)
+// This sample demonstrates a scneario where azure service bus connecter is used to 
+// send a batch of messages to a queue using message sender, receive batch of messsages using message receiver with PEEK_LOCK mode
+// then dead-letter the received messages and agian receive the dead-lettered messages using message receiver.
 public function main() returns error? {
 
     // Input values
@@ -37,16 +31,23 @@ public function main() returns error? {
     byte[] byteContent = stringContent.toBytes();
     int timeToLive = 60; // In seconds
     int serverWaitTime = 60; // In seconds
-
-    asb:ApplicationProperties applicationProperties = {
-        properties: {a: "propertyValue1", b: "propertyValue2"}
-    };
+    int maxMessageCount = 2;
 
     asb:Message message1 = {
         body: byteContent,
         contentType: asb:TEXT,
-        timeToLive: timeToLive,
-        applicationProperties: applicationProperties
+        timeToLive: timeToLive
+    };
+
+    asb:Message message2 = {
+        body: byteContent,
+        contentType: asb:TEXT,
+        timeToLive: timeToLive
+    };
+
+    asb:MessageBatch messages = {
+        messageCount: 2,
+        messages: [message1, message2]
     };
 
     asb:ASBServiceSenderConfig senderConfig = {
@@ -69,21 +70,42 @@ public function main() returns error? {
     log:printInfo("Initializing Asb receiver client.");
     asb:MessageReceiver queueReceiver = check new (receiverConfig);
 
+    // Sending messages
     log:printInfo("Sending via Asb sender client.");
-    check queueSender->send(message1);
+    check queueSender->sendBatch(messages);
 
+    // Receiving messages
     log:printInfo("Receiving from Asb receiver client.");
-    asb:Message|error? messageReceived = queueReceiver->receive(serverWaitTime);
+    asb:MessageBatch|error? messageReceived = queueReceiver->receiveBatch(maxMessageCount, serverWaitTime);
 
-    if messageReceived is asb:Message {
-        check queueReceiver->renewLock(messageReceived);
-        log:printInfo("Renew lock message successful");
+    if messageReceived is asb:MessageBatch {
+        foreach asb:Message message in messageReceived.messages {
+            if message.toString() != ""{
+                log:printInfo("Reading Received Message : " + message.toString());
+                // Dead-lettering the received message
+                check queueReceiver->deadLetter(message);
+            }
+        }
     } else if messageReceived is () {
         log:printError("No message in the queue.");
     } else {
         log:printError("Receiving message via Asb receiver connection failed.");
     }
+    // Receiving dead-lettered messages
+    log:printInfo("Receiving from Asb dead-letter receiver client.");
+    asb:MessageBatch|error? receivedDeadletterMessages = queueReceiver->receiveBatch(maxMessageCount, serverWaitTime, true);
 
+    if receivedDeadletterMessages is asb:MessageBatch {
+        foreach asb:Message message in receivedDeadletterMessages.messages {
+            if message.toString() != "" {
+                log:printInfo("Reading Received Dead-Letter Message : " + message.toString());
+            }
+        }
+    } else if receivedDeadletterMessages is () {
+        log:printError("No message in the queue.");
+    } else {
+        log:printError("Receiving message via Asb receiver connection failed.");
+    }
     log:printInfo("Closing Asb sender client.");
     check queueSender->close();
 
