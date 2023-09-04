@@ -44,6 +44,8 @@ public class ASBConstants {
 
     // Message constant fields
     public static final String MESSAGE_RECORD = "Message";
+    public static final String LOCK_DURATION = "LockDuration";
+    public static final String MESSAGE_MAP_RECORD = "MessageMap";
     public static final String APPLICATION_PROPERTY_TYPE = "ApplicationProperties";
     // Message content data binding errors
     public static final String XML_CONTENT_ERROR = "Error while retrieving the xml content of the message. ";

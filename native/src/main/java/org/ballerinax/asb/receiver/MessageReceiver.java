@@ -43,6 +43,7 @@ import io.ballerina.runtime.api.values.BTypedesc;
 import org.ballerinax.asb.util.ASBConstants;
 import org.ballerinax.asb.util.ASBErrorCreator;
 import org.ballerinax.asb.util.ASBUtils;
+import org.ballerinax.asb.util.ExpiringMessageMap;
 import org.ballerinax.asb.util.ModuleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,8 +67,11 @@ import static org.ballerinax.asb.util.ASBConstants.DELIVERY_COUNT;
 import static org.ballerinax.asb.util.ASBConstants.ENQUEUED_SEQUENCE_NUMBER;
 import static org.ballerinax.asb.util.ASBConstants.ENQUEUED_TIME;
 import static org.ballerinax.asb.util.ASBConstants.LABEL;
+import static org.ballerinax.asb.util.ASBConstants.LOCK_DURATION;
 import static org.ballerinax.asb.util.ASBConstants.LOCK_TOKEN;
 import static org.ballerinax.asb.util.ASBConstants.MESSAGE_ID;
+import static org.ballerinax.asb.util.ASBConstants.MESSAGE_MAP_RECORD;
+import static org.ballerinax.asb.util.ASBConstants.MESSAGE_RECORD;
 import static org.ballerinax.asb.util.ASBConstants.PARTITION_KEY;
 import static org.ballerinax.asb.util.ASBConstants.RECEIVER_CLIENT;
 import static org.ballerinax.asb.util.ASBConstants.REPLY_TO;
@@ -270,8 +274,7 @@ public class MessageReceiver {
      */
     public static Object complete(BObject receiverClient, BString lockToken) {
         try {
-            ServiceBusReceivedMessage message = (ServiceBusReceivedMessage) receiverClient
-                    .getNativeData(lockToken.getValue());
+            ServiceBusReceivedMessage message = getMessageFromBObject(receiverClient, lockToken);
             ServiceBusReceiverClient receiver;
             if (message.getDeadLetterReason() != null) {
                 receiver = (ServiceBusReceiverClient) getDeadLetterMessageReceiverFromBObject(receiverClient);
@@ -279,7 +282,7 @@ public class MessageReceiver {
                 receiver = getReceiverFromBObject(receiverClient);
             }
             receiver.complete(message);
-            receiverClient.getNativeData().remove(lockToken.getValue());
+            removeMessageFromBObject(receiverClient, lockToken);
             LOGGER.debug("Completed the message(Id: " + message.getMessageId() + ") with lockToken " + lockToken);
             return null;
         } catch (BError e) {
@@ -301,10 +304,9 @@ public class MessageReceiver {
     public static Object abandon(BObject receiverClient, BString lockToken) {
         try {
             ServiceBusReceiverClient receiver = getReceiverFromBObject(receiverClient);
-            ServiceBusReceivedMessage message = (ServiceBusReceivedMessage) receiverClient
-                    .getNativeData(lockToken.getValue());
+            ServiceBusReceivedMessage message = getMessageFromBObject(receiverClient, lockToken);
             receiver.abandon(message);
-            receiverClient.getNativeData().remove(lockToken.getValue());
+            removeMessageFromBObject(receiverClient, lockToken);
             LOGGER.debug(String.format("Done abandoning a message(Id: %s) using its lock token from %n%s",
                     message.getMessageId(), receiver.getEntityPath()));
             return null;
@@ -330,13 +332,12 @@ public class MessageReceiver {
                                     Object deadLetterErrorDescription) {
         try {
             ServiceBusReceiverClient receiver = getReceiverFromBObject(receiverClient);
-            ServiceBusReceivedMessage message = (ServiceBusReceivedMessage) receiverClient
-                    .getNativeData(lockToken.getValue());
+            ServiceBusReceivedMessage message = getMessageFromBObject(receiverClient, lockToken);
             DeadLetterOptions options = new DeadLetterOptions()
                     .setDeadLetterErrorDescription(ASBUtils.convertString(deadLetterErrorDescription));
             options.setDeadLetterReason(ASBUtils.convertString(deadLetterReason));
             receiver.deadLetter(message, options);
-            receiverClient.getNativeData().remove(lockToken.getValue());
+            removeMessageFromBObject(receiverClient, lockToken);
             LOGGER.debug(String.format("Done dead-lettering a message(Id: %s) using its lock token from %s",
                     message.getMessageId(), receiver.getEntityPath()));
             return null;
@@ -359,10 +360,9 @@ public class MessageReceiver {
     public static Object defer(BObject receiverClient, BString lockToken) {
         try {
             ServiceBusReceiverClient receiver = getReceiverFromBObject(receiverClient);
-            ServiceBusReceivedMessage message = (ServiceBusReceivedMessage) receiverClient
-                    .getNativeData(lockToken.getValue());
+            ServiceBusReceivedMessage message = getMessageFromBObject(receiverClient, lockToken);
             receiver.defer(message);
-            receiverClient.getNativeData().remove(lockToken.getValue());
+            removeMessageFromBObject(receiverClient, lockToken);
             LOGGER.debug(String.format("Done deferring a message(Id: %s) using its lock token from %s",
                     message.getMessageId(), receiver.getEntityPath()));
             return null;
@@ -415,11 +415,10 @@ public class MessageReceiver {
      */
     public static Object renewLock(BObject receiverClient, BString lockToken) {
         try {
-            ServiceBusReceivedMessage message = (ServiceBusReceivedMessage) receiverClient
-                    .getNativeData(lockToken.getValue());
+            ServiceBusReceivedMessage message = getMessageFromBObject(receiverClient, lockToken);
             ServiceBusReceiverClient receiver = getReceiverFromBObject(receiverClient);
             receiver.renewMessageLock(message);
-            receiverClient.getNativeData().remove(lockToken.getValue());
+            removeMessageFromBObject(receiverClient, lockToken);
             LOGGER.debug(String.format("Done renewing a message(Id: %s) using its lock token from %s",
                     message.getMessageId(), receiver.getEntityPath()));
             return null;
@@ -477,11 +476,30 @@ public class MessageReceiver {
 
         // This is to avoid adding messages to the native data map, if the receive-mode is 'RECEIVE_AND_DELETE'.
         if (!message.getLockToken().equals(DEFAULT_MESSAGE_LOCK_TOKEN)) {
-            receiverClient.addNativeData(message.getLockToken(), message);
+            ExpiringMessageMap messageMap;
+            Map<String, Object> messageData = new HashMap<>();
+            messageData.put(MESSAGE_RECORD, message);
+            messageData.put(LOCK_DURATION, message.getLockedUntil());
+            if (receiverClient.getNativeData(MESSAGE_MAP_RECORD) == null) {
+                messageMap = new ExpiringMessageMap();
+                messageMap.initialize();
+                messageMap.put(message.getLockToken(), messageData);
+            } else {
+                messageMap = (ExpiringMessageMap) receiverClient.getNativeData(MESSAGE_MAP_RECORD);
+                receiverClient.getNativeData().remove(MESSAGE_MAP_RECORD);
+                messageMap.put(message.getLockToken(), messageData);
+            }
+            receiverClient.addNativeData(MESSAGE_MAP_RECORD, messageMap);
         }
         return createBRecordValue(map, expectedType);
     }
 
+    /**
+     * Populates the optional fields of the message to a map.
+     *
+     * @param message ASB received message
+     * @return Map containing the optional fields
+     */
     private static Map<String, Object> populateOptionalFieldsMap(ServiceBusReceivedMessage message) {
         Map<String, Object> map = new HashMap<>();
         addFieldIfPresent(map, CONTENT_TYPE, message.getContentType());
@@ -508,6 +526,13 @@ public class MessageReceiver {
         return map;
     }
 
+    /**
+     * Creates a Ballerina record value from the given map.
+     *
+     * @param map        Map containing the record fields
+     * @param recordType Record type
+     * @return Ballerina record value
+     */
     private static BMap<BString, Object> createBRecordValue(Map<String, Object> map, RecordType recordType) {
         if (recordType == null) {
             return createRecordValue(ModuleUtils.getModule(), ASBConstants.MESSAGE_RECORD, map);
@@ -538,6 +563,14 @@ public class MessageReceiver {
         }
     }
 
+    /**
+     * Get the received messages batch from the native data map.
+     *
+     * @param receiverClient  Ballerina ASB client object
+     * @param maxMessageCount Maximum no. of messages in a batch.
+     * @param serverWaitTime  Server wait time.
+     * @return Batch Message Object of the received batch of messages.
+     */
     private static BMap<BString, Object> getReceivedMessageBatch(BObject receiverClient, Object maxMessageCount,
                                                                  Object serverWaitTime, Object deadLettered)
             throws InterruptedException, ServiceBusException {
@@ -582,6 +615,13 @@ public class MessageReceiver {
         return createRecordValue(applicationPropertiesRecord, applicationProperties);
     }
 
+    /**
+     * Remove the message from the native data map.
+     *
+     * @param applicationProperties Application properties map
+     * @param key                   Property key
+     * @param value                 Property value
+     */
     private static void populateApplicationProperty(BMap<BString, Object> applicationProperties,
                                                     String key, Object value) {
         BString propertyKey = StringUtils.fromString(key);
@@ -608,10 +648,22 @@ public class MessageReceiver {
         }
     }
 
+    /**
+     * Get the receiver client from the native data map.
+     *
+     * @param receiverObject Ballerina ASB client object
+     * @return receiverClient ASB Receiver client object
+     */
     private static ServiceBusReceiverClient getReceiverFromBObject(BObject receiverObject) {
         return (ServiceBusReceiverClient) receiverObject.getNativeData(RECEIVER_CLIENT);
     }
 
+    /**
+     * Get the dead letter message receiver from the native data map.
+     *
+     * @param receiverObject Ballerina ASB client object
+     * @return nativeReceiverClient
+     */
     private static Object getDeadLetterMessageReceiverFromBObject(BObject receiverObject) {
         if (receiverObject.getNativeData(ASBConstants.DEAD_LETTER_RECEIVER_CLIENT) != null) {
             return receiverObject.getNativeData(ASBConstants.DEAD_LETTER_RECEIVER_CLIENT);
@@ -645,6 +697,19 @@ public class MessageReceiver {
         }
     }
 
+    /**
+     * Set the client data to the native data map.
+     *
+     * @param receiverObject           Ballerina ASB client object
+     * @param connectionString         Azure service bus connection string.
+     * @param queueName                QueueName
+     * @param topicName                Topic Name
+     * @param subscriptionName         Subscription Name
+     * @param receiveMode              Receive Mode as PeekLock or Receive&Delete.
+     * @param maxAutoLockRenewDuration Max lock renewal duration under Peek Lock mode.
+     * @param logLevel                 Log Level
+     * @param retryConfigs             Retry Configs
+     */
     private static void setClientData(BObject receiverObject, String connectionString, String queueName,
                                       String topicName, String subscriptionName,
                                       String receiveMode, long maxAutoLockRenewDuration,
@@ -660,11 +725,45 @@ public class MessageReceiver {
         receiverObject.addNativeData(ASBConstants.RECEIVER_CLIENT_RETRY_CONFIGS, retryConfigs);
     }
 
+    /**
+     * Set the client to the native data map.
+     *
+     * @param receiverObject Ballerina ASB client object
+     * @param isDeadLetter   Whether the client is a dead letter client or not.
+     */
     private static void setClient(BObject receiverObject, ServiceBusReceiverClient client, boolean isDeadLetter) {
         if (isDeadLetter) {
             receiverObject.addNativeData(ASBConstants.DEAD_LETTER_RECEIVER_CLIENT, client);
         } else {
             receiverObject.addNativeData(ASBConstants.RECEIVER_CLIENT, client);
+        }
+    }
+
+    /**
+     * Add the message to the native data map.
+     *
+     * @param receiverClient Ballerina ASB client object
+     * @param lockToken      Message lock token
+     * @return Message object
+     */
+    private static ServiceBusReceivedMessage getMessageFromBObject(BObject receiverClient, BString lockToken) {
+        ExpiringMessageMap messageMap = (ExpiringMessageMap) receiverClient.getNativeData(MESSAGE_MAP_RECORD);
+        Map<String, Object> messageData = (Map<String, Object>) messageMap.get(lockToken.getValue());
+        return (ServiceBusReceivedMessage) messageData.get("Message");
+    }
+
+    /**
+     * Remove the message from the native data map.
+     *
+     * @param receiverClient Ballerina ASB client object
+     * @param lockToken      Message lock token
+     */
+    private static void removeMessageFromBObject(BObject receiverClient, BString lockToken) {
+        ExpiringMessageMap messageMap = (ExpiringMessageMap) receiverClient.getNativeData(MESSAGE_MAP_RECORD);
+        if (messageMap.get(lockToken.getValue()) != null) {
+            messageMap.remove(lockToken.getValue());
+            receiverClient.getNativeData().remove(MESSAGE_MAP_RECORD);
+            receiverClient.addNativeData(MESSAGE_MAP_RECORD, messageMap);
         }
     }
 }
