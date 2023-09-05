@@ -22,6 +22,7 @@ import com.azure.messaging.servicebus.ServiceBusException;
 import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BError;
+import org.ballerinax.asb.util.exception.ExpiringMessageMapException;
 
 import static org.ballerinax.asb.util.ASBConstants.ASB_ERROR;
 import static org.ballerinax.asb.util.ModuleUtils.getModule;
@@ -54,5 +55,8 @@ public class ASBErrorCreator {
     }
     private static BError fromJavaException(String message, Throwable cause) {
         return fromBError(message, ErrorCreator.createError(cause));
+    }
+    public static BError fromExpiringMessageMapException(ExpiringMessageMapException cause) {
+        return fromJavaException(ASB_ERROR_PREFIX + cause.getMessage(), cause);
     }
 }

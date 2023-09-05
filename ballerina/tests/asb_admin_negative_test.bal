@@ -15,9 +15,37 @@
 // under the License.
 
 import ballerina/log;
+import ballerina/lang.runtime;
 import ballerina/test;
 
+Duration maxPeekLockDue = {
+    seconds: 30,
+    nanoseconds: 0
+};
+int ttl_serverwt = 60;
+
+
+Message testMessage = {
+    body: byteContent,
+    contentType: TEXT,
+    timeToLive: ttl_serverwt
+};
+
+ASBServiceSenderConfig testSender = {
+    connectionString: connectionString,
+    entityType: QUEUE,
+    topicOrQueueName: testQueue5
+};
+
+ASBServiceReceiverConfig testReceiver = {
+    connectionString: connectionString,
+    entityConfig: {
+        queueName: testQueue5
+    },
+    receiveMode: PEEK_LOCK
+};
 string testTopic3 = "topic3";
+string testQueue5 = "queue5";
 string nonExistingName = "nonExistingTopicName";
 string invalidName = "#TEST";
 string testSubscription3 = "subscription3";
@@ -34,6 +62,56 @@ string invalidNameErrorPrefix = string `Error occurred while processing request:
 string invalidSubscriptionNameErrorPrefix = string `Error occurred while processing request:`;
 string invalidRuleNameErrorPrefix = string `Error occurred while processing request: 'sb://`;
 
+@test:Config {
+    groups: ["asb_admin_negative"],
+    enable: true
+}
+function testLockExpire() returns error?{
+    log:printInfo("[[testLockExpiration]]");
+
+    log:printInfo("Initializing Asb admin client.");
+    Administrator adminClient = check new (connectionString);
+    QueueProperties? testQueue = check adminClient->createQueue(testQueue5,lockDuration = maxPeekLockDue);
+    test:assertTrue(testQueue is QueueProperties, msg = "Queue creation failed.");
+
+    log:printInfo("Initializing Asb sender client.");
+    MessageSender sender = check new (testSender);
+
+    log:printInfo("Initializing Asb receiver client.");
+    MessageReceiver receiver = check new (testReceiver);
+
+    log:printInfo("Sending via Asb sender client.");
+    check sender->send(testMessage);
+
+    log:printInfo("Receiving from Asb receiver client.");
+    Message|Error? messageReceived = receiver->receive(ttl_serverwt);
+
+    if (messageReceived is Message) {
+        log:printInfo("Message received.");
+
+        log:printInfo("Waiting for 35 seconds to ensure the message is deleted from the queue.");
+        runtime:sleep(35);
+
+        log:printInfo("Completing the message.");
+        error? e = receiver->complete(messageReceived);
+        if (e is error) {
+            test:assertTrue(e.message().startsWith("ASB Error: Message lockToken:"),"Incorrect exception message for lock expiration failure.");
+        } else {
+            test:assertFail(msg = "The lock expiration mechanism is not working properly.");
+        }
+    } else {
+        test:assertFail(msg = "Message receive failed.");
+    }
+
+    log:printInfo("Closing Asb sender client.");
+    check sender->close();
+
+    log:printInfo("Closing Asb receiver client.");
+    check receiver->close();
+    
+    log:printInfo("Deleting the queue.");
+    check adminClient->deleteQueue(testQueue5);
+}
 @test:Config {
     groups: ["asb_admin_negative"],
     enable: true

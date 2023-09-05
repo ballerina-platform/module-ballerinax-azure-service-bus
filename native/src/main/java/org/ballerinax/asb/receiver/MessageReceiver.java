@@ -45,6 +45,7 @@ import org.ballerinax.asb.util.ASBErrorCreator;
 import org.ballerinax.asb.util.ASBUtils;
 import org.ballerinax.asb.util.ExpiringMessageMap;
 import org.ballerinax.asb.util.ModuleUtils;
+import org.ballerinax.asb.util.exception.ExpiringMessageMapException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,6 +88,7 @@ import static org.ballerinax.asb.util.ASBUtils.convertAMQPToJava;
 import static org.ballerinax.asb.util.ASBUtils.convertJavaToBValue;
 import static org.ballerinax.asb.util.ASBUtils.getRetryOptions;
 import static org.ballerinax.asb.util.ASBUtils.getValueWithIntendedType;
+
 
 /**
  * This facilitates the client operations of MessageReceiver client in
@@ -289,6 +291,8 @@ public class MessageReceiver {
             return ASBErrorCreator.fromBError(e);
         } catch (ServiceBusException e) {
             return ASBErrorCreator.fromASBException(e);
+        } catch (ExpiringMessageMapException e) {
+            return ASBErrorCreator.fromExpiringMessageMapException(e);
         } catch (Exception e) {
             return ASBErrorCreator.fromUnhandledException(e);
         }
@@ -314,6 +318,8 @@ public class MessageReceiver {
             return ASBErrorCreator.fromBError(e);
         } catch (ServiceBusException e) {
             return ASBErrorCreator.fromASBException(e);
+        } catch (ExpiringMessageMapException e) {
+            return ASBErrorCreator.fromExpiringMessageMapException(e);
         } catch (Exception e) {
             return ASBErrorCreator.fromUnhandledException(e);
         }
@@ -345,6 +351,8 @@ public class MessageReceiver {
             return ASBErrorCreator.fromBError(e);
         } catch (ServiceBusException e) {
             return ASBErrorCreator.fromASBException(e);
+        } catch (ExpiringMessageMapException e) {
+            return ASBErrorCreator.fromExpiringMessageMapException(e);
         } catch (Exception e) {
             return ASBErrorCreator.fromUnhandledException(e);
         }
@@ -370,6 +378,8 @@ public class MessageReceiver {
             return ASBErrorCreator.fromBError(e);
         } catch (ServiceBusException e) {
             return ASBErrorCreator.fromASBException(e);
+        } catch (ExpiringMessageMapException e) {
+            return ASBErrorCreator.fromExpiringMessageMapException(e);
         } catch (Exception e) {
             return ASBErrorCreator.fromUnhandledException(e);
         }
@@ -746,10 +756,26 @@ public class MessageReceiver {
      * @param lockToken      Message lock token
      * @return Message object
      */
-    private static ServiceBusReceivedMessage getMessageFromBObject(BObject receiverClient, BString lockToken) {
+    private static ServiceBusReceivedMessage getMessageFromBObject(BObject receiverClient, BString lockToken)
+            throws ExpiringMessageMapException  {
         ExpiringMessageMap messageMap = (ExpiringMessageMap) receiverClient.getNativeData(MESSAGE_MAP_RECORD);
-        Map<String, Object> messageData = (Map<String, Object>) messageMap.get(lockToken.getValue());
-        return (ServiceBusReceivedMessage) messageData.get("Message");
+        Object messageData = messageMap.get(lockToken.getValue());
+
+        if (messageData == null) {
+            throw new ExpiringMessageMapException("Message lockToken: " + lockToken +
+                    " is already expired or consumed");
+        }
+
+        if (messageData instanceof Map) {
+            Map<String, Object> messageMapData = (Map<String, Object>) messageData;
+            Object message = messageMapData.get(MESSAGE_RECORD);
+
+            if (message instanceof ServiceBusReceivedMessage) {
+                return (ServiceBusReceivedMessage) message;
+            }
+        }
+        throw new ExpiringMessageMapException("Invalid message data or type for lockToken: " + lockToken);
+
     }
 
     /**
