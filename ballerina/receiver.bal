@@ -21,13 +21,13 @@ import ballerina/jballerina.java as java;
 @display {label: "Azure Service Bus Message Receiver", iconPath: "icon.png"}
 public isolated client class MessageReceiver {
 
-    private string connectionString;
-    private string queueName;
-    private string subscriptionName;
-    private string topicName;
-    private string receiveMode;
-    private int maxAutoLockRenewDuration;
-    private LogLevel logLevel;
+    private final readonly & string connectionString;
+    private final readonly & string queueName;
+    private final readonly & string subscriptionName;
+    private final readonly & string topicName;
+    private final readonly & string receiveMode;
+    private final readonly & int maxAutoLockRenewDuration;
+    private final readonly & LogLevel logLevel;
 
     # Initializes the connector. During initialization you can pass the [Shared Access Signature (SAS) authentication credentials](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-sas)
     # Create an [Azure account](https://docs.microsoft.com/en-us/learn/modules/create-an-azure-account/) and
