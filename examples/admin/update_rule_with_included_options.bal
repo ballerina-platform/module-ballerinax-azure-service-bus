@@ -17,7 +17,7 @@
 import ballerina/log;
 import ballerinax/asb;
 
-asb:SqlRule RULE = {
+asb:SqlRule sqlRule = {
     filter: "1=1",
     action: "SET a = 'b'"
 };
@@ -30,7 +30,7 @@ configurable string connectionString = ?;
 public function main() returns error? {
     log:printInfo("Initializing Asb admin client...");
     asb:Administrator adminClient = check new (connectionString);
-    asb:RuleProperties? rule = check adminClient->updateRule("test-topic", "test-subscription", "test-rule", RULE);
+    asb:RuleProperties? rule = check adminClient->updateRule("test-topic", "test-subscription", "test-rule", rule=sqlRule);
     if rule is asb:RuleProperties {
         log:printInfo(rule.toString());
     } else {

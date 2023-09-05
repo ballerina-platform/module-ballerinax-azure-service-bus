@@ -22,10 +22,10 @@ import ballerina/time;
 @display {label: "Azure Service Bus Message Sender", iconPath: "icon.png"}
 public isolated client class MessageSender {
 
-    private string connectionString;
-    private string topicOrQueueName;
-    private string entityType;
-    private LogLevel logLevel;
+    private final readonly & string connectionString;
+    private final readonly & string topicOrQueueName;
+    private final readonly & string entityType;
+    private final readonly & LogLevel logLevel;
 
     # Initializes the connector. During initialization you can pass the [Shared Access Signature (SAS) authentication credentials](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-sas)
     # Create an [Azure account](https://docs.microsoft.com/en-us/learn/modules/create-an-azure-account/) and 
