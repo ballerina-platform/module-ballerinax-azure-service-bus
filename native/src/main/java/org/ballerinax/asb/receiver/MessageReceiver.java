@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, WSO2 LLC. (http://www.wso2.org).
+ * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.org).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -68,6 +68,7 @@ import static org.ballerinax.asb.util.ASBConstants.ENQUEUED_TIME;
 import static org.ballerinax.asb.util.ASBConstants.LABEL;
 import static org.ballerinax.asb.util.ASBConstants.LOCK_TOKEN;
 import static org.ballerinax.asb.util.ASBConstants.MESSAGE_ID;
+import static org.ballerinax.asb.util.ASBConstants.NATIVE_MESSAGE;
 import static org.ballerinax.asb.util.ASBConstants.PARTITION_KEY;
 import static org.ballerinax.asb.util.ASBConstants.RECEIVER_CLIENT;
 import static org.ballerinax.asb.util.ASBConstants.REPLY_TO;
@@ -265,22 +266,21 @@ public class MessageReceiver {
      * Completes Messages from Queue or Subscription based on messageLockToken.
      *
      * @param receiverClient Ballerina ASB client object
-     * @param lockToken      Message lock token.
+     * @param message        Message object.
      * @return An error if failed to complete the message.
      */
-    public static Object complete(BObject receiverClient, BString lockToken) {
+    public static Object complete(BObject receiverClient, BMap<BString, Object> message) {
         try {
-            ServiceBusReceivedMessage message = (ServiceBusReceivedMessage) receiverClient
-                    .getNativeData(lockToken.getValue());
+            ServiceBusReceivedMessage nativeMessage = getNativeMessage(message);
             ServiceBusReceiverClient receiver;
-            if (message.getDeadLetterReason() != null) {
+            if (nativeMessage.getDeadLetterReason() != null) {
                 receiver = (ServiceBusReceiverClient) getDeadLetterMessageReceiverFromBObject(receiverClient);
             } else {
                 receiver = getReceiverFromBObject(receiverClient);
             }
-            receiver.complete(message);
-            receiverClient.getNativeData().remove(lockToken.getValue());
-            LOGGER.debug("Completed the message(Id: " + message.getMessageId() + ") with lockToken " + lockToken);
+            receiver.complete(nativeMessage);
+            LOGGER.debug("Completed the message(Id: " + nativeMessage.getMessageId() + ") with lockToken " +
+                    nativeMessage.getLockToken());
             return null;
         } catch (BError e) {
             return ASBErrorCreator.fromBError(e);
@@ -295,18 +295,17 @@ public class MessageReceiver {
      * Abandons message & make available again for processing from Queue or Subscription, based on messageLockToken.
      *
      * @param receiverClient Ballerina ASB client object
-     * @param lockToken      Message lock token.
+     * @param message        Message object.
      * @return An error if failed to abandon the message.
      */
-    public static Object abandon(BObject receiverClient, BString lockToken) {
+    public static Object abandon(BObject receiverClient, BMap<BString, Object> message) {
         try {
             ServiceBusReceiverClient receiver = getReceiverFromBObject(receiverClient);
-            ServiceBusReceivedMessage message = (ServiceBusReceivedMessage) receiverClient
-                    .getNativeData(lockToken.getValue());
-            receiver.abandon(message);
-            receiverClient.getNativeData().remove(lockToken.getValue());
+            ServiceBusReceivedMessage nativeMessage = getNativeMessage(message);
+            ;
+            receiver.abandon(nativeMessage);
             LOGGER.debug(String.format("Done abandoning a message(Id: %s) using its lock token from %n%s",
-                    message.getMessageId(), receiver.getEntityPath()));
+                    nativeMessage.getMessageId(), receiver.getEntityPath()));
             return null;
         } catch (BError e) {
             return ASBErrorCreator.fromBError(e);
@@ -321,24 +320,22 @@ public class MessageReceiver {
      * Dead-Letter the message & moves the message to the Dead-Letter Queue based on messageLockToken.
      *
      * @param receiverClient             Ballerina ASB client object
-     * @param lockToken                  Message lock token.
+     * @param message                    Message object.
      * @param deadLetterReason           The dead letter reason.
      * @param deadLetterErrorDescription The dead letter error description.
      * @return An error if failed to dead letter the message.
      */
-    public static Object deadLetter(BObject receiverClient, BString lockToken, Object deadLetterReason,
+    public static Object deadLetter(BObject receiverClient, BMap<BString, Object> message, Object deadLetterReason,
                                     Object deadLetterErrorDescription) {
         try {
             ServiceBusReceiverClient receiver = getReceiverFromBObject(receiverClient);
-            ServiceBusReceivedMessage message = (ServiceBusReceivedMessage) receiverClient
-                    .getNativeData(lockToken.getValue());
+            ServiceBusReceivedMessage nativeMessage = getNativeMessage(message);
             DeadLetterOptions options = new DeadLetterOptions()
                     .setDeadLetterErrorDescription(ASBUtils.convertString(deadLetterErrorDescription));
             options.setDeadLetterReason(ASBUtils.convertString(deadLetterReason));
-            receiver.deadLetter(message, options);
-            receiverClient.getNativeData().remove(lockToken.getValue());
+            receiver.deadLetter(nativeMessage, options);
             LOGGER.debug(String.format("Done dead-lettering a message(Id: %s) using its lock token from %s",
-                    message.getMessageId(), receiver.getEntityPath()));
+                    nativeMessage.getMessageId(), receiver.getEntityPath()));
             return null;
         } catch (BError e) {
             return ASBErrorCreator.fromBError(e);
@@ -353,18 +350,16 @@ public class MessageReceiver {
      * Defer the message in a Queue or Subscription based on messageLockToken.
      *
      * @param receiverClient Ballerina ASB client object
-     * @param lockToken      Message lock token.
+     * @param message        Message object.
      * @return An error if failed to defer the message.
      */
-    public static Object defer(BObject receiverClient, BString lockToken) {
+    public static Object defer(BObject receiverClient, BMap<BString, Object> message) {
         try {
             ServiceBusReceiverClient receiver = getReceiverFromBObject(receiverClient);
-            ServiceBusReceivedMessage message = (ServiceBusReceivedMessage) receiverClient
-                    .getNativeData(lockToken.getValue());
-            receiver.defer(message);
-            receiverClient.getNativeData().remove(lockToken.getValue());
+            ServiceBusReceivedMessage nativeMessage = getNativeMessage(message);
+            receiver.defer(nativeMessage);
             LOGGER.debug(String.format("Done deferring a message(Id: %s) using its lock token from %s",
-                    message.getMessageId(), receiver.getEntityPath()));
+                    nativeMessage.getMessageId(), receiver.getEntityPath()));
             return null;
         } catch (BError e) {
             return ASBErrorCreator.fromBError(e);
@@ -410,18 +405,16 @@ public class MessageReceiver {
      * messageLockToken.
      *
      * @param receiverClient Ballerina ASB client object
-     * @param lockToken      Message lock token.
+     * @param message        Message object.
      * @return An error if failed to renewLock of the message.
      */
-    public static Object renewLock(BObject receiverClient, BString lockToken) {
+    public static Object renewLock(BObject receiverClient, BMap<BString, Object> message) {
         try {
-            ServiceBusReceivedMessage message = (ServiceBusReceivedMessage) receiverClient
-                    .getNativeData(lockToken.getValue());
             ServiceBusReceiverClient receiver = getReceiverFromBObject(receiverClient);
-            receiver.renewMessageLock(message);
-            receiverClient.getNativeData().remove(lockToken.getValue());
+            ServiceBusReceivedMessage nativeMessage = getNativeMessage(message);
+            receiver.renewMessageLock(nativeMessage);
             LOGGER.debug(String.format("Done renewing a message(Id: %s) using its lock token from %s",
-                    message.getMessageId(), receiver.getEntityPath()));
+                    nativeMessage.getMessageId(), receiver.getEntityPath()));
             return null;
         } catch (BError e) {
             return ASBErrorCreator.fromBError(e);
@@ -474,12 +467,12 @@ public class MessageReceiver {
         } else {
             map.put(BODY, messageBody);
         }
-
-        // This is to avoid adding messages to the native data map, if the receive-mode is 'RECEIVE_AND_DELETE'.
+        BMap<BString, Object> constructedMessage = createBRecordValue(map, expectedType);
+        // Only add the native message if the message received in peek lock mode.
         if (!message.getLockToken().equals(DEFAULT_MESSAGE_LOCK_TOKEN)) {
-            receiverClient.addNativeData(message.getLockToken(), message);
+            constructedMessage.addNativeData(NATIVE_MESSAGE, message);
         }
-        return createBRecordValue(map, expectedType);
+        return constructedMessage;
     }
 
     private static Map<String, Object> populateOptionalFieldsMap(ServiceBusReceivedMessage message) {
@@ -558,7 +551,10 @@ public class MessageReceiver {
         LinkedList<Object> receivedMessages = new LinkedList<>();
         for (ServiceBusReceivedMessage receivedMessage : receivedMessageStream) {
             BMap<BString, Object> recordMap = constructExpectedMessageRecord(receiverClient, receivedMessage, null);
-            receivedMessages.add(createRecordValue(ModuleUtils.getModule(), ASBConstants.MESSAGE_RECORD, recordMap));
+            BMap<BString, Object> messageRecord = createRecordValue(ModuleUtils.getModule(),
+                    ASBConstants.MESSAGE_RECORD, recordMap);
+            messageRecord.addNativeData(NATIVE_MESSAGE, receivedMessage);
+            receivedMessages.add(messageRecord);
         }
 
         BMap<BString, Object> messageRecord = ValueCreator.createRecordValue(ModuleUtils.getModule(),
@@ -666,5 +662,9 @@ public class MessageReceiver {
         } else {
             receiverObject.addNativeData(ASBConstants.RECEIVER_CLIENT, client);
         }
+    }
+
+    private static ServiceBusReceivedMessage getNativeMessage(BMap<BString, Object> message) {
+        return (ServiceBusReceivedMessage) message.getNativeData(NATIVE_MESSAGE);
     }
 }
