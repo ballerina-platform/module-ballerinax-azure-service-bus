@@ -119,7 +119,7 @@ public isolated client class MessageReceiver {
         if message?.lockToken.toString() != DEFAULT_MESSAGE_LOCK_TOKEN {
             return complete(self, message);
         }
-        return createError("Failed to complete message with ID " + message?.messageId.toString());
+        return createError(string `Failed to complete message with ID ${message?.messageId.toString()}`);
     }
 
     # Abandon message from queue or subscription based on messageLockToken. Abandon processing of the message for 
@@ -133,7 +133,7 @@ public isolated client class MessageReceiver {
         if message?.lockToken.toString() != DEFAULT_MESSAGE_LOCK_TOKEN {
             return abandon(self, message);
         }
-        return createError("Failed to abandon message with ID " + message?.messageId.toString());
+        return createError(string `Failed to abandon message with ID ${message?.messageId.toString()}`);
     }
 
     # Dead-Letter the message & moves the message to the Dead-Letter Queue based on messageLockToken. Transfer 
@@ -151,7 +151,7 @@ public isolated client class MessageReceiver {
         if message?.lockToken.toString() != DEFAULT_MESSAGE_LOCK_TOKEN {
             return deadLetter(self, message, deadLetterReason, deadLetterErrorDescription);
         }
-        return createError("Failed to deadletter message with ID " + message?.messageId.toString());
+        return createError(string `Failed to deadletter message with ID ${message?.messageId.toString()}`);
     }
 
     # Defer the message in a Queue or Subscription based on messageLockToken.  It prevents the message from being 
@@ -189,7 +189,7 @@ public isolated client class MessageReceiver {
         if message?.lockToken.toString() != DEFAULT_MESSAGE_LOCK_TOKEN {
             return renewLock(self, message);
         }
-        return createError("Failed to renew lock on message with ID " + message?.messageId.toString());
+        return createError(string `Failed to renew lock on message with ID ${message?.messageId.toString()}`);
     }
 
     # Closes the ASB sender connection.
