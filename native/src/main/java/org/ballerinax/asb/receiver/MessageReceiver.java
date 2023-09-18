@@ -302,7 +302,6 @@ public class MessageReceiver {
         try {
             ServiceBusReceiverClient receiver = getReceiverFromBObject(receiverClient);
             ServiceBusReceivedMessage nativeMessage = getNativeMessage(message);
-            ;
             receiver.abandon(nativeMessage);
             LOGGER.debug(String.format("Done abandoning a message(Id: %s) using its lock token from %n%s",
                     nativeMessage.getMessageId(), receiver.getEntityPath()));
