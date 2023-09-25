@@ -1,8 +1,8 @@
 [package]
-distribution = "2201.7.0"
+distribution = "2201.8.0"
 org = "ballerinax"
 name = "asb"
-version = "3.6.0"
+version = "3.7.0"
 license= ["Apache-2.0"]
 authors = ["Ballerina"]
 keywords = ["IT Operations/Message Brokers", "Cost/Paid", "Vendor/Microsoft"]
@@ -16,8 +16,8 @@ observabilityIncluded = true
 graalvmCompatible = true
 
 [[platform.java11.dependency]]
-path = "../native/build/libs/azure-service-bus-native-3.6.0.jar"
+path = "../native/build/libs/azure-service-bus-native-3.7.0.jar"
 groupId = "org.ballerinax"
 artifactId = "asb-native"
 module = "asb-native" 
-version = "3.6.0"
+version = "3.7.0"
