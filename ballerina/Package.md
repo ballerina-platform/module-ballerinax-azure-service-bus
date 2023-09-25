@@ -13,7 +13,7 @@ This package offers usage and management capabilities for Azure Service Bus reso
 
 |                            | Version               |
 |----------------------------|-----------------------|
-| Ballerina Language         | Swan Lake 2201.7.0    |
+| Ballerina Language         | Swan Lake 2201.8.0    |
 | Azure Service Bus SDK      | 7.13.1                |
 
 ## Report issues

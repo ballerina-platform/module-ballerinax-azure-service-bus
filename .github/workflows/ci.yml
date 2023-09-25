@@ -1,9 +1,9 @@
 name: CI
 on:
   push:
-    branches-ignore:
-      - "automated/dependency_version_update"
-      - "automated/dependency_version_update_tmp"
+    branches:
+      - main
+      - 2201.[0-9]+.x
   repository_dispatch:
     types:
       check_connector_for_breaking_changes
@@ -13,13 +13,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       # Set up Java Environment
-      - name: Set up JDK 11
-        uses: actions/setup-java@v1
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
         with:
-          java-version: 11
+          distribution: 'temurin'
+          java-version: 17.0.7
 
       # Setup Ballerina Environment
       - name: Set Up Ballerina
