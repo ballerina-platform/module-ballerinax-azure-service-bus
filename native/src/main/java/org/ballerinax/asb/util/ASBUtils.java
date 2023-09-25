@@ -41,17 +41,21 @@ import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.creators.TypeCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.ArrayType;
+import io.ballerina.runtime.api.types.ErrorType;
 import io.ballerina.runtime.api.types.IntersectionType;
 import io.ballerina.runtime.api.types.MapType;
+import io.ballerina.runtime.api.types.ObjectType;
 import io.ballerina.runtime.api.types.RecordType;
 import io.ballerina.runtime.api.types.Type;
 import io.ballerina.runtime.api.types.UnionType;
 import io.ballerina.runtime.api.utils.JsonUtils;
 import io.ballerina.runtime.api.utils.StringUtils;
+import io.ballerina.runtime.api.utils.TypeUtils;
 import io.ballerina.runtime.api.utils.XmlUtils;
 import io.ballerina.runtime.api.values.BDecimal;
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BMap;
+import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
 import io.ballerina.runtime.api.values.BTypedesc;
 import org.apache.qpid.proton.amqp.Binary;
@@ -64,6 +68,7 @@ import org.slf4j.LoggerFactory;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -77,6 +82,8 @@ import static io.ballerina.runtime.api.TypeTags.RECORD_TYPE_TAG;
 import static io.ballerina.runtime.api.TypeTags.STRING_TAG;
 import static io.ballerina.runtime.api.TypeTags.UNION_TAG;
 import static io.ballerina.runtime.api.TypeTags.XML_TAG;
+import static io.ballerina.runtime.api.constants.RuntimeConstants.ORG_NAME_SEPARATOR;
+import static io.ballerina.runtime.api.constants.RuntimeConstants.VERSION_SEPARATOR;
 import static io.ballerina.runtime.api.utils.TypeUtils.getReferredType;
 import static org.ballerinax.asb.util.ASBConstants.DELAY;
 import static org.ballerinax.asb.util.ASBConstants.MAX_DELAY;
@@ -958,4 +965,107 @@ public class ASBUtils {
             map.put(key, receivedProperty);
         }
     }
+    
+    /**
+     * Get the value as string or as empty based on the object value.
+     *
+     * @param value Input value.
+     * @return value as a string or empty.
+     */
+    public static String valueToEmptyOrToString(Object value) {
+        return (value == null || Objects.equals(value.toString(), "")) ? null : value.toString();
+    }
+
+    /**
+     * Returns a Ballerina Error with the given String message.
+     *
+     * @param errorMessage The error message
+     * @return Resulting Ballerina Error
+     */
+    public static BError createErrorValue(String errorMessage) {
+        return ErrorCreator.createError(StringUtils.fromString(errorMessage));
+    }
+
+    /**
+     * Returns a Ballerina Error with the given String message and exception.
+     *
+     * @param message The error message
+     * @param error   The exception
+     * @return Resulting Ballerina Error
+     */
+    public static BError createErrorValue(String message, Exception error) {
+        ErrorType errorType = TypeCreator.createErrorType(error.getClass().getTypeName(), ModuleUtils.getModule());
+        String errorFromClass = error.getStackTrace()[0].getClassName();
+        String errorMessage = "An error occurred while processing your request. ";
+        errorMessage += "Cause: " + error.getCause() + " ";
+        errorMessage += "Class: " + error.getClass() + " ";
+        BError er = ErrorCreator.createError(StringUtils.fromString(errorMessage));
+
+        BMap<BString, Object> map = ValueCreator.createMapValue();
+        map.put(StringUtils.fromString("Type"), StringUtils.fromString(error.getClass().getSimpleName()));
+        map.put(StringUtils.fromString("errorCause"), StringUtils.fromString(error.getCause().getClass().getName()));
+        map.put(StringUtils.fromString("message"), StringUtils.fromString(error.getMessage()));
+        map.put(StringUtils.fromString("stackTrace"), StringUtils.fromString(Arrays.toString(error.getStackTrace())));
+        return ErrorCreator.createError(errorType, StringUtils.fromString(message + " error from " + errorFromClass),
+                er, map);
+    }
+
+    /**
+     * Checks if PEEK LOCK mode is enabled for listening for messages.
+     * 
+     * @param service Service instance having configuration 
+     * @return true if enabled
+     */
+    public static boolean isPeekLockModeEnabled(BObject service) {
+        BMap<BString, Object> serviceConfig = getServiceConfig(service);
+        boolean peekLockEnabled = false;
+        if (serviceConfig != null && serviceConfig.containsKey(ASBConstants.PEEK_LOCK_ENABLE_CONFIG_KEY)) {
+            peekLockEnabled = serviceConfig.getBooleanValue(ASBConstants.PEEK_LOCK_ENABLE_CONFIG_KEY);
+        }
+        return peekLockEnabled;
+    }
+
+    /**
+     * Obtain string value of a service level configuration. 
+     * 
+     * @param service Service instance
+     * @param key Key of the configuration
+     * @return String value of the given config key, or empty string if not found
+     */
+    public static String getServiceConfigStringValue(BObject service, String key) {
+        BMap<BString, Object> serviceConfig = getServiceConfig(service);
+        if (serviceConfig != null && serviceConfig.containsKey(StringUtils.fromString(key))) {
+            return serviceConfig.getStringValue(StringUtils.fromString(key)).getValue();
+        } else {
+            return ASBConstants.EMPTY_STRING;
+        }
+    }
+
+    /**
+     * Obtain numeric value of a service level configuration.
+     * 
+     * @param service Service instance
+     * @param key     Key of the configuration
+     * @return Integer value of the given config key, or null if not found
+     */
+    public static Integer getServiceConfigSNumericValue(BObject service, String key, int defaultValue) {
+        BMap<BString, Object> serviceConfig = getServiceConfig(service);
+        if (serviceConfig != null && serviceConfig.containsKey(StringUtils.fromString(key))) {
+            return serviceConfig.getIntValue(StringUtils.fromString(key)).intValue();
+        } else {
+            return defaultValue;
+        }
+    }
+    
+    private static BMap<BString, Object> getServiceConfig(BObject service) {
+        ObjectType serviceType = (ObjectType) TypeUtils.getReferredType(service.getType());
+        @SuppressWarnings("unchecked")
+        BMap<BString, Object> serviceConfig = (BMap<BString, Object>) serviceType
+                .getAnnotation(StringUtils.fromString(ModuleUtils.getModule().getOrg() + ORG_NAME_SEPARATOR
+                        + ModuleUtils.getModule().getName() + VERSION_SEPARATOR
+                        + ModuleUtils.getModule().getMajorVersion() + ":"
+                        + ASBConstants.SERVICE_CONFIG));
+        return serviceConfig;
+    }
+
 }
