@@ -19,7 +19,7 @@ import ballerina/test;
 import ballerina/regex;
 
 string invalidCompleteError = "^Failed to complete message with ID:.*$";
-
+string invalidAbandonError = "^Failed to abandon message with ID:.*$";
 @test:Config {
     groups: ["asb_sender_receiver_negative"],
     dependsOn: [testCreateQueue, testCreateTopicOperation, testCreateSubscription]
@@ -88,12 +88,52 @@ function testInvalidComplete() returns error? {
     check messageSender->close();
 
     log:printInfo("Closing Asb receiver client.");
-    check messageSender->close();
+    check messageReceiver->close();
 }
 
 @test:Config {
     groups: ["asb_sender_receiver_negative"],
     dependsOn: [testInvalidComplete]
+}
+function testInvalidAbandon() returns error? {
+    log:printInfo("[[testInvalidAbandon]");
+
+    log:printInfo("Initializing Asb sender client.");
+    MessageSender messageSender = check new (senderConfig);
+
+    log:printInfo("Initializing Asb receiver client.");
+    receiverConfig.receiveMode = RECEIVE_AND_DELETE;
+
+    MessageReceiver messageReceiver = check new (receiverConfig);
+
+    log:printInfo("Sending via Asb sender.");
+    check messageSender->send(message1);
+
+    log:printInfo("Receiving from Asb receiver client.");
+    Message|error? receivedMessage = messageReceiver->receive(serverWaitTime);
+
+    if receivedMessage is Message {
+        log:printInfo("messgae" + receivedMessage.toString());
+        Error? result = messageReceiver->abandon(receivedMessage);
+        test:assertTrue(result is error, msg = "Unexpected Abandon for Messages in Receive and Delete Mode");
+        test:assertTrue(regex:matches((<Error>result).message(),invalidAbandonError), msg = "Invalid Abandon for " +
+        " Messages in Receive and Delete Mode");
+    } else if receivedMessage is () {
+        test:assertFail("No message in the queue.");
+    } else {
+        test:assertFail("Receiving message via Asb receiver connection failed.");
+    }
+
+    log:printInfo("Closing Asb sender client.");
+    check messageSender->close();
+
+    log:printInfo("Closing Asb receiver client.");
+    check messageReceiver->close();
+}
+
+@test:Config {
+    groups: ["asb_sender_receiver_negative"],
+    dependsOn: [testInvalidAbandon]
 }
 function testReceivePayloadWithUnsupportedUnionExpectedType() returns error? {
     log:printInfo("[[testReceivePayloadWithUnsupportedUnionExpectedType]]");
