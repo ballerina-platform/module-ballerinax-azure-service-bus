@@ -26,13 +26,14 @@ import io.ballerina.runtime.api.values.BString;
  */
 public class ASBConstants {
 
-    //Clients
+    //Native Object Identifiers
     public static final String RECEIVER_CLIENT = "RECEIVER_CLIENT";
     public static final String ADMINISTRATOR_CLIENT = "ADMINISTRATOR_CLIENT";
     public static final String SENDER_CLIENT = "SENDER_CLIENT";
     public static final String DEAD_LETTER_RECEIVER_CLIENT = "DEAD_LETTER_RECEIVER_CLIENT";
+    public static final String NATIVE_MESSAGE = "NATIVE_MESSAGE";
 
-    //Client Init Data
+    //Receiver Client Init Data
     public static final String RECEIVER_CLIENT_CONNECTION_STRING = "CONNECTION_STRING";
     public static final String RECEIVER_CLIENT_RECEIVE_MODE = "RECEIVE_MODE";
     public static final String RECEIVER_CLIENT_TOPIC_NAME = "TOPIC_NAME";
@@ -45,7 +46,7 @@ public class ASBConstants {
     // Message constant fields
     public static final String MESSAGE_RECORD = "Message";
     public static final String APPLICATION_PROPERTY_TYPE = "ApplicationProperties";
-    
+
     // Message content data binding errors
     public static final String XML_CONTENT_ERROR = "Error while retrieving the xml content of the message. ";
     public static final String JSON_CONTENT_ERROR = "Error while retrieving the json content of the message. ";
@@ -118,6 +119,7 @@ public class ASBConstants {
     // Error constant fields
     static final String ASB_ERROR = "Error";
 
+    // Subscription/Topic/Queue Properties record fields
     public static final String SUBSCRIPTION_CREATED_RECORD = "SubscriptionProperties";
     public static final String TOPIC_CREATED_RECORD = "TopicProperties";
     public static final String QUEUE_CREATED_RECORD = "QueueProperties";
