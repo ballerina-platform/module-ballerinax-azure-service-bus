@@ -962,7 +962,7 @@ function createRuleWithInclusionParameters() returns error? {
     log:printInfo("[[createRuleWithInclusionParameters]]");
     log:printInfo("Initializing Asb admin client.");
     Administrator adminClient = check new (connectionString);
-    RuleProperties? ruleProp = check adminClient->createRule(testTopic4, testSubscription4, testRule4, rule=rule);
+    RuleProperties? ruleProp = check adminClient->createRule(testTopic4, testSubscription4, testRule4, rule = rule);
     if ruleProp is RuleProperties {
         log:printInfo("Rule created successfully.");
         test:assertEquals(ruleProp.name, testRule4, msg = "Rule creation failed.");
@@ -981,7 +981,7 @@ function updateRuleWithInclusionParameters() returns error? {
     log:printInfo("[[updateRuleWithInclusionParameters]]");
     log:printInfo("Initializing Asb admin client.");
     Administrator adminClient = check new (connectionString);
-    RuleProperties? ruleProp = check adminClient->updateRule(testTopic4, testSubscription4, testRule4, rule=rule);
+    RuleProperties? ruleProp = check adminClient->updateRule(testTopic4, testSubscription4, testRule4, rule = rule);
     if ruleProp is RuleProperties {
         log:printInfo("Rule created successfully.");
         test:assertEquals(ruleProp.name, testRule4, msg = "Rule creation failed.");

@@ -19,6 +19,7 @@ import ballerina/test;
 
 @test:Config {
     groups: ["asb_sender_receiver_negative"],
+    enable: true,
     dependsOn: [testCreateQueue, testCreateTopicOperation, testCreateSubscription]
 }
 function testReceivePayloadWithIncorrectExpectedType() returns error? {
@@ -50,6 +51,7 @@ function testReceivePayloadWithIncorrectExpectedType() returns error? {
 
 @test:Config {
     groups: ["asb_sender_receiver_negative"],
+    enable: true,
     dependsOn: [testReceivePayloadWithIncorrectExpectedType]
 }
 function testReceivePayloadWithUnsupportedUnionExpectedType() returns error? {
@@ -80,6 +82,7 @@ function testReceivePayloadWithUnsupportedUnionExpectedType() returns error? {
 
 @test:Config {
     groups: ["asb_sender_receiver_negative"],
+    enable: true,
     dependsOn: [testReceivePayloadWithUnsupportedUnionExpectedType]
 }
 function testSendToInvalidTopic() returns error? {
@@ -99,6 +102,7 @@ function testSendToInvalidTopic() returns error? {
 
 @test:Config {
     groups: ["asb_sender_receiver_negative"],
+    enable: true,
     dependsOn: [testSendToInvalidTopic]
 }
 function testReceiveFromInvalidQueue() returns error? {
@@ -118,6 +122,7 @@ function testReceiveFromInvalidQueue() returns error? {
 
 @test:Config {
     groups: ["asb_sender_receiver_negative"],
+    enable: true,
     dependsOn: [testReceiveFromInvalidQueue]
 }
 function testInvalidConnectionString() returns error? {

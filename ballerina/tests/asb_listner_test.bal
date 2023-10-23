@@ -14,18 +14,65 @@
 // specific language governing permissions and limitations
 // under the License.
 
-import ballerina/test;
-import ballerina/log;
 import ballerina/lang.runtime;
+import ballerina/log;
+import ballerina/test;
 
-boolean testSuccessfullyCompleted = false;
+// Connection Configurations
 string lisnterTestQueueName = "pre-created-test-queue";
 
 ListenerConfig configuration = {
     connectionString: connectionString
 };
 
+ASBServiceSenderConfig listnerTestSenderConfig = {
+    connectionString: connectionString,
+    entityType: QUEUE,
+    topicOrQueueName: lisnterTestQueueName
+};
+
 listener Listener asbListener = new (configuration);
+
+enum State {
+    NONE,
+    RECIEVED,
+    RECIEVED_AND_COMPLETED,
+    RECIEVED_AND_ABANDON,
+    RECIEVED_AND_DLQ,
+    RECIEVED_AND_DEFER
+}
+
+isolated State listnerState = NONE;
+
+isolated function getListnerState() returns State
+{
+    lock {
+        return listnerState;
+    }
+}
+
+isolated function setListnerState(State state)
+{
+    lock {
+        listnerState = state;
+    }
+}
+
+isolated int testCaseCounter = 0;
+
+isolated function getTestCaseCount() returns int
+{
+    lock {
+        return testCaseCounter;
+    }
+}
+
+isolated function increamentTestCaseCount()
+{
+    lock {
+        testCaseCounter += 1;
+    }
+}
 
 @ServiceConfig {
     queueName: "pre-created-test-queue",
@@ -34,46 +81,125 @@ listener Listener asbListener = new (configuration);
     prefetchCount: 20,
     maxAutoLockRenewDuration: 300
 }
-
 service MessageService on asbListener {
-    remote function onMessage(Message message, Caller caller) returns error? {
-        Error? result = caller.complete(message);
-        log:printInfo("Message received"+message.body.toString());
-        if (message.body == byteContent && result is ()) {
-            testSuccessfullyCompleted = true;
+    isolated remote function onMessage(Message message, Caller caller) returns error? {
+        log:printInfo("Message received:" + message.body.toString());
+        if message.body == "This is ASB connector test-Message Body".toBytes() {
+            if getTestCaseCount() == 0 {
+                setListnerState(RECIEVED);
+            }
+            else if getTestCaseCount() == 1 && caller.complete(message) == () {
+                setListnerState(RECIEVED_AND_COMPLETED);
+            }
+            else if getTestCaseCount() == 2 && caller.defer(message) is int {
+                setListnerState(RECIEVED_AND_DEFER);
+            }
+            else if getTestCaseCount() == 3 && caller.deadLetter(message, "Testing Purpose", "Manual DLQ : Testing Purpose") == () {
+                setListnerState(RECIEVED_AND_DLQ);
+            }
+            else if getTestCaseCount() == 4 && caller.abandon(message) == () {
+                setListnerState(RECIEVED_AND_ABANDON);
+            }
+            increamentTestCaseCount();
         }
         return;
     }
-    remote function onError(ErrorContext context, error 'error) returns error? {
+    isolated remote function onError(ErrorContext context, error 'error) returns error? {
         return;
     }
 };
+
+function sendMessage() returns error? {
+    MessageSender queueSender = check new (listnerTestSenderConfig);
+    check queueSender->send(message);
+    check queueSender->close();
+}
 
 @test:Config {
     enable: true,
     groups: ["asb_listner"]
 }
-function testListner() returns error? {
-    log:printInfo("[[testListner]]");
-    ASBServiceSenderConfig listnerTestSenderConfig = {
-        connectionString: connectionString,
-        entityType: QUEUE,
-        topicOrQueueName: lisnterTestQueueName
-    };
-    log:printInfo("Initializing Asb sender client.");
-    MessageSender queueSender = check new (listnerTestSenderConfig);
-
+function testListnerReceive() returns error? {
+    log:printInfo("[[testListnerReceive]]");
     log:printInfo("Sending via Asb sender client.");
-    check queueSender->send(message1);
- 
-    log:printInfo("Closing Asb sender client.");
-    check queueSender->close();
-
-    int counter = 20;
-    while (!testSuccessfullyCompleted && counter >= 0) {
+    check sendMessage();
+    int counter = 10;
+    while (getListnerState() != RECIEVED && counter >= 0) {
         runtime:sleep(1);
         log:printInfo("Waiting for the message to be received");
         counter -= 1;
     }
-    test:assertTrue(testSuccessfullyCompleted, msg = "ASB listener did not receive the message");
+    test:assertTrue(getListnerState() == RECIEVED, msg = "ASB listener did not receive the message");
+}
+
+@test:Config {
+    enable: true,
+    groups: ["asb_listner"],
+    dependsOn: [testListnerReceive]
+}
+function testListnerReceiveAndCompleted() returns error? {
+    log:printInfo("[[testListnerReceiveAndCompleted]]");
+    log:printInfo("Sending via Asb sender client.");
+    check sendMessage();
+    int counter = 10;
+    while (getListnerState() != RECIEVED_AND_COMPLETED && counter >= 0) {
+        runtime:sleep(1);
+        log:printInfo("Waiting for the message to be received");
+        counter -= 1;
+    }
+    test:assertTrue(getListnerState() == RECIEVED_AND_COMPLETED, msg = "ASB listener did not receive and completed the message");
+}
+
+@test:Config {
+    enable: true,
+    groups: ["asb_listner"],
+    dependsOn: [testListnerReceiveAndCompleted]
+}
+function testListnerReceiveAndDefer() returns error? {
+    log:printInfo("[[testListnerReceiveAndDefer]]");
+    log:printInfo("Sending via Asb sender client.");
+    check sendMessage();
+    int counter = 10;
+    while (getListnerState() != RECIEVED_AND_DEFER && counter >= 0) {
+        runtime:sleep(1);
+        log:printInfo("Waiting for the message to be received");
+        counter -= 1;
+    }
+    test:assertTrue(getListnerState() == RECIEVED_AND_DEFER, msg = "ASB listener did not receive and defer the message");
+}
+
+@test:Config {
+    enable: true,
+    groups: ["asb_listner"],
+    dependsOn: [testListnerReceiveAndDefer]
+}
+function testListnerReceiveAndDLQ() returns error? {
+    log:printInfo("[[testListnerReceiveAndDLQ]]");
+    log:printInfo("Sending via Asb sender client.");
+    check sendMessage();
+    int counter = 10;
+    while (getListnerState() != RECIEVED_AND_DLQ && counter >= 0) {
+        runtime:sleep(1);
+        log:printInfo("Waiting for the message to be received");
+        counter -= 1;
+    }
+    test:assertTrue(getListnerState() == RECIEVED_AND_DLQ, msg = "ASB listener did not receive and DLQ the message");
+}
+
+@test:Config {
+    enable: true,
+    groups: ["asb_listner"],
+    dependsOn: [testListnerReceiveAndDLQ]
+}
+function testListnerReceiveAndAbandon() returns error? {
+    log:printInfo("[[testListnerReceiveAndAbandon]]");
+    log:printInfo("Sending via Asb sender client.");
+    check sendMessage();
+    int counter = 10;
+    while (getListnerState() != RECIEVED_AND_ABANDON && counter >= 0) {
+        runtime:sleep(1);
+        log:printInfo("Waiting for the message to be received");
+        counter -= 1;
+    }
+    test:assertTrue(getListnerState() == RECIEVED_AND_ABANDON, msg = "ASB listener did not receive and abandon the message");
 }

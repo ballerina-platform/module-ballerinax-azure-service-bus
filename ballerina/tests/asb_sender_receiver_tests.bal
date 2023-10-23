@@ -45,6 +45,13 @@ ApplicationProperties applicationProperties = {
     properties: properties
 };
 
+Message message = {
+    body: byteContent,
+    contentType: TEXT,
+    timeToLive: timeToLive,
+    applicationProperties: applicationProperties
+};
+
 Message message1 = {
     body: byteContent,
     contentType: TEXT,
@@ -924,7 +931,7 @@ function testDeferMessageFromSubscriptionOperation() returns error? {
 function testMessageScheduling() returns error? {
     log:printInfo("[[testMessageScheduling]]");
     MessageSender? topicSender = ();
-    MessageReceiver? subscriptionReceiver= ();
+    MessageReceiver? subscriptionReceiver = ();
 
     do {
 

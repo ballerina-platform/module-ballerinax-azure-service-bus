@@ -76,7 +76,7 @@ public class MessageDispatcher {
      * @throws IllegalArgumentException If queueName/topicname not set
      * @throws NullPointerException     If callbacks are not set
      */
-    public MessageDispatcher(Runtime runtime, BObject service,
+     MessageDispatcher(Runtime runtime, BObject service,
                              BObject caller, ServiceBusClientBuilder sharedClientBuilder) {
 
         this.runtime = runtime;
@@ -155,8 +155,6 @@ public class MessageDispatcher {
     /**
      * Starts receiving messages asynchronously and dispatch the messages to the
      * attached service.
-     *
-     * @param clientBuilder
      */
     public void startListeningAndDispatching() {
 

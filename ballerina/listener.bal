@@ -30,7 +30,7 @@ public class Listener {
     #
     # + listenerConfig - The configurations to be used when initializing the `listener`
     # + return - An error if listener initialization failed
-    public isolated function init(ListenerConfig listenerConfig) returns error? {
+    public isolated function init(*ListenerConfig listenerConfig) returns error? {
         self.connectionString = listenerConfig.connectionString;
         self.logLevel = customConfiguration.logLevel;
         self.listenerHandle = initListener(java:fromString(self.connectionString), java:fromString(self.logLevel));

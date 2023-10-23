@@ -846,8 +846,7 @@ public enum EntityStatus {
 };
 
 # Azure service bus listener configuration.
-# 
-# + connectionString - The connection string of Azure service bus
+#
 public type ListenerConfig record {
     # The connection string of Azure service bus
     @display {label: "ASB Connection String"}
@@ -883,7 +882,7 @@ public type ErrorContext record {
 };
 
 # Configurations for the ASB Service
-# 
+#
 # + queueName - The name of the queue to listen to
 # + peekLockModeEnabled - Whether to use peekLock mode or not
 # + topicName - The name of the topic to listen to
@@ -893,21 +892,21 @@ public type ErrorContext record {
 # + maxAutoLockRenewDuration - The maximum duration to renew the lock automatically
 # + logLevel - The log level to use
 public type ASBServiceConfig record {|
-    @display { label: "Queue Name"}
+    @display {label: "Queue Name"}
     string queueName?;
-    @display { label: "Peek Lock Mode Enabled"}
+    @display {label: "Peek Lock Mode Enabled"}
     boolean peekLockModeEnabled = false;
-    @display { label: "Topic Name"}
+    @display {label: "Topic Name"}
     string topicName?;
-    @display { label: "Subscription Name"}
+    @display {label: "Subscription Name"}
     string subscriptionName?;
-    @display { label: "Max Concurrency"}
+    @display {label: "Max Concurrency"}
     int maxConcurrency = 1;
-    @display { label: "Prefetch Count"}
-    int prefetchCount =  0;
-    @display { label: "Max Auto Lock Renew Duration"}
+    @display {label: "Prefetch Count"}
+    int prefetchCount = 0;
+    @display {label: "Max Auto Lock Renew Duration"}
     int maxAutoLockRenewDuration = 300;
-    @display { label: "Log Level"}
+    @display {label: "Log Level"}
     string logLevel = ERROR;
 |};
 

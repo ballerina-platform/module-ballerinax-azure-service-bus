@@ -61,7 +61,7 @@ public class MessageListener {
      * @param caller object represeting Ballerina Caller 
      */
     public void externalInit(BObject caller) {
-        this.caller = caller;
+        this.caller = caller; 
     }
 
     /**
@@ -89,8 +89,10 @@ public class MessageListener {
                 throw new IllegalStateException("Service already attached.");
             }
             return null;
-        } catch (IllegalStateException | IllegalArgumentException | NullPointerException ex) {
+        } catch (IllegalStateException | IllegalArgumentException ex) {
             return ASBUtils.createErrorValue("Error when attaching service to the listener and stating processor.", ex);
+        } catch (Exception ex) {
+            return ASBUtils.createErrorValue("An unexpected error occurred.", ex);
         }
     }
 
