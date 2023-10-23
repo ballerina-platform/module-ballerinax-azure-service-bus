@@ -34,12 +34,12 @@ listener asb:Listener asbListener = new (configuration);
     maxAutoLockRenewDuration: 300
 }
 service asb:MessageService on asbListener {
-    remote function onMessage(asb:Message message, asb:Caller caller) returns asb:Error? {
+    isolated remote function onMessage(asb:Message message, asb:Caller caller) returns asb:Error? {
         log:printInfo("Message received from queue: " + message.toBalString());
         _ = check caller.complete(message);
     }
 
-    remote function onError(asb:ErrorContext context, error 'error) returns asb:Error? {
+    isolated remote function onError(asb:ErrorContext context, error 'error) returns asb:Error? {
         log:printInfo("Error received from queue: " + context.toBalString());
     }
 };
