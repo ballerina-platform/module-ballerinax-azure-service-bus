@@ -296,7 +296,7 @@ public class MessageSender {
         if (message.containsKey(StringUtils.fromString(ASBConstants.APPLICATION_PROPERTY_KEY))) {
             BMap<BString, Object> propertyBMap = (BMap<BString, Object>) message.get(StringUtils.fromString(
                     ASBConstants.APPLICATION_PROPERTY_KEY));
-            Object propertyMap = propertyBMap.get(StringUtils.fromString(ASBConstants.APPLICATION_PROPERTIES));
+            Object propertyMap = propertyBMap.get(StringUtils.fromString(ASBConstants.PROPERTIES));
             Map<String, Object> map = ASBUtils.toMap((BMap) propertyMap);
             asbMessage.getApplicationProperties().putAll(map);
         }

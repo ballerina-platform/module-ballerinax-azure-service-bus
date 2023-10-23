@@ -86,7 +86,7 @@ public class ASBConstants {
     public static final String DEAD_LETTER_ERROR_DESCRIPTION = "deadLetterErrorDescription";
     public static final String STATE = "state";
     public static final String APPLICATION_PROPERTY_KEY = "applicationProperties";
-    public static final String APPLICATION_PROPERTIES = "properties";
+    public static final String PROPERTIES = "properties";
 
     public static final int DEFAULT_TIME_TO_LIVE = 60; // In seconds
     public static final String DEFAULT_MESSAGE_LOCK_TOKEN = "00000000-0000-0000-0000-000000000000";
@@ -352,4 +352,19 @@ public class ASBConstants {
     // Rule List
     public static final String LIST_OF_RULES = "list";
     public static final String LIST_OF_RULES_RECORD = "RuleList";
+
+    // Asynchronous Listener
+    public static final String APPLICATION_PROPERTIES = "ApplicationProperties";
+    public static final BString PEEK_LOCK_ENABLE_CONFIG_KEY = StringUtils.fromString("peekLockModeEnabled");
+    public static final String QUEUE_NAME_CONFIG_KEY = "queueName";
+    public static final String TOPIC_NAME_CONFIG_KEY = "topicName";
+    public static final String SUBSCRIPTION_NAME_CONFIG_KEY = "subscriptionName";
+    public static final String MAX_CONCURRENCY_CONFIG_KEY = "maxConcurrency";
+    public static final String MSG_PREFETCH_COUNT_CONFIG_KEY = "prefetchCount";
+    public static final String LOCK_RENEW_DURATION_CONFIG_KEY = "maxAutoLockRenewDuration";
+    public static final String LOG_LEVEL_CONGIG_KEY = "logLevel";
+    public static final String EMPTY_STRING = "";
+    public static final int MAX_CONCURRENCY_DEFAULT = 1;
+    public static final int LOCK_RENEW_DURATION_DEFAULT = 300;
+    public static final int MSG_PREFETCH_COUNT_DEFAULT = 0;
 }
