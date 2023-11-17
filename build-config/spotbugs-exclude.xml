@@ -16,4 +16,8 @@
   ~ under the License.
   -->
 <FindBugsFilter>
+    <Match>
+        <Class name="org.ballerinax.asb.listener.MessageListener" />
+        <Method name="externalInit" />
+    </Match>
 </FindBugsFilter>
