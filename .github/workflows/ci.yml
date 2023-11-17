@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - master
+      - main
       - 2201.[0-9]+.x
   repository_dispatch:
     types: check_connector_for_breaking_changes
