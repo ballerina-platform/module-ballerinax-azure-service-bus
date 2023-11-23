@@ -84,7 +84,7 @@ To obtain a token following steps should be followed:
 
 2. In the left navigation pane of the namespace page, select *Shared access policies*.
 
-3. Click on the *RootManageSharedAccessKey* policy.
+3. Click on the *+ Add* and create a policy with *Manage*, *Send* and *Listen* permissions.
 
 4. Copy the *Primary Connection String* value and save it in a secure location. This is the connection string that you use to authenticate with the Service Bus service.
 ![Connection String](https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/tree/main/ballerina/resources/connection-string.png?raw=true)
