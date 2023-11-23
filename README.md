@@ -99,7 +99,7 @@ To obtain a token following steps should be followed:
 4. Copy the *Primary Connection String* value and save it in a secure location. This is the connection string that you use to authenticate with the Service Bus service.
 ![Connection String](https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/tree/main/ballerina/resources/connection-string.png?raw=true)
 
-## Quickstart
+## Sample
 
 To use the Azure Service Bus connector in your Ballerina application, update the .bal file as follows:
 ### Enabling Azure SDK Logs
