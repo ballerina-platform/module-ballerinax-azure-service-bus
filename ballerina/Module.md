@@ -111,7 +111,7 @@ logLevel="OFF"
 Import the `ballerinax/asb` module into the Ballerina project.
 
 ```ballerina
-import ballerinax/asb as asb;
+import ballerinax/asb;
 ```
 
 ### Step 2: Create a new connector instance
@@ -240,6 +240,7 @@ This can be done by providing a connection string.
     }
     ```
     Following is an example on how to receive messages from the Azure Service Bus using the listner in connector.
+    
     **Listen to Messages from the Azure Service Bus**
     ```ballerina
     @ServiceConfig {

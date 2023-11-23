@@ -250,6 +250,7 @@ This can be done by providing a connection string.
     }
     ```
     Following is an example on how to receive messages from the Azure Service Bus using the listner in connector.
+    
     **Listen to Messages from the Azure Service Bus**
     ```ballerina
     @ServiceConfig {
