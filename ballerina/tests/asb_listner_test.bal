@@ -13,7 +13,6 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
 import ballerina/lang.runtime;
 import ballerina/log;
 import ballerina/test;
@@ -29,6 +28,10 @@ ASBServiceSenderConfig listnerTestSenderConfig = {
     connectionString: connectionString,
     entityType: QUEUE,
     topicOrQueueName: lisnterTestQueueName
+};
+
+QueueConfig queue = {
+    queueName: lisnterTestQueueName
 };
 
 listener Listener asbListener = new (configuration);
@@ -75,7 +78,7 @@ isolated function increamentTestCaseCount()
 }
 
 @ServiceConfig {
-    queueName: "pre-created-test-queue",
+    entityConfig: queue,
     peekLockModeEnabled: true,
     maxConcurrency: 1,
     prefetchCount: 20,

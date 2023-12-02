@@ -883,23 +883,17 @@ public type ErrorContext record {
 
 # Configurations for the ASB Service
 #
-# + queueName - The name of the queue to listen to
+# + entityConfig - The entity configuration for the service
 # + peekLockModeEnabled - Whether to use peekLock mode or not
-# + topicName - The name of the topic to listen to
-# + subscriptionName - The name of the subscription to listen to
 # + maxConcurrency - The maximum number of concurrent messages to process
 # + prefetchCount - The number of messages to prefetch
 # + maxAutoLockRenewDuration - The maximum duration to renew the lock automatically
 # + logLevel - The log level to use
 public type ASBServiceConfig record {|
-    @display {label: "Queue Name"}
-    string queueName?;
+    @display {label: "Entity Configuration"}
+    TopicSubsConfig|QueueConfig entityConfig;
     @display {label: "Peek Lock Mode Enabled"}
     boolean peekLockModeEnabled = false;
-    @display {label: "Topic Name"}
-    string topicName?;
-    @display {label: "Subscription Name"}
-    string subscriptionName?;
     @display {label: "Max Concurrency"}
     int maxConcurrency = 1;
     @display {label: "Prefetch Count"}
