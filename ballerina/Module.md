@@ -43,7 +43,7 @@ If you don't have an Azure subscription, [sign up for a free Azure account](http
 #### Step 2: Go to the Create Resource Service Bus menu
 
 In the left navigation pane of the portal, select **All services**, select **Integration** from the list of categories, hover the mouse over **Service Bus**, and then select **Create** on the Service Bus tile.
-![Create Resource Service Bus Menu](https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/tree/main/ballerina/resources/create-resource-service-bus-menu.png?raw=true)
+![Create Resource Service Bus Menu](https://raw.githubusercontent.com/ballerina-platform/module-ballerinax-azure-service-bus/main/ballerina/resources/create-resource-service-bus-menu.png)
 
 #### Step 3: In the Basics tag of the Create namespace page, follow these steps:
 
@@ -69,7 +69,7 @@ If you selected the Premium pricing tier, specify the number of messaging units.
 
 6. Select **Review + create** at the bottom of the page.
 
-![Create Namespace](https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/tree/main/ballerina/resources/create-namespace.png?raw=true)
+![Create Namespace](https://raw.githubusercontent.com/ballerina-platform/module-ballerinax-azure-service-bus/main/ballerina/resources/create-namespace.png)
 
 7. On the **Review + create** page, review settings, and select **Create**.
 
@@ -87,7 +87,7 @@ To obtain a token following steps should be followed:
 3. Click on the *+ Add* and create a policy with *Manage*, *Send* and *Listen* permissions.
 
 4. Copy the *Primary Connection String* value and save it in a secure location. This is the connection string that you use to authenticate with the Service Bus service.
-![Connection String](https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/tree/main/ballerina/resources/connection-string.png?raw=true)
+![Connection String](https://raw.githubusercontent.com/ballerina-platform/module-ballerinax-azure-service-bus/main/ballerina/resources/connection-string.png)
 
 ## Sample
 
