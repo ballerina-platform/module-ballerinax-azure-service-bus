@@ -1,5 +1,4 @@
-Ballerina Azure Service Bus Connector
-===================
+# Ballerina Azure Service Bus Connector
 
 [![Build](https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/actions/workflows/ci.yml/badge.svg)](https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/actions/workflows/ci.yml)
 [![Trivy](https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/actions/workflows/trivy-scan.yml/badge.svg)](https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/actions/workflows/trivy-scan.yml)
@@ -37,16 +36,17 @@ supports [Service Bus SDK 7.13.1 version](https://learn.microsoft.com/en-us/java
 located [here](https://github.com/Azure/azure-service-bus-java). The
 primary wire protocol for Service Bus is Advanced Messaging Queueing Protocol (AMQP) 1.0, an open ISO/IEC standard.
 
-## Prerequisites
+## Setup guide
 
 Before using this connector in your Ballerina application, complete the following:
 
 ### Create a namespace in the Azure portal
+
 To begin using Service Bus messaging entities in Azure, you must first create a namespace with a name that is unique across Azure. A namespace provides a scoping container for Service Bus resources within your application.
 
 To create a namespace:
 
-#### Step 1: Sign in to the [Azure portal](https://portal.azure.com/).
+#### Step 1: Sign in to the [Azure portal](https://portal.azure.com/)
 If you don't have an Azure subscription, [sign up for a free Azure account](https://azure.microsoft.com/free/).
 
 #### Step 2: Go to the Create Resource Service Bus menu
@@ -99,6 +99,7 @@ To obtain a token following steps should be followed:
 ![Connection String](https://raw.githubusercontent.com/ballerina-platform/module-ballerinax-azure-service-bus/main/ballerina/resources/connection-string.png)
 
 ## ASB Admin Client
+
 Azure Service Bus Admin Client is used to manage the Service Bus entities. This client can be used to create, update, delete, and list queues, topics, subscriptions, and rules.
 
 The code snippet given below initializes an admin client with the basic configuration and creates a queue in the Azure Service Bus.
@@ -162,6 +163,7 @@ The code snippet given below initializes a message sender client with the basic 
 ```
 
 ## ASB Message Receiver Client
+
 Azure Service Bus Message Receiver Client is used to receive messages from a queue, topic, or subscription.
 
 The code snippet given below initializes a message receiver client with the basic configuration and receives a message from the Azure Service Bus.
@@ -201,6 +203,7 @@ The code snippet given below initializes a message receiver client with the basi
 ```
 
 ## ASB Message Listener Client
+
 Azure Service Bus Message Listener Client is used to listen to messages from a queue, topic, or subscription and process them asynchronously.
 
 The code snippet given below initializes a message listener client with the basic configuration and listens to messages from the Azure Service Bus.
@@ -237,7 +240,9 @@ The code snippet given below initializes a message listener client with the basi
     };
 ```
 
-**[You can find a list of samples here](https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/tree/main/examples)**
+## Examples
+
+You can find a list of samples [here](https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/tree/main/examples)
 
 ## Issues and projects 
 
