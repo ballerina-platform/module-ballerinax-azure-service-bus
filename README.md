@@ -21,7 +21,6 @@ This connector supports the following operations:
 - Manage (Get/Create/Update/Delete/list) a queue, topic, subscription or rule.
 - Send messages to a queue, topic, or subscription.
 - Receive messages from a queue, topic, or subscription.
-- Listen to messages from a queue, topic, or subscription.
 
 Service Bus provides a Microsoft-supported [native Java API](https://docs.microsoft.com/en-us/java/api/overview/azure/servicebus?view=azure-java-stable) (
 SDK) and this module makes use of
@@ -200,44 +199,6 @@ The code snippet given below initializes a message receiver client with the basi
 
         check queueReceiver->close();
     }
-```
-
-## ASB Message Listener Client
-
-Azure Service Bus Message Listener Client is used to listen to messages from a queue, topic, or subscription and process them asynchronously.
-
-The code snippet given below initializes a message listener client with the basic configuration and listens to messages from the Azure Service Bus.
-
-```ballerina
-    import ballerina/log;
-    import ballerinax/asb;
-
-    configurable string connectionString = ?;
-
-    // Listener Configurations
-    asb:ListenerConfig configuration = {
-        connectionString: connectionString
-    };
-
-    listener asb:Listener asbListener = new (configuration);
-
-    @asb:ServiceConfig {
-        queueName: "test-queue",
-        peekLockModeEnabled: true,
-        maxConcurrency: 1,
-        prefetchCount: 10,
-        maxAutoLockRenewDuration: 300
-    }
-    service asb:MessageService on asbListener {
-        isolated remote function onMessage(asb:Message message, asb:Caller caller) returns asb:Error? {
-            log:printInfo("Message received from queue: " + message.toBalString());
-            _ = check caller.complete(message);
-        }
-
-        isolated remote function onError(asb:ErrorContext context, error 'error) returns asb:Error? {
-            log:printInfo("Error received from queue: " + context.toBalString());
-        }
-    };
 ```
 
 ## Examples
