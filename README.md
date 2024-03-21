@@ -242,7 +242,7 @@ The code snippet given below initializes a message listener client with the basi
 
 ## Examples
 
-You can find a list of samples [here](https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/tree/main/examples)
+You can find a list of samples [here](https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/tree/main/examples)**
 
 ## Issues and projects 
 
