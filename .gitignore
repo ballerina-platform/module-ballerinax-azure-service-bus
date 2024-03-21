@@ -49,7 +49,7 @@ build
 *.env
 
 # .deb files
-.deb
+*.deb
 
 # Dependancy toml
 ballerina/Dependencies.toml
