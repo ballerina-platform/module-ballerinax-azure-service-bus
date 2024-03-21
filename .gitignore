@@ -47,3 +47,6 @@ build
 
 # Environment files
 *.env
+
+# .deb files
+.deb
