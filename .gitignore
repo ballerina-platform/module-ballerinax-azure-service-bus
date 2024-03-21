@@ -50,3 +50,6 @@ build
 
 # .deb files
 .deb
+
+# Dependancy toml
+ballerina/Dependencies.toml
