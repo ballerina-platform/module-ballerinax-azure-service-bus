@@ -10,9 +10,7 @@
 ## Overview
 
 The [Azure Service Bus](https://docs.microsoft.com/en-us/azure/service-bus-messaging/) is a fully managed enterprise message broker with message queues and publish-subscribe topics. It
-provides the capability to send and receive messages from Service Bus queues, topics, and subscriptions. The Azure
-Service Bus handles messages that include data representing any kind of information, including structured data encoded
-with common formats such as the following ones: JSON, XML, and Plain Text.
+provides the capability to send and receive messages from Service Bus queues, topics, and subscriptions.
 
 The [Ballerina](https://ballerina.io/) connector for Azure Service Bus allows you to connect to
 an [Azure Service Bus](https://docs.microsoft.com/en-us/azure/service-bus-messaging/) via the Ballerina language.
@@ -106,7 +104,7 @@ This can be done by providing a connection string.
 
 ````ballerina
     configurable string connectionString = ?;
-    asb:AdminClient admin = check new (connectionString);
+    asb:AdminClient asbAdmin = check new (connectionString);
 ````
 
 #### Initialize a Message Sender client
@@ -121,7 +119,7 @@ This can be done by providing a connection string with a queue or topic name.
         entityType: QUEUE,
         topicOrQueueName: "myQueue"
     };
-    asb:MessageSender sender = check new (senderConfig);
+    asb:MessageSender asbSender = check new (senderConfig);
 ```
 
 #### Initialize a Message Receiver client
@@ -140,7 +138,7 @@ This can be done by providing a connection string with a queue name, topic name,
         },
         receiveMode: PEEK_LOCK
     };
-    asb:MessageReceiver receiver = check new (receiverConfig);
+    asb:MessageReceiver asbReceiver = check new (receiverConfig);
 ```
 
 ### Step 3: Invoke connector operation
@@ -151,11 +149,11 @@ Now you can use the remote operations available within the connector,
 
  ```ballerina
 public function main() returns error? {
-    asb:AdminClient admin = check new (adminConfig);
+    asb:AdminClient asbAdmin = check new (connectionString);
 
-    check admin->createQueue("myQueue");
+    check asbAdmin->createQueue("myQueue");
 
-    check admin->close();
+    check asbAdmin->close();
 }
  ```
 
@@ -163,7 +161,7 @@ public function main() returns error? {
 
 ```ballerina
 public function main() returns error? {
-    asb:MessageSender queueSender = check new (senderConfig);
+    asb:MessageSender asbSender = check new (senderConfig);
 
     string stringContent = "This is My Message Body"; 
     byte[] byteContent = stringContent.toBytes();
@@ -180,9 +178,9 @@ public function main() returns error? {
         applicationProperties: applicationProperties
     };
 
-    check queueSender->send(message);
+    check asbSender->send(message);
 
-    check queueSender->close();
+    check asbSender->close();
 }
 ```
 
@@ -190,21 +188,21 @@ public function main() returns error? {
 
 ```ballerina
 public function main() returns error? {
-    asb:MessageReceiver queueReceiver = check new (receiverConfig);
+    asb:MessageReceiver asbReceiver = check new (receiverConfig);
 
     int serverWaitTime = 60; // In seconds
 
-    asb:Message|asb:Error? messageReceived = queueReceiver->receive(serverWaitTime);
+    asb:Message|asb:Error? messageReceived = asbReceiver->receive(serverWaitTime);
 
     if (messageReceived is asb:Message) {
-        log:printInfo("Reading Received Message : " + messageReceived.toString());
+        log:printInfo("Reading Received Message : " + message received.toString());
     } else if (messageReceived is ()) {
         log:printError("No message in the queue.");
     } else {
         log:printError("Receiving message via Asb receiver connection failed.");
     }
 
-    check queueReceiver->close();
+    check asbReceiver->close();
 }
 ```
     
