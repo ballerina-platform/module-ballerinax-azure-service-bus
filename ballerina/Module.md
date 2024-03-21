@@ -1,181 +1,214 @@
 ## Overview
 
+The [Azure Service Bus](https://docs.microsoft.com/en-us/azure/service-bus-messaging/) is a fully managed enterprise message broker with message queues and publish-subscribe topics. It
+provides the capability to send and receive messages from Service Bus queues, topics, and subscriptions. The Azure
+Service Bus handles messages that include data representing any kind of information, including structured data encoded
+with common formats such as the following ones: JSON, XML, and Plain Text.
+
 The [Ballerina](https://ballerina.io/) connector for Azure Service Bus allows you to connect to
 an [Azure Service Bus](https://docs.microsoft.com/en-us/azure/service-bus-messaging/) via the Ballerina language.
 
-The Azure Service Bus is a fully managed enterprise message broker with message queues and publish-subscribe topics.It
-provides the capability to send and receive messages from Service Bus queues, topics, and subscriptions. The Azure
-Service Bus handles messages that include data representing any kind of information, including structured data encoded
-with the common formats such as the following ones: JSON, XML, Plain Text.
+This connector supports the following operations:
+- Manage (Get/Create/Update/Delete/list) a queue, topic, subscription or rule.
+- Send messages to a queue, topic, or subscription.
+- Receive messages from a queue, topic, or subscription.
 
-This module also supports asynchronous message listening capabilities from the azure service bus. Service Bus provides a
-Microsoft
-supported [native Java API](https://docs.microsoft.com/en-us/java/api/overview/azure/servicebus?view=azure-java-stable) (
-SDK) and this module make use of
-this [public API](https://docs.microsoft.com/en-us/java/api/overview/azure/servicebus/client?view=azure-java-stable&preserve-view=true)
-. As the public API
-applies [SAS authentication](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-sas), this module
-supports SAS authentication as well.
+The Ballerina Azure Service Bus module utilizes Microsoft's [Azure Service Bus JAVA SDK 7.13.1](https://learn.microsoft.com/en-us/java/api/overview/azure/service-bus?view=azure-java-stable#libraries-for-data-access). 
 
-This module
-supports [Service Bus SDK 7.13.1 version](https://learn.microsoft.com/en-us/java/api/overview/azure/service-bus?view=azure-java-stable#libraries-for-data-access)
-. The source code on GitHub is
-located [here](https://github.com/Azure/azure-sdk-for-java/tree/main/sdk/servicebus/azure-messaging-servicebus). The
-primary wire protocol for Service Bus is Advanced Messaging Queueing Protocol (AMQP) 1.0, an open ISO/IEC standard.
-
-## Prerequisites
+## Setup guide
 
 Before using this connector in your Ballerina application, complete the following:
 
-* Create an Azure account and a subscription. If you don't have an Azure
-  subscription, [sign up for a free Azure account](https://azure.microsoft.com/free/).
+### Create a namespace in the Azure portal
 
-* Create a Service Bus namespace. If you don't
-  have [a service bus namespace](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-create-namespace-portal)
-  , learn how to create your Service Bus namespace.
+To begin using Service Bus messaging in Azure, you must first create a namespace with a name that is unique across Azure. A namespace provides a scoping container for Service Bus resources within your application.
 
-* Obtain tokens
+To create a namespace:
 
-  Shared Access Signature (SAS) Authentication Credentials are required to communicate with the Azure Service Bus.
-    * Connection String
+#### Step 1: Sign in to the [Azure portal](https://portal.azure.com/)
+If you don't have an Azure subscription, [sign up for a free Azure account](https://azure.microsoft.com/free/).
 
-  Obtain the authorization credentials:
-    * For Service Bus Queues
+#### Step 2: Go to the Create Resource Service Bus menu
 
-        1. [Create a namespace in the Azure portal](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-portal#create-a-namespace-in-the-azure-portal)
+In the left navigation pane of the portal, select **All services**, select **Integration** from the list of categories, hover the mouse over **Service Bus**, and then select **Create** on the Service Bus tile.
 
-        2. [Get the connection string](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-portal#get-the-connection-string)
+![Create Resource Service Bus Menu](https://raw.githubusercontent.com/ballerina-platform/module-ballerinax-azure-service-bus/main/ballerina/resources/create-resource-service-bus-menu.png)
 
-        3. [Create a queue in the Azure portal & get queue name](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-portal#create-a-queue-in-the-azure-portal)
-           . It is in the format ‘queueName’.
+#### Step 3: In the Basics tag of the Create namespace page, follow these steps:
 
-    * For Service Bus Topics and Subscriptions
+1. For **Subscription**, choose an Azure subscription in which to create the namespace.
 
-        1. [Create a namespace in the Azure portal](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-portal#create-a-namespace-in-the-azure-portal)
+2. For **Resource group**, choose an existing resource group in which the namespace will live, or create a new one.
 
-        2. [Get the connection string](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-portal#get-the-connection-string)
+3. Enter a **name for the namespace**. The namespace name should adhere to the following naming conventions:
 
-        3. [Create a topic in the Azure portal & get topic name](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-topics-subscriptions-portal#create-a-topic-using-the-azure-portal)
-           . It's in the format ‘topicName‘.
+* The name must be unique across Azure. The system immediately checks to see if the name is available.
+* The name length is at least 6 and at most 50 characters.
+* The name can contain only letters, numbers, and hyphens “-“.
+* The name must start with a letter and end with a letter or number.
+* The name doesn't end with “-sb“ or “-mgmt“.
 
-        4. [Create a subscription in the Azure portal & get its name](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-topics-subscriptions-portal#create-subscriptions-to-the-topic)
-           . It’s in the format ‘topicName/subscriptions/subscriptionName’.
+4. For **Location**, choose the region in which your namespace should be hosted.
+
+5. For **Pricing tier**, select the pricing tier (Basic, Standard, or Premium) for the namespace. For this quickstart, select Standard.
+
+> **Notice:** If you want to use topics and subscriptions, choose either Standard or Premium. Topics/subscriptions aren't supported in the Basic pricing tier. If you selected the Premium pricing tier, specify the number of messaging units. The premium tier provides resource isolation at the CPU and memory level so that each workload runs in isolation. This resource container is called a messaging unit. A premium namespace has at least one messaging unit. You can select 1, 2, 4, 8, or 16 messaging units for each Service Bus Premium namespace. For more information, see [Service Bus Premium Messaging](https://learn.microsoft.com/en-us/azure/service-bus-messaging/service-bus-premium-messaging).`
+
+6. Select **Review + create** at the bottom of the page.
+
+![Create Namespace](https://raw.githubusercontent.com/ballerina-platform/module-ballerinax-azure-service-bus/main/ballerina/resources/create-namespace.png)
+
+7. On the **Review + create** page, review settings, and select **Create**.
+
+
+### Obtain tokens for authentication
+
+To send and receive messages from a Service Bus queue or topic, clients must use a token that is signed by a shared access key, which is part of a shared access policy. A shared access policy defines a set of permissions that can be assigned to one or more Service Bus entities (queues, topics, event hubs, or relays). A shared access policy can be assigned to more than one entity, and a single entity can have more than one shared access policy assigned to it.
+
+To obtain a token following steps should be followed:
+
+1. In the left navigation pane of the portal, select *All services*, select *Integration* from the list of categories, hover the mouse over *Service Bus*, and then select your namespace.
+
+2. In the left navigation pane of the namespace page, select *Shared access policies*.
+
+3. Click on the *RootManageSharedAccessKey* policy.
+
+4. Copy the *Primary Connection String* value and save it in a secure location. This is the connection string that you use to authenticate with the Service Bus service.
+
+![Connection String](https://raw.githubusercontent.com/ballerina-platform/module-ballerinax-azure-service-bus/main/ballerina/resources/connection-string.png)
+
 
 ## Quickstart
-
-To use the Azure Service Bus connector in your Ballerina application, update the .bal file as follows:
-### Enabling Azure SDK Logs
-To enable Azure logs in a Ballerina module, you need to set the environment variable ASB_CLOUD_LOGS to ACTIVE. You can do this by adding the following line to your shell script or using the export command in your terminal(to deactivate,remove the variable value):
-
-`export ASB_CLOUD_LOGS=ACTIVE`
-
-### Enabling Internal Connector Logs
-To enable internal connector logs in a Ballerina module, you need to set the log level in the Config.toml file using the  custom configuration record Where <log_level> is the desired log level (e.g. DEBUG, INFO, WARN, ERROR, FATAL, (Default)OFF)
-
-```
-[ballerinax.asb.customConfiguration]
-logLevel="OFF"
-```
-
+To use the ASB connector in your Ballerina application, modify the .bal file as follows:
 
 ### Step 1: Import connector
 
 Import the `ballerinax/asb` module into the Ballerina project.
 
 ```ballerina
-import ballerinax/asb as asb;
+import ballerinax/asb;
 ```
 
 ### Step 2: Create a new connector instance
 
+#### Initialize an Admin Client
+
+This can be done by providing a connection string.
+
+````ballerina
+    configurable string connectionString = ?;
+    asb:AdminClient admin = check new (connectionString);
+````
+
 #### Initialize a Message Sender client
 
-This can be done providing connection string with queue or topic name.
+This can be done by providing a connection string with a queue or topic name.
 
 ```ballerina
-asb:MessageSender queueSender = check new (senderConfig);
-asb:MessageSender topicSender = check new (senderConfig);
+    configurable string connectionString = ?;
+
+    ASBServiceSenderConfig senderConfig = {
+        connectionString: connectionString,
+        entityType: QUEUE,
+        topicOrQueueName: "myQueue"
+    };
+    asb:MessageSender sender = check new (senderConfig);
 ```
 
 #### Initialize a Message Receiver client
 
-This can be done providing connection string with queue name, topic name or subscription path. Here, Receive mode is
-optional. (Default : PEEKLOCK)
+This can be done by providing a connection string with a queue name, topic name, or subscription path. 
+
+> Here, the Receive mode is optional. (Default: PEEKLOCK)
 
 ```ballerina
-asb:MessageReceiver queueReceiver = check new (receiverConfig);
-asb:MessageReceiver subscriptionReceiver = check new (receiverConfig);
+    configurable string connectionString = ?;
+
+    ASBServiceReceiverConfig receiverConfig = {
+        connectionString: connectionString,
+        entityConfig: {
+            queueName: "myQueue"
+        },
+        receiveMode: PEEK_LOCK
+    };
+    asb:MessageReceiver receiver = check new (receiverConfig);
 ```
 
 ### Step 3: Invoke connector operation
 
-1. Now you can use the operations available within the connector. Note that they are in the form of remote operations.
+Now you can use the remote operations available within the connector,
 
-   Following is an example on how to send messages to the Azure Service Bus using the connector.
+**Create a queue in the Azure Service Bus**
 
-   Send a message to the Azure Service Bus
+ ```ballerina
+public function main() returns error? {
+    asb:AdminClient admin = check new (adminConfig);
 
-    ```ballerina
-    public function main() returns error? {
-        asb:MessageSender queueSender = check new (senderConfig);
+    check admin->createQueue("myQueue");
 
-        string stringContent = "This is My Message Body"; 
-        byte[] byteContent = stringContent.toBytes();
-        int timeToLive = 60; // In seconds
+    check admin->close();
+}
+ ```
 
-        asb:ApplicationProperties applicationProperties = {
-            properties: {a: "propertyValue1", b: "propertyValue2"}
-        };
+**Send a message to the Azure Service Bus**
 
-        asb:Message message = {
-            body: byteContent,
-            contentType: asb:TEXT,
-            timeToLive: timeToLive,
-            applicationProperties: applicationProperties
-        };
+```ballerina
+public function main() returns error? {
+    asb:MessageSender queueSender = check new (senderConfig);
 
-        check queueSender->send(message);
+    string stringContent = "This is My Message Body"; 
+    byte[] byteContent = stringContent.toBytes();
+    int timeToLive = 60; // In seconds
 
-        check queueSender->close();
+    asb:ApplicationProperties applicationProperties = {
+        properties: {a: "propertyValue1", b: "propertyValue2"}
+    };
+
+    asb:Message message = {
+        body: byteContent,
+        contentType: asb:TEXT,
+        timeToLive: timeToLive,
+        applicationProperties: applicationProperties
+    };
+
+    check queueSender->send(message);
+
+    check queueSender->close();
+}
+```
+
+**Receive a message from the Azure Service Bus**
+
+```ballerina
+public function main() returns error? {
+    asb:MessageReceiver queueReceiver = check new (receiverConfig);
+
+    int serverWaitTime = 60; // In seconds
+
+    asb:Message|asb:Error? messageReceived = queueReceiver->receive(serverWaitTime);
+
+    if (messageReceived is asb:Message) {
+        log:printInfo("Reading Received Message : " + messageReceived.toString());
+    } else if (messageReceived is ()) {
+        log:printError("No message in the queue.");
+    } else {
+        log:printError("Receiving message via Asb receiver connection failed.");
     }
-    ```
 
-   Following is an example on how to receive messages from the Azure Service Bus using the client connector.Optionally
-   you can provide the receive mode which is PEEKLOCK by default. You can find more information about the receive
-   modes [here](https://docs.microsoft.com/en-us/java/api/com.microsoft.azure.servicebus.receivemode?view=azure-java-stable)
-   .
-
-   Receive a message from the Azure Service Bus
-
-    ```ballerina
-        public function main() returns error? {
-            asb:MessageReceiver queueReceiver = check new (receiverConfig);
-
-            int serverWaitTime = 60; // In seconds
-
-            asb:Message|asb:Error? messageReceived = queueReceiver->receive(serverWaitTime);
-
-            if (messageReceived is asb:Message) {
-                log:printInfo("Reading Received Message : " + messageReceived.toString());
-            } else if (messageReceived is ()) {
-                log:printError("No message in the queue.");
-            } else {
-                log:printError("Receiving message via Asb receiver connection failed.");
-            }
-
-            check queueReceiver->close();
-        }
-    ```
+    check queueReceiver->close();
+}
+```
     
-   **!!! NOTE:**
-   Currently we are using the asb:Message record for both sender & receiver operations. When we use the ASB receiver
-   connector instead of the ASB listener to receive messages we return the exact message converted (re-engineered) to
-   the specific data type based on the content type of the message. But in the ASB listener we receive the message body
-   as byte[] which is the standard according to the AMQP protocol. We haven't re-engineered the listener. Rather we
-   provide the message body as a standard byte[]. So the user must do the conversion based on the content type of the
-   message. We have provided a sample code segment above, where you can do the conversion easily.
+### Step 4: Run the Ballerina application
 
+```bash
+bal run
+```
 
-2. Use `bal run` command to compile and run the Ballerina program.
+## Examples
 
-**[You can find a list of samples here](https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/tree/main/examples)**
+There are two sets of examples demonstrating the use of the Ballerina Azure Service Bus (ASB) Connector.
+
+- **[Management Related Examples](https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/tree/main/examples/admin)**: These examples cover operations related to managing the Service Bus, such as managing queues, topics, subscriptions, and rules. 
+
+- **[Message Sending and Receiving Related Examples](https://github.com/ballerina-platform/module-ballerinax-azure-service-bus/tree/main/examples/sender_reciever)**: This set includes examples for sending to and receiving messages from queues, topics, and subscriptions in the Service Bus.

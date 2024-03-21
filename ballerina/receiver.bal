@@ -117,9 +117,9 @@ public isolated client class MessageReceiver {
     isolated remote function complete(@display {label: "Message"} Message message)
                                         returns Error? {
         if message?.lockToken.toString() != DEFAULT_MESSAGE_LOCK_TOKEN {
-            return complete(self, message?.lockToken.toString());
+            return complete(self, message);
         }
-        return createError("Failed to complete message with ID " + message?.messageId.toString());
+        return createError(string `Failed to complete message with ID: ${message?.messageId.toString()}`);
     }
 
     # Abandon message from queue or subscription based on messageLockToken. Abandon processing of the message for 
@@ -131,9 +131,9 @@ public isolated client class MessageReceiver {
     @display {label: "Abandon Message"}
     isolated remote function abandon(@display {label: "Message"} Message message) returns Error? {
         if message?.lockToken.toString() != DEFAULT_MESSAGE_LOCK_TOKEN {
-            return abandon(self, message?.lockToken.toString());
+            return abandon(self, message);
         }
-        return createError("Failed to abandon message with ID " + message?.messageId.toString());
+        return createError(string `Failed to abandon message with ID: ${message?.messageId.toString()}`);
     }
 
     # Dead-Letter the message & moves the message to the Dead-Letter Queue based on messageLockToken. Transfer 
@@ -149,10 +149,9 @@ public isolated client class MessageReceiver {
             @display {label: "Dead Letter Description"}
                                         string? deadLetterErrorDescription = ()) returns Error? {
         if message?.lockToken.toString() != DEFAULT_MESSAGE_LOCK_TOKEN {
-            return deadLetter(self, message?.lockToken.toString(), deadLetterReason,
-                deadLetterErrorDescription);
+            return deadLetter(self, message, deadLetterReason, deadLetterErrorDescription);
         }
-        return createError("Failed to deadletter message with ID " + message?.messageId.toString());
+        return createError(string `Failed to deadletter message with ID: ${message?.messageId.toString()}`);
     }
 
     # Defer the message in a Queue or Subscription based on messageLockToken.  It prevents the message from being 
@@ -163,7 +162,7 @@ public isolated client class MessageReceiver {
     @display {label: "Defer Message"}
     isolated remote function defer(@display {label: "Message"} Message message)
                                     returns @display {label: "Deferred Msg Seq Num"} int|Error {
-        check defer(self, message?.lockToken.toString());
+        check defer(self, message);
         return <int>message?.sequenceNumber;
     }
 
@@ -188,9 +187,9 @@ public isolated client class MessageReceiver {
     @display {label: "Renew Lock On Message"}
     isolated remote function renewLock(@display {label: "Message"} Message message) returns Error? {
         if message?.lockToken.toString() != DEFAULT_MESSAGE_LOCK_TOKEN {
-            return renewLock(self, message?.lockToken.toString());
+            return renewLock(self, message);
         }
-        return createError("Failed to renew lock on message with ID " + message?.messageId.toString());
+        return createError(string `Failed to renew lock on message with ID: ${message?.messageId.toString()}`);
     }
 
     # Closes the ASB sender connection.
@@ -213,20 +212,20 @@ isolated function receiveBatch(MessageReceiver endpointClient, int? maxMessageCo
     'class: "org.ballerinax.asb.receiver.MessageReceiver"
 } external;
 
-isolated function complete(MessageReceiver endpointClient, string lockToken) returns Error? = @java:Method {
+isolated function complete(MessageReceiver endpointClient, Message message) returns Error? = @java:Method {
     'class: "org.ballerinax.asb.receiver.MessageReceiver"
 } external;
 
-isolated function abandon(MessageReceiver endpointClient, string lockToken) returns Error? = @java:Method {
+isolated function abandon(MessageReceiver endpointClient, Message message) returns Error? = @java:Method {
     'class: "org.ballerinax.asb.receiver.MessageReceiver"
 } external;
 
-isolated function deadLetter(MessageReceiver endpointClient, string lockToken, string? deadLetterReason, string? deadLetterErrorDescription) returns
+isolated function deadLetter(MessageReceiver endpointClient, Message message, string? deadLetterReason, string? deadLetterErrorDescription) returns
                         Error? = @java:Method {
     'class: "org.ballerinax.asb.receiver.MessageReceiver"
 } external;
 
-isolated function defer(MessageReceiver endpointClient, string lockToken) returns Error? = @java:Method {
+isolated function defer(MessageReceiver endpointClient, Message message) returns Error? = @java:Method {
     'class: "org.ballerinax.asb.receiver.MessageReceiver"
 } external;
 
@@ -234,6 +233,6 @@ isolated function receiveDeferred(MessageReceiver endpointClient, int sequenceNu
     'class: "org.ballerinax.asb.receiver.MessageReceiver"
 } external;
 
-isolated function renewLock(MessageReceiver endpointClient, string lockToken) returns Error? = @java:Method {
+isolated function renewLock(MessageReceiver endpointClient, Message message) returns Error? = @java:Method {
     'class: "org.ballerinax.asb.receiver.MessageReceiver"
 } external;
