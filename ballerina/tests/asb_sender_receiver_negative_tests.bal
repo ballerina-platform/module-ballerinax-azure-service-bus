@@ -16,10 +16,7 @@
 
 import ballerina/log;
 import ballerina/test;
-import ballerina/regex;
 
-string invalidCompleteError = "^Failed to complete message with ID:.*$";
-string invalidAbandonError = "^Failed to abandon message with ID:.*$";
 @test:Config {
     groups: ["asb_sender_receiver_negative"],
     dependsOn: [testCreateQueue, testCreateTopicOperation, testCreateSubscription]
@@ -76,7 +73,8 @@ function testInvalidComplete() returns error? {
         log:printInfo("messgae" + receivedMessage.toString());
         Error? result = messageReceiver->complete(receivedMessage);
         test:assertTrue(result is error, msg = "Unexpected Complete for Messages in Receive and Delete Mode");
-        test:assertTrue(regex:matches((<Error>result).message(),invalidCompleteError), msg = "Invalid Complete for " +
+        string:RegExp completeFailedMsg = re `^Failed to complete message with ID:.*$`;
+        test:assertTrue(completeFailedMsg.isFullMatch((<Error>result).message()), msg = "Invalid Complete for " +
         " Messages in Receive and Delete Mode");
     } else if receivedMessage is () {
         test:assertFail("No message in the queue.");
@@ -116,7 +114,8 @@ function testInvalidAbandon() returns error? {
         log:printInfo("messgae" + receivedMessage.toString());
         Error? result = messageReceiver->abandon(receivedMessage);
         test:assertTrue(result is error, msg = "Unexpected Abandon for Messages in Receive and Delete Mode");
-        test:assertTrue(regex:matches((<Error>result).message(),invalidAbandonError), msg = "Invalid Abandon for " +
+        string:RegExp abandonFailedMsg = re `^Failed to abandon message with ID:.*$`;
+        test:assertTrue(abandonFailedMsg.isFullMatch((<Error>result).message()), msg = "Invalid Abandon for " +
         " Messages in Receive and Delete Mode");
     } else if receivedMessage is () {
         test:assertFail("No message in the queue.");
