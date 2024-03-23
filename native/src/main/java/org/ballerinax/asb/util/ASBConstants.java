@@ -356,6 +356,7 @@ public class ASBConstants {
     // Asynchronous Listener
     public static final String APPLICATION_PROPERTIES = "ApplicationProperties";
     public static final BString PEEK_LOCK_ENABLE_CONFIG_KEY = StringUtils.fromString("peekLockModeEnabled");
+    public static final String ENTITY_CONFIG_KEY = "entityConfig";
     public static final String QUEUE_NAME_CONFIG_KEY = "queueName";
     public static final String TOPIC_NAME_CONFIG_KEY = "topicName";
     public static final String SUBSCRIPTION_NAME_CONFIG_KEY = "subscriptionName";

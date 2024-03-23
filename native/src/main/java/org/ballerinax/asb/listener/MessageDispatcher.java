@@ -76,8 +76,8 @@ public class MessageDispatcher {
      * @throws IllegalArgumentException If queueName/topicname not set
      * @throws NullPointerException     If callbacks are not set
      */
-     MessageDispatcher(Runtime runtime, BObject service,
-                             BObject caller, ServiceBusClientBuilder sharedClientBuilder) {
+    MessageDispatcher(Runtime runtime, BObject service,
+                      BObject caller, ServiceBusClientBuilder sharedClientBuilder) {
 
         this.runtime = runtime;
         this.service = service;
@@ -87,10 +87,8 @@ public class MessageDispatcher {
     }
 
     private ServiceBusProcessorClient createMessageProcessor(ServiceBusClientBuilder sharedClientBuilder) {
-        String queueName = ASBUtils.getServiceConfigStringValue(service, ASBConstants.QUEUE_NAME_CONFIG_KEY);
-        String topicName = ASBUtils.getServiceConfigStringValue(service, ASBConstants.TOPIC_NAME_CONFIG_KEY);
-        String subscriptionName = ASBUtils.getServiceConfigStringValue(service,
-                ASBConstants.SUBSCRIPTION_NAME_CONFIG_KEY);
+        Map<String, Object> entityConfigMap = ASBUtils.getServiceConfigMapValue(service,
+                ASBConstants.ENTITY_CONFIG_KEY);
         boolean isPeekLockModeEnabled = ASBUtils.isPeekLockModeEnabled(service);
         int maxConcurrentCalls = ASBUtils.getServiceConfigSNumericValue(service,
                 ASBConstants.MAX_CONCURRENCY_CONFIG_KEY, ASBConstants.MAX_CONCURRENCY_DEFAULT);
@@ -104,36 +102,28 @@ public class MessageDispatcher {
                         + ", maxConcurrentCalls- "
                         + maxConcurrentCalls + ", prefetchCount - " + prefetchCount
                         + ", maxAutoLockRenewDuration(seconds) - " + maxAutoLockRenewDuration);
-        // create processor client using sharedClientBuilder attahed to the listener
         ServiceBusProcessorClientBuilder clientBuilder = sharedClientBuilder.processor()
                 .maxConcurrentCalls(maxConcurrentCalls)
                 .disableAutoComplete()
                 .prefetchCount(prefetchCount);
-        if (!queueName.isEmpty()) {
-            if (isPeekLockModeEnabled) {
-                clientBuilder
-                        .receiveMode(ServiceBusReceiveMode.PEEK_LOCK)
-                        .queueName(queueName)
-                        .maxAutoLockRenewDuration(Duration.ofSeconds(maxAutoLockRenewDuration));
-            } else {
-                clientBuilder
-                        .receiveMode(ServiceBusReceiveMode.RECEIVE_AND_DELETE)
-                        .queueName(queueName);
-            }
-        } else if (!subscriptionName.isEmpty() && !topicName.isEmpty()) {
-            if (isPeekLockModeEnabled) {
-                clientBuilder
-                        .receiveMode(ServiceBusReceiveMode.PEEK_LOCK)
-                        .topicName(topicName)
-                        .subscriptionName(subscriptionName)
-                        .maxAutoLockRenewDuration(Duration.ofSeconds(maxAutoLockRenewDuration));
-            } else {
-                clientBuilder
-                        .receiveMode(ServiceBusReceiveMode.RECEIVE_AND_DELETE)
-                        .topicName(topicName)
-                        .subscriptionName(subscriptionName);
-            }
+
+        // Create processor client using sharedClientBuilder attached to the listener
+        ServiceBusReceiveMode receiveMode = isPeekLockModeEnabled ? ServiceBusReceiveMode.PEEK_LOCK
+                : ServiceBusReceiveMode.RECEIVE_AND_DELETE;
+        clientBuilder.receiveMode(receiveMode);
+
+        if (entityConfigMap.containsKey(ASBConstants.QUEUE_NAME_CONFIG_KEY)) {
+            clientBuilder.queueName(entityConfigMap.get(ASBConstants.QUEUE_NAME_CONFIG_KEY).toString());
+        } else if (entityConfigMap.containsKey(ASBConstants.TOPIC_NAME_CONFIG_KEY)
+                && entityConfigMap.containsKey(ASBConstants.SUBSCRIPTION_NAME_CONFIG_KEY)) {
+            clientBuilder.topicName(entityConfigMap.get(ASBConstants.TOPIC_NAME_CONFIG_KEY).toString())
+                    .subscriptionName(entityConfigMap.get(ASBConstants.SUBSCRIPTION_NAME_CONFIG_KEY).toString());
         }
+
+        if (isPeekLockModeEnabled) {
+            clientBuilder.maxAutoLockRenewDuration(Duration.ofSeconds(maxAutoLockRenewDuration));
+        }
+
         ServiceBusProcessorClient processorClient = clientBuilder.processMessage(t -> {
             try {
                 this.processMessage(t);
@@ -169,6 +159,14 @@ public class MessageDispatcher {
      */
     public void stopListeningAndDispatching() {
         this.messageProcessor.stop();
+        LOGGER.debug("[Message Dispatcher]Receiving stopped, identifier: " + messageProcessor.getIdentifier());
+    }
+
+    /**
+     * Close the processor client.
+     */
+    public void closeProcessorClient() {
+        this.messageProcessor.close();
         LOGGER.debug("[Message Dispatcher]Receiving stopped, identifier: " + messageProcessor.getIdentifier());
     }
 
@@ -226,8 +224,8 @@ public class MessageDispatcher {
             return;
         }
         Throwable throwable = context.getException();
-        ServiceBusException exception = (throwable instanceof ServiceBusException) ? (ServiceBusException) throwable :
-                new ServiceBusException(throwable, context.getErrorSource());
+        ServiceBusException exception = (throwable instanceof ServiceBusException) ? (ServiceBusException) throwable
+                : new ServiceBusException(throwable, context.getErrorSource());
         ServiceBusFailureReason reason = exception.getReason();
         if (reason == ServiceBusFailureReason.MESSAGING_ENTITY_DISABLED
                 || reason == ServiceBusFailureReason.MESSAGING_ENTITY_NOT_FOUND
@@ -342,8 +340,8 @@ public class MessageDispatcher {
         map.put("namespace", StringUtils.fromString(context.getFullyQualifiedNamespace()));
         map.put("errorSource", StringUtils.fromString(context.getErrorSource().toString()));
         Throwable throwable = context.getException();
-        ServiceBusException exception = (throwable instanceof ServiceBusException) ? (ServiceBusException) throwable :
-                new ServiceBusException(throwable, context.getErrorSource());
+        ServiceBusException exception = (throwable instanceof ServiceBusException) ? (ServiceBusException) throwable
+                : new ServiceBusException(throwable, context.getErrorSource());
         ServiceBusFailureReason reason = exception.getReason();
         map.put("reason", StringUtils.fromString(reason.toString()));
         BMap<BString, Object> createRecordValue = ValueCreator.createRecordValue(ModuleUtils.getModule(),
@@ -371,5 +369,3 @@ public class MessageDispatcher {
                 PredefinedTypes.TYPE_NULL, args);
     }
 }
-
-

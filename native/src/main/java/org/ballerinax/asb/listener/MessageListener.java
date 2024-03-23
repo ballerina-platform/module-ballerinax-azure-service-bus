@@ -34,46 +34,43 @@ import java.util.Map;
  * ASB message listener representation binding it to a Ballerina service.
  */
 public class MessageListener {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageListener.class);
 
-    private Runtime runtime;
-    private ArrayList<BObject> services = new ArrayList<>();
-    private Map<BObject, MessageDispatcher> dispatcherSet = new HashMap<BObject, MessageDispatcher>();
-    private BObject caller;
-    private ServiceBusClientBuilder sharedConnectionBuilder;
-    private boolean started = false;
+    public static Runtime runtime;
+    private static ArrayList<BObject> services = new ArrayList<>();
+    public static Map<BObject, MessageDispatcher> dispatcherSet = new HashMap<BObject, MessageDispatcher>();
+    private static BObject caller;
+    private static ServiceBusClientBuilder sharedConnectionBuilder;
+    private static boolean started = false;
 
     /**
-     * Initializes Azure Service Bus listener. This creates a connection to the pointed
+     * Initializes Azure Service Bus listener. This creates a connection to the
+     * pointed
      * Azure Service Bus. Actual listeners will get created with the information
      * of attached services.
      *
      * @param connectionString Azure service bus connection string.
+     * @param logLevel         Log level to be used.
+     * @param callerObject     Ballerina object which is used to call the caller.
      */
-    public MessageListener(String connectionString, String logLevel) {
-        this.sharedConnectionBuilder = new ServiceBusClientBuilder().connectionString(connectionString);
+    public static Object initializeListner(String connectionString, String logLevel, BObject callerObject) {
+        sharedConnectionBuilder = new ServiceBusClientBuilder().connectionString(connectionString);
         LOGGER.debug("ServiceBusListnerClient initialized");
+        caller = callerObject;
+        return null;
     }
 
     /**
-     * Attaches Caller object to the listener. 
-     * 
-     * @param caller object represeting Ballerina Caller 
-     */
-    public void externalInit(BObject caller) {
-        this.caller = caller; 
-    }
-
-    /**
-     * Attaches the service to the ASB listener endpoint. Here, a new ASB message processor client 
+     * Attaches the service to the ASB listener endpoint. Here, a new ASB message
+     * processor client
      * is created internally with the message dispatcher, but not started.
      *
-     * @param environment     Ballerina runtime
-     * @param listenerBObject Ballerina listener object
-     * @param service         Ballerina service instance
+     * @param environment Ballerina runtime
+     * @param service     Ballerina service instance
      * @return An error if failed to create IMessageReceiver connection instance
      */
-    public Object attach(Environment environment, BObject listenerBObject, BObject service) {
+    public static Object attach(Environment environment, BObject service) {
         try {
             runtime = environment.getRuntime();
             if (service == null) {
@@ -97,13 +94,12 @@ public class MessageListener {
     }
 
     /**
-     * Starts consuming the messages on all the attached 
+     * Starts consuming the messages on all the attached
      * services if not already started.
      *
-     * @param listenerBObject Ballerina listener object
      * @return An error if failed to start the listener
      */
-    public Object start(BObject listenerBObject) {
+    public static Object start() {
         if (services.isEmpty()) {
             return ASBUtils.createErrorValue("No attached services found");
         }
@@ -122,11 +118,10 @@ public class MessageListener {
      * Stops consuming messages and detaches the service from the ASB Listener
      * endpoint.
      *
-     * @param listenerBObject Ballerina listener object.
-     * @param service         Ballerina service instance.
+     * @param service Ballerina service instance.
      * @return An error if failed detaching the service.
      */
-    public Object detach(BObject listenerBObject, BObject service) {
+    public static Object detach(BObject service) {
         try {
             stopMessageDispatch(service);
         } catch (Exception e) {
@@ -139,13 +134,11 @@ public class MessageListener {
     }
 
     /**
-     * Stops consuming messages through all consumer services by terminating the
-     * listeners and connection.
+     * Stops consuming messages through all consumer services by terminating the connection and all its channels.
      *
-     * @param listenerBObject Ballerina listener object.
      * @return An error if listener fails to stop.
      */
-    public Object stop(BObject listenerBObject) {
+    public static Object gracefulStop() {
         if (!started) {
             return ASBUtils.createErrorValue("Listener has not started.");
         } else {
@@ -159,23 +152,35 @@ public class MessageListener {
     }
 
     /**
-     * Stops consuming messages through all the consumer services and terminates the
-     * listeners and the connection with server.
+     * Stops consuming messages through all the consumer services and terminates the connection
+     * with the server.
      *
-     * @param listenerBObject Ballerina listener object.
-     * @return An error if listener fails to abort the connection.
+     * @return An error if listener fails to stop.
      */
-    public Object forceStop(BObject listenerBObject) {
-        stop(listenerBObject);
+    public static Object immediateStop() {
+        if (!started) {
+            return ASBUtils.createErrorValue("Listener has not started.");
+        } else {
+            for (BObject service : services) {
+                closeMessageDispatch(service);
+            }
+            services.clear();
+            dispatcherSet.clear();
+        }
         return null;
     }
 
-    private void stopMessageDispatch(BObject service) {
+    private static void stopMessageDispatch(BObject service) {
         MessageDispatcher msgDispatcher = dispatcherSet.get(service);
         msgDispatcher.stopListeningAndDispatching();
     }
 
-    private void startMessageDispatch(BObject service) {
+    private static void closeMessageDispatch(BObject service) {
+        MessageDispatcher msgDispatcher = dispatcherSet.get(service);
+        msgDispatcher.closeProcessorClient();
+    }
+
+    private static void startMessageDispatch(BObject service) {
         MessageDispatcher msgDispatcher = dispatcherSet.get(service);
         if (!msgDispatcher.isRunning()) {
             msgDispatcher.startListeningAndDispatching();

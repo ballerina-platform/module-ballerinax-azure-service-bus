@@ -222,7 +222,7 @@ public class ASBUtils {
      * @param map Input BMap used to convert to Map.
      * @return Converted Map object.
      */
-    public static Map<String, Object> toMap(BMap<BString, Object> map) {
+    public static Map<String, Object> toStringMap(BMap<BString, Object> map) {
         Map<String, Object> returnMap = new HashMap<>();
         Object value;
         String classType;
@@ -268,14 +268,14 @@ public class ASBUtils {
     /**
      * Convert BMap to Object Map.
      *
-     * @param map Input BMap used to convert to Map.
+     * @param bMap Input BMap used to convert to Map.
      * @return Converted Map object.
      */
-    public static Map<String, Object> toObjectMap(BMap<BString, Object> map) {
+    public static Map<String, Object> toObjectMap(BMap<?, ?> bMap) {
         Map<String, Object> returnMap = new HashMap<>();
-        if (map != null) {
-            for (Object aKey : map.getKeys()) {
-                returnMap.put(aKey.toString(), map.get(aKey));
+        if (bMap != null) {
+            for (Object aKey : bMap.getKeys()) {
+                returnMap.put(aKey.toString(), bMap.get(aKey));
             }
         }
         return returnMap;
@@ -312,8 +312,8 @@ public class ASBUtils {
      * @param subscriptionConfig BMap containing the subscription configurations.
      * @return CreateSubscriptionOptions object.
      */
-    public static CreateSubscriptionOptions getCreateSubscriptionPropertiesFromBObject(BMap<BString, Object>
-                                                                                               subscriptionConfig) {
+    public static CreateSubscriptionOptions getCreateSubscriptionPropertiesFromBObject(
+            BMap<BString, Object> subscriptionConfig) {
         CreateSubscriptionOptions subscriptionOptions = new CreateSubscriptionOptions();
         if (subscriptionConfig.containsKey(ASBConstants.SUBSCRIPTION_RECORD_FIELD_AUTO_DELETE_ON_IDLE)) {
             subscriptionOptions.setAutoDeleteOnIdle(
@@ -923,10 +923,12 @@ public class ASBUtils {
     }
 
     /**
-     * Checks whether the given type is a union type of two member types, including the nil type.
+     * Checks whether the given type is a union type of two member types, including
+     * the nil type.
      *
      * @param type Type to be checked
-     * @return True if the given type is a union type of two member types, including nil type.
+     * @return True if the given type is a union type of two member types, including
+     * nil type.
      */
     private static boolean isSupportedUnionType(Type type) {
         if (type.getTag() != UNION_TAG) {
@@ -965,7 +967,7 @@ public class ASBUtils {
             map.put(key, receivedProperty);
         }
     }
-    
+
     /**
      * Get the value as string or as empty based on the object value.
      *
@@ -1012,8 +1014,8 @@ public class ASBUtils {
 
     /**
      * Checks if PEEK LOCK mode is enabled for listening for messages.
-     * 
-     * @param service Service instance having configuration 
+     *
+     * @param service Service instance having configuration
      * @return true if enabled
      */
     public static boolean isPeekLockModeEnabled(BObject service) {
@@ -1026,10 +1028,27 @@ public class ASBUtils {
     }
 
     /**
-     * Obtain string value of a service level configuration. 
-     * 
+     * Obtain map value of a service level configuration.
+     *
+     * @param service
+     * @param key
+     * @return
+     */
+
+    public static Map<String, Object> getServiceConfigMapValue(BObject service, String key) {
+        BMap<BString, Object> serviceConfig = getServiceConfig(service);
+        if (serviceConfig != null && serviceConfig.containsKey(StringUtils.fromString(key))) {
+            return toObjectMap(serviceConfig.getMapValue(StringUtils.fromString(key)));
+        } else {
+            return new HashMap<>();
+        }
+    }
+
+    /**
+     * Obtain string value of a service level configuration.
+     *
      * @param service Service instance
-     * @param key Key of the configuration
+     * @param key     Key of the configuration
      * @return String value of the given config key, or empty string if not found
      */
     public static String getServiceConfigStringValue(BObject service, String key) {
@@ -1043,7 +1062,7 @@ public class ASBUtils {
 
     /**
      * Obtain numeric value of a service level configuration.
-     * 
+     *
      * @param service Service instance
      * @param key     Key of the configuration
      * @return Integer value of the given config key, or null if not found
@@ -1056,7 +1075,7 @@ public class ASBUtils {
             return defaultValue;
         }
     }
-    
+
     private static BMap<BString, Object> getServiceConfig(BObject service) {
         ObjectType serviceType = (ObjectType) TypeUtils.getReferredType(service.getType());
         @SuppressWarnings("unchecked")
