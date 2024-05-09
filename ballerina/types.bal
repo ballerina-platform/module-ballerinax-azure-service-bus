@@ -845,13 +845,28 @@ public enum EntityStatus {
     UNKNOWN = "Unknown"
 };
 
-# Azure service bus listener configuration.
+# Represents Azure service bus listener configuration.
 #
-public type ListenerConfig record {
-    # The connection string of Azure service bus
-    @display {label: "ASB Connection String"}
-    string connectionString;
-};
+# + autoComplete - Enables auto-complete and auto-abandon of received messages 
+# + prefetchCount - The number of messages to prefetch  
+# + maxConcurrency - Max concurrent messages that this listener should process
+public type ListenerConfiguration record {|
+    *ASBServiceReceiverConfig;
+    boolean autoComplete = true;
+    int prefetchCount = 0;
+    int maxConcurrency = 1;
+|};
+
+# Options to specify when sending an `asb:Message` received via `asb:ReceiveMode#PEEK_LOCK` to the dead-letter queue.
+#
+# + deadLetterReason - The deadletter reason
+# + deadLetterErrorDescription - The deadletter error description
+# + propertiesToModify - Message properties to modify
+public type DeadLetterOptions record {|
+    string deadLetterReason?;
+    string deadLetterErrorDescription?;
+    map<anydata> propertiesToModify?;
+|};
 
 # Represents Custom configurations for the ASB connector
 #
@@ -861,13 +876,13 @@ public type Options record {
     LogLevel logLevel = OFF;
 };
 
-# ErrorContext is a record type that represents error context information
+# Represents message retrieval error context.
 #
 # + entityPath - The entity path of the error source  
-# + className - The name of the class that threw the error  
-# + namespace - The namespace of the error source  
-# + errorSource - The error source, such as a function or action name  
-# + reason - The error reason
+# + className - The name of the originating class    
+# + namespace -  The namespace of the error source  
+# + errorSource - The error source, such as a function or action name   
+# + reason - The reason for the error
 public type ErrorContext record {
     @display {label: "Entity Path"}
     string entityPath;
@@ -880,34 +895,3 @@ public type ErrorContext record {
     @display {label: "Reason"}
     string reason;
 };
-
-# Configurations for the ASB Service
-#
-# + queueName - The name of the queue to listen to
-# + peekLockModeEnabled - Whether to use peekLock mode or not
-# + topicName - The name of the topic to listen to
-# + subscriptionName - The name of the subscription to listen to
-# + maxConcurrency - The maximum number of concurrent messages to process
-# + prefetchCount - The number of messages to prefetch
-# + maxAutoLockRenewDuration - The maximum duration to renew the lock automatically
-# + logLevel - The log level to use
-public type ASBServiceConfig record {|
-    @display {label: "Queue Name"}
-    string queueName?;
-    @display {label: "Peek Lock Mode Enabled"}
-    boolean peekLockModeEnabled = false;
-    @display {label: "Topic Name"}
-    string topicName?;
-    @display {label: "Subscription Name"}
-    string subscriptionName?;
-    @display {label: "Max Concurrency"}
-    int maxConcurrency = 1;
-    @display {label: "Prefetch Count"}
-    int prefetchCount = 0;
-    @display {label: "Max Auto Lock Renew Duration"}
-    int maxAutoLockRenewDuration = 300;
-    @display {label: "Log Level"}
-    string logLevel = ERROR;
-|};
-
-public annotation ASBServiceConfig ServiceConfig on service, class;

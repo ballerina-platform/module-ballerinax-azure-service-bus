@@ -16,98 +16,81 @@
 
 import ballerina/jballerina.java as java;
 
-# Ballerina Azure Service Bus Message Listener.
-public class Listener {
+# Represents a ASB consumer listener.
+public isolated class Listener {
 
-    private final string connectionString;
-    private final handle listenerHandle;
-    private final LogLevel logLevel;
-    Caller caller;
-
-    # Gets invoked to initialize the `listener`.
-    # The listener initialization requires setting the credentials. 
-    # Create an [Azure account](https://azure.microsoft.com) and obtain tokens following [this guide](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-portal).
-    #
-    # + listenerConfig - The configurations to be used when initializing the `listener`
-    # + return - An error if listener initialization failed
-    public isolated function init(*ListenerConfig listenerConfig) returns error? {
-        self.connectionString = listenerConfig.connectionString;
-        self.logLevel = customConfiguration.logLevel;
-        self.listenerHandle = initListener(java:fromString(self.connectionString), java:fromString(self.logLevel));
-        self.caller = new Caller(self.logLevel);
-        externalInit(self.listenerHandle, self.caller);
+    # Creates a new `asb:Listener`.
+    # ```ballerina
+    # listener asb:Listener asbListener = check new (
+    #   connectionString = "xxxxxxxx",
+    #   entityConfig = {
+    #       queueName: "test-queue"
+    #   },
+    #   autoComplete = false
+    # );
+    # ```
+    # 
+    # + config - ASB listener configurations
+    # + return - An `asb:Error` if an error is encountered or else '()'
+    public isolated function init(*ListenerConfiguration config) returns Error? {
+        return self.externInit(config);
     }
 
-    # Starts consuming the messages on all the attached services.
-    #
-    # + return - `()` or else an error upon failure to start
-    public isolated function 'start() returns Error? {
-        return 'start(self.listenerHandle, self);
-    }
 
-    # Attaches the service to the `asb:Listener` endpoint.
-    #
-    # + s - Type descriptor of the service
+    private isolated function externInit(ListenerConfiguration config) returns Error? = @java:Method {
+        'class: "org.ballerinax.asb.listener.NativeListener"
+    } external;
+
+    # Attaches an `asb:Service` to a listener.
+    # ```ballerina
+    # check asbListener.attach(asbService);
+    # ```
+    # 
+    # + 'service - The service instance
     # + name - Name of the service
-    # + return - `()` or else an error upon failure to register the service
-    public isolated function attach(MessageService s, string[]|string? name = ()) returns Error? {
-        return attach(self.listenerHandle, self, s);
-    }
+    # + return - An `asb:Error` if there is an error or else `()`
+    public isolated function attach(Service 'service, string[]|string? name = ()) returns Error? = @java:Method {
+        'class: "org.ballerinax.asb.listener.NativeListener"
+    } external;
 
-    # Stops consuming messages and detaches the service from the `asb:Listener` endpoint.
+    # Detaches an `asb:Service` from the the listener.
+    # ```ballerina
+    # check asbListener.detach(asbService);
+    # ```
     #
-    # + s - Type descriptor of the service
-    # + return - `()` or else  an error upon failure to detach the service
-    public isolated function detach(MessageService s) returns Error? {
-        return detach(self.listenerHandle, self, s);
-    }
+    # + 'service - The service to be detached
+    # + return - A `jms:Error` if there is an error or else `()`
+    public isolated function detach(Service 'service) returns Error? = @java:Method {
+        'class: "org.ballerinax.asb.listener.NativeListener"
+    } external;
 
-    # Stops consuming messages through all consumer services by terminating the connection and all its channels.
+    # Starts the `asb:Listener`.
+    # ```ballerina
+    # check asbListener.'start();
+    # ```
     #
-    # + return - `()` or else  an error upon failure to close the `ChannelListener`
-    public isolated function gracefulStop() returns Error? {
-        return stop(self.listenerHandle, self);
-    }
+    # + return - An `asb:Error` if there is an error or else `()`
+    public isolated function 'start() returns Error? = @java:Method {
+        'class: "org.ballerinax.asb.listener.NativeListener"
+    } external;
 
-    # Stops consuming messages through all the consumer services and terminates the connection
-    # with the server.
+    # Stops the `asb:Listener` gracefully.
+    # ```ballerina
+    # check asbListener.gracefulStop();
+    # ```
     #
-    # + return - `()` or else  an error upon failure to close the `ChannelListener`.
-    public isolated function immediateStop() returns Error? {
-        return forceStop(self.listenerHandle, self);
-    }
+    # + return - An `asb:Error` if there is an error or else `()`
+    public isolated function gracefulStop() returns Error? = @java:Method {
+        'class: "org.ballerinax.asb.listener.NativeListener"
+    } external;
+
+    # Stops the `asb:Listener` immediately.
+    # ```ballerina
+    # check asbListener.immediateStop();
+    # ```
+    #
+    # + return - An `asb:Error` if there is an error or else `()`
+    public isolated function immediateStop() returns Error? = @java:Method {
+        'class: "org.ballerinax.asb.listener.NativeListener"
+    } external;
 }
-
-isolated function initListener(handle connectionString, handle logLevel)
-returns handle = @java:Constructor {
-    'class: "org.ballerinax.asb.listener.MessageListener",
-    paramTypes: [
-        "java.lang.String",
-        "java.lang.String"
-    ]
-} external;
-
-isolated function externalInit(handle listenerHandle, Caller caller) = @java:Method {
-    'class: "org.ballerinax.asb.listener.MessageListener"
-} external;
-
-isolated function 'start(handle listenerHandle, Listener lis) returns Error? = @java:Method {
-    'class: "org.ballerinax.asb.listener.MessageListener"
-} external;
-
-isolated function stop(handle listenerHandle, Listener lis) returns Error? = @java:Method {
-    'class: "org.ballerinax.asb.listener.MessageListener"
-} external;
-
-isolated function attach(handle listenerHandle, Listener lis, MessageService serviceType) returns Error? = @java:Method {
-    'class: "org.ballerinax.asb.listener.MessageListener"
-} external;
-
-isolated function detach(handle listenerHandle, Listener lis, MessageService serviceType) returns Error? = @java:Method {
-    'class: "org.ballerinax.asb.listener.MessageListener"
-} external;
-
-isolated function forceStop(handle listenerHandle, Listener lis) returns Error? = @java:Method {
-    'class: "org.ballerinax.asb.listener.MessageListener"
-} external;
-
