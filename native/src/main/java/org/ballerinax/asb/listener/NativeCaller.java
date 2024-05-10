@@ -22,12 +22,14 @@ import com.azure.messaging.servicebus.ServiceBusReceivedMessageContext;
 import com.azure.messaging.servicebus.models.AbandonOptions;
 import com.azure.messaging.servicebus.models.DeadLetterOptions;
 import com.azure.messaging.servicebus.models.DeferOptions;
+import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
 import org.ballerinax.asb.util.ASBErrorCreator;
 import org.ballerinax.asb.util.ASBUtils;
+import org.ballerinax.asb.util.ModuleUtils;
 
 import java.util.Map;
 import java.util.Objects;
@@ -36,6 +38,7 @@ import java.util.Objects;
  * {@code NativeCaller} provides the utility methods for the Ballerina ASB caller implementation.
  */
 public final class NativeCaller {
+    private static final String CALLER = "Caller";
     private static final String NATIVE_MSG_CONTEXT = "messageContext";
 
     private static final BString DEAD_LETTER_REASON = StringUtils.fromString("deadLetterReason");
@@ -46,8 +49,10 @@ public final class NativeCaller {
     private NativeCaller() {
     }
 
-    public static void init(BObject bCaller, ServiceBusReceivedMessageContext messageContext) {
+    public static BObject createCaller(ServiceBusReceivedMessageContext messageContext) {
+        BObject bCaller = ValueCreator.createObjectValue(ModuleUtils.getModule(), CALLER);
         bCaller.addNativeData(NATIVE_MSG_CONTEXT, messageContext);
+        return bCaller;
     }
 
     public static Object complete(BObject bCaller) {
