@@ -30,7 +30,6 @@ import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
-import org.ballerinax.asb.util.ASBErrorCreator;
 import org.ballerinax.asb.util.ModuleUtils;
 
 import java.util.function.Consumer;
@@ -57,16 +56,12 @@ public class ErrorConsumer implements Consumer<ServiceBusErrorContext> {
     @Override
     public void accept(ServiceBusErrorContext errorContext) {
         NativeBServiceAdaptor bService = NativeListener.getBallerinaSvc(this.bListener);
-        Object[] params = methodParameters(bService.getOnErrorParams(), errorContext);
+        Object[] params = getMethodParams(bService.getOnErrorParams(), errorContext);
         Callback callback = OnErrorCallback.getInstance();
         bService.invokeOnError(callback, params, errorContext.getException());
     }
 
-    private Object[] methodParameters(Parameter[] parameters, ServiceBusErrorContext errorContext) {
-        if (parameters.length == 0) {
-            throw ASBErrorCreator.createError(
-                    "Required parameter `error` has not been defined in the `onError` method");
-        }
+    private Object[] getMethodParams(Parameter[] parameters, ServiceBusErrorContext errorContext) {
         Object[] args = new Object[parameters.length * 2];
         args[0] = createError(errorContext);
         args[1] = true;
