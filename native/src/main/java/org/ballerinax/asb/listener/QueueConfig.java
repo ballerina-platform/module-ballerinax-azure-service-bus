@@ -20,6 +20,8 @@ package org.ballerinax.asb.listener;
 
 /**
  * {@code QueueConfig} represents an ASB queue configurations.
+ *
+ * @param queue Name of the queue.
  */
 public record QueueConfig(String queue) implements EntityConfig {
 }

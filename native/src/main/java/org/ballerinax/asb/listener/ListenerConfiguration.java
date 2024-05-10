@@ -29,10 +29,23 @@ import static org.ballerinax.asb.util.ASBUtils.getRetryOptions;
 /**
  * {@code ListenerConfiguration} contains the java representation of the Ballerina ASB listener configurations.
  */
+
+/**
+ * {@code ListenerConfiguration} contains the java representation of the Ballerina ASB listener configurations.
+ *
+ * @param connectionString ASB connection string.
+ * @param entityConfig ASB entity related configurations.
+ * @param receiveMode Receive mode of the underlying client.
+ * @param maxAutoLockRenewDuration Amount of time to continue auto-renewing the lock.
+ * @param maxConcurrency Max concurrent messages that this processor should process.
+ * @param prefetchCount Prefetch count of the processor.
+ * @param autoComplete Flag indicating auto-complete and auto-abandon of received messages is enabled.
+ * @param amqpRetryOptions Retry options for Service Bus client.
+ */
 public record ListenerConfiguration(String connectionString, EntityConfig entityConfig,
                                     ServiceBusReceiveMode receiveMode, int maxAutoLockRenewDuration,
                                     int maxConcurrency, int prefetchCount, boolean autoComplete,
-                                    AmqpRetryOptions retryOptions) {
+                                    AmqpRetryOptions amqpRetryOptions) {
     private static final BString CONNECTION_STRING = StringUtils.fromString("connectionString");
     private static final BString ENTITY_CONFIG = StringUtils.fromString("entityConfig");
     private static final BString ENTITY_CONFIG_QUEUE_NAME = StringUtils.fromString("queueName");
@@ -43,7 +56,7 @@ public record ListenerConfiguration(String connectionString, EntityConfig entity
     private static final BString MAX_CONCURRENCY = StringUtils.fromString("maxConcurrency");
     private static final BString PREFETCH_COUNT = StringUtils.fromString("prefetchCount");
     private static final BString AUTO_COMPLETE = StringUtils.fromString("autoComplete");
-    private static final BString RETRY_OPTIONS = StringUtils.fromString("retryOptions");
+    private static final BString AMQP_RETRY_OPTIONS = StringUtils.fromString("amqpRetryOptions");
 
 
     @SuppressWarnings("unchecked")
@@ -56,7 +69,7 @@ public record ListenerConfiguration(String connectionString, EntityConfig entity
                 configurations.getIntValue(MAX_CONCURRENCY).intValue(),
                 configurations.getIntValue(PREFETCH_COUNT).intValue(),
                 configurations.getBooleanValue(AUTO_COMPLETE),
-                getRetryOptions((BMap<BString, Object>) configurations.getMapValue(RETRY_OPTIONS))
+                getRetryOptions((BMap<BString, Object>) configurations.getMapValue(AMQP_RETRY_OPTIONS))
         );
     }
 

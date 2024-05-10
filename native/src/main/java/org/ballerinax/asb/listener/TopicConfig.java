@@ -20,6 +20,9 @@ package org.ballerinax.asb.listener;
 
 /**
  * {@code TopicConfig} represents an ASB topic configurations.
+ *
+ * @param topic Name of the topic
+ * @param subscription Name of the subscription
  */
 public record TopicConfig(String topic, String subscription) implements EntityConfig {
 }
