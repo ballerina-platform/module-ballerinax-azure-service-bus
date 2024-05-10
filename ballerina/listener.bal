@@ -59,7 +59,7 @@ public isolated class Listener {
     # ```
     #
     # + 'service - The service to be detached
-    # + return - A `jms:Error` if there is an error or else `()`
+    # + return - An `asb:Error` if there is an error or else `()`
     public isolated function detach(Service 'service) returns Error? = @java:Method {
         'class: "org.ballerinax.asb.listener.NativeListener"
     } external;
