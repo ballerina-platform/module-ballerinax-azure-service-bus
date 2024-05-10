@@ -34,7 +34,6 @@ import io.ballerina.runtime.api.values.BObject;
 import org.ballerinax.asb.util.ASBErrorCreator;
 import org.ballerinax.asb.util.ModuleUtils;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -119,9 +118,6 @@ public final class NativeBServiceAdaptor {
 
     public void invokeOnError(Callback callback, Object[] params, Throwable rootCause) {
         if (onError.isEmpty()) {
-            if (Objects.nonNull(rootCause)) {
-                rootCause.printStackTrace();
-            }
             return;
         }
         Module module = ModuleUtils.getModule();
