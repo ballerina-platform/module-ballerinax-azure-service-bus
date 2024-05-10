@@ -40,7 +40,7 @@ public final class NativeListener {
     private NativeListener() {
     }
 
-    public Object externInit(BObject bListener, BMap<BString, Object> config) {
+    public static Object externInit(BObject bListener, BMap<BString, Object> config) {
         try {
             ListenerConfiguration listenerConfigs = new ListenerConfiguration(config);
             ServiceBusProcessorClient nativeClient = constructNativeClient(bListener, listenerConfigs);
@@ -56,7 +56,7 @@ public final class NativeListener {
     private static ServiceBusProcessorClient constructNativeClient(BObject bListener, ListenerConfiguration configs) {
         ServiceBusClientBuilder.ServiceBusProcessorClientBuilder clientBuilder = new ServiceBusClientBuilder()
                 .connectionString(configs.connectionString())
-                .retryOptions(configs.retryOptions())
+                .retryOptions(configs.amqpRetryOptions())
                 .processor()
                 .receiveMode(configs.receiveMode())
                 .prefetchCount(configs.prefetchCount())
