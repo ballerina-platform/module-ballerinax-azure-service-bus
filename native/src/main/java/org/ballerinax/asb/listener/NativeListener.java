@@ -29,7 +29,7 @@ import java.time.Duration;
 import java.util.Objects;
 
 /**
- * {@code NativeListener} provides the utility methods for ASB listener implementation.
+ * {@code NativeListener} provides the utility methods for the Ballerina ASB listener implementation.
  */
 public final class NativeListener {
     private static final String NATIVE_CLIENT = "nativeClient";

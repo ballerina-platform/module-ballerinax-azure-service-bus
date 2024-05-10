@@ -26,6 +26,9 @@ import io.ballerina.runtime.api.values.BString;
 
 import static org.ballerinax.asb.util.ASBUtils.getRetryOptions;
 
+/**
+ * {@code ListenerConfiguration} contains the java representation of the Ballerina ASB listener configurations.
+ */
 public record ListenerConfiguration(String connectionString, EntityConfig entityConfig,
                                     ServiceBusReceiveMode receiveMode, int maxAutoLockRenewDuration,
                                     int maxConcurrency, int prefetchCount, boolean autoComplete,
