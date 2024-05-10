@@ -21,7 +21,6 @@ package org.ballerinax.asb.listener;
 import com.azure.messaging.servicebus.ServiceBusClientBuilder;
 import com.azure.messaging.servicebus.ServiceBusProcessorClient;
 import io.ballerina.runtime.api.Environment;
-import io.ballerina.runtime.api.Runtime;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
@@ -41,11 +40,10 @@ public final class NativeListener {
     private NativeListener() {
     }
 
-    public Object externInit(Environment env, BObject bListener, BMap<BString, Object> config) {
+    public Object externInit(BObject bListener, BMap<BString, Object> config) {
         try {
             ListenerConfiguration listenerConfigs = new ListenerConfiguration(config);
-            ServiceBusProcessorClient nativeClient = constructNativeClient(
-                    bListener, listenerConfigs, env.getRuntime());
+            ServiceBusProcessorClient nativeClient = constructNativeClient(bListener, listenerConfigs);
             bListener.addNativeData(NATIVE_LISTENER_CONFIGS, listenerConfigs);
             bListener.addNativeData(NATIVE_CLIENT, nativeClient);
         } catch (Exception e) {
@@ -55,8 +53,7 @@ public final class NativeListener {
         return null;
     }
 
-    private static ServiceBusProcessorClient constructNativeClient(BObject bListener, ListenerConfiguration configs,
-                                                                   Runtime bRuntime) {
+    private static ServiceBusProcessorClient constructNativeClient(BObject bListener, ListenerConfiguration configs) {
         ServiceBusClientBuilder.ServiceBusProcessorClientBuilder clientBuilder = new ServiceBusClientBuilder()
                 .connectionString(configs.connectionString())
                 .retryOptions(configs.retryOptions())
@@ -65,8 +62,8 @@ public final class NativeListener {
                 .prefetchCount(configs.prefetchCount())
                 .maxAutoLockRenewDuration(Duration.ofSeconds(configs.maxAutoLockRenewDuration()))
                 .maxConcurrentCalls(configs.maxConcurrency())
-                .processMessage(new MessageConsumer(bListener, bRuntime))
-                .processError(new ErrorConsumer(bListener, bRuntime));
+                .processMessage(new MessageConsumer(bListener))
+                .processError(new ErrorConsumer(bListener));
         if (!configs.autoComplete()) {
             clientBuilder.disableAutoComplete();
         }
@@ -78,11 +75,12 @@ public final class NativeListener {
         return clientBuilder.buildProcessorClient();
     }
 
-    public static Object attach(BObject bListener, BObject bService, Object name) {
+    public static Object attach(Environment env, BObject bListener, BObject bService, Object name) {
         try {
             ListenerConfiguration configs = (ListenerConfiguration) bListener
                     .getNativeData(NATIVE_LISTENER_CONFIGS);
-            NativeBServiceAdaptor nativeBService = new NativeBServiceAdaptor(bService, name, configs.autoComplete());
+            NativeBServiceAdaptor nativeBService = new NativeBServiceAdaptor(
+                    env.getRuntime(), bService, name, configs.autoComplete());
             nativeBService.validate();
             bListener.addNativeData(NATIVE_SVC_OBJ, nativeBService);
         } catch (Exception e) {

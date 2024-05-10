@@ -45,6 +45,7 @@ public final class NativeBServiceAdaptor {
     private static final String ON_MESSAGE_METHOD = "onMessage";
     private static final String ON_ERROR_METHOD = "onError";
 
+    private final Runtime bRuntime;
     private final BObject bServiceObj;
     private final Object bServiceName;
     private final boolean autoCompleteEnabled;
@@ -52,7 +53,8 @@ public final class NativeBServiceAdaptor {
     private final MethodType onMessage;
     private final Optional<MethodType> onError;
 
-    public NativeBServiceAdaptor(BObject bService, Object svcName, boolean autoCompleteEnabled) {
+    public NativeBServiceAdaptor(Runtime bRuntime, BObject bService, Object svcName, boolean autoCompleteEnabled) {
+        this.bRuntime = bRuntime;
         this.bServiceObj = bService;
         this.bServiceName = svcName;
         this.autoCompleteEnabled = autoCompleteEnabled;
@@ -98,7 +100,7 @@ public final class NativeBServiceAdaptor {
         return onMessage.getParameters();
     }
 
-    public void invokeOnMessage(Runtime bRuntime, Callback callback, Object[] params) {
+    public void invokeOnMessage(Callback callback, Object[] params) {
         Module module = ModuleUtils.getModule();
         StrandMetadata metadata = new StrandMetadata(
                 module.getOrg(), module.getName(), module.getMajorVersion(), ON_MESSAGE_METHOD);
@@ -115,7 +117,7 @@ public final class NativeBServiceAdaptor {
         return onError.map(FunctionType::getParameters).orElse(new Parameter[]{});
     }
 
-    public void invokeOnError(Runtime bRuntime, Callback callback, Object[] params, Throwable rootCause) {
+    public void invokeOnError(Callback callback, Object[] params, Throwable rootCause) {
         if (onError.isEmpty()) {
             if (Objects.nonNull(rootCause)) {
                 rootCause.printStackTrace();

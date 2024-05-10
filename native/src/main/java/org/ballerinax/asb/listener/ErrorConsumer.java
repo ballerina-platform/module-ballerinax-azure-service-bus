@@ -21,7 +21,6 @@ package org.ballerinax.asb.listener;
 import com.azure.messaging.servicebus.ServiceBusErrorContext;
 import com.azure.messaging.servicebus.ServiceBusException;
 import com.azure.messaging.servicebus.ServiceBusFailureReason;
-import io.ballerina.runtime.api.Runtime;
 import io.ballerina.runtime.api.async.Callback;
 import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
@@ -50,11 +49,9 @@ public class ErrorConsumer implements Consumer<ServiceBusErrorContext> {
     private static final BString ERROR_CTX_REASON = StringUtils.fromString("reason");
 
     private final BObject bListener;
-    private final Runtime bRuntime;
 
-    public ErrorConsumer(BObject bListener, Runtime bRuntime) {
+    public ErrorConsumer(BObject bListener) {
         this.bListener = bListener;
-        this.bRuntime = bRuntime;
     }
 
     @Override
@@ -62,7 +59,7 @@ public class ErrorConsumer implements Consumer<ServiceBusErrorContext> {
         NativeBServiceAdaptor bService = NativeListener.getBallerinaSvc(this.bListener);
         Object[] params = methodParameters(bService.getOnErrorParams(), errorContext);
         Callback callback = OnErrorCallback.getInstance();
-        bService.invokeOnError(bRuntime, callback, params, errorContext.getException());
+        bService.invokeOnError(callback, params, errorContext.getException());
     }
 
     private Object[] methodParameters(Parameter[] parameters, ServiceBusErrorContext errorContext) {
