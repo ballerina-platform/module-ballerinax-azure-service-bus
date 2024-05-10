@@ -40,6 +40,7 @@ public isolated client class Caller {
     # Dead-Letter the message & moves the message to the Dead-Letter Queue based on messageLockToken. Transfer 
     # the message from the primary queue into a special "dead-letter sub-queue".
     # 
+    # + options - Options to specify while putting message in dead-letter queue
     # + return - An `asb:Error` if failed to deadletter message or else `()`
     isolated remote function deadLetter(*DeadLetterOptions options) returns Error? = @java:Method {
         'class: "org.ballerinax.asb.listener.NativeCaller"
@@ -50,7 +51,7 @@ public isolated client class Caller {
     # 
     # + propertiesToModify - Message properties to modify
     # + return - An `asb:Error` if failed to defer message or else sequence number
-    isolated remote function defer(*record {|anydata...;|} propertiesToModify) returns int|Error = @java:Method {
+    isolated remote function defer(*record {|anydata...;|} propertiesToModify) returns Error? = @java:Method {
         'class: "org.ballerinax.asb.listener.NativeCaller"
     } external;
-};
+}

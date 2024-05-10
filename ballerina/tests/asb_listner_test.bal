@@ -94,7 +94,7 @@ service on asbListener {
             }
             else if getTestCaseCount() == 2 {
                 var result = caller->defer();
-                if result is int {
+                if result is () {
                     setListnerState(RECIEVED_AND_DEFER);
                 }
             }
