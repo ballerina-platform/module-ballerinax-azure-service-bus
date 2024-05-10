@@ -35,14 +35,18 @@ import java.util.Objects;
  */
 public final class NativeListener {
     private static final String NATIVE_CLIENT = "nativeClient";
-    private static final String BALLERINA_SERVICE_OBJ = "serviceObject";
+    private static final String NATIVE_LISTENER_CONFIGS = "listenerConfigs";
+    private static final String NATIVE_SVC_OBJ = "nativeSvcObject";
 
     private NativeListener() {
     }
 
     public Object externInit(Environment env, BObject bListener, BMap<BString, Object> config) {
         try {
-            ServiceBusProcessorClient nativeClient = constructNativeClient(bListener, config, env.getRuntime());
+            ListenerConfiguration listenerConfigs = new ListenerConfiguration(config);
+            ServiceBusProcessorClient nativeClient = constructNativeClient(
+                    bListener, listenerConfigs, env.getRuntime());
+            bListener.addNativeData(NATIVE_LISTENER_CONFIGS, listenerConfigs);
             bListener.addNativeData(NATIVE_CLIENT, nativeClient);
         } catch (Exception e) {
             return ASBErrorCreator.createError(
@@ -51,42 +55,50 @@ public final class NativeListener {
         return null;
     }
 
-    private static ServiceBusProcessorClient constructNativeClient(BObject bListener, BMap<BString, Object> config,
+    private static ServiceBusProcessorClient constructNativeClient(BObject bListener, ListenerConfiguration configs,
                                                                    Runtime bRuntime) {
-        ListenerConfiguration listenerConfigs = new ListenerConfiguration(config);
         ServiceBusClientBuilder.ServiceBusProcessorClientBuilder clientBuilder = new ServiceBusClientBuilder()
-                .connectionString(listenerConfigs.connectionString())
-                .retryOptions(listenerConfigs.retryOptions())
+                .connectionString(configs.connectionString())
+                .retryOptions(configs.retryOptions())
                 .processor()
-                .receiveMode(listenerConfigs.receiveMode())
-                .prefetchCount(listenerConfigs.prefetchCount())
-                .maxAutoLockRenewDuration(Duration.ofSeconds(listenerConfigs.maxAutoLockRenewDuration()))
-                .maxConcurrentCalls(listenerConfigs.maxConcurrency())
+                .receiveMode(configs.receiveMode())
+                .prefetchCount(configs.prefetchCount())
+                .maxAutoLockRenewDuration(Duration.ofSeconds(configs.maxAutoLockRenewDuration()))
+                .maxConcurrentCalls(configs.maxConcurrency())
                 .processMessage(new MessageConsumer(bListener, bRuntime))
                 .processError(new ErrorConsumer(bListener, bRuntime));
-        if (!listenerConfigs.autoComplete()) {
+        if (!configs.autoComplete()) {
             clientBuilder.disableAutoComplete();
         }
-        if (listenerConfigs.entityConfig() instanceof TopicConfig topicConfig) {
+        if (configs.entityConfig() instanceof TopicConfig topicConfig) {
             clientBuilder.topicName(topicConfig.topic()).subscriptionName(topicConfig.subscription());
-        } else if (listenerConfigs.entityConfig() instanceof QueueConfig queueConfig) {
+        } else if (configs.entityConfig() instanceof QueueConfig queueConfig) {
             clientBuilder.queueName(queueConfig.queue());
         }
         return clientBuilder.buildProcessorClient();
     }
 
     public static Object attach(BObject bListener, BObject bService, Object name) {
-        bListener.addNativeData(BALLERINA_SERVICE_OBJ, bService);
+        try {
+            ListenerConfiguration configs = (ListenerConfiguration) bListener
+                    .getNativeData(NATIVE_LISTENER_CONFIGS);
+            NativeBServiceAdaptor nativeBService = new NativeBServiceAdaptor(bService, name, configs.autoComplete());
+            nativeBService.validate();
+            bListener.addNativeData(NATIVE_SVC_OBJ, nativeBService);
+        } catch (Exception e) {
+            return ASBErrorCreator.createError(
+                    String.format("Error occurred while attaching a service to the listener: %s", e.getMessage()), e);
+        }
         return null;
     }
 
     public static Object detach(BObject bListener, BObject bService) {
-        bListener.addNativeData(BALLERINA_SERVICE_OBJ, null);
+        bListener.addNativeData(NATIVE_SVC_OBJ, null);
         return null;
     }
 
     public static Object start(BObject bListener) {
-        BObject bService = getBallerinaSvc(bListener);
+        NativeBServiceAdaptor bService = getBallerinaSvc(bListener);
         try {
             Object nativeClient = bListener.getNativeData(NATIVE_CLIENT);
             if (Objects.isNull(nativeClient)) {
@@ -100,12 +112,12 @@ public final class NativeListener {
         return null;
     }
 
-    public static BObject getBallerinaSvc(BObject bListener) {
-        Object bService = bListener.getNativeData(BALLERINA_SERVICE_OBJ);
+    public static NativeBServiceAdaptor getBallerinaSvc(BObject bListener) {
+        Object bService = bListener.getNativeData(NATIVE_SVC_OBJ);
         if (Objects.isNull(bService)) {
             throw ASBErrorCreator.createError("Could not find the `asb:Service` attached to the listener");
         }
-        return (BObject) bService;
+        return (NativeBServiceAdaptor) bService;
     }
 
     public static Object gracefulStop(BObject bListener) {

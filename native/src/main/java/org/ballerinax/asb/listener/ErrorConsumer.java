@@ -21,17 +21,12 @@ package org.ballerinax.asb.listener;
 import com.azure.messaging.servicebus.ServiceBusErrorContext;
 import com.azure.messaging.servicebus.ServiceBusException;
 import com.azure.messaging.servicebus.ServiceBusFailureReason;
-import io.ballerina.runtime.api.Module;
-import io.ballerina.runtime.api.PredefinedTypes;
 import io.ballerina.runtime.api.Runtime;
-import io.ballerina.runtime.api.async.StrandMetadata;
+import io.ballerina.runtime.api.async.Callback;
 import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
-import io.ballerina.runtime.api.types.MethodType;
-import io.ballerina.runtime.api.types.ObjectType;
 import io.ballerina.runtime.api.types.Parameter;
 import io.ballerina.runtime.api.utils.StringUtils;
-import io.ballerina.runtime.api.utils.TypeUtils;
 import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
@@ -39,15 +34,12 @@ import io.ballerina.runtime.api.values.BString;
 import org.ballerinax.asb.util.ASBErrorCreator;
 import org.ballerinax.asb.util.ModuleUtils;
 
-import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
 
 /**
  * {@code ErrorConsumer} provides the capability to invoke `onError` function of the ASB service.
  */
 public class ErrorConsumer implements Consumer<ServiceBusErrorContext> {
-    private static final String ON_ERROR_METHOD = "onError";
     private static final String MESSAGE_RETRIEVAL_ERROR = "MessageRetrievalError";
     private static final String ERROR_CONTEXT_RECORD = "ErrorContext";
 
@@ -67,34 +59,13 @@ public class ErrorConsumer implements Consumer<ServiceBusErrorContext> {
 
     @Override
     public void accept(ServiceBusErrorContext errorContext) {
-        BObject bService = NativeListener.getBallerinaSvc(this.bListener);
-        Module module = ModuleUtils.getModule();
-        StrandMetadata metadata = new StrandMetadata(
-                module.getOrg(), module.getName(), module.getMajorVersion(), ON_ERROR_METHOD);
-        ObjectType serviceType = (ObjectType) TypeUtils.getReferredType(TypeUtils.getType(bService));
-        Optional<MethodType> onErrorFuncOpt = Stream.of(serviceType.getMethods())
-                .filter(methodType -> ON_ERROR_METHOD.equals(methodType.getName()))
-                .findFirst();
-        if (onErrorFuncOpt.isEmpty()) {
-            errorContext.getException().printStackTrace();
-            return;
-        }
-        MethodType onErrorFunction = onErrorFuncOpt.get();
-        Object[] params = methodParameters(onErrorFunction, errorContext);
-        OnErrorCallback callback = OnErrorCallback.getInstance();
-        if (serviceType.isIsolated() && serviceType.isIsolated(ON_ERROR_METHOD)) {
-            bRuntime.invokeMethodAsyncConcurrently(
-                    bService, ON_ERROR_METHOD, null, metadata, callback, null, PredefinedTypes.TYPE_NULL,
-                    params);
-        } else {
-            bRuntime.invokeMethodAsyncSequentially(
-                    bService, ON_ERROR_METHOD, null, metadata, callback, null, PredefinedTypes.TYPE_NULL,
-                    params);
-        }
+        NativeBServiceAdaptor bService = NativeListener.getBallerinaSvc(this.bListener);
+        Object[] params = methodParameters(bService.getOnErrorParams(), errorContext);
+        Callback callback = OnErrorCallback.getInstance();
+        bService.invokeOnError(bRuntime, callback, params, errorContext.getException());
     }
 
-    private Object[] methodParameters(MethodType onErrorFunction, ServiceBusErrorContext errorContext) {
-        Parameter[] parameters = onErrorFunction.getParameters();
+    private Object[] methodParameters(Parameter[] parameters, ServiceBusErrorContext errorContext) {
         if (parameters.length == 0) {
             throw ASBErrorCreator.createError(
                     "Required parameter `error` has not been defined in the `onError` method");
