@@ -20,6 +20,8 @@ package org.ballerinax.asb.listener;
 
 import com.azure.messaging.servicebus.ServiceBusClientBuilder;
 import com.azure.messaging.servicebus.ServiceBusProcessorClient;
+import io.ballerina.runtime.api.Environment;
+import io.ballerina.runtime.api.Runtime;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
@@ -38,9 +40,9 @@ public final class NativeListener {
     private NativeListener() {
     }
 
-    public Object externInit(BObject bListener, BMap<BString, Object> config) {
+    public Object externInit(Environment env, BObject bListener, BMap<BString, Object> config) {
         try {
-            ServiceBusProcessorClient nativeClient = constructNativeClient(bListener, config);
+            ServiceBusProcessorClient nativeClient = constructNativeClient(bListener, config, env.getRuntime());
             bListener.addNativeData(NATIVE_CLIENT, nativeClient);
         } catch (Exception e) {
             return ASBErrorCreator.createError(
@@ -49,7 +51,8 @@ public final class NativeListener {
         return null;
     }
 
-    private static ServiceBusProcessorClient constructNativeClient(BObject bListener, BMap<BString, Object> config) {
+    private static ServiceBusProcessorClient constructNativeClient(BObject bListener, BMap<BString, Object> config,
+                                                                   Runtime bRuntime) {
         ListenerConfiguration listenerConfigs = new ListenerConfiguration(config);
         ServiceBusClientBuilder.ServiceBusProcessorClientBuilder clientBuilder = new ServiceBusClientBuilder()
                 .connectionString(listenerConfigs.connectionString())
@@ -59,8 +62,8 @@ public final class NativeListener {
                 .prefetchCount(listenerConfigs.prefetchCount())
                 .maxAutoLockRenewDuration(Duration.ofSeconds(listenerConfigs.maxAutoLockRenewDuration()))
                 .maxConcurrentCalls(listenerConfigs.maxConcurrency())
-                .processMessage(new MessageConsumer(bListener))
-                .processError(new ErrorConsumer(bListener));
+                .processMessage(new MessageConsumer(bListener, bRuntime))
+                .processError(new ErrorConsumer(bListener, bRuntime));
         if (!listenerConfigs.autoComplete()) {
             clientBuilder.disableAutoComplete();
         }
