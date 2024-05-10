@@ -48,15 +48,16 @@ public final class NativeBServiceAdaptor {
     private final BObject bServiceObj;
     private final Object bServiceName;
     private final boolean autoCompleteEnabled;
+    private final boolean isolated;
     private final MethodType onMessage;
     private final Optional<MethodType> onError;
-    private final boolean isolated;
 
     public NativeBServiceAdaptor(BObject bService, Object svcName, boolean autoCompleteEnabled) {
         this.bServiceObj = bService;
         this.bServiceName = svcName;
         this.autoCompleteEnabled = autoCompleteEnabled;
         ObjectType serviceType = (ObjectType) TypeUtils.getReferredType(TypeUtils.getType(bService));
+        this.isolated = serviceType.isIsolated() && serviceType.isIsolated(ON_MESSAGE_METHOD);
         Optional<MethodType> onMessageFuncOpt = Stream.of(serviceType.getMethods())
                 .filter(methodType -> ON_MESSAGE_METHOD.equals(methodType.getName()))
                 .findFirst();
@@ -67,7 +68,6 @@ public final class NativeBServiceAdaptor {
         this.onError = Stream.of(serviceType.getMethods())
                 .filter(methodType -> ON_ERROR_METHOD.equals(methodType.getName()))
                 .findFirst();
-        this.isolated = serviceType.isIsolated() && serviceType.isIsolated(ON_MESSAGE_METHOD);
     }
 
     public void validate() {
