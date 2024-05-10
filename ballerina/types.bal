@@ -239,9 +239,9 @@ public enum EntityType {
 # Message receiver modes
 public enum ReceiveMode {
     @display {label: "RECEIVE AND DELETE"}
-    RECEIVE_AND_DELETE = "RECEIVEANDDELETE",
+    RECEIVE_AND_DELETE = "RECEIVE_AND_DELETE",
     @display {label: "PEEK LOCK"}
-    PEEK_LOCK = "PEEKLOCK"
+    PEEK_LOCK = "PEEK_LOCK"
 }
 
 # Log levels
