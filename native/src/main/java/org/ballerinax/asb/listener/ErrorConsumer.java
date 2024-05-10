@@ -81,14 +81,15 @@ public class ErrorConsumer implements Consumer<ServiceBusErrorContext> {
         }
         MethodType onErrorFunction = onErrorFuncOpt.get();
         Object[] params = methodParameters(onErrorFunction, errorContext);
+        OnErrorCallback callback = OnErrorCallback.getInstance();
         if (serviceType.isIsolated() && serviceType.isIsolated(ON_ERROR_METHOD)) {
             bRuntime.invokeMethodAsyncConcurrently(
-                    bService, ON_ERROR_METHOD, null, metadata, OnErrorCallback.getInstance(), null,
-                    PredefinedTypes.TYPE_NULL, params);
+                    bService, ON_ERROR_METHOD, null, metadata, callback, null, PredefinedTypes.TYPE_NULL,
+                    params);
         } else {
             bRuntime.invokeMethodAsyncSequentially(
-                    bService, ON_ERROR_METHOD, null, metadata, OnErrorCallback.getInstance(), null,
-                    PredefinedTypes.TYPE_NULL, params);
+                    bService, ON_ERROR_METHOD, null, metadata, callback, null, PredefinedTypes.TYPE_NULL,
+                    params);
         }
     }
 
