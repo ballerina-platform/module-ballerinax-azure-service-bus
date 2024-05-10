@@ -20,6 +20,7 @@ package org.ballerinax.asb.listener;
 
 import com.azure.messaging.servicebus.ServiceBusClientBuilder;
 import com.azure.messaging.servicebus.ServiceBusProcessorClient;
+import com.azure.messaging.servicebus.models.ServiceBusReceiveMode;
 import io.ballerina.runtime.api.Environment;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
@@ -60,12 +61,14 @@ public final class NativeListener {
                 .processor()
                 .receiveMode(configs.receiveMode())
                 .prefetchCount(configs.prefetchCount())
-                .maxAutoLockRenewDuration(Duration.ofSeconds(configs.maxAutoLockRenewDuration()))
                 .maxConcurrentCalls(configs.maxConcurrency())
                 .processMessage(new MessageConsumer(bListener))
                 .processError(new ErrorConsumer(bListener));
         if (!configs.autoComplete()) {
             clientBuilder.disableAutoComplete();
+        }
+        if (ServiceBusReceiveMode.PEEK_LOCK.equals(configs.receiveMode())) {
+            clientBuilder.maxAutoLockRenewDuration(Duration.ofSeconds(configs.maxAutoLockRenewDuration()));
         }
         if (configs.entityConfig() instanceof TopicConfig topicConfig) {
             clientBuilder.topicName(topicConfig.topic()).subscriptionName(topicConfig.subscription());
