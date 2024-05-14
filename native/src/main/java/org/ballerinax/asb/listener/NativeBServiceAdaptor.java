@@ -95,6 +95,10 @@ public final class NativeBServiceAdaptor {
         }
     }
 
+    public boolean isAutoCompleteEnabled() {
+        return autoCompleteEnabled;
+    }
+
     public Parameter[] getOnMessageParams() {
         return onMessage.getParameters();
     }

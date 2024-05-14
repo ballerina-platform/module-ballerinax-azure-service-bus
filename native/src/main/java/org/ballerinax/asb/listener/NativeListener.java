@@ -64,9 +64,13 @@ public final class NativeListener {
                 .maxConcurrentCalls(configs.maxConcurrency())
                 .processMessage(new MessageConsumer(bListener))
                 .processError(new ErrorConsumer(bListener));
-        if (!configs.autoComplete()) {
-            clientBuilder.disableAutoComplete();
-        }
+        // In the Ballerina listener-service mode, using the default auto-complete mode is impractical because the
+        // actual outcomes are only determined at the callback level (following the execution of the remote method),
+        // and the default auto-complete mode does not account for this. Therefore, we will disable the default
+        // auto-complete mode in this context and introduce a manual auto-complete implementation instead. For further
+        // details, refer to the `OnMessageAutoCompleteCallback` class
+        clientBuilder.disableAutoComplete();
+        
         if (ServiceBusReceiveMode.PEEK_LOCK.equals(configs.receiveMode())) {
             clientBuilder.maxAutoLockRenewDuration(Duration.ofSeconds(configs.maxAutoLockRenewDuration()));
         }

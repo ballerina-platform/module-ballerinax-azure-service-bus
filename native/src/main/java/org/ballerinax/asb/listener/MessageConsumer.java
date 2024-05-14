@@ -21,6 +21,7 @@ package org.ballerinax.asb.listener;
 import com.azure.messaging.servicebus.ServiceBusReceivedMessage;
 import com.azure.messaging.servicebus.ServiceBusReceivedMessageContext;
 import io.ballerina.runtime.api.PredefinedTypes;
+import io.ballerina.runtime.api.async.Callback;
 import io.ballerina.runtime.api.types.Parameter;
 import io.ballerina.runtime.api.types.Type;
 import io.ballerina.runtime.api.utils.TypeUtils;
@@ -64,9 +65,17 @@ public class MessageConsumer implements Consumer<ServiceBusReceivedMessageContex
                     String.format("Error occurred while acquiring the native lock: %s", e.getMessage()), e);
         }
         NativeBServiceAdaptor bService = NativeListener.getBallerinaSvc(this.bListener);
-        OnMessageCallback callback = new OnMessageCallback(semaphore);
+        Callback callback = getBRuntimeCallback(bService, messageContext);
         Object[] params = getMethodParams(bService.getOnMessageParams(), messageContext);
         bService.invokeOnMessage(callback, params);
+    }
+
+    private Callback getBRuntimeCallback(NativeBServiceAdaptor bService,
+                                         ServiceBusReceivedMessageContext messageContext) {
+        if (bService.isAutoCompleteEnabled()) {
+            return new OnMessageAutoCompleteCallback(semaphore, messageContext);
+        }
+        return new OnMessageCallback(semaphore);
     }
 
     private Object[] getMethodParams(Parameter[] parameters, ServiceBusReceivedMessageContext messageContext) {
