@@ -35,7 +35,6 @@ import java.util.Objects;
  */
 public final class NativeListener {
     private static final String NATIVE_CLIENT = "nativeClient";
-    private static final String NATIVE_LISTENER_CONFIGS = "listenerConfigs";
     private static final String NATIVE_SVC_OBJ = "nativeSvcObject";
 
     private NativeListener() {
@@ -43,9 +42,7 @@ public final class NativeListener {
 
     public static Object externInit(BObject bListener, BMap<BString, Object> config) {
         try {
-            ListenerConfiguration listenerConfigs = new ListenerConfiguration(config);
-            ServiceBusProcessorClient nativeClient = constructNativeClient(bListener, listenerConfigs);
-            bListener.addNativeData(NATIVE_LISTENER_CONFIGS, listenerConfigs);
+            ServiceBusProcessorClient nativeClient = constructNativeClient(bListener, config);
             bListener.addNativeData(NATIVE_CLIENT, nativeClient);
         } catch (Exception e) {
             return ASBErrorCreator.createError(
@@ -54,7 +51,9 @@ public final class NativeListener {
         return null;
     }
 
-    private static ServiceBusProcessorClient constructNativeClient(BObject bListener, ListenerConfiguration configs) {
+    private static ServiceBusProcessorClient constructNativeClient(BObject bListener,
+                                                                   BMap<BString, Object> listenerConfigs) {
+        ListenerConfiguration configs = new ListenerConfiguration(listenerConfigs);
         ServiceBusClientBuilder.ServiceBusProcessorClientBuilder clientBuilder = new ServiceBusClientBuilder()
                 .connectionString(configs.connectionString())
                 .retryOptions(configs.amqpRetryOptions())
@@ -62,7 +61,7 @@ public final class NativeListener {
                 .receiveMode(configs.receiveMode())
                 .prefetchCount(configs.prefetchCount())
                 .maxConcurrentCalls(configs.maxConcurrency())
-                .processMessage(new MessageConsumer(bListener))
+                .processMessage(new MessageConsumer(bListener, configs.autoComplete()))
                 .processError(new ErrorConsumer(bListener));
         // In the Ballerina listener-service mode, using the default auto-complete mode is impractical because the
         // actual outcomes are only determined at the callback level (following the execution of the remote method),
@@ -70,7 +69,7 @@ public final class NativeListener {
         // auto-complete mode in this context and introduce a manual auto-complete implementation instead. For further
         // details, refer to the `OnMessageAutoCompleteCallback` class
         clientBuilder.disableAutoComplete();
-        
+
         if (ServiceBusReceiveMode.PEEK_LOCK.equals(configs.receiveMode())) {
             clientBuilder.maxAutoLockRenewDuration(Duration.ofSeconds(configs.maxAutoLockRenewDuration()));
         }
@@ -84,10 +83,7 @@ public final class NativeListener {
 
     public static Object attach(Environment env, BObject bListener, BObject bService, Object name) {
         try {
-            ListenerConfiguration configs = (ListenerConfiguration) bListener
-                    .getNativeData(NATIVE_LISTENER_CONFIGS);
-            NativeBServiceAdaptor nativeBService = new NativeBServiceAdaptor(
-                    env.getRuntime(), bService, name, configs.autoComplete());
+            NativeBServiceAdaptor nativeBService = new NativeBServiceAdaptor(env.getRuntime(), bService, name);
             nativeBService.validate();
             bListener.addNativeData(NATIVE_SVC_OBJ, nativeBService);
         } catch (Exception e) {

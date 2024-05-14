@@ -50,10 +50,12 @@ public class MessageConsumer implements Consumer<ServiceBusReceivedMessageContex
     private static final String MESSAGE_RECORD = "Message";
 
     private final BObject bListener;
+    private final boolean isAutoCompleteEnabled;
     private final Semaphore semaphore = new Semaphore(1);
 
-    public MessageConsumer(BObject bListener) {
+    public MessageConsumer(BObject bListener, boolean autoCompleteEnabled) {
         this.bListener = bListener;
+        this.isAutoCompleteEnabled = autoCompleteEnabled;
     }
 
     @Override
@@ -65,14 +67,13 @@ public class MessageConsumer implements Consumer<ServiceBusReceivedMessageContex
                     String.format("Error occurred while acquiring the native lock: %s", e.getMessage()), e);
         }
         NativeBServiceAdaptor bService = NativeListener.getBallerinaSvc(this.bListener);
-        Callback callback = getBRuntimeCallback(bService, messageContext);
+        Callback callback = getBRuntimeCallback(messageContext);
         Object[] params = getMethodParams(bService.getOnMessageParams(), messageContext);
         bService.invokeOnMessage(callback, params);
     }
 
-    private Callback getBRuntimeCallback(NativeBServiceAdaptor bService,
-                                         ServiceBusReceivedMessageContext messageContext) {
-        if (bService.isAutoCompleteEnabled()) {
+    private Callback getBRuntimeCallback(ServiceBusReceivedMessageContext messageContext) {
+        if (isAutoCompleteEnabled) {
             return new OnMessageAutoCompleteCallback(semaphore, messageContext);
         }
         return new OnMessageCallback(semaphore);

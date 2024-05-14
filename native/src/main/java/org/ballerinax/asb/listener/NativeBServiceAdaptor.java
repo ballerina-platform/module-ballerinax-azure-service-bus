@@ -21,14 +21,12 @@ package org.ballerinax.asb.listener;
 import io.ballerina.runtime.api.Module;
 import io.ballerina.runtime.api.PredefinedTypes;
 import io.ballerina.runtime.api.Runtime;
-import io.ballerina.runtime.api.TypeTags;
 import io.ballerina.runtime.api.async.Callback;
 import io.ballerina.runtime.api.async.StrandMetadata;
 import io.ballerina.runtime.api.types.FunctionType;
 import io.ballerina.runtime.api.types.MethodType;
 import io.ballerina.runtime.api.types.ObjectType;
 import io.ballerina.runtime.api.types.Parameter;
-import io.ballerina.runtime.api.types.Type;
 import io.ballerina.runtime.api.utils.TypeUtils;
 import io.ballerina.runtime.api.values.BObject;
 import org.ballerinax.asb.util.ASBErrorCreator;
@@ -47,16 +45,14 @@ public final class NativeBServiceAdaptor {
     private final Runtime bRuntime;
     private final BObject bServiceObj;
     private final Object bServiceName;
-    private final boolean autoCompleteEnabled;
     private final boolean isolated;
     private final MethodType onMessage;
     private final Optional<MethodType> onError;
 
-    public NativeBServiceAdaptor(Runtime bRuntime, BObject bService, Object svcName, boolean autoCompleteEnabled) {
+    public NativeBServiceAdaptor(Runtime bRuntime, BObject bService, Object svcName) {
         this.bRuntime = bRuntime;
         this.bServiceObj = bService;
         this.bServiceName = svcName;
-        this.autoCompleteEnabled = autoCompleteEnabled;
         ObjectType serviceType = (ObjectType) TypeUtils.getReferredType(TypeUtils.getType(bService));
         this.isolated = serviceType.isIsolated() && serviceType.isIsolated(ON_MESSAGE_METHOD);
         Optional<MethodType> onMessageFuncOpt = Stream.of(serviceType.getMethods())
@@ -77,15 +73,6 @@ public final class NativeBServiceAdaptor {
             throw ASBErrorCreator.createError(
                     "Required parameter `message` has not been defined in the `onMessage` method");
         }
-        if (autoCompleteEnabled) {
-            for (Parameter param: onMessageParams) {
-                Type referredType = TypeUtils.getReferredType(param.type);
-                if (TypeTags.OBJECT_TYPE_TAG == referredType.getTag()) {
-                    throw ASBErrorCreator.createError(
-                            "Using an `asb:Caller` when autoComplete mode is enabled");
-                }
-            }
-        }
         if (onError.isPresent()) {
             Parameter[] onErrorParams = onError.get().getParameters();
             if (onErrorParams.length == 0) {
@@ -93,10 +80,6 @@ public final class NativeBServiceAdaptor {
                         "Required parameter `error` has not been defined in the `onError` method");
             }
         }
-    }
-
-    public boolean isAutoCompleteEnabled() {
-        return autoCompleteEnabled;
     }
 
     public Parameter[] getOnMessageParams() {
