@@ -28,10 +28,6 @@ import static org.ballerinax.asb.util.ASBUtils.getRetryOptions;
 
 /**
  * {@code ListenerConfiguration} contains the java representation of the Ballerina ASB listener configurations.
- */
-
-/**
- * {@code ListenerConfiguration} contains the java representation of the Ballerina ASB listener configurations.
  *
  * @param connectionString ASB connection string.
  * @param entityConfig ASB entity related configurations.

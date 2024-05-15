@@ -19,18 +19,18 @@ import ballerina/log;
 import ballerina/test;
 
 // Connection Configurations
-string lisnterTestQueueName = "pre-created-test-queue";
+string listenerTestQueueName = "pre-created-test-queue";
 
 ASBServiceSenderConfig listnerTestSenderConfig = {
     connectionString: connectionString,
     entityType: QUEUE,
-    topicOrQueueName: lisnterTestQueueName
+    topicOrQueueName: listenerTestQueueName
 };
 
 ListenerConfiguration configuration = {
     connectionString: connectionString,
     entityConfig: {
-        queueName: lisnterTestQueueName
+        queueName: listenerTestQueueName
     },
     autoComplete: false,
     maxConcurrency: 1,
