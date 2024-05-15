@@ -67,7 +67,7 @@ public final class NativeListener {
         // actual outcomes are only determined at the callback level (following the execution of the remote method),
         // and the default auto-complete mode does not account for this. Therefore, we will disable the default
         // auto-complete mode in this context and introduce a manual auto-complete implementation instead. For further
-        // details, refer to the `OnMessageAutoCompleteCallback` class
+        // details, refer to the `OnMessageAutoCompletableCallback`
         clientBuilder.disableAutoComplete();
 
         if (ServiceBusReceiveMode.PEEK_LOCK.equals(configs.receiveMode())) {

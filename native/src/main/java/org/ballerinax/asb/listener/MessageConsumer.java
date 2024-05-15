@@ -74,7 +74,7 @@ public class MessageConsumer implements Consumer<ServiceBusReceivedMessageContex
 
     private Callback getBRuntimeCallback(ServiceBusReceivedMessageContext messageContext) {
         if (isAutoCompleteEnabled) {
-            return new OnMessageAutoCompleteCallback(semaphore, messageContext);
+            return new OnMessageAutoCompletableCallback(semaphore, messageContext);
         }
         return new OnMessageCallback(semaphore);
     }

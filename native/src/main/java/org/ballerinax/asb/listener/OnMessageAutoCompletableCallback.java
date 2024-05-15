@@ -29,11 +29,11 @@ import java.util.concurrent.Semaphore;
  * This particular callback implementation will mark the messages complete/abandon automatically once the remote
  * functions return the results.
  */
-public class OnMessageAutoCompleteCallback implements Callback {
+public class OnMessageAutoCompletableCallback implements Callback {
     private final Semaphore semaphore;
     private final ServiceBusReceivedMessageContext messageContext;
 
-    public OnMessageAutoCompleteCallback(Semaphore semaphore, ServiceBusReceivedMessageContext messageContext) {
+    public OnMessageAutoCompletableCallback(Semaphore semaphore, ServiceBusReceivedMessageContext messageContext) {
         this.semaphore = semaphore;
         this.messageContext = messageContext;
     }
