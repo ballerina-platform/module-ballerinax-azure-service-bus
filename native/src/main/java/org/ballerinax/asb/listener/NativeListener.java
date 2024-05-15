@@ -82,6 +82,10 @@ public final class NativeListener {
     }
 
     public static Object attach(Environment env, BObject bListener, BObject bService, Object name) {
+        Object svcObject = bListener.getNativeData(NATIVE_SVC_OBJ);
+        if (Objects.nonNull(svcObject)) {
+            return ASBErrorCreator.createError("Trying to attach multiple `asb:Service` objects to the same listener");
+        }
         try {
             NativeBServiceAdaptor nativeBService = new NativeBServiceAdaptor(env.getRuntime(), bService, name);
             nativeBService.validate();
