@@ -58,7 +58,7 @@ public class ErrorConsumer implements Consumer<ServiceBusErrorContext> {
         NativeBServiceAdaptor bService = NativeListener.getBallerinaSvc(this.bListener);
         Object[] params = getMethodParams(bService.getOnErrorParams(), errorContext);
         Callback callback = OnErrorCallback.getInstance();
-        bService.invokeOnError(callback, params, errorContext.getException());
+        bService.invokeOnError(callback, params);
     }
 
     private Object[] getMethodParams(Parameter[] parameters, ServiceBusErrorContext errorContext) {

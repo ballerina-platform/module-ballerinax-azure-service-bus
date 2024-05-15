@@ -103,7 +103,7 @@ public final class NativeBServiceAdaptor {
         return onError.map(FunctionType::getParameters).orElse(new Parameter[]{});
     }
 
-    public void invokeOnError(Callback callback, Object[] params, Throwable rootCause) {
+    public void invokeOnError(Callback callback, Object[] params) {
         if (onError.isEmpty()) {
             return;
         }
