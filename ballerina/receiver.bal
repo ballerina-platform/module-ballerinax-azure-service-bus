@@ -207,7 +207,7 @@ isolated function initializeReceiver(MessageReceiver receiverClient, handle conn
     'class: "org.ballerinax.asb.receiver.MessageReceiver"
 } external;
 
-isolated function receiveBatch(MessageReceiver endpointClient, int? maxMessageCount, int? serverWaitTime, boolean deadLettered)
+isolated function receiveBatch(MessageReceiver endpointClient, int maxMessageCount, int? serverWaitTime, boolean deadLettered)
                                 returns MessageBatch|Error? = @java:Method {
     'class: "org.ballerinax.asb.receiver.MessageReceiver"
 } external;
