@@ -150,7 +150,7 @@ public class MessageReceiver {
                                  boolean deadLettered) {
         ServiceBusReceiverClient receiver = getReceiverFromBObject(receiverClient, deadLettered);
         Future future = env.markAsync();
-        EXECUTOR_SERVICE.submit(() -> {
+        EXECUTOR_SERVICE.execute(() -> {
             try {
                 List<ServiceBusReceivedMessage> messages = receiver
                         .receiveMessages(1, Duration.ofSeconds((long) serverWaitTime))
@@ -188,7 +188,7 @@ public class MessageReceiver {
                                         BTypedesc expectedType, boolean deadLettered) {
         ServiceBusReceiverClient receiver = getReceiverFromBObject(receiverClient, deadLettered);
         Future future = env.markAsync();
-        EXECUTOR_SERVICE.submit(() -> {
+        EXECUTOR_SERVICE.execute(() -> {
             try {
                 List<ServiceBusReceivedMessage> messages = receiver
                         .receiveMessages(1, Duration.ofSeconds((long) serverWaitTime))
@@ -241,7 +241,7 @@ public class MessageReceiver {
                                       Object serverWaitTime, boolean deadLettered) {
         ServiceBusReceiverClient receiver = getReceiverFromBObject(receiverClient, deadLettered);
         Future future = env.markAsync();
-        EXECUTOR_SERVICE.submit(() -> {
+        EXECUTOR_SERVICE.execute(() -> {
             try {
                 IterableStream<ServiceBusReceivedMessage> receivedMessageStream;
                 if (Objects.isNull(serverWaitTime)) {
@@ -291,7 +291,7 @@ public class MessageReceiver {
         ServiceBusReceiverClient receiver = getReceiverFromBObject(
                 receiverClient, Objects.nonNull(nativeMessage.getDeadLetterReason()));
         Future future = env.markAsync();
-        EXECUTOR_SERVICE.submit(() -> {
+        EXECUTOR_SERVICE.execute(() -> {
             try {
                 receiver.complete(nativeMessage);
                 future.complete(null);
@@ -320,7 +320,7 @@ public class MessageReceiver {
         ServiceBusReceivedMessage nativeMessage = getNativeMessage(message);
         ServiceBusReceiverClient receiver = getReceiverFromBObject(receiverClient, false);
         Future future = env.markAsync();
-        EXECUTOR_SERVICE.submit(() -> {
+        EXECUTOR_SERVICE.execute(() -> {
             try {
                 receiver.abandon(nativeMessage);
                 future.complete(null);
@@ -379,7 +379,7 @@ public class MessageReceiver {
         ServiceBusReceivedMessage nativeMessage = getNativeMessage(message);
         ServiceBusReceiverClient receiver = getReceiverFromBObject(receiverClient, false);
         Future future = env.markAsync();
-        EXECUTOR_SERVICE.submit(() -> {
+        EXECUTOR_SERVICE.execute(() -> {
             try {
                 receiver.defer(nativeMessage);
                 future.complete(null);
@@ -412,7 +412,7 @@ public class MessageReceiver {
     public static Object receiveDeferred(Environment env, BObject receiverClient, long sequenceNumber) {
         ServiceBusReceiverClient receiver = getReceiverFromBObject(receiverClient, false);
         Future future = env.markAsync();
-        EXECUTOR_SERVICE.submit(() -> {
+        EXECUTOR_SERVICE.execute(() -> {
             try {
                 ServiceBusReceivedMessage message = receiver.receiveDeferredMessage(sequenceNumber);
                 if (Objects.isNull(message)) {
@@ -447,7 +447,7 @@ public class MessageReceiver {
         ServiceBusReceivedMessage nativeMessage = getNativeMessage(message);
         ServiceBusReceiverClient receiver = getReceiverFromBObject(receiverClient, false);
         Future future = env.markAsync();
-        EXECUTOR_SERVICE.submit(() -> {
+        EXECUTOR_SERVICE.execute(() -> {
             try {
                 receiver.renewMessageLock(nativeMessage);
                 future.complete(null);
