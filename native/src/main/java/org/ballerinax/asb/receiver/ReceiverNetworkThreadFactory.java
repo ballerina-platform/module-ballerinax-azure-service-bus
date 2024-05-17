@@ -28,8 +28,8 @@ public class ReceiverNetworkThreadFactory implements ThreadFactory {
 
     @Override
     public Thread newThread(Runnable runnable) {
-        Thread gitActionThread = new Thread(runnable);
-        gitActionThread.setName(threadGroupName);
-        return gitActionThread;
+        Thread receiverThread = new Thread(runnable);
+        receiverThread.setName(threadGroupName);
+        return receiverThread;
     }
 }
