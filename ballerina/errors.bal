@@ -17,6 +17,9 @@
 # Defines the common error type for the module.
 public type Error distinct error;
 
+# Error type to capture the errors occurred while retrieving messages in Azure service bus listener.
+public type MessageRetrievalError distinct Error & error<ErrorContext>;
+
 isolated function createError(string|error|Error errorOrMessage) returns Error {
     if errorOrMessage is Error {
         // input is a ASB 'error' value

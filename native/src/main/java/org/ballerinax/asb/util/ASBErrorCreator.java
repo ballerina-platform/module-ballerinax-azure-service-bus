@@ -55,4 +55,15 @@ public class ASBErrorCreator {
     private static BError fromJavaException(String message, Throwable cause) {
         return fromBError(message, ErrorCreator.createError(cause));
     }
+
+    public static BError createError(String message) {
+        return ErrorCreator.createError(
+                ModuleUtils.getModule(), ASB_ERROR, StringUtils.fromString(message), null, null);
+    }
+
+    public static BError createError(String message, Throwable throwable) {
+        BError cause = ErrorCreator.createError(throwable);
+        return ErrorCreator.createError(
+                ModuleUtils.getModule(), ASB_ERROR, StringUtils.fromString(message), cause, null);
+    }
 }

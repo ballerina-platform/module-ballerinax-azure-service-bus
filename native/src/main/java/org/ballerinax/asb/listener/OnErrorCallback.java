@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, WSO2 LLC. (http://www.wso2.org).
+ * Copyright (c) 2024, WSO2 LLC. (http://www.wso2.com).
  *
  * WSO2 LLC. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -21,30 +21,26 @@ package org.ballerinax.asb.listener;
 import io.ballerina.runtime.api.async.Callback;
 import io.ballerina.runtime.api.values.BError;
 
-import java.util.concurrent.CountDownLatch;
-
 /**
- * Handles the Azure service bus resource callback.
+ * Callback code to be executed when the message-listener complete a `onError` invocation of the ballerina service.
  */
-public class ASBResourceCallback implements Callback {
+public class OnErrorCallback implements Callback {
+    private static final OnErrorCallback INSTANCE = new OnErrorCallback();
 
-    private final CountDownLatch countDownLatch;
-
-    ASBResourceCallback(CountDownLatch countDownLatch) {
-        this.countDownLatch = countDownLatch;
+    static OnErrorCallback getInstance() {
+        return INSTANCE;
     }
 
     @Override
-    public void notifySuccess(Object obj) {
-        if (obj instanceof BError) {
-            ((BError) obj).printStackTrace();
+    public void notifySuccess(Object o) {
+        if (o instanceof BError) {
+            ((BError) o).printStackTrace();
         }
-        countDownLatch.countDown();
     }
 
     @Override
-    public void notifyFailure(BError error) {
-        error.printStackTrace();
-        countDownLatch.countDown();
+    public void notifyFailure(BError bError) {
+        bError.printStackTrace();
+        System.exit(1);
     }
 }
