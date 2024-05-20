@@ -87,19 +87,19 @@ service on asbListener {
             if getTestCaseCount() == 0 {
                 setListnerState(RECIEVED);
             } else if getTestCaseCount() == 1 {
-                var result = caller->complete();
+                Error? result = caller->complete();
                 if result is () {
                     setListnerState(RECIEVED_AND_COMPLETED);
                 }
             }
             else if getTestCaseCount() == 2 {
-                var result = caller->defer();
+                Error? result = caller->defer();
                 if result is () {
                     setListnerState(RECIEVED_AND_DEFER);
                 }
             }
             else if getTestCaseCount() == 3 {
-                var result = caller->deadLetter(
+                Error? result = caller->deadLetter(
                     deadLetterReason = "Testing Purpose", 
                     deadLetterErrorDescription = "Manual DLQ : Testing Purpose");
                 if result is () {
@@ -107,7 +107,7 @@ service on asbListener {
                 }
             }
             else if getTestCaseCount() == 4 {
-                var result = caller->abandon();
+                Error? result = caller->abandon();
                 if result is () {
                     setListnerState(RECIEVED_AND_ABANDON);
                 }
