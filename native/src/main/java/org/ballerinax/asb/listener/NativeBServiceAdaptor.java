@@ -27,6 +27,7 @@ import io.ballerina.runtime.api.types.FunctionType;
 import io.ballerina.runtime.api.types.MethodType;
 import io.ballerina.runtime.api.types.ObjectType;
 import io.ballerina.runtime.api.types.Parameter;
+import io.ballerina.runtime.api.types.Type;
 import io.ballerina.runtime.api.utils.TypeUtils;
 import io.ballerina.runtime.api.values.BObject;
 import org.ballerinax.asb.util.ASBErrorCreator;
@@ -34,6 +35,8 @@ import org.ballerinax.asb.util.ModuleUtils;
 
 import java.util.Optional;
 import java.util.stream.Stream;
+
+import static io.ballerina.runtime.api.TypeTags.OBJECT_TYPE_TAG;
 
 /**
  * {@code NativeBServiceAdaptor} represents a native wrapper for ballerina service object.
@@ -67,12 +70,22 @@ public final class NativeBServiceAdaptor {
                 .findFirst();
     }
 
-    public void validate() {
+    public void validate(boolean autoComplete) {
         Parameter[] onMessageParams = onMessage.getParameters();
         if (onMessageParams.length == 0) {
             throw ASBErrorCreator.createError(
                     "Required parameter `message` has not been defined in the `onMessage` method");
         }
+
+        if (autoComplete) {
+            for (Parameter param: onMessage.getParameters()) {
+                Type referredType = TypeUtils.getReferredType(param.type);
+                if (OBJECT_TYPE_TAG == referredType.getTag()) {
+                    throw ASBErrorCreator.createError("Cannot use `asb:Caller` when using auto-complete mode");
+                }
+            }
+        }
+
         if (onError.isPresent()) {
             Parameter[] onErrorParams = onError.get().getParameters();
             if (onErrorParams.length == 0) {

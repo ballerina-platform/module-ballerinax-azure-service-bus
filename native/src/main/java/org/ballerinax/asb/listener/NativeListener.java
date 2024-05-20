@@ -35,6 +35,7 @@ import java.util.Objects;
  */
 public final class NativeListener {
     private static final String NATIVE_CLIENT = "nativeClient";
+    private static final String NATIVE_CLIENT_CONFIGS = "nativeClientConfigs";
     private static final String NATIVE_SVC_OBJ = "nativeSvcObject";
 
     private NativeListener() {
@@ -42,7 +43,9 @@ public final class NativeListener {
 
     public static Object externInit(BObject bListener, BMap<BString, Object> config) {
         try {
-            ServiceBusProcessorClient nativeClient = constructNativeClient(bListener, config);
+            ListenerConfiguration listenerConfigs = new ListenerConfiguration(config);
+            ServiceBusProcessorClient nativeClient = constructNativeClient(bListener, listenerConfigs);
+            bListener.addNativeData(NATIVE_CLIENT_CONFIGS, listenerConfigs);
             bListener.addNativeData(NATIVE_CLIENT, nativeClient);
         } catch (Exception e) {
             return ASBErrorCreator.createError(
@@ -51,9 +54,7 @@ public final class NativeListener {
         return null;
     }
 
-    private static ServiceBusProcessorClient constructNativeClient(BObject bListener,
-                                                                   BMap<BString, Object> listenerConfigs) {
-        ListenerConfiguration configs = new ListenerConfiguration(listenerConfigs);
+    private static ServiceBusProcessorClient constructNativeClient(BObject bListener, ListenerConfiguration configs) {
         ServiceBusClientBuilder.ServiceBusProcessorClientBuilder clientBuilder = new ServiceBusClientBuilder()
                 .connectionString(configs.connectionString())
                 .retryOptions(configs.amqpRetryOptions())
@@ -87,8 +88,10 @@ public final class NativeListener {
             return ASBErrorCreator.createError("Trying to attach multiple `asb:Service` objects to the same listener");
         }
         try {
+            ListenerConfiguration listenerConfig = (ListenerConfiguration) bListener
+                    .getNativeData(NATIVE_CLIENT_CONFIGS);
             NativeBServiceAdaptor nativeBService = new NativeBServiceAdaptor(env.getRuntime(), bService, name);
-            nativeBService.validate();
+            nativeBService.validate(listenerConfig.autoComplete());
             bListener.addNativeData(NATIVE_SVC_OBJ, nativeBService);
         } catch (Exception e) {
             return ASBErrorCreator.createError(
