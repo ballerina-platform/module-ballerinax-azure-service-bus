@@ -106,8 +106,8 @@ public final class NativeListener {
     }
 
     public static Object start(BObject bListener) {
-        NativeBServiceAdaptor bService = getBallerinaSvc(bListener);
         try {
+            NativeBServiceAdaptor bService = getBallerinaSvc(bListener);
             Object nativeClient = bListener.getNativeData(NATIVE_CLIENT);
             if (Objects.isNull(nativeClient)) {
                 return ASBErrorCreator.createError("Could not find the native client used by the listener");
