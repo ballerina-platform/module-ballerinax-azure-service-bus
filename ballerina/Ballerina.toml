@@ -16,7 +16,7 @@ observabilityIncluded = true
 graalvmCompatible = true
 
 [[platform.java17.dependency]]
-path = "../native/build/libs/azure-service-bus-native-3.7.0.jar"
+path = "../native/build/libs/asb-native-3.7.0.jar"
 groupId = "org.ballerinax"
 artifactId = "asb-native"
 module = "asb-native" 
