@@ -34,3 +34,9 @@ groupId = "com.azure"
 artifactId = "azure-core"
 version = "1.49.0"
 path = "./lib/azure-core-1.49.0.jar"
+
+[[platform.java11.dependency]]
+groupId = "com.azure"
+artifactId = "azure-core-amqp"
+version = "2.9.4"
+path = "./lib/azure-core-amqp-2.9.4.jar"
