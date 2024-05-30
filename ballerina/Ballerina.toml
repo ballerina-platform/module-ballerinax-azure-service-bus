@@ -41,6 +41,12 @@ artifactId = "azure-core-amqp"
 version = "2.9.4"
 path = "./lib/azure-core-amqp-2.9.4.jar"
 
+[[platform.java17.dependency]]
+groupId = "com.azure"
+artifactId = "azure-core-serializer-json-jackson"
+version = "1.4.12"
+path = "./lib/azure-core-serializer-json-jackson-1.4.12.jar"
+
 # Jackson dependencies
 [[platform.java17.dependency]]
 groupId = "com.fasterxml.jackson.core"
