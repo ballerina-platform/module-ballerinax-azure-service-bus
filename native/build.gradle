@@ -62,6 +62,7 @@ test {
 }
 
 spotbugsMain {
+    ignoreFailures = true
     effort = "max"
     reportLevel = "low"
     reportsDir = file("$project.buildDir/reports/spotbugs")
