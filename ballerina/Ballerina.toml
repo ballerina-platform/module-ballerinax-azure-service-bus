@@ -50,6 +50,12 @@ path = "./lib/jackson-core-2.17.1.jar"
 
 [[platform.java17.dependency]]
 groupId = "com.fasterxml.jackson.core"
+artifactId = "jackson-annotations"
+version = "2.17.1"
+path = "./lib/jackson-annotations-2.17.1.jar"
+
+[[platform.java17.dependency]]
+groupId = "com.fasterxml.jackson.core"
 artifactId = "jackson-databind"
 version = "@jackson.databind.version@"
 path = "./lib/jackson-databind-2.17.1.jar"
