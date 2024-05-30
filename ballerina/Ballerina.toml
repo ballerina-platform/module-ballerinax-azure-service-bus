@@ -61,3 +61,10 @@ groupId = "io.projectreactor"
 artifactId = "reactor-core"
 version = "3.6.6"
 path = "./lib/reactor-core-3.6.6.jar"
+
+# Apache proton-j dependencies
+[[platform.java17.dependency]]
+groupId = "org.apache.qpid"
+artifactId = "proton-j"
+version = "0.34.1"
+path = "./lib/proton-j-0.34.1.jar"
