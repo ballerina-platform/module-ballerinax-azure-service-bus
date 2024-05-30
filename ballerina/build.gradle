@@ -24,7 +24,7 @@ plugins {
 
 description = 'Ballerina - Azure Service Bus Ballerina Connector'
 
-def packageName = "azure-service-bus"
+def packageName = "asb"
 def packageOrg = "ballerinax"
 def tomlVersion = stripBallerinaExtensionVersion("${project.version}")
 def ballerinaTomlFilePlaceHolder = new File("${project.rootDir}/build-config/resources/Ballerina.toml")
@@ -83,4 +83,8 @@ clean {
 
 build.dependsOn copyToLib
 build.dependsOn ":${packageName}-native:build"
+
 test.dependsOn ":${packageName}-native:build"
+
+publish.dependsOn build
+publishToMavenLocal.dependsOn build

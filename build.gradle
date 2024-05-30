@@ -60,8 +60,8 @@ allprojects {
 }
 
 task build {
-    dependsOn(":azure-service-bus-native:build")
-    dependsOn(":azure-service-bus-ballerina:build")
+    dependsOn(":asb-native:build")
+    dependsOn(":asb-ballerina:build")
 }
 
 def moduleVersion = project.version.replace("-SNAPSHOT", "")
