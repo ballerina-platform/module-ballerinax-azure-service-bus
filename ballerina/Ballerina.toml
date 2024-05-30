@@ -47,3 +47,10 @@ groupId = "com.fasterxml.jackson.core"
 artifactId = "jackson-core"
 version = "2.17.1"
 path = "./lib/jackson-core-2.17.1.jar"
+
+# Reactive streams dependencies
+[[platform.java17.dependency]]
+groupId = "org.reactivestreams"
+artifactId = "reactive-streams"
+version = "1.0.4"
+path = "./lib/reactive-streams-1.0.4.jar"
