@@ -23,20 +23,27 @@ version = "3.7.0"
 path = "../native/build/libs/asb-native-3.7.0.jar"
 
 # Azure dependencies
-[[platform.java11.dependency]]
+[[platform.java17.dependency]]
 groupId = "com.azure"
 artifactId = "azure-messaging-servicebus"
 version = "7.14.3"
 path = "./lib/azure-messaging-servicebus-7.14.3.jar"
 
-[[platform.java11.dependency]]
+[[platform.java17.dependency]]
 groupId = "com.azure"
 artifactId = "azure-core"
 version = "1.49.0"
 path = "./lib/azure-core-1.49.0.jar"
 
-[[platform.java11.dependency]]
+[[platform.java17.dependency]]
 groupId = "com.azure"
 artifactId = "azure-core-amqp"
 version = "2.9.4"
 path = "./lib/azure-core-amqp-2.9.4.jar"
+
+# Jackson dependencies
+[[platform.java17.dependency]]
+groupId = "com.fasterxml.jackson.core"
+artifactId = "jackson-core"
+version = "2.17.1"
+path = "./lib/jackson-core-2.17.1.jar"
