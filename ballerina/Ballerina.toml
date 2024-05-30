@@ -48,6 +48,12 @@ artifactId = "jackson-core"
 version = "2.17.1"
 path = "./lib/jackson-core-2.17.1.jar"
 
+[[platform.java17.dependency]]
+groupId = "com.fasterxml.jackson.core"
+artifactId = "jackson-databind"
+version = "2.17.1"
+path = "./lib/jackson-databind-2.17.1.jar"
+
 # Reactive streams dependencies
 [[platform.java17.dependency]]
 groupId = "org.reactivestreams"
