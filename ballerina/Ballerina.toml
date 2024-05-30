@@ -54,3 +54,10 @@ groupId = "org.reactivestreams"
 artifactId = "reactive-streams"
 version = "1.0.4"
 path = "./lib/reactive-streams-1.0.4.jar"
+
+# Project reactor dependencies
+[[platform.java17.dependency]]
+groupId = "io.projectreactor"
+artifactId = "reactor-core"
+version = "3.6.6"
+path = "./lib/reactor-core-3.6.6.jar"
