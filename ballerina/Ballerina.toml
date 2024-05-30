@@ -28,3 +28,9 @@ groupId = "com.azure"
 artifactId = "azure-messaging-servicebus"
 version = "7.14.3"
 path = "./lib/azure-messaging-servicebus-7.14.3.jar"
+
+[[platform.java11.dependency]]
+groupId = "com.azure"
+artifactId = "azure-core"
+version = "1.49.0"
+path = "./lib/azure-core-1.49.0.jar"
