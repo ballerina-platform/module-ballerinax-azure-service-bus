@@ -29,6 +29,10 @@ The conforming implementation of the specification is released to Ballerina Cent
     * 3.1. [Configurations](#31-configurations)
     * 3.2. [Initialization](#32-initialization)
     * 3.3. [Functions](#33-functions)
+4. [Message receiver](#4-message-receiver)
+    * 4.1. [Configurations](#41-configurations)
+    * 4.2. [Initialization](#42-initialization)
+    * 4.3. [Functions](#43-functions)
 
 ## 1. Overview
 
@@ -153,7 +157,7 @@ public type AmqpRetryOptions record {|
     # Maximum duration to wait for completion of a single attempt in seconds
     decimal tryTimeout = 60;
     # Approach to use for calculating retry delays
-    AmqpRetryMode retryMode = FIXED;
+    AmqpRetryMode retryMode = asb:FIXED;
 |};
 
 # Represents the type of approach to apply when calculating the delay between retry attempts.
@@ -191,7 +195,7 @@ public type ASBServiceSenderConfig record {
 # configurable string connectionString = ?;
 # asb:ASBServiceSenderConfig senderConfig = {
 #   connectionString: connectionString,
-#   entityType: QUEUE,
+#   entityType: asb:QUEUE,
 #   topicOrQueueName: "testQueue1" 
 # };
 # asb:MessageSender sender = check new(senderConfig);
@@ -279,6 +283,241 @@ isolated remote function sendBatch(asb:MessageBatch messageBatch) returns asb:Er
 # Closes the ASB sender connection.
 # ```
 # check sender->close();
+# ```
+#
+# + return - An `asb:Error` if failed to close connection or else `()`
+isolated remote function close() returns asb:Error?;
+```
+
+## 4. Message receiver
+
+A message receiver is responsible for receiving Azure service bus messages from a queue or topic/subscription on the Azure service bus instance.
+
+### 4.1. Configurations
+
+- `TopicSubsConfig` record represents the configuration details of a topic and its associated subscription.
+
+```ballerina
+public type TopicSubsConfig record {
+    # A string field that holds the name of the topic
+    string topicName;
+    # A string field that holds the name of the subscription associated with the topic
+    string subscriptionName;
+};
+```
+
+- `QueueConfig` record represents the configuration details of a queue.
+
+```ballerina
+public type QueueConfig record {
+    # the configuration details of a queue
+    string queueName;
+};
+```
+
+- `ReceiveMode` enum represents the possible receive modes for a Azure service bus message receiver.
+
+```ballerina
+public enum ReceiveMode {
+    RECEIVE_AND_DELETE, PEEK_LOCK
+}
+```
+
+- `ASBServiceReceiverConfig` record represents the Azure service bus message receiver configurations.
+
+```ballerina
+public type ASBServiceReceiverConfig record {
+    # A string field that holds the Service Bus connection string with Shared Access Signatures
+    string connectionString;
+    # This field holds the configuration details of either a topic or a queue. The type of the entity is
+    # determined by the entityType field. The actual configuration details are stored in either a
+    # TopicSubsConfig or a QueueConfig record
+    TopicSubsConfig|QueueConfig entityConfig;
+    # This field holds the receive modes(RECEIVE_AND_DELETE/PEEK_LOCK) for the connection. The receive mode determines 
+    # how messages are retrieved from the entity. The default value is PEEK_LOCK 
+    ReceiveMode receiveMode = asb:PEEK_LOCK;
+    # Max lock renewal duration under PEEK_LOCK mode in seconds. Setting to 0 disables auto-renewal
+    int maxAutoLockRenewDuration = 300;
+    # Retry configurations related to underlying AMQP message receiver
+    AmqpRetryOptions amqpRetryOptions = {};
+};
+```
+
+### 4.2. Initialization
+
+- The `asb:MessageReceiver` can be initialized by providing the `asb:ASBServiceReceiverConfig`.
+
+```ballerina
+# Initializes an Azure service bus message receiver.
+# ```
+# configurable string connectionString = ?;
+# asb:ASBServiceReceiverConfig receiverConfig = {
+#     connectionString: connectionString,
+#     entityConfig: {
+#         queueName: "testQueue1"
+#     },
+#     receiveMode: asb:PEEK_LOCK
+# };
+# asb:MessageReceiver receiver = check new(receiverConfig);
+# ```
+#
+# + config - Azure service bus receiver configuration.
+# + return - The `asb:MessageReceiver` or an `asb:Error` if the initialization failed
+public isolated function init(asb:ASBServiceReceiverConfig config) returns asb:Error?;
+```
+
+### 4.3. Functions
+
+- To receive a message from a queue or subscription, the `receive` function can be used.
+
+```ballerina
+# Receive message from queue or subscription.
+# ```
+# asb:Message? message = check receiver->receive();
+# ```
+#
+# + serverWaitTime - Specified server wait time in seconds to receive message (optional)
+# + T - Expected type of the message. This can be either a `asb:Message` or a subtype of it.
+# + deadLettered - If set to `true`, messages from dead-letter queue will be received. (optional)
+# + return - A `asb:Message` record if message is received, `()` if no message is in the queue or else an `asb:Error`
+# if failed to receive message
+isolated remote function receive(int? serverWaitTime = 60, typedesc<Message> T = <>, boolean deadLettered = false) 
+        returns T|asb:Error?;
+```
+
+- To receive a message payload from a queue or subscription, the `receivePayload` function can be used.
+
+```ballerina
+# Receive message payload from queue or subscription.
+# ```
+# string messagePayload = check receiver->receivePayload();
+# ```
+#
+# + serverWaitTime - Specified server wait time in seconds to receive message (optional)
+# + T - Expected type of the message. This can be any subtype of `anydata` type
+# + deadLettered - If set to `true`, messages from dead-letter queue will be received. (optional)
+# + return - A `asb:Message` record if message is received, `()` if no message is in the queue or else an `asb:Error`
+# if failed to receive message
+isolated remote function receivePayload(int? serverWaitTime = 60, typedesc<anydata> T = <>, boolean deadLettered = false) 
+        returns T|asb:Error;
+```
+
+- To receive a batch of messages from a queue or subscription, the `receiveBatch` function can be used.
+
+```ballerina
+# Receive batch of messages from queue or subscription.
+# ```
+# asb:MessageBatch batch = check receiver->receiveBatch(10);
+# ```
+#
+# + maxMessageCount - Maximum message count to receive in a batch
+# + serverWaitTime - Specified server wait time in seconds to receive message (optional)
+# + deadLettered - If set to `true`, messages from dead-letter queue will be received. (optional)
+# + return - A `asb:MessageBatch` record if batch is received, `()` if no batch is in the queue or else an `asb:Error`
+# if failed to receive batch
+isolated remote function receiveBatch(int maxMessageCount, int? serverWaitTime = (), boolean deadLettered = false) 
+        returns asb:MessageBatch|asb:Error?;
+```
+
+- To mark an Azure service bus message as complete, the `complete` function can be used.
+
+```ballerina
+# Complete message from queue or subscription based on messageLockToken. Declares the message processing to be 
+# successfully completed, removing the message from the queue.
+# ```
+# asb:Message message = ...;
+# check receiver->complete(message);
+# ```
+#
+# + message - `asb:Message` record
+# + return - An `asb:Error` if failed to complete message or else `()`
+isolated remote function complete(asb:Message message) returns asb:Error?;
+```
+
+- To mark an Azure service bus message as abandon, the `abandon` function can be used.
+
+```ballerina
+# Abandon message from queue or subscription based on messageLockToken. Abandon processing of the message for 
+# the time being, returning the message immediately back to the queue to be picked up by another (or the same) 
+# receiver.
+# ```
+# asb:Message message = ...;
+# check receiver->abandon(message);
+# ```
+# 
+# + message - `asb:Message` record
+# + return - An `asb:Error` if failed to abandon message or else `()`
+isolated remote function abandon(asb:Message message) returns asb:Error?;
+```
+
+- To move an Azure service bus message to the dead-letter queue, the `deadLetter` function can be used.
+
+```ballerina
+# Dead-Letter the message & moves the message to the Dead-Letter Queue based on messageLockToken. Transfer 
+# the message from the primary queue into a special "dead-letter sub-queue".
+# ```
+# asb:Message message = ...;
+# check receiver->deadLetter(message);
+# ```
+#
+# + message - `asb:Message` record
+# + deadLetterReason - The deadletter reason (optional)
+# + deadLetterErrorDescription - The deadletter error description (optional)
+# + return - An `asb:Error` if failed to deadletter message or else `()`
+isolated remote function deadLetter(asb:Message message, string deadLetterReason = "DEADLETTERED_BY_RECEIVER", string?  deadLetterErrorDescription = ()) returns asb:Error?;
+```
+
+- To mark an Azure service bus message as deferred, the `defer` function can be used.
+
+```ballerina
+# Defer the message in a Queue or Subscription based on messageLockToken.  It prevents the message from being 
+# directly received from the queue by setting it aside such that it must be received by sequence number.
+# ```
+# asb:Message message = ...;
+# int sequenceNumber = check receiver->defer(message);
+# ```
+# 
+# + message - `asb:Message` record
+# + return - An `asb:Error` if failed to defer message or else sequence number
+isolated remote function defer(asb:Message message) returns int|asb:Error;
+```
+
+- To receive a deferred message, the `receiveDeferred` function can be used.
+
+```ballerina
+# Receives a deferred Message. Deferred messages can only be received by using sequence number and return
+# Message object.
+# ```
+# asb:Message? message = check receiver->receiveDeferred(1);
+# ```
+# 
+# + sequenceNumber - Unique number assigned to a message by Service Bus. The sequence number is a unique 64-bit
+# integer assigned to a message as it is accepted and stored by the broker and functions as
+# its true identifier.
+# + return - An `asb:Error` if failed to receive deferred message, a Message record if successful or else `()`
+isolated remote function receiveDeferred(int sequenceNumber) returns asb:Message|asb:Error?;
+```
+
+- To renew the lock on a message in a queue or subscription, the `renewLock` function can be used.
+
+```ballerina
+# The operation renews lock on a message in a queue or subscription based on messageLockToken.
+# ```
+# asb:Message message = ...;
+# check receiver->renewLock(message);
+# ```
+# 
+# + message - `asb:Message` record
+# + return - An `asb:Error` if failed to renew message or else `()`
+isolated remote function renewLock(asb:Message message) returns asb:Error?;
+```
+
+- To close the ASB receiver connection, the `close` function can be used.
+
+```ballerina
+# Closes the ASB receiver connection.
+# ```
+# check receiver->close();
 # ```
 #
 # + return - An `asb:Error` if failed to close connection or else `()`
