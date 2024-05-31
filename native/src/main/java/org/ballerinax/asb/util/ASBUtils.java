@@ -88,7 +88,6 @@ import static io.ballerina.runtime.api.utils.TypeUtils.getReferredType;
 import static org.ballerinax.asb.util.ASBConstants.DELAY;
 import static org.ballerinax.asb.util.ASBConstants.MAX_DELAY;
 import static org.ballerinax.asb.util.ASBConstants.MAX_RETRIES;
-import static org.ballerinax.asb.util.ASBConstants.RECEIVE_AND_DELETE;
 import static org.ballerinax.asb.util.ASBConstants.RETRY_MODE;
 import static org.ballerinax.asb.util.ASBConstants.TRY_TIMEOUT;
 
@@ -182,9 +181,7 @@ public class ASBUtils {
                 .retryOptions(retryOptions)
                 .receiver();
 
-        ServiceBusReceiveMode mode = Objects.equals(receiveMode, RECEIVE_AND_DELETE)
-                ? ServiceBusReceiveMode.RECEIVE_AND_DELETE
-                : ServiceBusReceiveMode.PEEK_LOCK;
+        ServiceBusReceiveMode mode = ServiceBusReceiveMode.valueOf(receiveMode);
 
         if (isDeadLetterReceiver) {
             receiverClientBuilder.subQueue(SubQueue.DEAD_LETTER_QUEUE);

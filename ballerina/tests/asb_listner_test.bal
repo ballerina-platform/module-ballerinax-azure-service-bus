@@ -19,16 +19,23 @@ import ballerina/log;
 import ballerina/test;
 
 // Connection Configurations
-string lisnterTestQueueName = "pre-created-test-queue";
-
-ListenerConfig configuration = {
-    connectionString: connectionString
-};
+string listenerTestQueueName = "pre-created-test-queue";
 
 ASBServiceSenderConfig listnerTestSenderConfig = {
     connectionString: connectionString,
     entityType: QUEUE,
-    topicOrQueueName: lisnterTestQueueName
+    topicOrQueueName: listenerTestQueueName
+};
+
+ListenerConfiguration configuration = {
+    connectionString: connectionString,
+    entityConfig: {
+        queueName: listenerTestQueueName
+    },
+    autoComplete: false,
+    maxConcurrency: 1,
+    prefetchCount: 20,
+    maxAutoLockRenewDuration: 300
 };
 
 listener Listener asbListener = new (configuration);
@@ -74,40 +81,43 @@ isolated function increamentTestCaseCount()
     }
 }
 
-@ServiceConfig {
-    queueName: "pre-created-test-queue",
-    peekLockModeEnabled: true,
-    maxConcurrency: 1,
-    prefetchCount: 20,
-    maxAutoLockRenewDuration: 300
-}
-service MessageService on asbListener {
+service on asbListener {
     isolated remote function onMessage(Message message, Caller caller) returns error? {
-        log:printInfo("Message received:" + message.body.toString());
         if message.body == "This is ASB connector test-Message Body".toBytes() {
             if getTestCaseCount() == 0 {
                 setListnerState(RECIEVED);
+            } else if getTestCaseCount() == 1 {
+                Error? result = caller->complete();
+                if result is () {
+                    setListnerState(RECIEVED_AND_COMPLETED);
+                }
             }
-            else if getTestCaseCount() == 1 && caller.complete(message) == () {
-                setListnerState(RECIEVED_AND_COMPLETED);
+            else if getTestCaseCount() == 2 {
+                Error? result = caller->defer();
+                if result is () {
+                    setListnerState(RECIEVED_AND_DEFER);
+                }
             }
-            else if getTestCaseCount() == 2 && caller.defer(message) is int {
-                setListnerState(RECIEVED_AND_DEFER);
+            else if getTestCaseCount() == 3 {
+                Error? result = caller->deadLetter(
+                    deadLetterReason = "Testing Purpose", 
+                    deadLetterErrorDescription = "Manual DLQ : Testing Purpose");
+                if result is () {
+                    setListnerState(RECIEVED_AND_DLQ);
+                }
             }
-            else if getTestCaseCount() == 3 && caller.deadLetter(message, "Testing Purpose", "Manual DLQ : Testing Purpose") == () {
-                setListnerState(RECIEVED_AND_DLQ);
-            }
-            else if getTestCaseCount() == 4 && caller.abandon(message) == () {
-                setListnerState(RECIEVED_AND_ABANDON);
+            else if getTestCaseCount() == 4 {
+                Error? result = caller->abandon();
+                if result is () {
+                    setListnerState(RECIEVED_AND_ABANDON);
+                }
             }
             increamentTestCaseCount();
         }
-        return;
     }
-    isolated remote function onError(ErrorContext context, error 'error) returns error? {
-        return;
-    }
-};
+
+    isolated remote function onError(ErrorContext context, error 'error) returns error? {}
+}
 
 function sendMessage() returns error? {
     MessageSender queueSender = check new (listnerTestSenderConfig);

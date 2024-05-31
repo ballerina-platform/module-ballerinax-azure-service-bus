@@ -513,7 +513,7 @@ public class MessageReceiver {
         return constructedMessage;
     }
 
-    private static Map<String, Object> populateOptionalFieldsMap(ServiceBusReceivedMessage message) {
+    public static Map<String, Object> populateOptionalFieldsMap(ServiceBusReceivedMessage message) {
         Map<String, Object> map = new HashMap<>();
         addFieldIfPresent(map, CONTENT_TYPE, message.getContentType());
         addFieldIfPresent(map, MESSAGE_ID, message.getMessageId());
@@ -552,7 +552,7 @@ public class MessageReceiver {
      *
      * @param receivedMessage ASB received message
      */
-    private static Object getMessagePayload(ServiceBusReceivedMessage receivedMessage) {
+    public static Object getMessagePayload(ServiceBusReceivedMessage receivedMessage) {
         AmqpAnnotatedMessage rawAmqpMessage = receivedMessage.getRawAmqpMessage();
         AmqpMessageBodyType bodyType = rawAmqpMessage.getBody().getBodyType();
         switch (bodyType) {
