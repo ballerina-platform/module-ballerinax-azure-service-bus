@@ -25,6 +25,10 @@ The conforming implementation of the specification is released to Ballerina Cent
 
 1. [Overview](#1-overview)
 2. [Message](#2-message)
+3. [Message sender](#3-message-sender)
+    * 3.1. [Configurations](#31-configurations)
+    * 3.2. [Initialization](#32-initialization)
+    * 3.3. [Functions](#33-functions)
 
 ## 1. Overview
 
