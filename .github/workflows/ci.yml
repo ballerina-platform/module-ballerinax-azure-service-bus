@@ -5,6 +5,9 @@ on:
     branches:
       - main
       - 2201.[0-9]+.x
+    paths-ignore:
+      - "*.md"
+      - "docs/**"
   repository_dispatch:
     types: check_connector_for_breaking_changes
 
