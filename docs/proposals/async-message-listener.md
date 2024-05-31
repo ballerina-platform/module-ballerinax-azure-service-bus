@@ -94,7 +94,7 @@ The following error types and error details records will be introduced to the pa
 
 ```ballerina
 # Error type to capture the errors occurred while retrieving messages in Azure service bus listener.
-public type MessageRetrievalError distinct (asb:Error & error<ErrorContext>);
+public type MessageRetrievalError distinct Error & error<ErrorContext>;
 
 # Represents message retrieval error context.
 #
@@ -117,9 +117,9 @@ The following service object and caller type will be introduced to the package:
 ```ballerina
 # The ASB service type.
 public type Service distinct service object {
-    // isolated remote function onMessage(asb:Message message, asb:Caller caller) returns error?;
+    isolated remote function onMessage(asb:Message message, asb:Caller caller) returns error?;
 
-    // isolated remote function onError(asb:MessageRetrievalError 'error) returns error?;
+    isolated remote function onError(asb:MessageRetrievalError 'error) returns error?;
 };
 
 # Represents a ASB caller, which can be used to mark messages as complete, abandon, deadLetter, or defer.
