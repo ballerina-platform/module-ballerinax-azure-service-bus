@@ -33,6 +33,17 @@ The conforming implementation of the specification is released to Ballerina Cent
     * 4.1. [Configurations](#41-configurations)
     * 4.2. [Initialization](#42-initialization)
     * 4.3. [Functions](#43-functions)
+5. [Message listener](#5-message-listener)
+    * 5.1. [Configurations](#51-configurations)
+    * 5.2. [Initialization](#52-initialization)
+    * 5.3. [Functions](#53-functions)
+    * 5.4. [Caller](#54-caller)
+        * 5.4.1. [Functions](#541-functions)
+    * 5.5. [Validations](#55-validations)
+        * 5.5.1. [Attaching multiple services to a listener](#551-attaching-multiple-services-to-a-listener)
+        * 5.5.2. [Using `autoComplete` mode](#552-using-autocomplete-mode)
+    * 5.6. [Usage](#56-usage)
+
 
 ## 1. Overview
 
@@ -522,4 +533,210 @@ isolated remote function renewLock(asb:Message message) returns asb:Error?;
 #
 # + return - An `asb:Error` if failed to close connection or else `()`
 isolated remote function close() returns asb:Error?;
+```
+
+## 5. Message listener
+
+An Azure Service Bus message listener is a mechanism for asynchronously receiving messages in an event-driven manner. Rather than continuously polling for messages, a message listener can be set up. When a message arrives at a designated queue or topic on the Azure Service Bus, the listener's callback method is automatically invoked.
+
+### 5.1. Configurations
+
+- `ListenerConfiguration` record represents the Azure service bus message listener configurations.
+
+```ballerina
+public type ListenerConfiguration record {|
+    *ASBServiceReceiverConfig;
+    # Enables auto-complete and auto-abandon of received messages
+    boolean autoComplete = true;
+    # The number of messages to prefetch
+    int prefetchCount = 0;
+    # Max concurrent messages that this listener should process
+    int maxConcurrency = 1;
+|};
+```
+
+### 5.2. Initialization
+
+- The `asb:Listener` can be initialized by providing the `asb:ListenerConfiguration`.
+
+```ballerina
+# Creates a new `asb:Listener`.
+# ```ballerina
+# listener asb:Listener asbListener = check new (
+#   connectionString = "xxxxxxxx",
+#   entityConfig = {
+#       queueName: "test-queue"
+#   },
+#   autoComplete = false
+# );
+# ```
+# 
+# + config - ASB listener configurations
+# + return - An `asb:Error` if an error is encountered or else '()'
+public isolated function init(*asb:ListenerConfiguration config) returns asb:Error?;
+```
+
+### 5.3. Functions
+
+- To attach a service to the listener, the `attach` function can be used.
+
+```ballerina
+# Attaches an `asb:Service` to a listener.
+# ```
+# check asbListener.attach(asbService);
+# ```
+# 
+# + 'service - The service instance
+# + name - Name of the service
+# + return - An `asb:Error` if there is an error or else `()`
+public isolated function attach(asb:Service 'service, string[]|string? name = ()) returns asb:Error?;
+```
+
+- To detach a service from the listener, the `detach` function can be used.
+
+```ballerina
+# Detaches an `asb:Service` from the the listener.
+# ```
+# check asbListener.detach(asbService);
+# ```
+#
+# + 'service - The service to be detached
+# + return - An `asb:Error` if there is an error or else `()`
+public isolated function detach(asb:Service 'service) returns asb:Error?;
+```
+
+- To start the listener, the `'start` function can be used.
+
+```ballerina
+# Starts the `asb:Listener`.
+# ```
+# check asbListener.'start();
+# ```
+#
+# + return - An `asb:Error` if there is an error or else `()`
+public isolated function 'start() returns asb:Error?;
+```
+
+- To stop the listener gracefully, the `gracefulStop` function can be used.
+
+```ballerina
+# Stops the `asb:Listener` gracefully.
+# ```
+# check asbListener.gracefulStop();
+# ```
+#
+# + return - An `asb:Error` if there is an error or else `()`
+public isolated function gracefulStop() returns asb:Error?;
+```
+
+- To stop the listener immediately, the `immediateStop` function can be used.
+
+```ballerina
+# Stops the `asb:Listener` immediately.
+# ```
+# check asbListener.immediateStop();
+# ```
+#
+# + return - An `asb:Error` if there is an error or else `()`
+public isolated function immediateStop() returns Error?;
+```
+
+### 5.4. Caller
+
+An `asb:Caller` can be used to mark messages as complete, abandon, deadLetter, or defer.
+
+### 5.4.1. Functions
+
+- To mark an Azure service bus message as complete, the `complete` function can be used.
+
+```ballerina
+# Complete message from queue or subscription based on messageLockToken. Declares the message processing to be 
+# successfully completed, removing the message from the queue.
+# ```
+# check caller->complete(message);
+# ```
+#
+# + return - An `asb:Error` if failed to complete message or else `()`
+isolated remote function complete() returns asb:Error?;
+```
+
+- To mark an Azure service bus message as abandon, the `abandon` function can be used.
+
+```ballerina
+# Abandon message from queue or subscription based on messageLockToken. Abandon processing of the message for 
+# the time being, returning the message immediately back to the queue to be picked up by another (or the same) 
+# receiver.
+# ```
+# check caller->abandon();
+# ```
+# 
+# + propertiesToModify - Message properties to modify
+# + return - An `asb:Error` if failed to abandon message or else `()`
+isolated remote function abandon(*record {|anydata...;|} propertiesToModify) returns asb:Error?;
+```
+
+- To move an Azure service bus message to the dead-letter queue, the `deadLetter` function can be used.
+
+```ballerina
+# Options to specify when sending an `asb:Message` received via `asb:ReceiveMode#PEEK_LOCK` to the dead-letter queue.
+#
+# + deadLetterReason - The deadletter reason
+# + deadLetterErrorDescription - The deadletter error description
+# + propertiesToModify - Message properties to modify
+public type DeadLetterOptions record {|
+    string deadLetterReason?;
+    string deadLetterErrorDescription?;
+    map<anydata> propertiesToModify?;
+|};
+
+# Dead-Letter the message & moves the message to the Dead-Letter Queue based on messageLockToken. Transfer 
+# the message from the primary queue into a special "dead-letter sub-queue".
+# ```
+# check caller->deadLetter();
+# ```
+#
+# + options - Options to specify while putting message in dead-letter queue
+# + return - An `asb:Error` if failed to deadletter message or else `()`
+isolated remote function deadLetter(*DeadLetterOptions options) returns asb:Error?;
+```
+
+- To mark an Azure service bus message as deferred, the `defer` function can be used.
+
+```ballerina
+# Defer the message in a Queue or Subscription based on messageLockToken.  It prevents the message from being 
+# directly received from the queue by setting it aside such that it must be received by sequence number.
+# ```
+# check caller->defer();
+# ```
+# 
+# + propertiesToModify - Message properties to modify
+# + return - An `asb:Error` if failed to defer message or else sequence number
+isolated remote function defer(*record {|anydata...;|} propertiesToModify) returns asb:Error?;
+```
+
+### 5.5. Validations
+
+#### 5.5.1. Attaching multiple services to a listener
+
+A listener is directly associated with a single native client, which in turn is tied to a specific Azure Service Bus (ASB) entity, either a queue or a topic. Consequently, linking multiple services to the same listener does not make sense. Therefore, if multiple services are attached to the same listener, a runtime error will be thrown. In the future, this should be validated during compilation by a compiler plugin.
+
+#### 5.5.2. Using `autoComplete` mode
+
+When `autoComplete` mode is enabled, explicit acknowledgment or rejection of messages (ack/nack) by the caller is unnecessary. Therefore, if `autoComplete` is active and the developer defines the `onMessage` method with an `asb:Caller` parameter, a runtime error will be thrown. In the future, this should be validated during compilation by a compiler plugin.
+
+### 5.6. Usage
+
+After initializing the `asb:Listener` an `asb:Service` can be attached to it.
+
+```ballerina
+service asb:Service on asbListener {
+
+    isolated remote function onMessage(asb:Message message, asb:Caller caller) returns error? {
+        // implement the message processing logic here
+    }
+
+    isolated remote function onError(asb:MessageRetrievalError 'error) returns error? {
+        // implement error handling logic here
+    }
+}
 ```
