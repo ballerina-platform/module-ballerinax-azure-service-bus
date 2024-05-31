@@ -120,3 +120,163 @@ public type MessageBatch record {|
     Message[] messages = [];
 |};
 ```
+
+## 3. Message sender
+
+A message sender is responsible for sending Azure service bus messages to a queue or topic on the Azure service bus instance.
+
+### 3.1. Configurations
+
+- `EntityType` enum represents the Azure service bus resource entity type.
+
+```ballerina
+public enum EntityType {
+    QUEUE = "queue",
+    TOPIC = "topic"
+}
+```
+
+- `AmqpRetryOptions` represents options that can be used to specify the underlying client retry behavior.
+
+```ballerina
+public type AmqpRetryOptions record {|
+    # Maximum number of retry attempts
+    int maxRetries = 3;
+    # Delay between retry attempts in seconds
+    decimal delay = 10;
+    # Maximum permissible delay between retry attempts in seconds
+    decimal maxDelay = 60;
+    # Maximum duration to wait for completion of a single attempt in seconds
+    decimal tryTimeout = 60;
+    # Approach to use for calculating retry delays
+    AmqpRetryMode retryMode = FIXED;
+|};
+
+# Represents the type of approach to apply when calculating the delay between retry attempts.
+public enum AmqpRetryMode {
+    # Retry attempts happen at fixed intervals; each delay is a consistent duration.
+    FIXED,
+    # Retry attempts will delay based on a backoff strategy, where each attempt will increase the duration that it waits before retrying.
+    EXPONENTIAL
+};
+```
+
+- `ASBServiceSenderConfig` record represents the Azure service bus message sender configurations.
+
+```ballerina
+public type ASBServiceSenderConfig record {
+    # An enumeration value of type EntityType, which specifies whether the connection is for a topic or a queue. 
+    # The valid values are TOPIC and QUEUE
+    EntityType entityType;
+    # A string field that holds the name of the topic or queue
+    string topicOrQueueName;
+    # A string field that holds the Service Bus connection string with Shared Access Signatures
+    string connectionString;
+    # Retry configurations related to underlying AMQP message sender
+    AmqpRetryOptions amqpRetryOptions = {};
+};
+```
+
+### 3.2. Initialization
+
+- The `asb:MessageSender` can be initialized by providing the `asb:ASBServiceSenderConfig`.
+
+```ballerina
+# Initializes an Azure service bus message sender.
+# ```
+# configurable string connectionString = ?;
+# asb:ASBServiceSenderConfig senderConfig = {
+#   connectionString: connectionString,
+#   entityType: QUEUE,
+#   topicOrQueueName: "testQueue1" 
+# };
+# asb:MessageSender sender = check new(senderConfig);
+# ```
+#
+# + config - Azure service bus sender configuration
+# + return - The `asb:MessageSender` or an `asb:Error` if the initialization failed
+public isolated function init(asb:ASBServiceSenderConfig config) returns asb:Error?;
+```
+
+### 3.3. Functions
+
+- To send a message to a queue or topic, the `send` function can be used.
+
+```ballerina
+# Send message to queue or topic with a message body.
+# ```
+# check sender->send({body: "Sample text message", contentType: asb:TEXT});
+# ```
+# 
+# + message - Azure service bus message representation (`asb:Message` record)
+# + return - An `asb:Error` if failed to send message or else `()`
+isolated remote function send(asb:Message message) returns asb:Error?;
+```
+
+- To send a message to a queue or topic with a message body, the `sendPayload` function can be used.
+
+```ballerina
+# Send message to queue or topic with a message body.
+# ```
+# check sender->sendPayload("Sample text message");
+# ```
+#
+# + messagePayload - Message body
+# + return - An `asb:Error` if failed to send message or else `()`
+isolated remote function sendPayload(anydata messagePayload) returns asb:Error?;
+```
+
+- To send a scheduled message to a queue or topic, the `schedule` function can be used.
+
+```ballerina
+# Sends a scheduled message to the Azure Service Bus entity this sender is connected to. 
+# A scheduled message is enqueued and made available to receivers only at the scheduled enqueue time.
+# ```
+# time:Civil scheduledTime = check time:civilFromString("2007-12-03T10:15:30.00Z");
+# check sender->send({body: "Sample text message", contentType: asb:TEXT}, scheduledTime);
+# ```
+#
+# + message - Message to be scheduled  
+# + scheduledEnqueueTime - Datetime at which the message should appear in the Service Bus queue or topic
+# + return - The sequence number of the scheduled message which can be used to cancel the scheduling of the message
+isolated remote function schedule(asb:Message message, time:Civil scheduledEnqueueTime) returns int|asb:Error;
+```
+
+- To cancel the enqueuing of a scheduled message, the `cancel` function can be used.
+
+```ballerina
+# Cancels the enqueuing of a scheduled message, if they are not already enqueued.
+# ```
+# check sender->cancel(1);
+# ```
+#
+# + sequenceNumber - The sequence number of the message to cancel
+# + return - An `asb:Error` if the message could not be cancelled or else `()`.
+isolated remote function cancel(int sequenceNumber) returns asb:Error?;
+```
+
+- To send a batch of messages to a queue or topic, the `sendBatch` function can be used.
+
+```ballerina
+# Send batch of messages to queue or topic.
+# ```
+# asb:MessageBatch batch = ...;
+# check sender->sendBatch(batch);
+# ```
+#
+# + messageBatch - Azure service bus batch message representation (`asb:MessageBatch` record)
+# + return - An `asb:Error` if failed to send message or else `()`
+isolated remote function sendBatch(asb:MessageBatch messageBatch) returns asb:Error?;
+```
+
+- To close the ASB sender connection, the `close` function can be used.
+
+```ballerina
+# Closes the ASB sender connection.
+# ```
+# check sender->close();
+# ```
+#
+# + return - An `asb:Error` if failed to close connection or else `()`
+isolated remote function close() returns asb:Error?;
+```
