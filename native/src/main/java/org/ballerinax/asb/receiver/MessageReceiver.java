@@ -347,25 +347,30 @@ public class MessageReceiver {
      * @param deadLetterErrorDescription The dead letter error description.
      * @return An error if failed to dead letter the message.
      */
-    public static Object deadLetter(BObject receiverClient, BMap<BString, Object> message, Object deadLetterReason,
-                                    Object deadLetterErrorDescription) {
-        try {
-            ServiceBusReceiverClient receiver = getReceiverFromBObject(receiverClient);
-            ServiceBusReceivedMessage nativeMessage = getNativeMessage(message);
-            DeadLetterOptions options = new DeadLetterOptions()
-                    .setDeadLetterErrorDescription(ASBUtils.convertString(deadLetterErrorDescription));
-            options.setDeadLetterReason(ASBUtils.convertString(deadLetterReason));
-            receiver.deadLetter(nativeMessage, options);
-            LOGGER.debug(String.format("Done dead-lettering a message(Id: %s) using its lock token from %s",
-                    nativeMessage.getMessageId(), receiver.getEntityPath()));
-            return null;
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
+    public static Object deadLetter(Environment env, BObject receiverClient, BMap<BString, Object> message,
+                                    Object deadLetterReason, Object deadLetterErrorDescription) {
+        ServiceBusReceivedMessage nativeMessage = getNativeMessage(message);
+        ServiceBusReceiverClient receiver = getReceiverFromBObject(receiverClient, false);
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            try {
+                DeadLetterOptions options = new DeadLetterOptions()
+                        .setDeadLetterErrorDescription(ASBUtils.convertString(deadLetterErrorDescription));
+                options.setDeadLetterReason(ASBUtils.convertString(deadLetterReason));
+                receiver.deadLetter(nativeMessage, options);
+                future.complete(null);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
+            }
+        });
+        return null;
     }
 
     /**
@@ -470,19 +475,25 @@ public class MessageReceiver {
      *
      * @return An error if failed to close the receiver.
      */
-    public static Object closeReceiver(BObject receiverClient) {
-        try {
-            ServiceBusReceiverClient receiver = getReceiverFromBObject(receiverClient, false);
-            receiver.close();
-            LOGGER.debug("Closed the receiver");
-            return null;
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
+    public static Object closeReceiver(Environment env, BObject receiverClient) {
+        ServiceBusReceiverClient receiver = getReceiverFromBObject(receiverClient, false);
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            try {
+                receiver.close();
+                future.complete(null);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
+            }
+        });
+        return null;
     }
 
     /**
