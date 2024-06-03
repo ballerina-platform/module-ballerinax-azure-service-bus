@@ -740,3 +740,93 @@ service asb:Service on asbListener {
     }
 }
 ```
+
+## 6. Administrator
+
+An administrator client is responsible for managing a Service Bus namespace.
+
+### 6.1. Configurations
+
+### 6.2. Initialization
+
+- The `asb:Administrator` can be initialized by providing the connection string.
+
+```ballerina
+# Initialize the Azure Service Bus Admin client.
+# ```ballerina
+# configurable string connectionString = ?;
+# asb:Administrator admin = check new (connectionString);
+# ```
+# 
+# + connectionString - Azure Service Bus connection string
+# + return - The `asb:Administrator` or an `asb:Error` if the initialization failed
+public isolated function init(string connectionString) returns asb:Error?;
+```
+
+### 6.3. Functions
+
+- To create an ASB topic, the `createTopic` function can be used.
+
+```ballerina
+# Create a topic with the given name or name and options.
+# ```
+# asb:TopicProperties? topicProperties = check admin->createTopic("topic-1");
+# ```
+# 
+# + topicName - Topic name
+# + topicOptions - Topic options to create the topic.This should be a record of type CreateTopicOptions
+# + return - Topic properties(Type of `asb:TopicProperies`) or error
+isolated remote function createTopic(string topicName, *asb:CreateTopicOptions topicOptions) returns asb:TopicProperties|asb:Error?;
+```
+
+- To retrieve details of an ASB topic, the `getTopic` function can be used.
+
+```ballerina
+# Get the topic with the given name.
+# ```
+# asb:TopicProperties? topicProperties = check admin->getTopic("topic-1");
+# ```
+#
+# + topicName - Topic name
+# + return - Topic properties(Type of `asb:TopicProperies`) or error
+isolated remote function getTopic(string topicName) returns asb:TopicProperties|asb:Error?;
+```
+
+- To update the configurations of an ASB topic, the `updateTopic` function can be used.
+
+```ballerina
+# Update the topic with the given options.
+# ```
+# asb:TopicProperties? topicProp = check admin->updateTopic("topic-1", supportOrdering = true);
+# ```
+#
+# + topicName - Topic name
+# + topicOptions - Topic options to update the topic.This should be a record of type UpdateTopicOptions
+# + return - Topic properties(Type of `asb:TopicProperies`) or error
+isolated remote function updateTopic(string topicName, *asb:UpdateTopicOptions topicOptions) returns asb:TopicProperties|asb:Error?;
+```
+
+- To list all the ASB topics, the `listTopics` function can be used.
+
+```ballerina
+# List the topics.
+# ```
+# asb:TopicList topics = check admin->listTopics();
+# ```
+#
+# + return - Topic list(Type of `asb:TopicList`) or error
+isolated remote function listTopics() returns asb:TopicList|asb:Error?;
+```
+
+- To delete an ASB topic, the `deleteTopic` function can be used.
+
+```ballerina
+# Delete the topic with the given name.
+# ```ballerina
+# check admin->deleteTopic("topic-1");
+# ```
+# 
+# + topicName - Topic name
+# + return - an `asb:Error` or nil
+isolated remote function deleteTopic(string topicName) returns asb:Error?;
+```
