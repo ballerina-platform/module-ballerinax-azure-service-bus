@@ -43,6 +43,9 @@ The conforming implementation of the specification is released to Ballerina Cent
         * 5.5.1. [Attaching multiple services to a listener](#551-attaching-multiple-services-to-a-listener)
         * 5.5.2. [Using `autoComplete` mode](#552-using-autocomplete-mode)
     * 5.6. [Usage](#56-usage)
+6. [Administrator](#6-administrator)
+    * 6.1. [Initialization](#61-initialization)
+    * 6.2. [Functions](#62-functions)
 
 
 ## 1. Overview
@@ -745,9 +748,7 @@ service asb:Service on asbListener {
 
 An administrator client is responsible for managing a Service Bus namespace.
 
-### 6.1. Configurations
-
-### 6.2. Initialization
+### 6.1. Initialization
 
 - The `asb:Administrator` can be initialized by providing the connection string.
 
@@ -763,7 +764,7 @@ An administrator client is responsible for managing a Service Bus namespace.
 public isolated function init(string connectionString) returns asb:Error?;
 ```
 
-### 6.3. Functions
+### 6.2. Functions
 
 - To create an ASB topic, the `createTopic` function can be used.
 
