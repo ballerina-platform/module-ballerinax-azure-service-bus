@@ -1008,3 +1008,82 @@ isolated remote function listRules(string topicName, string subscriptionName)ret
 # + return - An `asb:Error` or nil
 isolated remote function deleteRule(string topicName, string subscriptionName, string ruleName) returns asb:Error?;
 ```
+
+- To create an ASB queue, the `createQueue` function can be used.
+
+```ballerina
+# Create a queue with the given name or name and options.
+# ```
+# asb:QueueProperties queueProperties = check admin->createQueue("queue-1");
+# ```
+# 
+# + queueName - Name of the queue
+# + queueOptions - Queue options to create the queue.This should be a record of type CreateQueueOptions
+# + return - Queue properties(Type of `asb:QueueProperties`) or error
+isolated remote function createQueue(string queueName, *asb:CreateQueueOptions queueOptions) returns asb:QueueProperties|asb:Error?;
+```
+
+- To retrieve the details of an ASB queue, the `getQueue` function can be used.
+
+```ballerina
+# Get the queue with the given name.
+# ```
+# asb:QueueProperties? queueProperties = check admin->getQueue("queue-1");
+# ```
+#
+# + queueName - Name of the queue
+# + return - Queue properties(Type of `asb:QueueProperties`) or error
+isolated remote function getQueue(string queueName) returns asb:QueueProperties|asb:Error?;
+```
+
+- To update the configurations of an ASB queue, the `updateQueue` function can be used.
+
+```ballerina
+# Update the queue with the options.
+# ```
+# asb:QueueProperties? queueProperties = check admin->updateQueue("queue-1", maxDeliveryCount = 10);
+# ```
+# 
+# + queueName - Name of the queue
+# + queueOptions - Queue options to update the queue.This should be a record of type UpdateQueueOptions
+# + return - Queue properties(Type of `asb:QueueProperties`) or error
+isolated remote function updateQueue(string queueName, *asb:UpdateQueueOptions queueOptions) returns asb:QueueProperties|asb:Error?;
+```
+
+- To list the available ASB queues, the `listQueues` function can be used.
+
+```ballerina
+# List the queues.
+# ```
+# asb:QueueList? queues = check admin->listQueues();
+# ```
+#
+# + return - Queue list(Type of `asb:QueueList`) or error
+isolated remote function listQueues() returns asb:QueueList|asb:Error?;
+```
+
+- To delete an ASB queue, the `deleteQueue` function can be used.
+
+```ballerina
+# Delete the queue with the given name.
+# ```
+# check admin->deleteQueue("queue-1");
+# ```
+#
+# + queueName - Name of the queue
+# + return - An `asb:Error` or nil
+isolated remote function deleteQueue(string queueName) returns asb:Error?;
+```
+
+- To check whether an ASB queue exists, the `queueExists` function can be used.
+
+```ballerina
+# Check whether the queue exists.
+# ```
+# boolean exists = check admin->queueExists("queue-1");
+# ```
+#
+# + queueName - Name of the queue
+# + return - Boolean or error
+isolated remote function queueExists(string queueName) returns boolean|asb:Error?;
+```
