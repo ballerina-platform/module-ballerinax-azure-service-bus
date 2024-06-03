@@ -811,7 +811,7 @@ isolated remote function updateTopic(string topicName, *asb:UpdateTopicOptions t
 ```ballerina
 # List the topics.
 # ```
-# asb:TopicList topics = check admin->listTopics();
+# asb:TopicList? topics = check admin->listTopics();
 # ```
 #
 # + return - Topic list(Type of `asb:TopicList`) or error
@@ -830,3 +830,104 @@ isolated remote function listTopics() returns asb:TopicList|asb:Error?;
 # + return - an `asb:Error` or nil
 isolated remote function deleteTopic(string topicName) returns asb:Error?;
 ```
+
+- To check whether an ASB topic exists, the `topicExists` function can be used.
+
+```ballerina
+# Get the status of existance of a topic with the given name.
+# ```
+# boolean exists = check admin->topicExists("topic-1");
+# ```
+# 
+# + topicName - Topic name
+# + return - Boolean or error
+isolated remote function topicExists(string topicName) returns boolean|asb:Error?;
+```
+
+- To create an ASB subscription, the `createSubscription` function can be used.
+
+```ballerina
+# Create a subscription with the given name or name and options.
+# ```
+# asb:SubscriptionProperties? subscriptionProperties = check admin->createSubscription("topic-1", "sub-a");
+# ```
+#
+# + topicName - Name of the topic associated with subscription
+# + subscriptionName - Name of the subscription
+# + subscriptionOptions - Subscription options to create the subscription.This should be a record of type CreateSubscriptionOptions.
+# + return - Subscription properties(Type of `asb:SubscriptionProperies`) or error
+isolated remote function createSubscription(string topicName, string subscriptionName, *asb:CreateSubscriptionOptions subscriptionOptions) 
+        returns asb:SubscriptionProperties|asb:Error?;
+```
+
+- To retrieve the details of an ASB subscription, the `getSubscription` function can be used.
+
+```ballerina
+# Get the subscription with the given name.
+# ```ballerina
+# asb:SubscriptionProperties? subscriptionProperties = check admin->getSubscription("topic-1", "sub-a");
+# ```
+#
+# + topicName - Name of the topic associated with subscription
+# + subscriptionName - Name of the subscription
+# + return - Subscription properties(Type of `asb:SubscriptionProperies`) or error
+isolated remote function getSubscription(string topicName, string subscriptionName) returns asb:SubscriptionProperties|asb:Error?;
+```
+
+- To update the configurations of an ASB subscription, the `updateSubscription` function can be used.
+
+```ballerina
+# Update the subscription with the given options.
+# ```
+# asb:SubscriptionProperties? subscriptionProperties = check admin->updateSubscription("topic-1", "sub-a", maxDeliveryCount = 10);
+# ```
+# 
+# + topicName - Name of the topic associated with subscription
+# + subscriptionName - Name of the subscription
+# + subscriptionOptions - Subscription options to update the subscription.This should be a record of type UpdateSubscriptionOptions
+# + return - Subscription properties(Type of `asb:SubscriptionProperies`) or error
+isolated remote function updateSubscription(string topicName, string subscriptionName, *asb:UpdateSubscriptionOptions subscriptionOptions) 
+        returns asb:SubscriptionProperties|asb:Error?;
+```
+
+- To list subscriptions for an ASB topic, the `listSubscriptions` function can be used.
+
+```ballerina
+# List the subscriptions.
+# ```
+# asb:SubscriptionList? subscriptions = check admin->listSubscriptions("topic-1");
+# ```
+#
+# + topicName - Name of the topic associated with subscription
+# + return - Subscription list(Type of `asb:SubscriptionList`) or error
+isolated remote function listSubscriptions(string topicName) returns asb:SubscriptionList|asb:Error?;
+```
+
+- To delete an ASB subscription, the `deleteSubscription` function can be used.
+
+```ballerina
+# Delete the subscription with the given name.
+# ```
+# check admin->deleteSubscription("topic-1", "sub-a");
+# ```
+#
+# + topicName - Topic name
+# + subscriptionName - Subscription name
+# + return - An `asb:Error` or nil
+isolated remote function deleteSubscription(string topicName, string subscriptionName) returns asb:Error?;
+```
+
+- To check whether an ASB subscription exists, the `subscriptionExists` function can be used.
+
+```ballerina
+# Get the status of existance of a subscription with the given name.
+# ```
+# boolean exists = check admin->subscriptionExists("topic-1", "sub-a");
+# ```
+#
+# + topicName - Topic name
+# + subscriptionName - Subscription name
+# + return - Boolean or error
+isolated remote function subscriptionExists(string topicName, string subscriptionName) returns boolean|asb:Error?;
+```
+
