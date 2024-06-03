@@ -134,6 +134,23 @@ This can be done by providing a connection string with a queue name, topic name,
     asb:MessageReceiver receiver = check new (receiverConfig);
 ```
 
+#### Initialize a message listener
+
+This can be done by providing a connection string with a queue name, topic name, or subscription path.
+
+> Here, the Receive mode is optional. (Default: PEEKLOCK)
+
+```ballerina
+    configurable string connectionString = ?;
+
+    listener asb:Listener asbListener = check new (
+        connectionString = connectionString,
+        entityConfig = {
+            queueName: "myQueue"
+        }
+    );
+```
+
 ### Step 3: Invoke connector operation
 
 Now you can use the remote operations available within the connector,
@@ -198,7 +215,22 @@ public function main() returns error? {
     check queueReceiver->close();
 }
 ```
-    
+
+**Receive messages from Azure service bus using `asb:Service`**
+
+```ballerina
+service asb:Service on asbListener {
+
+    isolated remote function onMessage(asb:Message message) returns error? {
+        log:printInfo("Reading Received Message : " + message.toString());
+    }
+
+    isolated remote function onError(asb:MessageRetrievalError 'error) returns error? {
+        log:printError("Error occurred while receiving messages from ASB", 'error);
+    }
+}
+```
+
 ### Step 4: Run the Ballerina application
 
 ```bash
