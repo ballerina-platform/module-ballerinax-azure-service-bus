@@ -931,3 +931,80 @@ isolated remote function deleteSubscription(string topicName, string subscriptio
 isolated remote function subscriptionExists(string topicName, string subscriptionName) returns boolean|asb:Error?;
 ```
 
+- To create a subscription rule, the `createRule` function can be used.
+
+```ballerina
+# Create a rule with the given name or name and options.
+# ```
+# asb:RuleProperties? properties = check admin->createRule("topic-1", "sub-a", "rule-1");
+# ```
+# 
+# + topicName - Name of the topic associated with subscription
+# + subscriptionName - Name of the subscription
+# + ruleName - Name of the rule
+# + ruleOptions - Rule options to create the rule.This should be a record of type CreateRuleOptions
+# + return - Rule properties(Type of `asb:RuleProperies`) or error
+isolated remote function createRule(string topicName, string subscriptionName, string ruleName, *asb:CreateRuleOptions ruleOptions) 
+        returns asb:RuleProperties|asb:Error?;
+```
+
+- To retrieve the details for a subscription rule, the `getRule` function can be used.
+
+```ballerina
+# Get the rule with the given name.
+# ```
+# asb:RuleProperties? properties = check admin->getRule("topic-1", "sub-a", "rule-1");
+# ```
+#
+# + topicName - Name of the topic associated with subscription
+# + subscriptionName - Name of the subscription associated with rule
+# + ruleName - Rule name
+# + return - An `asb:Error` or nil
+isolated remote function getRule(string topicName, string subscriptionName, string ruleName) returns asb:RuleProperties|asb:Error?;
+```
+
+- To update the configurations of a subscription rule, the `updateRule` can be used.
+
+```ballerina
+# Update the rule with the options.
+# ```
+# asb:SqlRule rule = ...;
+# asb:RuleProperties? ruleProperties = check admin->updateRule("topic-1", "sub-a", "rule-1", rule = rule);
+# ```
+#
+# + topicName - Name of the topic associated with subscription
+# + subscriptionName - Name of the subscription associated with rule
+ + ruleName - Rule name
+# + ruleOptions - Rule options to update the rule.This should be a record of type UpdateRuleOptions
+# + return - Rule properties(Type of `asb:RuleProperies`) or error
+isolated remote function updateRule(string topicName, string subscriptionName, string ruleName, *asb:UpdateRuleOptions ruleOptions) 
+        returns asb:RuleProperties|asb:Error?;
+```
+
+- To list the subscription rules, the `listRules` function can be used.
+
+```ballerina
+# List the rules.
+# ```
+# asb:RuleList? rules = check admin->listRules("topic-1", "sub-a");
+# ```
+#
+# + topicName - Name of the topic associated with subscription
+# + subscriptionName - Name of the subscription
+# + return - Rule list(Type of `asb:RuleList`) or error
+isolated remote function listRules(string topicName, string subscriptionName)returns asb:RuleList|asb:Error?;
+```
+
+- To delete a subscription rule, the `deleteRule` function can be used.
+
+```ballerina
+# Delete the rule with the given name.
+# ```
+# check admin->deleteRule("topic-1", "sub-a", "rule-1");
+# ```
+# + topicName - Name of the topic associated with subscription
+# + subscriptionName - Name of the subscription associated with rule
+# + ruleName - Rule name
+# + return - An `asb:Error` or nil
+isolated remote function deleteRule(string topicName, string subscriptionName, string ruleName) returns asb:Error?;
+```
