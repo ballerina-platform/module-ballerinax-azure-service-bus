@@ -26,6 +26,8 @@ import com.azure.messaging.servicebus.ServiceBusMessage;
 import com.azure.messaging.servicebus.ServiceBusMessageBatch;
 import com.azure.messaging.servicebus.ServiceBusSenderClient;
 import com.azure.messaging.servicebus.models.CreateMessageBatchOptions;
+import io.ballerina.runtime.api.Environment;
+import io.ballerina.runtime.api.Future;
 import io.ballerina.runtime.api.TypeTags;
 import io.ballerina.runtime.api.types.Type;
 import io.ballerina.runtime.api.utils.StringUtils;
@@ -49,6 +51,8 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static org.ballerinax.asb.util.ASBUtils.getRetryOptions;
 
@@ -56,6 +60,8 @@ import static org.ballerinax.asb.util.ASBUtils.getRetryOptions;
  * This facilitates the client operations of MessageSender client in Ballerina.
  */
 public class MessageSender {
+    private static final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool(
+            new SenderNetworkThreadFactory());
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageSender.class);
 
@@ -98,22 +104,26 @@ public class MessageSender {
      * @param message Input message record as a BMap
      * @return An error if failed to send the message
      */
-    public static Object send(BObject senderClient, BMap<BString, Object> message) {
-        try {
-            ServiceBusSenderClient sender = getSenderFromBObject(senderClient);
-            ServiceBusMessage messageToSend = constructMessage(message);
-            sender.sendMessage(messageToSend);
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Sent the message successfully. Message Id = " + messageToSend.getMessageId());
+    public static Object send(Environment env, BObject senderClient, BMap<BString, Object> message) {
+        ServiceBusSenderClient sender = getSenderFromBObject(senderClient);
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            try {
+                ServiceBusMessage messageToSend = constructMessage(message);
+                sender.sendMessage(messageToSend);
+                future.complete(null);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
             }
-            return null;
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
+        });
+        return null;
     }
 
     /**
@@ -124,23 +134,27 @@ public class MessageSender {
      * @param scheduleTime Input schedule time record as a BMap
      * @return An error if failed to send the message
      */
-    public static Object schedule(BObject senderClient, BMap<BString, Object> message,
+    public static Object schedule(Environment env, BObject senderClient, BMap<BString, Object> message,
                                   BMap<BString, Object> scheduleTime) {
-        try {
-            ServiceBusSenderClient sender = getSenderFromBObject(senderClient);
-            ServiceBusMessage messageToSend = constructMessage(message);
-            Long sequenceNumber = sender.scheduleMessage(messageToSend, constructOffset(scheduleTime));
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Scheduled the message successfully. Message Id = " + messageToSend.getMessageId());
+        ServiceBusSenderClient sender = getSenderFromBObject(senderClient);
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            try {
+                ServiceBusMessage messageToSend = constructMessage(message);
+                Long sequenceNumber = sender.scheduleMessage(messageToSend, constructOffset(scheduleTime));
+                future.complete(sequenceNumber);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
             }
-            return sequenceNumber;
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
+        });
+        return null;
     }
 
     /**
@@ -149,21 +163,25 @@ public class MessageSender {
      * @param sequenceNumber The sequence number of the message to cance
      * @return An error if failed to send the message
      */
-    public static Object cancel(BObject senderClient, long sequenceNumber) {
-        try {
-            ServiceBusSenderClient sender = getSenderFromBObject(senderClient);
-            sender.cancelScheduledMessage(sequenceNumber);
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Successfully cancelled scheduled message with sequenceNumber = " + sequenceNumber);
+    public static Object cancel(Environment env, BObject senderClient, long sequenceNumber) {
+        ServiceBusSenderClient sender = getSenderFromBObject(senderClient);
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            try {
+                sender.cancelScheduledMessage(sequenceNumber);
+                future.complete(null);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
             }
-            return null;
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
+        });
+        return null;
     }
 
     /**
@@ -174,47 +192,51 @@ public class MessageSender {
      * @param messages Input batch message record as a BMap
      * @return An error if failed send the message.
      */
-    public static Object sendBatch(BObject senderClient, BMap<BString, Object> messages) {
-        try {
-            ServiceBusSenderClient sender = getSenderFromBObject(senderClient);
-            Map<String, Object> messagesMap = ASBUtils.toObjectMap(messages);
-            BArray messageArray = (BArray) messagesMap.get("messages");
-            Collection<ServiceBusMessage> messageBatch = new ArrayList<>();
-            for (int i = 0; i < messageArray.getLength(); i++) {
-                BMap<BString, Object> messageBMap = (BMap<BString, Object>) messageArray.get(i);
-                ServiceBusMessage asbMessage = constructMessage(messageBMap);
-                messageBatch.add(asbMessage);
-            }
-            ServiceBusMessageBatch currentBatch = sender.createMessageBatch(new CreateMessageBatchOptions());
-            for (ServiceBusMessage message : messageBatch) {
-                if (currentBatch.tryAddMessage(message)) {
-                    continue;
+    public static Object sendBatch(Environment env, BObject senderClient, BMap<BString, Object> messages) {
+        ServiceBusSenderClient sender = getSenderFromBObject(senderClient);
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            try {
+                Map<String, Object> messagesMap = ASBUtils.toObjectMap(messages);
+                BArray messageArray = (BArray) messagesMap.get("messages");
+                Collection<ServiceBusMessage> messageBatch = new ArrayList<>();
+                for (int i = 0; i < messageArray.getLength(); i++) {
+                    BMap<BString, Object> messageBMap = (BMap<BString, Object>) messageArray.get(i);
+                    ServiceBusMessage asbMessage = constructMessage(messageBMap);
+                    messageBatch.add(asbMessage);
                 }
-                // The batch is full, so we create a new batch and send the batch.
-                sender.sendMessages(currentBatch);
-                currentBatch = sender.createMessageBatch();
+                ServiceBusMessageBatch currentBatch = sender.createMessageBatch(new CreateMessageBatchOptions());
+                for (ServiceBusMessage message : messageBatch) {
+                    if (currentBatch.tryAddMessage(message)) {
+                        continue;
+                    }
+                    // The batch is full, so we create a new batch and send the batch.
+                    sender.sendMessages(currentBatch);
+                    currentBatch = sender.createMessageBatch();
 
-                // Add that message that we couldn't before.
-                if (!currentBatch.tryAddMessage(message)) {
-                    if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Message is too large for an empty batch. Skipping. Max size: "
-                                + currentBatch.getMaxSizeInBytes() + ". Message: " +
-                                message.getBody().toString());
+                    // Add that message that we couldn't before.
+                    if (!currentBatch.tryAddMessage(message)) {
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("Message is too large for an empty batch. Skipping. Max size: "
+                                    + currentBatch.getMaxSizeInBytes() + ". Message: " +
+                                    message.getBody().toString());
+                        }
                     }
                 }
+                sender.sendMessages(currentBatch);
+                future.complete(null);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
             }
-            sender.sendMessages(currentBatch);
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Sent the batch message successfully");
-            }
-            return null;
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
+        });
+        return null;
     }
 
     /**
@@ -222,19 +244,25 @@ public class MessageSender {
      *
      * @return @return An error if failed close the sender.
      */
-    public static Object close(BObject senderClient) {
-        try {
-            ServiceBusSenderClient sender = getSenderFromBObject(senderClient);
-            sender.close();
-            LOGGER.debug("Closed the sender. Identifier=" + sender.getIdentifier());
-            return null;
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
+    public static Object close(Environment env, BObject senderClient) {
+        ServiceBusSenderClient sender = getSenderFromBObject(senderClient);
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            try {
+                sender.close();
+                future.complete(null);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
+            }
+        });
+        return null;
     }
 
     private static ServiceBusMessage constructMessage(BMap<BString, Object> message) {
