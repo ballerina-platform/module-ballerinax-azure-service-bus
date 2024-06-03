@@ -190,8 +190,14 @@ function testSendToInvalidTopic() returns error? {
 function testReceiveFromInvalidQueue() returns error? {
     log:printInfo("[[testReceiveFromInvalidQueue]]");
     log:printInfo("Creating Asb message receiver.");
-    receiverConfig.entityConfig = {queueName: "non-existing-queue"};
-    MessageReceiver messageReceiver = check new (receiverConfig);
+    ASBServiceReceiverConfig invalidReceiverConfig = {
+        connectionString: connectionString,
+        entityConfig: {
+            queueName: "non-existing-queue"
+        },
+        receiveMode: PEEK_LOCK
+    };
+    MessageReceiver messageReceiver = check new (invalidReceiverConfig);
 
     log:printInfo("Sending payloads via ASB sender");
     Message|error? e = messageReceiver->receive(5);
