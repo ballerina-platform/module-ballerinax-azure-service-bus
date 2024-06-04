@@ -526,6 +526,7 @@ public class Administrator {
             } catch (HttpResponseException e) {
                 if (e.getResponse().getStatusCode() == 404) {
                     future.complete(false);
+                    return;
                 }
                 BError bError = ASBErrorCreator.fromASBHttpResponseException(e);
                 future.complete(bError);
@@ -748,26 +749,33 @@ public class Administrator {
      * @param queueProperties     properties of the Queue (Requires QueueProperties object)
      * @return queueProperties object
      */
-    public static Object createQueue(BObject administratorClient,
+    public static Object createQueue(Environment env, BObject administratorClient,
                                      BString queueName, BMap<BString, Object> queueProperties) {
         ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
-        try {
-            QueueProperties queueProp;
-            if (queueProperties.isEmpty()) {
-                queueProp = clientEp.createQueue(queueName.toString());
-            } else {
-                queueProp = clientEp.createQueue(queueName.toString(),
-                        ASBUtils.getQueuePropertiesFromBObject(queueProperties));
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            try {
+                QueueProperties queueProp;
+                if (queueProperties.isEmpty()) {
+                    queueProp = clientEp.createQueue(queueName.toString());
+                } else {
+                    queueProp = clientEp.createQueue(queueName.toString(),
+                            ASBUtils.getQueuePropertiesFromBObject(queueProperties));
+                }
+                BMap<BString, Object> updatedQueueProperties = constructQueueCreatedRecord(queueProp);
+                future.complete(updatedQueueProperties);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
             }
-            LOGGER.debug("Created queue successfully with name: " + queueProp.getName());
-            return constructQueueCreatedRecord(queueProp);
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
+        });
+        return null;
     }
 
     /**
@@ -777,19 +785,26 @@ public class Administrator {
      * @param queueName           name of the Queue
      * @return queueProperties object
      */
-    public static Object getQueue(BObject administratorClient, BString queueName) {
+    public static Object getQueue(Environment env, BObject administratorClient, BString queueName) {
         ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
-        try {
-            QueueProperties queueProp = clientEp.getQueue(queueName.toString());
-            LOGGER.debug("Retrieved queue successfully with name: " + queueProp.getName());
-            return constructQueueCreatedRecord(queueProp);
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            try {
+                QueueProperties queueProp = clientEp.getQueue(queueName.toString());
+                BMap<BString, Object> queueProperties = constructQueueCreatedRecord(queueProp);
+                future.complete(queueProperties);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
+            }
+        });
+        return null;
     }
 
     /**
@@ -800,25 +815,32 @@ public class Administrator {
      * @param queueProperties     properties of the Queue (Requires QueueProperties object)
      * @return queueProperties object
      */
-    public static Object updateQueue(BObject administratorClient, BString queueName,
+    public static Object updateQueue(Environment env, BObject administratorClient, BString queueName,
                                      BMap<BString, Object> queueProperties) {
         ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
-        try {
-            QueueProperties queueProp = clientEp.getQueue(queueName.toString());
-            QueueProperties updatedQueueProps = clientEp.updateQueue(
-                    ASBUtils.getUpdatedQueuePropertiesFromBObject(queueProperties, queueProp));
-            LOGGER.debug("Updated queue successfully with name: " + updatedQueueProps.getName());
-            return constructQueueCreatedRecord(updatedQueueProps);
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (HttpResponseException e) {
-            return ASBErrorCreator.fromASBHttpResponseException(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-
-        }
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            try {
+                QueueProperties queueProp = clientEp.getQueue(queueName.toString());
+                QueueProperties updatedQueueProps = clientEp.updateQueue(
+                        ASBUtils.getUpdatedQueuePropertiesFromBObject(queueProperties, queueProp));
+                BMap<BString, Object> updatedQueueProperties = constructQueueCreatedRecord(updatedQueueProps);
+                future.complete(updatedQueueProperties);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            } catch (HttpResponseException e) {
+                BError bError = ASBErrorCreator.fromASBHttpResponseException(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
+            }
+        });
+        return null;
     }
 
     /**
@@ -827,21 +849,29 @@ public class Administrator {
      * @param administratorClient Azure Service Bus Administrator Client
      * @return queueProperties object
      */
-    public static Object listQueues(BObject administratorClient) {
+    public static Object listQueues(Environment env, BObject administratorClient) {
         ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
-        try {
-            PagedIterable<QueueProperties> queueProp = clientEp.listQueues();
-            LOGGER.debug("Retrieved all queues successfully");
-            return constructQueuePropertiesArray(queueProp);
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (HttpResponseException e) {
-            return ASBErrorCreator.fromASBHttpResponseException(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            try {
+                PagedIterable<QueueProperties> queueProp = clientEp.listQueues();
+                BMap<BString, Object> queueProperties = constructQueuePropertiesArray(queueProp);
+                future.complete(queueProperties);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            } catch (HttpResponseException e) {
+                BError bError = ASBErrorCreator.fromASBHttpResponseException(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
+            }
+        });
+        return null;
     }
 
     private static BMap<BString, Object> constructQueuePropertiesArray(PagedIterable<QueueProperties> queueProp) {
@@ -867,19 +897,25 @@ public class Administrator {
      * @param queueName           name of the Queue
      * @return null
      */
-    public static Object deleteQueue(BObject administratorClient, BString queueName) {
+    public static Object deleteQueue(Environment env, BObject administratorClient, BString queueName) {
         ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
-        try {
-            clientEp.deleteQueue(queueName.toString());
-            LOGGER.debug("Deleted queue successfully with name: " + queueName);
-            return null;
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            try {
+                clientEp.deleteQueue(queueName.toString());
+                future.complete(null);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
+            }
+        });
+        return null;
     }
 
     /**
@@ -889,22 +925,32 @@ public class Administrator {
      * @param queueName           name of the Queue
      * @return null
      */
-    public static Object queueExists(BObject administratorClient, BString queueName) {
+    public static Object queueExists(Environment env, BObject administratorClient, BString queueName) {
         ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
-        try {
-            return clientEp.getQueueExists(queueName.toString());
-        } catch (HttpResponseException e) {
-            if (e.getResponse().getStatusCode() == 404) {
-                return false;
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            try {
+                boolean queueExists = clientEp.getQueueExists(queueName.toString());
+                future.complete(queueExists);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            } catch (HttpResponseException e) {
+                if (e.getResponse().getStatusCode() == 404) {
+                    future.complete(false);
+                    return;
+                }
+                BError bError = ASBErrorCreator.fromASBHttpResponseException(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
             }
-            return ASBErrorCreator.fromASBHttpResponseException(e);
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
+        });
+        return null;
     }
 
     private static BMap<BString, Object> constructRuleCreatedRecord(RuleProperties properties) {
