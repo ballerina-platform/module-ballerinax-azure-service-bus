@@ -34,6 +34,8 @@ import com.azure.messaging.servicebus.administration.models.SqlRuleAction;
 import com.azure.messaging.servicebus.administration.models.SqlRuleFilter;
 import com.azure.messaging.servicebus.administration.models.SubscriptionProperties;
 import com.azure.messaging.servicebus.administration.models.TopicProperties;
+import io.ballerina.runtime.api.Environment;
+import io.ballerina.runtime.api.Future;
 import io.ballerina.runtime.api.PredefinedTypes;
 import io.ballerina.runtime.api.creators.TypeCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
@@ -57,6 +59,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static io.ballerina.runtime.api.creators.ValueCreator.createRecordValue;
 
@@ -64,6 +68,8 @@ import static io.ballerina.runtime.api.creators.ValueCreator.createRecordValue;
  * This facilitates the client operations of ASB Administrator client in Ballerina.
  */
 public class Administrator {
+    private static final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool(
+            new AdminNetworkThreadFactory());
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Administrator.class);
 
@@ -97,26 +103,33 @@ public class Administrator {
      * @param topicProperties     properties of the Topic (Requires TopicProperties object)
      * @return topicProperties
      */
-    public static Object createTopic(BObject administratorClient, BString topicName,
+    public static Object createTopic(Environment env, BObject administratorClient, BString topicName,
                                      BMap<BString, Object> topicProperties) {
         ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
-        TopicProperties topicProp;
-        try {
-            if (topicProperties == null) {
-                topicProp = clientEp.createTopic(topicName.toString());
-            } else {
-                topicProp = clientEp.createTopic(topicName.toString(),
-                        ASBUtils.getCreateTopicPropertiesFromBObject(topicProperties));
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            TopicProperties topicProp;
+            try {
+                if (topicProperties == null) {
+                    topicProp = clientEp.createTopic(topicName.toString());
+                } else {
+                    topicProp = clientEp.createTopic(topicName.toString(),
+                            ASBUtils.getCreateTopicPropertiesFromBObject(topicProperties));
+                }
+                BMap<BString, Object> updatedTopicProperties = constructTopicCreatedRecord(topicProp);
+                future.complete(updatedTopicProperties);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
             }
-            LOGGER.debug("Created topic successfully with name: " + topicProp.getName());
-            return constructTopicCreatedRecord(topicProp);
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
+        });
+        return null;
     }
 
     /**
@@ -126,21 +139,29 @@ public class Administrator {
      * @param topicName           name of the topic
      * @return topicProperties
      */
-    public static Object getTopic(BObject administratorClient, BString topicName) {
+    public static Object getTopic(Environment env, BObject administratorClient, BString topicName) {
         ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
-        try {
-            TopicProperties topicProp = clientEp.getTopic(topicName.toString());
-            LOGGER.debug("Retrieved topic successfully with name: " + topicProp.getName());
-            return constructTopicCreatedRecord(topicProp);
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (HttpResponseException e) {
-            return ASBErrorCreator.fromASBHttpResponseException(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            try {
+                TopicProperties topicProp = clientEp.getTopic(topicName.toString());
+                BMap<BString, Object> topicProperties = constructTopicCreatedRecord(topicProp);
+                future.complete(topicProperties);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            } catch (HttpResponseException e) {
+                BError bError = ASBErrorCreator.fromASBHttpResponseException(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
+            }
+        });
+        return null;
     }
 
     /**
@@ -151,25 +172,32 @@ public class Administrator {
      * @param topicProperties     properties of the Topic (Requires TopicProperties object)
      * @return topicProperties
      */
-    public static Object updateTopic(BObject administratorClient, BString topicName,
+    public static Object updateTopic(Environment env, BObject administratorClient, BString topicName,
                                      BMap<BString, Object> topicProperties) {
         ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
-        try {
-            TopicProperties topicProp = clientEp.getTopic(topicName.toString());
-            TopicProperties updatedTopicProps = clientEp.updateTopic(
-                    ASBUtils.getUpdatedTopicPropertiesFromBObject(topicProperties, topicProp));
-            LOGGER.debug("Updated topic successfully with name: " + updatedTopicProps.getName());
-            return constructTopicCreatedRecord(updatedTopicProps);
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (HttpResponseException e) {
-            return ASBErrorCreator.fromASBHttpResponseException(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
-
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            try {
+                TopicProperties topicProp = clientEp.getTopic(topicName.toString());
+                TopicProperties updatedTopicProps = clientEp.updateTopic(
+                        ASBUtils.getUpdatedTopicPropertiesFromBObject(topicProperties, topicProp));
+                BMap<BString, Object> updatedTopicProperties = constructTopicCreatedRecord(updatedTopicProps);
+                future.complete(updatedTopicProperties);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            } catch (HttpResponseException e) {
+                BError bError = ASBErrorCreator.fromASBHttpResponseException(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
+            }
+        });
+        return null;
     }
 
     /**
@@ -178,21 +206,29 @@ public class Administrator {
      * @param administratorClient Azure Service Bus Administrator Client
      * @return topicProperties
      */
-    public static Object listTopics(BObject administratorClient) {
+    public static Object listTopics(Environment env, BObject administratorClient) {
         ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
-        try {
-            PagedIterable<TopicProperties> topicProp = clientEp.listTopics();
-            LOGGER.debug("Retrieved all topics successfully");
-            return constructTopicPropertiesArray(topicProp);
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (HttpResponseException e) {
-            return ASBErrorCreator.fromASBHttpResponseException(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            try {
+                PagedIterable<TopicProperties> topicProp = clientEp.listTopics();
+                BMap<BString, Object> topicProperties = constructTopicPropertiesArray(topicProp);
+                future.complete(topicProperties);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            } catch (HttpResponseException e) {
+                BError bError = ASBErrorCreator.fromASBHttpResponseException(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
+            }
+        });
+        return null;
     }
 
     private static BMap<BString, Object> constructTopicPropertiesArray(PagedIterable<TopicProperties> topicProp) {
@@ -218,18 +254,24 @@ public class Administrator {
      * @param topicName           name of the topic
      * @return null
      */
-    public static Object deleteTopic(BObject administratorClient, BString topicName) {
+    public static Object deleteTopic(Environment env, BObject administratorClient, BString topicName) {
         ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
-        try {
-            clientEp.deleteTopic(topicName.toString());
-            LOGGER.debug("Deleted topic successfully with name: " + topicName);
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            try {
+                clientEp.deleteTopic(topicName.toString());
+                future.complete(null);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
+            }
+        });
         return null;
     }
 
@@ -240,22 +282,32 @@ public class Administrator {
      * @param topicName           name of the Topic
      * @return null
      */
-    public static Object topicExists(BObject administratorClient, BString topicName) {
+    public static Object topicExists(Environment env, BObject administratorClient, BString topicName) {
         ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
-        try {
-            return clientEp.getTopicExists(topicName.toString());
-        } catch (HttpResponseException e) {
-            if (e.getResponse().getStatusCode() == 404) {
-                return false;
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            try {
+                boolean topicExists = clientEp.getTopicExists(topicName.toString());
+                future.complete(topicExists);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            }  catch (HttpResponseException e) {
+                if (e.getResponse().getStatusCode() == 404) {
+                    future.complete(false);
+                    return;
+                }
+                BError bError = ASBErrorCreator.fromASBHttpResponseException(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
             }
-            return ASBErrorCreator.fromASBHttpResponseException(e);
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
+        });
+        return null;
     }
 
     /**
