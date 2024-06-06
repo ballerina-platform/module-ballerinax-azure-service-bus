@@ -564,7 +564,7 @@ public type ListenerConfiguration record {|
 
 ```ballerina
 # Creates a new `asb:Listener`.
-# ```ballerina
+# ```
 # listener asb:Listener asbListener = check new (
 #   connectionString = "xxxxxxxx",
 #   entityConfig = {
@@ -754,7 +754,7 @@ An administrator client is responsible for managing a Service Bus namespace.
 
 ```ballerina
 # Initialize the Azure Service Bus Admin client.
-# ```ballerina
+# ```
 # configurable string connectionString = ?;
 # asb:Administrator admin = check new (connectionString);
 # ```
@@ -823,7 +823,7 @@ isolated remote function listTopics() returns asb:TopicList|asb:Error?;
 
 ```ballerina
 # Delete the topic with the given name.
-# ```ballerina
+# ```
 # check admin->deleteTopic("topic-1");
 # ```
 # 
@@ -865,7 +865,7 @@ isolated remote function createSubscription(string topicName, string subscriptio
 
 ```ballerina
 # Get the subscription with the given name.
-# ```ballerina
+# ```
 # asb:SubscriptionProperties? subscriptionProperties = check admin->getSubscription("topic-1", "sub-a");
 # ```
 #
