@@ -148,7 +148,7 @@ public class MessageReceiver {
      */
     public static Object receive(Environment env, BObject receiverClient, Object serverWaitTime, BTypedesc expectedType,
                                  boolean deadLettered) {
-        ServiceBusReceiverClient receiver = getReceiverFromBObject(receiverClient, deadLettered);
+        ServiceBusReceiverClient receiver = getNativeReceiver(receiverClient, deadLettered);
         Future future = env.markAsync();
         EXECUTOR_SERVICE.execute(() -> {
             try {
@@ -186,7 +186,7 @@ public class MessageReceiver {
      */
     public static Object receivePayload(Environment env, BObject receiverClient, Object serverWaitTime,
                                         BTypedesc expectedType, boolean deadLettered) {
-        ServiceBusReceiverClient receiver = getReceiverFromBObject(receiverClient, deadLettered);
+        ServiceBusReceiverClient receiver = getNativeReceiver(receiverClient, deadLettered);
         Future future = env.markAsync();
         EXECUTOR_SERVICE.execute(() -> {
             try {
@@ -239,7 +239,7 @@ public class MessageReceiver {
      */
     public static Object receiveBatch(Environment env, BObject receiverClient, long maxMessageCount,
                                       Object serverWaitTime, boolean deadLettered) {
-        ServiceBusReceiverClient receiver = getReceiverFromBObject(receiverClient, deadLettered);
+        ServiceBusReceiverClient receiver = getNativeReceiver(receiverClient, deadLettered);
         Future future = env.markAsync();
         EXECUTOR_SERVICE.execute(() -> {
             try {
@@ -288,7 +288,7 @@ public class MessageReceiver {
      */
     public static Object complete(Environment env, BObject receiverClient, BMap<BString, Object> message) {
         ServiceBusReceivedMessage nativeMessage = getNativeMessage(message);
-        ServiceBusReceiverClient receiver = getReceiverFromBObject(
+        ServiceBusReceiverClient receiver = getNativeReceiver(
                 receiverClient, Objects.nonNull(nativeMessage.getDeadLetterReason()));
         Future future = env.markAsync();
         EXECUTOR_SERVICE.execute(() -> {
@@ -318,7 +318,7 @@ public class MessageReceiver {
      */
     public static Object abandon(Environment env, BObject receiverClient, BMap<BString, Object> message) {
         ServiceBusReceivedMessage nativeMessage = getNativeMessage(message);
-        ServiceBusReceiverClient receiver = getReceiverFromBObject(receiverClient, false);
+        ServiceBusReceiverClient receiver = getNativeReceiver(receiverClient, false);
         Future future = env.markAsync();
         EXECUTOR_SERVICE.execute(() -> {
             try {
@@ -350,7 +350,7 @@ public class MessageReceiver {
     public static Object deadLetter(Environment env, BObject receiverClient, BMap<BString, Object> message,
                                     Object deadLetterReason, Object deadLetterErrorDescription) {
         ServiceBusReceivedMessage nativeMessage = getNativeMessage(message);
-        ServiceBusReceiverClient receiver = getReceiverFromBObject(receiverClient, false);
+        ServiceBusReceiverClient receiver = getNativeReceiver(receiverClient, false);
         Future future = env.markAsync();
         EXECUTOR_SERVICE.execute(() -> {
             try {
@@ -382,7 +382,7 @@ public class MessageReceiver {
      */
     public static Object defer(Environment env, BObject receiverClient, BMap<BString, Object> message) {
         ServiceBusReceivedMessage nativeMessage = getNativeMessage(message);
-        ServiceBusReceiverClient receiver = getReceiverFromBObject(receiverClient, false);
+        ServiceBusReceiverClient receiver = getNativeReceiver(receiverClient, false);
         Future future = env.markAsync();
         EXECUTOR_SERVICE.execute(() -> {
             try {
@@ -415,7 +415,7 @@ public class MessageReceiver {
      * @return The received Message or null if there is no message for given sequence number.
      */
     public static Object receiveDeferred(Environment env, BObject receiverClient, long sequenceNumber) {
-        ServiceBusReceiverClient receiver = getReceiverFromBObject(receiverClient, false);
+        ServiceBusReceiverClient receiver = getNativeReceiver(receiverClient, false);
         Future future = env.markAsync();
         EXECUTOR_SERVICE.execute(() -> {
             try {
@@ -450,7 +450,7 @@ public class MessageReceiver {
      */
     public static Object renewLock(Environment env, BObject receiverClient, BMap<BString, Object> message) {
         ServiceBusReceivedMessage nativeMessage = getNativeMessage(message);
-        ServiceBusReceiverClient receiver = getReceiverFromBObject(receiverClient, false);
+        ServiceBusReceiverClient receiver = getNativeReceiver(receiverClient, false);
         Future future = env.markAsync();
         EXECUTOR_SERVICE.execute(() -> {
             try {
@@ -476,7 +476,7 @@ public class MessageReceiver {
      * @return An error if failed to close the receiver.
      */
     public static Object closeReceiver(Environment env, BObject receiverClient) {
-        ServiceBusReceiverClient receiver = getReceiverFromBObject(receiverClient, false);
+        ServiceBusReceiverClient receiver = getNativeReceiver(receiverClient, false);
         Future future = env.markAsync();
         EXECUTOR_SERVICE.execute(() -> {
             try {
@@ -617,15 +617,11 @@ public class MessageReceiver {
         }
     }
 
-    private static ServiceBusReceiverClient getReceiverFromBObject(BObject bReceiver, boolean isDeadLetter) {
+    private static ServiceBusReceiverClient getNativeReceiver(BObject bReceiver, boolean isDeadLetter) {
         if (isDeadLetter) {
             return (ServiceBusReceiverClient) getDeadLetterMessageReceiverFromBObject(bReceiver);
         }
         return (ServiceBusReceiverClient) bReceiver.getNativeData(RECEIVER_CLIENT);
-    }
-
-    private static ServiceBusReceiverClient getReceiverFromBObject(BObject receiverObject) {
-        return (ServiceBusReceiverClient) receiverObject.getNativeData(RECEIVER_CLIENT);
     }
 
     private static Object getDeadLetterMessageReceiverFromBObject(BObject receiverObject) {
