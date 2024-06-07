@@ -24,7 +24,7 @@ import java.util.concurrent.ThreadFactory;
  * A {@link ThreadFactory} object that creates new threads on demand for ASB admin network actions.
  */
 public class AdminNetworkThreadFactory implements ThreadFactory {
-    private final String threadGroupName = "admin-network-thread";
+    private final String threadGroupName = "asb-admin-network-thread";
 
     @Override
     public Thread newThread(Runnable runnable) {

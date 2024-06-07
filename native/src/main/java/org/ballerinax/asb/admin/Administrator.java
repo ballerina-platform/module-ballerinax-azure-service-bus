@@ -105,7 +105,7 @@ public class Administrator {
      */
     public static Object createTopic(Environment env, BObject administratorClient, BString topicName,
                                      BMap<BString, Object> topicProperties) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
         Future future = env.markAsync();
         EXECUTOR_SERVICE.execute(() -> {
             TopicProperties topicProp;
@@ -140,7 +140,7 @@ public class Administrator {
      * @return topicProperties
      */
     public static Object getTopic(Environment env, BObject administratorClient, BString topicName) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
         Future future = env.markAsync();
         EXECUTOR_SERVICE.execute(() -> {
             try {
@@ -174,7 +174,7 @@ public class Administrator {
      */
     public static Object updateTopic(Environment env, BObject administratorClient, BString topicName,
                                      BMap<BString, Object> topicProperties) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
         Future future = env.markAsync();
         EXECUTOR_SERVICE.execute(() -> {
             try {
@@ -207,7 +207,7 @@ public class Administrator {
      * @return topicProperties
      */
     public static Object listTopics(Environment env, BObject administratorClient) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
         Future future = env.markAsync();
         EXECUTOR_SERVICE.execute(() -> {
             try {
@@ -255,7 +255,7 @@ public class Administrator {
      * @return null
      */
     public static Object deleteTopic(Environment env, BObject administratorClient, BString topicName) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
         Future future = env.markAsync();
         EXECUTOR_SERVICE.execute(() -> {
             try {
@@ -283,7 +283,7 @@ public class Administrator {
      * @return null
      */
     public static Object topicExists(Environment env, BObject administratorClient, BString topicName) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
         Future future = env.markAsync();
         EXECUTOR_SERVICE.execute(() -> {
             try {
@@ -322,7 +322,7 @@ public class Administrator {
     public static Object createSubscription(Environment env, BObject administratorClient,
                                             BString topicName, BString subscriptionName,
                                             BMap<BString, Object> subscriptionProperties) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
         Future future = env.markAsync();
         EXECUTOR_SERVICE.execute(() -> {
             SubscriptionProperties subscriptionProps;
@@ -360,7 +360,7 @@ public class Administrator {
      */
     public static Object getSubscription(Environment env, BObject administratorClient, BString topicName,
                                          BString subscriptionName) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
         Future future = env.markAsync();
         EXECUTOR_SERVICE.execute(() -> {
             try {
@@ -393,7 +393,7 @@ public class Administrator {
      */
     public static Object updateSubscription(Environment env, BObject administratorClient, BString topicName,
                                             BString subscriptionName, BMap<BString, Object> subscriptionProperties) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
         Future future = env.markAsync();
         EXECUTOR_SERVICE.execute(() -> {
             try {
@@ -430,7 +430,7 @@ public class Administrator {
      * @return subscriptionProperties
      */
     public static Object listSubscriptions(Environment env, BObject administratorClient, BString topicName) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
         Future future = env.markAsync();
         EXECUTOR_SERVICE.execute(() -> {
             try {
@@ -483,7 +483,7 @@ public class Administrator {
      */
     public static Object deleteSubscription(Environment env, BObject administratorClient, BString topicName,
                                             BString subscriptionName) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
         Future future = env.markAsync();
         EXECUTOR_SERVICE.execute(() -> {
             try {
@@ -513,7 +513,7 @@ public class Administrator {
      */
     public static Object subscriptionExists(Environment env, BObject administratorClient, BString topicName,
                                             BString subscriptionName) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
         Future future = env.markAsync();
         EXECUTOR_SERVICE.execute(() -> {
             try {
@@ -554,7 +554,7 @@ public class Administrator {
     public static Object createRule(Environment env, BObject administratorClient,
                                     BString topicName, BString subscriptionName, BString ruleName,
                                     BMap<BString, Object> ruleProperties) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
         Future future = env.markAsync();
         EXECUTOR_SERVICE.execute(() -> {
             RuleProperties ruleProp;
@@ -593,7 +593,7 @@ public class Administrator {
      */
     public static Object getRule(Environment env, BObject administratorClient, BString topicName,
                                  BString subscriptionName, BString ruleName) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
         Future future = env.markAsync();
         EXECUTOR_SERVICE.execute(() -> {
             try {
@@ -631,7 +631,7 @@ public class Administrator {
     public static Object updateRule(Environment env, BObject administratorClient, BString topicName,
                                     BString subscriptionName, BString ruleName,
                                     BMap<BString, Object> updateRuleProperties) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
         Future future = env.markAsync();
         EXECUTOR_SERVICE.execute(() -> {
             try {
@@ -668,7 +668,7 @@ public class Administrator {
      */
     public static Object listRules(Environment env, BObject administratorClient, BString topicName,
                                    BString subscriptionName) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
         Future future = env.markAsync();
         EXECUTOR_SERVICE.execute(() -> {
             try {
@@ -721,7 +721,7 @@ public class Administrator {
      */
     public static Object deleteRule(Environment env, BObject administratorClient, BString topicName,
                                     BString subscriptionName, BString ruleName) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
         Future future = env.markAsync();
         EXECUTOR_SERVICE.execute(() -> {
             try {
@@ -751,7 +751,7 @@ public class Administrator {
      */
     public static Object createQueue(Environment env, BObject administratorClient,
                                      BString queueName, BMap<BString, Object> queueProperties) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
         Future future = env.markAsync();
         EXECUTOR_SERVICE.execute(() -> {
             try {
@@ -786,7 +786,7 @@ public class Administrator {
      * @return queueProperties object
      */
     public static Object getQueue(Environment env, BObject administratorClient, BString queueName) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
         Future future = env.markAsync();
         EXECUTOR_SERVICE.execute(() -> {
             try {
@@ -817,7 +817,7 @@ public class Administrator {
      */
     public static Object updateQueue(Environment env, BObject administratorClient, BString queueName,
                                      BMap<BString, Object> queueProperties) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
         Future future = env.markAsync();
         EXECUTOR_SERVICE.execute(() -> {
             try {
@@ -850,7 +850,7 @@ public class Administrator {
      * @return queueProperties object
      */
     public static Object listQueues(Environment env, BObject administratorClient) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
         Future future = env.markAsync();
         EXECUTOR_SERVICE.execute(() -> {
             try {
@@ -898,7 +898,7 @@ public class Administrator {
      * @return null
      */
     public static Object deleteQueue(Environment env, BObject administratorClient, BString queueName) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
         Future future = env.markAsync();
         EXECUTOR_SERVICE.execute(() -> {
             try {
@@ -926,7 +926,7 @@ public class Administrator {
      * @return null
      */
     public static Object queueExists(Environment env, BObject administratorClient, BString queueName) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
         Future future = env.markAsync();
         EXECUTOR_SERVICE.execute(() -> {
             try {
@@ -1095,7 +1095,7 @@ public class Administrator {
         return map;
     }
 
-    private static ServiceBusAdministrationClient getAdminFromBObject(BObject adminObject) {
+    private static ServiceBusAdministrationClient getNativeAdminClient(BObject adminObject) {
         return (ServiceBusAdministrationClient) adminObject.getNativeData(ASBConstants.ADMINISTRATOR_CLIENT);
     }
 
