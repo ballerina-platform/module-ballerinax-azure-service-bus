@@ -105,7 +105,7 @@ public class MessageSender {
      * @return An error if failed to send the message
      */
     public static Object send(Environment env, BObject senderClient, BMap<BString, Object> message) {
-        ServiceBusSenderClient sender = getSenderFromBObject(senderClient);
+        ServiceBusSenderClient sender = getNativeSender(senderClient);
         Future future = env.markAsync();
         EXECUTOR_SERVICE.execute(() -> {
             try {
@@ -136,7 +136,7 @@ public class MessageSender {
      */
     public static Object schedule(Environment env, BObject senderClient, BMap<BString, Object> message,
                                   BMap<BString, Object> scheduleTime) {
-        ServiceBusSenderClient sender = getSenderFromBObject(senderClient);
+        ServiceBusSenderClient sender = getNativeSender(senderClient);
         Future future = env.markAsync();
         EXECUTOR_SERVICE.execute(() -> {
             try {
@@ -164,7 +164,7 @@ public class MessageSender {
      * @return An error if failed to send the message
      */
     public static Object cancel(Environment env, BObject senderClient, long sequenceNumber) {
-        ServiceBusSenderClient sender = getSenderFromBObject(senderClient);
+        ServiceBusSenderClient sender = getNativeSender(senderClient);
         Future future = env.markAsync();
         EXECUTOR_SERVICE.execute(() -> {
             try {
@@ -193,7 +193,7 @@ public class MessageSender {
      * @return An error if failed send the message.
      */
     public static Object sendBatch(Environment env, BObject senderClient, BMap<BString, Object> messages) {
-        ServiceBusSenderClient sender = getSenderFromBObject(senderClient);
+        ServiceBusSenderClient sender = getNativeSender(senderClient);
         Future future = env.markAsync();
         EXECUTOR_SERVICE.execute(() -> {
             try {
@@ -245,7 +245,7 @@ public class MessageSender {
      * @return @return An error if failed close the sender.
      */
     public static Object close(Environment env, BObject senderClient) {
-        ServiceBusSenderClient sender = getSenderFromBObject(senderClient);
+        ServiceBusSenderClient sender = getNativeSender(senderClient);
         Future future = env.markAsync();
         EXECUTOR_SERVICE.execute(() -> {
             try {
@@ -363,7 +363,7 @@ public class MessageSender {
         senderObject.addNativeData(ASBConstants.SENDER_CLIENT, client);
     }
 
-    private static ServiceBusSenderClient getSenderFromBObject(BObject senderObject) {
+    private static ServiceBusSenderClient getNativeSender(BObject senderObject) {
         return (ServiceBusSenderClient) senderObject.getNativeData(ASBConstants.SENDER_CLIENT);
     }
 }
