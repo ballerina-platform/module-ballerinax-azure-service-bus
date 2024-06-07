@@ -24,7 +24,7 @@ import java.util.concurrent.ThreadFactory;
  * A {@link ThreadFactory} object that creates new threads on demand for ASB message-sender network actions.
  */
 public class SenderNetworkThreadFactory implements ThreadFactory {
-    private final String threadGroupName = "sender-network-thread";
+    private final String threadGroupName = "asb-sender-network-thread";
 
     @Override
     public Thread newThread(Runnable runnable) {
