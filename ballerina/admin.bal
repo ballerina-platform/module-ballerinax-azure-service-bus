@@ -25,51 +25,70 @@ public isolated client class Administrator {
     # Create an [Azure account](https://docs.microsoft.com/en-us/learn/modules/create-an-azure-account/) and
     # obtain tokens following [this guide](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-portal#get-the-connection-string).
     # Configure the connection string to have the [required permission](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-sas).
-    #
+    # ```ballerina
+    # configurable string connectionString = ?;
+    # asb:Administrator admin = check new (connectionString);
+    # ```
+    # 
     # + connectionString - Azure Service Bus connection string
     public isolated function init(@display {label: "Azure Service Bus connection string"} string connectionString) returns Error? {
         check initializeAdministrator(self, java:fromString(connectionString));
     }
 
     # Create a topic with the given name or name and options.
-    #
+    # ```ballerina
+    # asb:TopicProperties? topicProperties = check admin->createTopic("topic-1");
+    # ```
+    # 
     # + topicName - Topic name
     # + topicOptions - Topic options to create the topic.This should be a record of type CreateTopicOptions
-    # + return - Topic properties(Type of asb:TopicProperies) or error
+    # + return - Topic properties(Type of `asb:TopicProperies`) or error
     @display {label: "Create Topic"}
     isolated remote function createTopic(@display {label: "Topic"} string topicName, @display {label: "Topic Options"} *CreateTopicOptions topicOptions) returns TopicProperties|Error? = @java:Method {
         'class: "org.ballerinax.asb.admin.Administrator"
     } external;
 
     # Get the topic with the given name.
+    # ```ballerina
+    # asb:TopicProperties? topicProperties = check admin->getTopic("topic-1");
+    # ```
     #
     # + topicName - Topic name
-    # + return - Topic properties(Type of asb:TopicProperies) or error
+    # + return - Topic properties(Type of `asb:TopicProperies`) or error
     @display {label: "Get Topic"}
     isolated remote function getTopic(@display {label: "Topic"} string topicName) returns TopicProperties|Error? = @java:Method {
         'class: "org.ballerinax.asb.admin.Administrator"
     } external;
 
     # Update the topic with the given options.
+    # ```ballerina
+    # asb:TopicProperties? topicProp = check admin->updateTopic("topic-1", supportOrdering = true);
+    # ```
     #
     # + topicName - Topic name
     # + topicOptions - Topic options to update the topic.This should be a record of type UpdateTopicOptions
-    # + return - Topic properties(Type of asb:TopicProperies) or error
+    # + return - Topic properties(Type of `asb:TopicProperies`) or error
     @display {label: "Update Topics"}
     isolated remote function updateTopic(@display {label: "Topic"} string topicName, @display {label: "Update Topic Options"} *UpdateTopicOptions topicOptions) returns TopicProperties|Error? = @java:Method {
         'class: "org.ballerinax.asb.admin.Administrator"
     } external;
 
     # List the topics.
+    # ```ballerina
+    # asb:TopicList? topics = check admin->listTopics();
+    # ```
     #
-    # + return - Topic list(Type of asb:TopicList) or error
+    # + return - Topic list(Type of `asb:TopicList`) or error
     @display {label: "List Topics"}
     isolated remote function listTopics() returns TopicList|Error? = @java:Method {
         'class: "org.ballerinax.asb.admin.Administrator"
     } external;
 
     # Delete the topic with the given name.
-    #
+    # ```ballerina
+    # check admin->deleteTopic("topic-1");
+    # ```
+    # 
     # + topicName - Topic name
     # + return - Error or nil
     @display {label: "Delete Topic"}
@@ -78,38 +97,50 @@ public isolated client class Administrator {
     } external;
 
     # Create a subscription with the given name or name and options.
+    # ```ballerina
+    # asb:SubscriptionProperties? subscriptionProperties = check admin->createSubscription("topic-1", "sub-a");
+    # ```
     #
     # + topicName - Name of the topic associated with subscription
     # + subscriptionName - Name of the subscription
     # + subscriptionOptions - Subscription options to create the subscription.This should be a record of type CreateSubscriptionOptions.
-    # + return - Subscription properties(Type of asb:SubscriptionProperies) or error
+    # + return - Subscription properties(Type of `asb:SubscriptionProperies`) or error
     @display {label: "Create Subscription"}
     isolated remote function createSubscription(@display {label: "Topic"} string topicName, @display {label: "Subscription"} string subscriptionName, @display {label: "Subscription Options"} *CreateSubscriptionOptions subscriptionOptions) returns SubscriptionProperties|Error? = @java:Method {
         'class: "org.ballerinax.asb.admin.Administrator"
     } external;
 
     # Get the subscription with the given name.
+    # ```ballerina
+    # asb:SubscriptionProperties? subscriptionProperties = check admin->getSubscription("topic-1", "sub-a");
+    # ```
     #
     # + topicName - Name of the topic associated with subscription
     # + subscriptionName - Name of the subscription
-    # + return - Subscription properties(Type of asb:SubscriptionProperies) or error
+    # + return - Subscription properties(Type of `asb:SubscriptionProperies`) or error
     @display {label: "Get Subscription"}
     isolated remote function getSubscription(@display {label: "Topic"} string topicName, @display {label: "Subscription"} string subscriptionName) returns SubscriptionProperties|Error? = @java:Method {
         'class: "org.ballerinax.asb.admin.Administrator"
     } external;
 
     # Update the subscription with the given options.
-    #
+    # ```ballerina
+    # asb:SubscriptionProperties? subProp = check admin->updateSubscription("topic-1", "sub-a", maxDeliveryCount = 10);
+    # ```
+    # 
     # + topicName - Name of the topic associated with subscription
     # + subscriptionName - Name of the subscription
     # + subscriptionOptions - Subscription options to update the subscription.This should be a record of type UpdateSubscriptionOptions
-    # + return - Subscription properties(Type of asb:SubscriptionProperies) or error
+    # + return - Subscription properties(Type of `asb:SubscriptionProperies`) or error
     @display {label: "Update Subscription"}
     isolated remote function updateSubscription(@display {label: "Topic"} string topicName, @display {label: "Subscription"} string subscriptionName, @display {label: "Update Subscription Options"} *UpdateSubscriptionOptions subscriptionOptions) returns SubscriptionProperties|Error? = @java:Method {
         'class: "org.ballerinax.asb.admin.Administrator"
     } external;
 
     # List the subscriptions.
+    # ```ballerina
+    # asb:SubscriptionList? subscriptions = check admin->listSubscriptions("topic-1");
+    # ```
     #
     # + topicName - Name of the topic associated with subscription
     # + return - Subscription list(Type of asb:SubscriptionList) or error
@@ -119,6 +150,9 @@ public isolated client class Administrator {
     } external;
 
     # Delete the subscription with the given name.
+    # ```ballerina
+    # check admin->deleteSubscription("topic-1", "sub-a");
+    # ```
     #
     # + topicName - Topic name
     # + subscriptionName - Subscription name
@@ -129,7 +163,10 @@ public isolated client class Administrator {
     } external;
 
     # Get the status of existance of a topic with the given name.
-    #
+    # ```ballerina
+    # boolean exists = check admin->topicExists("topic-1");
+    # ```
+    # 
     # + topicName - Topic name
     # + return - Boolean or error
     @display {label: "is Topic Exists"}
@@ -138,6 +175,9 @@ public isolated client class Administrator {
     } external;
 
     # Get the status of existance of a subscription with the given name.
+    # ```ballerina
+    # boolean exists = check admin->subscriptionExists("topic-1", "sub-a");
+    # ```
     #
     # + topicName - Topic name
     # + subscriptionName - Subscription name
@@ -148,98 +188,128 @@ public isolated client class Administrator {
     } external;
 
     # Create a rule with the given name or name and options.
-    #
+    # ```ballerina
+    # asb:RuleProperties? properties = check admin->createRule("topic-1", "sub-a", "rule-1");
+    # ```
+    # 
     # + topicName - Name of the topic associated with subscription
     # + subscriptionName - Name of the subscription
     # + ruleName - Name of the rule
     # + ruleOptions - Rule options to create the rule.This should be a record of type CreateRuleOptions
-    # + return - Rule properties(Type of asb:RuleProperies) or error
+    # + return - Rule properties(Type of `asb:RuleProperies`) or error
     @display {label: "Create Rule"}
     isolated remote function createRule(@display {label: "Topic"} string topicName, @display {label: "Subscription"} string subscriptionName, @display {label: "Rule"} string ruleName, @display {label: "Rule Options"} *CreateRuleOptions ruleOptions) returns RuleProperties|Error? = @java:Method {
         'class: "org.ballerinax.asb.admin.Administrator"
     } external;
 
-    # Delete the rule with the given name.
+    # Get the rule with the given name.
+    # ```ballerina
+    # asb:RuleProperties? properties = check admin->getRule("topic-1", "sub-a", "rule-1");
+    # ```
     #
     # + topicName - Name of the topic associated with subscription
     # + subscriptionName - Name of the subscription associated with rule
     # + ruleName - Rule name
-    # + return - Error or nil
+    # + return - An `asb:Error` or nil
     @display {label: "Get Rule"}
     isolated remote function getRule(@display {label: "Topic"} string topicName, @display {label: "Subscription"} string subscriptionName, @display {label: "Rule"} string ruleName) returns RuleProperties|Error? = @java:Method {
         'class: "org.ballerinax.asb.admin.Administrator"
     } external;
 
     # Update the rule with the options.
+    # ```ballerina
+    # asb:SqlRule rule = ...;
+    # asb:RuleProperties? ruleProperties = check admin->updateRule("topic-1", "sub-a", "rule-1", rule = rule);
+    # ```
     #
     # + topicName - Name of the topic associated with subscription
     # + subscriptionName - Name of the subscription associated with rule
     # + ruleName - Rule name
     # + ruleOptions - Rule options to update the rule.This should be a record of type UpdateRuleOptions
-    # + return - Rule properties(Type of asb:RuleProperies) or error
+    # + return - Rule properties(Type of `asb:RuleProperies`) or error
     @display {label: "Update Rule"}
     isolated remote function updateRule(@display {label: "Topic"} string topicName, @display {label: "Subscription"} string subscriptionName, @display {label: "Rule"} string ruleName, @display {label: "Update Rule Options"} *UpdateRuleOptions ruleOptions) returns RuleProperties|Error? = @java:Method {
         'class: "org.ballerinax.asb.admin.Administrator"
     } external;
 
     # List the rules.
+    # ```ballerina
+    # asb:RuleList? rules = check admin->listRules("topic-1", "sub-a");
+    # ```
     #
     # + topicName - Name of the topic associated with subscription
     # + subscriptionName - Name of the subscription
-    # + return - Rule list(Type of asb:RuleList) or error
+    # + return - Rule list(Type of `asb:RuleList`) or error
     @display {label: "List Rules"}
     isolated remote function listRules(@display {label: "Topic"} string topicName, @display {label: "Subscription"} string subscriptionName) returns RuleList|Error? = @java:Method {
         'class: "org.ballerinax.asb.admin.Administrator"
     } external;
 
     # Delete the rule with the given name.
-    #
+    # ```ballerina
+    # check admin->deleteRule("topic-1", "sub-a", "rule-1");
+    # ```
     # + topicName - Name of the topic associated with subscription
     # + subscriptionName - Name of the subscription associated with rule
     # + ruleName - Rule name
-    # + return - Error or nil
+    # + return - An `asb:Error` or nil
     @display {label: "Delete Rule"}
     isolated remote function deleteRule(@display {label: "Topic"} string topicName, @display {label: "Subscription"} string subscriptionName, @display {label: "Rule"} string ruleName) returns Error? = @java:Method {
         'class: "org.ballerinax.asb.admin.Administrator"
     } external;
 
     # Create a queue with the given name or name and options.
-    #
+    # ```ballerina
+    # asb:QueueProperties queueProperties = check admin->createQueue("queue-1");
+    # ```
+    # 
     # + queueName - Name of the queue
     # + queueOptions - Queue options to create the queue.This should be a record of type CreateQueueOptions
-    # + return - Queue properties(Type of asb:QueueProperties) or error
+    # + return - Queue properties(Type of `asb:QueueProperties`) or error
     @display {label: "Create Queue"}
     isolated remote function createQueue(@display {label: "Queue"} string queueName, @display {label: "Queue Options"} *CreateQueueOptions queueOptions) returns QueueProperties|Error? = @java:Method {
         'class: "org.ballerinax.asb.admin.Administrator"
     } external;
 
     # Get the queue with the given name.
+    # ```ballerina
+    # asb:QueueProperties? queueProperties = check admin->getQueue("queue-1");
+    # ```
     #
     # + queueName - Name of the queue
-    # + return - Queue properties(Type of asb:QueueProperties) or error
+    # + return - Queue properties(Type of `asb:QueueProperties`) or error
     @display {label: "Get Queue"}
     isolated remote function getQueue(@display {label: "Queue"} string queueName) returns QueueProperties|Error? = @java:Method {
         'class: "org.ballerinax.asb.admin.Administrator"
     } external;
 
-    # Update the queue with the options.Q
-    #
+    # Update the queue with the options.
+    # ```ballerina
+    # asb:QueueProperties? queueProperties = check admin->updateQueue("queue-1", maxDeliveryCount = 10);
+    # ```
+    # 
     # + queueName - Name of the queue
     # + queueOptions - Queue options to update the queue.This should be a record of type UpdateQueueOptions
-    # + return - Queue properties(Type of asb:QueueProperties) or error
+    # + return - Queue properties(Type of `asb:QueueProperties`) or error
     @display {label: "Update Queue"}
     isolated remote function updateQueue(@display {label: "Queue"} string queueName, @display {label: "Update Queue Options"} *UpdateQueueOptions queueOptions) returns QueueProperties|Error? = @java:Method {
         'class: "org.ballerinax.asb.admin.Administrator"
     } external;
 
     # List the queues.
+    # ```ballerina
+    # asb:QueueList? queues = check admin->listQueues();
+    # ```
     #
-    # + return - Queue list(Type of asb:QueueList) or error
+    # + return - Queue list(Type of `asb:QueueList`) or error
     isolated remote function listQueues() returns QueueList|Error? = @java:Method {
         'class: "org.ballerinax.asb.admin.Administrator"
     } external;
 
     # Delete the queue with the given name.
+    # ```ballerina
+    # check admin->deleteQueue("queue-1");
+    # ```
     #
     # + queueName - Name of the queue
     # + return - Error or nil
@@ -249,6 +319,9 @@ public isolated client class Administrator {
     } external;
 
     # Check whether the queue exists.
+    # ```ballerina
+    # boolean exists = check admin->queueExists("queue-1");
+    # ```
     #
     # + queueName - Name of the queue
     # + return - Boolean or error
