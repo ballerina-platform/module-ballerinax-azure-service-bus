@@ -22,6 +22,7 @@ import com.azure.messaging.servicebus.ServiceBusReceivedMessage;
 import com.azure.messaging.servicebus.ServiceBusReceivedMessageContext;
 import io.ballerina.lib.asb.receiver.MessageReceiver;
 import io.ballerina.lib.asb.util.ASBConstants;
+import io.ballerina.lib.asb.util.ASBErrorCreator;
 import io.ballerina.lib.asb.util.ASBUtils;
 import io.ballerina.lib.asb.util.ModuleUtils;
 import io.ballerina.runtime.api.PredefinedTypes;
@@ -33,7 +34,6 @@ import io.ballerina.runtime.api.utils.TypeUtils;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
-import io.ballerina.lib.asb.util.ASBErrorCreator;
 
 import java.util.Map;
 import java.util.concurrent.Semaphore;
@@ -41,7 +41,6 @@ import java.util.function.Consumer;
 
 import static io.ballerina.runtime.api.TypeTags.OBJECT_TYPE_TAG;
 import static io.ballerina.runtime.api.TypeTags.RECORD_TYPE_TAG;
-import static io.ballerina.runtime.api.creators.ValueCreator.createRecordValue;
 
 /**
  * {@code MessageConsumer} provides the capability to invoke `onMessage` function of the ASB service.
@@ -105,7 +104,8 @@ public class MessageConsumer implements Consumer<ServiceBusReceivedMessageContex
         Map<String, Object> map = MessageReceiver.populateOptionalFieldsMap(message);
         Object messageBody = MessageReceiver.getMessagePayload(message);
         if (messageBody instanceof byte[]) {
-            map.put(ASBConstants.BODY, ASBUtils.getValueWithIntendedType((byte[]) messageBody, PredefinedTypes.TYPE_ANYDATA));
+            map.put(ASBConstants.BODY, ASBUtils.getValueWithIntendedType(
+                    (byte[]) messageBody, PredefinedTypes.TYPE_ANYDATA));
         } else {
             map.put(ASBConstants.BODY, messageBody);
         }

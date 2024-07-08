@@ -17,6 +17,7 @@
  */
 
 package io.ballerina.lib.asb.util;
+
 import com.azure.core.exception.HttpResponseException;
 import com.azure.messaging.servicebus.ServiceBusException;
 import io.ballerina.runtime.api.creators.ErrorCreator;
@@ -47,7 +48,8 @@ public class ASBErrorCreator {
         return fromBError(error.getMessage(), error.getCause());
     }
     public static BError fromBError(String message, BError cause) {
-        return ErrorCreator.createDistinctError(ASBConstants.ASB_ERROR, ModuleUtils.getModule(), StringUtils.fromString(message), cause);
+        return ErrorCreator.createDistinctError(
+                ASBConstants.ASB_ERROR, ModuleUtils.getModule(), StringUtils.fromString(message), cause);
     }
     private static BError fromJavaException(String message, Throwable cause) {
         return fromBError(message, ErrorCreator.createError(cause));

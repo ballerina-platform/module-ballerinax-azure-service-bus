@@ -36,6 +36,7 @@ import com.azure.messaging.servicebus.administration.models.SubscriptionProperti
 import com.azure.messaging.servicebus.administration.models.TopicProperties;
 import com.azure.messaging.servicebus.models.ServiceBusReceiveMode;
 import com.azure.messaging.servicebus.models.SubQueue;
+import io.ballerina.lib.asb.receiver.MessageReceiver;
 import io.ballerina.runtime.api.PredefinedTypes;
 import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.creators.TypeCreator;
@@ -61,7 +62,6 @@ import io.ballerina.runtime.api.values.BTypedesc;
 import org.apache.qpid.proton.amqp.Binary;
 import org.ballerinalang.langlib.value.CloneWithType;
 import org.ballerinalang.langlib.value.FromJsonWithType;
-import io.ballerina.lib.asb.receiver.MessageReceiver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

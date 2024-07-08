@@ -27,6 +27,7 @@ import com.azure.messaging.servicebus.ServiceBusReceivedMessage;
 import com.azure.messaging.servicebus.ServiceBusReceiverClient;
 import com.azure.messaging.servicebus.models.DeadLetterOptions;
 import io.ballerina.lib.asb.util.ASBConstants;
+import io.ballerina.lib.asb.util.ASBErrorCreator;
 import io.ballerina.lib.asb.util.ASBUtils;
 import io.ballerina.lib.asb.util.ModuleUtils;
 import io.ballerina.runtime.api.Environment;
@@ -45,7 +46,6 @@ import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
 import io.ballerina.runtime.api.values.BTypedesc;
-import io.ballerina.lib.asb.util.ASBErrorCreator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,8 +90,9 @@ public class MessageReceiver {
                                             String logLevel, BMap<BString, Object> retryConfigs) {
         try {
             AmqpRetryOptions retryOptions = ASBUtils.getRetryOptions(retryConfigs);
-            ServiceBusReceiverClient nativeReceiverClient = ASBUtils.constructReceiverClient(retryOptions, connectionString,
-                    queueName, receiveMode, maxAutoLockRenewDuration, topicName, subscriptionName, false);
+            ServiceBusReceiverClient nativeReceiverClient = ASBUtils.constructReceiverClient(
+                    retryOptions, connectionString, queueName, receiveMode, maxAutoLockRenewDuration, topicName,
+                    subscriptionName, false);
             setClientData(receiverClient, connectionString, queueName, topicName, subscriptionName, receiveMode,
                     maxAutoLockRenewDuration, logLevel, retryConfigs);
             setClient(receiverClient, nativeReceiverClient, false);
@@ -171,7 +172,8 @@ public class MessageReceiver {
 
                 Object messageBody = getMessagePayload(message);
                 if (messageBody instanceof byte[] binaryPayload) {
-                    Object messagePayload = ASBUtils.getValueWithIntendedType(binaryPayload, expectedType.getDescribingType());
+                    Object messagePayload = ASBUtils.getValueWithIntendedType(binaryPayload,
+                            expectedType.getDescribingType());
                     future.complete(messagePayload);
                 } else {
                     Optional<Object> bValue = ASBUtils.convertJavaToBValue(message.getMessageId(), messageBody);
@@ -478,10 +480,12 @@ public class MessageReceiver {
         Object messageBody = getMessagePayload(message);
         if (messageBody instanceof byte[]) {
             if (expectedType != null) {
-                map.put(ASBConstants.BODY, ASBUtils.getValueWithIntendedType((byte[]) messageBody, expectedType.getFields().get(ASBConstants.BODY)
+                map.put(ASBConstants.BODY, ASBUtils.getValueWithIntendedType((byte[]) messageBody,
+                        expectedType.getFields().get(ASBConstants.BODY)
                         .getFieldType()));
             } else {
-                map.put(ASBConstants.BODY, ASBUtils.getValueWithIntendedType((byte[]) messageBody, PredefinedTypes.TYPE_ANYDATA));
+                map.put(ASBConstants.BODY, ASBUtils.getValueWithIntendedType((byte[]) messageBody,
+                        PredefinedTypes.TYPE_ANYDATA));
             }
         } else {
             map.put(ASBConstants.BODY, messageBody);
@@ -511,7 +515,8 @@ public class MessageReceiver {
         ASBUtils.addFieldIfPresent(map, ASBConstants.DELIVERY_COUNT, message.getDeliveryCount());
         ASBUtils.addFieldIfPresent(map, ASBConstants.ENQUEUED_TIME, message.getEnqueuedTime().toString());
         ASBUtils.addFieldIfPresent(map, ASBConstants.ENQUEUED_SEQUENCE_NUMBER, message.getEnqueuedSequenceNumber());
-        ASBUtils.addFieldIfPresent(map, ASBConstants.DEAD_LETTER_ERROR_DESCRIPTION, message.getDeadLetterErrorDescription());
+        ASBUtils.addFieldIfPresent(map, ASBConstants.DEAD_LETTER_ERROR_DESCRIPTION,
+                message.getDeadLetterErrorDescription());
         ASBUtils.addFieldIfPresent(map, ASBConstants.DEAD_LETTER_REASON, message.getDeadLetterReason());
         ASBUtils.addFieldIfPresent(map, ASBConstants.DEAD_LETTER_SOURCE, message.getDeadLetterSource());
         ASBUtils.addFieldIfPresent(map, ASBConstants.STATE, message.getState().toString());
