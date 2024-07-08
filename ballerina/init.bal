@@ -27,5 +27,5 @@ function init() {
 }
 
 function setModule() returns error? = @java:Method {
-    'class: "util.io.ballerina.lib.asb.ModuleUtils"
+    'class: "io.ballerina.lib.asb.util.ModuleUtils"
 } external;

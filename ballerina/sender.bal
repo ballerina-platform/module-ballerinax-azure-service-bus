@@ -82,7 +82,7 @@ public isolated client class MessageSender {
     # + sequenceNumber - The sequence number of the message to cancel
     # + return - If the message could not be cancelled
     isolated remote function cancel(@display {label: "Sequence Number"} int sequenceNumber) returns Error? = @java:Method {
-        'class: "sender.io.ballerina.lib.asb.MessageSender"
+        'class: "io.ballerina.lib.asb.sender.MessageSender"
     } external;
 
     # Send batch of messages to queue or topic.
@@ -102,23 +102,23 @@ public isolated client class MessageSender {
     # + return - An `asb:Error` if failed to close connection or else `()`
     @display {label: "Close Sender Connection"}
     isolated remote function close() returns Error? = @java:Method {
-        'class: "sender.io.ballerina.lib.asb.MessageSender"
+        'class: "io.ballerina.lib.asb.sender.MessageSender"
     } external;
 }
 
 isolated function initializeSender(MessageSender senderClient, handle connectionString, handle entityType, handle topicOrQueueName, handle isLogEnabled, AmqpRetryOptions retryOptions) returns Error? = @java:Method {
-    'class: "sender.io.ballerina.lib.asb.MessageSender"
+    'class: "io.ballerina.lib.asb.sender.MessageSender"
 } external;
 
 isolated function send(MessageSender senderClient, Message message) returns Error? = @java:Method {
-    'class: "sender.io.ballerina.lib.asb.MessageSender"
+    'class: "io.ballerina.lib.asb.sender.MessageSender"
 } external;
 
 isolated function sendBatch(MessageSender senderClient, MessageBatch messages) returns Error? = @java:Method {
-    'class: "sender.io.ballerina.lib.asb.MessageSender"
+    'class: "io.ballerina.lib.asb.sender.MessageSender"
 } external;
 
 isolated function schedule(MessageSender senderClient, Message message, time:Civil scheduleTime) returns int|Error = @java:Method {
-    'class: "sender.io.ballerina.lib.asb.MessageSender"
+    'class: "io.ballerina.lib.asb.sender.MessageSender"
 } external;
 

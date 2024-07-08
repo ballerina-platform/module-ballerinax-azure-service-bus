@@ -24,7 +24,7 @@ public isolated client class Caller {
     # 
     # + return - An `asb:Error` if failed to complete message or else `()`
     isolated remote function complete() returns Error? = @java:Method {
-        'class: "listener.io.ballerina.lib.asb.NativeCaller"
+        'class: "io.ballerina.lib.asb.listener.NativeCaller"
     } external;
 
     # Abandon message from queue or subscription based on messageLockToken. Abandon processing of the message for 
@@ -34,7 +34,7 @@ public isolated client class Caller {
     # + propertiesToModify - Message properties to modify
     # + return - An `asb:Error` if failed to abandon message or else `()`
     isolated remote function abandon(*record {|anydata...;|} propertiesToModify) returns Error? = @java:Method {
-        'class: "listener.io.ballerina.lib.asb.NativeCaller"
+        'class: "io.ballerina.lib.asb.listener.NativeCaller"
     } external;
 
     # Dead-Letter the message & moves the message to the Dead-Letter Queue based on messageLockToken. Transfer 
@@ -43,7 +43,7 @@ public isolated client class Caller {
     # + options - Options to specify while putting message in dead-letter queue
     # + return - An `asb:Error` if failed to deadletter message or else `()`
     isolated remote function deadLetter(*DeadLetterOptions options) returns Error? = @java:Method {
-        'class: "listener.io.ballerina.lib.asb.NativeCaller"
+        'class: "io.ballerina.lib.asb.listener.NativeCaller"
     } external;
 
     # Defer the message in a Queue or Subscription based on messageLockToken.  It prevents the message from being 
@@ -52,6 +52,6 @@ public isolated client class Caller {
     # + propertiesToModify - Message properties to modify
     # + return - An `asb:Error` if failed to defer message or else sequence number
     isolated remote function defer(*record {|anydata...;|} propertiesToModify) returns Error? = @java:Method {
-        'class: "listener.io.ballerina.lib.asb.NativeCaller"
+        'class: "io.ballerina.lib.asb.listener.NativeCaller"
     } external;
 }
