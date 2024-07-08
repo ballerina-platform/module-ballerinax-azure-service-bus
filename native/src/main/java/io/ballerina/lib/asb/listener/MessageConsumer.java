@@ -16,20 +16,24 @@
  * under the License.
  */
 
-package org.ballerinax.asb.listener;
+package io.ballerina.lib.asb.listener;
 
 import com.azure.messaging.servicebus.ServiceBusReceivedMessage;
 import com.azure.messaging.servicebus.ServiceBusReceivedMessageContext;
+import io.ballerina.lib.asb.receiver.MessageReceiver;
+import io.ballerina.lib.asb.util.ASBConstants;
+import io.ballerina.lib.asb.util.ASBErrorCreator;
+import io.ballerina.lib.asb.util.ASBUtils;
+import io.ballerina.lib.asb.util.ModuleUtils;
 import io.ballerina.runtime.api.PredefinedTypes;
 import io.ballerina.runtime.api.async.Callback;
+import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.Parameter;
 import io.ballerina.runtime.api.types.Type;
 import io.ballerina.runtime.api.utils.TypeUtils;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
-import org.ballerinax.asb.util.ASBErrorCreator;
-import org.ballerinax.asb.util.ModuleUtils;
 
 import java.util.Map;
 import java.util.concurrent.Semaphore;
@@ -37,11 +41,6 @@ import java.util.function.Consumer;
 
 import static io.ballerina.runtime.api.TypeTags.OBJECT_TYPE_TAG;
 import static io.ballerina.runtime.api.TypeTags.RECORD_TYPE_TAG;
-import static io.ballerina.runtime.api.creators.ValueCreator.createRecordValue;
-import static org.ballerinax.asb.receiver.MessageReceiver.getMessagePayload;
-import static org.ballerinax.asb.receiver.MessageReceiver.populateOptionalFieldsMap;
-import static org.ballerinax.asb.util.ASBConstants.BODY;
-import static org.ballerinax.asb.util.ASBUtils.getValueWithIntendedType;
 
 /**
  * {@code MessageConsumer} provides the capability to invoke `onMessage` function of the ASB service.
@@ -102,13 +101,14 @@ public class MessageConsumer implements Consumer<ServiceBusReceivedMessageContex
     }
 
     private BMap<BString, Object> constructBMessage(ServiceBusReceivedMessage message) {
-        Map<String, Object> map = populateOptionalFieldsMap(message);
-        Object messageBody = getMessagePayload(message);
+        Map<String, Object> map = MessageReceiver.populateOptionalFieldsMap(message);
+        Object messageBody = MessageReceiver.getMessagePayload(message);
         if (messageBody instanceof byte[]) {
-            map.put(BODY, getValueWithIntendedType((byte[]) messageBody, PredefinedTypes.TYPE_ANYDATA));
+            map.put(ASBConstants.BODY, ASBUtils.getValueWithIntendedType(
+                    (byte[]) messageBody, PredefinedTypes.TYPE_ANYDATA));
         } else {
-            map.put(BODY, messageBody);
+            map.put(ASBConstants.BODY, messageBody);
         }
-        return createRecordValue(ModuleUtils.getModule(), MESSAGE_RECORD, map);
+        return ValueCreator.createRecordValue(ModuleUtils.getModule(), MESSAGE_RECORD, map);
     }
 }

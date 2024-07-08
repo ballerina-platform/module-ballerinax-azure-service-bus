@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.ballerinax.asb.util;
+package io.ballerina.lib.asb.util;
 
 import com.azure.core.amqp.AmqpRetryMode;
 import com.azure.core.amqp.AmqpRetryOptions;
@@ -36,6 +36,7 @@ import com.azure.messaging.servicebus.administration.models.SubscriptionProperti
 import com.azure.messaging.servicebus.administration.models.TopicProperties;
 import com.azure.messaging.servicebus.models.ServiceBusReceiveMode;
 import com.azure.messaging.servicebus.models.SubQueue;
+import io.ballerina.lib.asb.receiver.MessageReceiver;
 import io.ballerina.runtime.api.PredefinedTypes;
 import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.creators.TypeCreator;
@@ -61,7 +62,6 @@ import io.ballerina.runtime.api.values.BTypedesc;
 import org.apache.qpid.proton.amqp.Binary;
 import org.ballerinalang.langlib.value.CloneWithType;
 import org.ballerinalang.langlib.value.FromJsonWithType;
-import org.ballerinax.asb.receiver.MessageReceiver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,11 +85,6 @@ import static io.ballerina.runtime.api.TypeTags.XML_TAG;
 import static io.ballerina.runtime.api.constants.RuntimeConstants.ORG_NAME_SEPARATOR;
 import static io.ballerina.runtime.api.constants.RuntimeConstants.VERSION_SEPARATOR;
 import static io.ballerina.runtime.api.utils.TypeUtils.getReferredType;
-import static org.ballerinax.asb.util.ASBConstants.DELAY;
-import static org.ballerinax.asb.util.ASBConstants.MAX_DELAY;
-import static org.ballerinax.asb.util.ASBConstants.MAX_RETRIES;
-import static org.ballerinax.asb.util.ASBConstants.RETRY_MODE;
-import static org.ballerinax.asb.util.ASBConstants.TRY_TIMEOUT;
 
 /**
  * Utility class for Azure Service Bus.
@@ -279,11 +274,11 @@ public class ASBUtils {
     }
 
     public static AmqpRetryOptions getRetryOptions(BMap<BString, Object> retryConfigs) {
-        Long maxRetries = retryConfigs.getIntValue(MAX_RETRIES);
-        BigDecimal delayConfig = ((BDecimal) retryConfigs.get(DELAY)).decimalValue();
-        BigDecimal maxDelay = ((BDecimal) retryConfigs.get(MAX_DELAY)).decimalValue();
-        BigDecimal tryTimeout = ((BDecimal) retryConfigs.get(TRY_TIMEOUT)).decimalValue();
-        String retryMode = retryConfigs.getStringValue(RETRY_MODE).getValue();
+        Long maxRetries = retryConfigs.getIntValue(ASBConstants.MAX_RETRIES);
+        BigDecimal delayConfig = ((BDecimal) retryConfigs.get(ASBConstants.DELAY)).decimalValue();
+        BigDecimal maxDelay = ((BDecimal) retryConfigs.get(ASBConstants.MAX_DELAY)).decimalValue();
+        BigDecimal tryTimeout = ((BDecimal) retryConfigs.get(ASBConstants.TRY_TIMEOUT)).decimalValue();
+        String retryMode = retryConfigs.getStringValue(ASBConstants.RETRY_MODE).getValue();
         return new AmqpRetryOptions()
                 .setMaxRetries(maxRetries.intValue())
                 .setDelay(Duration.ofSeconds(delayConfig.intValue()))

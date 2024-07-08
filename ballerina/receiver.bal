@@ -74,7 +74,7 @@ public isolated client class MessageReceiver {
             @display {label: "Expected Type"} typedesc<Message> T = <>,
             @display {label: "Dead-Lettered Messages"} boolean deadLettered = false)
                             returns @display {label: "Message"} T|Error? = @java:Method {
-        'class: "org.ballerinax.asb.receiver.MessageReceiver"
+        'class: "io.ballerina.lib.asb.receiver.MessageReceiver"
     } external;
 
     # Receive message payload from queue or subscription.
@@ -89,7 +89,7 @@ public isolated client class MessageReceiver {
             @display {label: "Expected Type"} typedesc<anydata> T = <>,
             @display {label: "Dead-Lettered Messages"} boolean deadLettered = false)
                                     returns @display {label: "Message Payload"} T|Error = @java:Method {
-        'class: "org.ballerinax.asb.receiver.MessageReceiver"
+        'class: "io.ballerina.lib.asb.receiver.MessageReceiver"
     } external;
 
     # Receive batch of messages from queue or subscription.
@@ -177,7 +177,7 @@ public isolated client class MessageReceiver {
     isolated remote function receiveDeferred(@display {label: "Deferred Msg Seq Num"}
                                             int sequenceNumber)
                                             returns @display {label: "Deferred Message"} Message|Error? = @java:Method {
-        'class: "org.ballerinax.asb.receiver.MessageReceiver"
+        'class: "io.ballerina.lib.asb.receiver.MessageReceiver"
     } external;
 
     # The operation renews lock on a message in a queue or subscription based on messageLockToken.
@@ -198,41 +198,41 @@ public isolated client class MessageReceiver {
     @display {label: "Close Receiver Connection"}
     isolated remote function close() returns Error? = @java:Method {
         name: "closeReceiver",
-        'class: "org.ballerinax.asb.receiver.MessageReceiver"
+        'class: "io.ballerina.lib.asb.receiver.MessageReceiver"
     } external;
 }
 
 isolated function initializeReceiver(MessageReceiver receiverClient, handle connectionString, handle queueName, handle topicName,
         handle subscriptionName, handle receiveMode, int maxAutoLockRenewDuration, handle isLogActive, AmqpRetryOptions retryOptions) returns Error? = @java:Method {
-    'class: "org.ballerinax.asb.receiver.MessageReceiver"
+    'class: "io.ballerina.lib.asb.receiver.MessageReceiver"
 } external;
 
 isolated function receiveBatch(MessageReceiver endpointClient, int maxMessageCount, int? serverWaitTime, boolean deadLettered)
                                 returns MessageBatch|Error? = @java:Method {
-    'class: "org.ballerinax.asb.receiver.MessageReceiver"
+    'class: "io.ballerina.lib.asb.receiver.MessageReceiver"
 } external;
 
 isolated function complete(MessageReceiver endpointClient, Message message) returns Error? = @java:Method {
-    'class: "org.ballerinax.asb.receiver.MessageReceiver"
+    'class: "io.ballerina.lib.asb.receiver.MessageReceiver"
 } external;
 
 isolated function abandon(MessageReceiver endpointClient, Message message) returns Error? = @java:Method {
-    'class: "org.ballerinax.asb.receiver.MessageReceiver"
+    'class: "io.ballerina.lib.asb.receiver.MessageReceiver"
 } external;
 
 isolated function deadLetter(MessageReceiver endpointClient, Message message, string? deadLetterReason, string? deadLetterErrorDescription) returns
                         Error? = @java:Method {
-    'class: "org.ballerinax.asb.receiver.MessageReceiver"
+    'class: "io.ballerina.lib.asb.receiver.MessageReceiver"
 } external;
 
 isolated function defer(MessageReceiver endpointClient, Message message) returns Error? = @java:Method {
-    'class: "org.ballerinax.asb.receiver.MessageReceiver"
+    'class: "io.ballerina.lib.asb.receiver.MessageReceiver"
 } external;
 
 isolated function receiveDeferred(MessageReceiver endpointClient, int sequenceNumber) returns Message|Error? = @java:Method {
-    'class: "org.ballerinax.asb.receiver.MessageReceiver"
+    'class: "io.ballerina.lib.asb.receiver.MessageReceiver"
 } external;
 
 isolated function renewLock(MessageReceiver endpointClient, Message message) returns Error? = @java:Method {
-    'class: "org.ballerinax.asb.receiver.MessageReceiver"
+    'class: "io.ballerina.lib.asb.receiver.MessageReceiver"
 } external;

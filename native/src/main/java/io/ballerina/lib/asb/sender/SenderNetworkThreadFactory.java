@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.ballerinax.asb.sender;
+package io.ballerina.lib.asb.sender;
 
 import java.util.concurrent.ThreadFactory;
 

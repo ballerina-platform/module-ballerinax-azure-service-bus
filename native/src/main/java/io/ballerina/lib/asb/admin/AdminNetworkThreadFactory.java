@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.ballerinax.asb.admin;
+package io.ballerina.lib.asb.admin;
 
 import java.util.concurrent.ThreadFactory;
 
