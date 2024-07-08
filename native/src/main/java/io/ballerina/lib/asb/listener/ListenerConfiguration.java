@@ -16,15 +16,14 @@
  * under the License.
  */
 
-package org.ballerinax.asb.listener;
+package io.ballerina.lib.asb.listener;
 
 import com.azure.core.amqp.AmqpRetryOptions;
 import com.azure.messaging.servicebus.models.ServiceBusReceiveMode;
+import io.ballerina.lib.asb.util.ASBUtils;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BString;
-
-import static org.ballerinax.asb.util.ASBUtils.getRetryOptions;
 
 /**
  * {@code ListenerConfiguration} contains the java representation of the Ballerina ASB listener configurations.
@@ -65,7 +64,7 @@ public record ListenerConfiguration(String connectionString, EntityConfig entity
                 configurations.getIntValue(MAX_CONCURRENCY).intValue(),
                 configurations.getIntValue(PREFETCH_COUNT).intValue(),
                 configurations.getBooleanValue(AUTO_COMPLETE),
-                getRetryOptions((BMap<BString, Object>) configurations.getMapValue(AMQP_RETRY_OPTIONS))
+                ASBUtils.getRetryOptions((BMap<BString, Object>) configurations.getMapValue(AMQP_RETRY_OPTIONS))
         );
     }
 

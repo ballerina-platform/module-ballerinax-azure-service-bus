@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.ballerinax.asb.receiver;
+package io.ballerina.lib.asb.receiver;
 
 import com.azure.core.amqp.AmqpRetryOptions;
 import com.azure.core.amqp.models.AmqpAnnotatedMessage;
@@ -26,6 +26,9 @@ import com.azure.messaging.servicebus.ServiceBusException;
 import com.azure.messaging.servicebus.ServiceBusReceivedMessage;
 import com.azure.messaging.servicebus.ServiceBusReceiverClient;
 import com.azure.messaging.servicebus.models.DeadLetterOptions;
+import io.ballerina.lib.asb.util.ASBConstants;
+import io.ballerina.lib.asb.util.ASBUtils;
+import io.ballerina.lib.asb.util.ModuleUtils;
 import io.ballerina.runtime.api.Environment;
 import io.ballerina.runtime.api.Future;
 import io.ballerina.runtime.api.PredefinedTypes;
@@ -42,10 +45,7 @@ import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
 import io.ballerina.runtime.api.values.BTypedesc;
-import org.ballerinax.asb.util.ASBConstants;
-import org.ballerinax.asb.util.ASBErrorCreator;
-import org.ballerinax.asb.util.ASBUtils;
-import org.ballerinax.asb.util.ModuleUtils;
+import io.ballerina.lib.asb.util.ASBErrorCreator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,36 +59,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static io.ballerina.runtime.api.creators.ValueCreator.createRecordValue;
-import static org.ballerinax.asb.util.ASBConstants.APPLICATION_PROPERTY_KEY;
-import static org.ballerinax.asb.util.ASBConstants.BODY;
-import static org.ballerinax.asb.util.ASBConstants.CONTENT_TYPE;
-import static org.ballerinax.asb.util.ASBConstants.CORRELATION_ID;
-import static org.ballerinax.asb.util.ASBConstants.DEAD_LETTER_ERROR_DESCRIPTION;
-import static org.ballerinax.asb.util.ASBConstants.DEAD_LETTER_REASON;
-import static org.ballerinax.asb.util.ASBConstants.DEAD_LETTER_SOURCE;
-import static org.ballerinax.asb.util.ASBConstants.DEFAULT_MESSAGE_LOCK_TOKEN;
-import static org.ballerinax.asb.util.ASBConstants.DELIVERY_COUNT;
-import static org.ballerinax.asb.util.ASBConstants.ENQUEUED_SEQUENCE_NUMBER;
-import static org.ballerinax.asb.util.ASBConstants.ENQUEUED_TIME;
-import static org.ballerinax.asb.util.ASBConstants.LABEL;
-import static org.ballerinax.asb.util.ASBConstants.LOCK_TOKEN;
-import static org.ballerinax.asb.util.ASBConstants.MESSAGE_ID;
-import static org.ballerinax.asb.util.ASBConstants.NATIVE_MESSAGE;
-import static org.ballerinax.asb.util.ASBConstants.PARTITION_KEY;
-import static org.ballerinax.asb.util.ASBConstants.RECEIVER_CLIENT;
-import static org.ballerinax.asb.util.ASBConstants.REPLY_TO;
-import static org.ballerinax.asb.util.ASBConstants.REPLY_TO_SESSION_ID;
-import static org.ballerinax.asb.util.ASBConstants.SEQUENCE_NUMBER;
-import static org.ballerinax.asb.util.ASBConstants.SESSION_ID;
-import static org.ballerinax.asb.util.ASBConstants.STATE;
-import static org.ballerinax.asb.util.ASBConstants.TIME_TO_LIVE;
-import static org.ballerinax.asb.util.ASBConstants.TO;
-import static org.ballerinax.asb.util.ASBUtils.addFieldIfPresent;
-import static org.ballerinax.asb.util.ASBUtils.constructReceiverClient;
-import static org.ballerinax.asb.util.ASBUtils.convertAMQPToJava;
-import static org.ballerinax.asb.util.ASBUtils.convertJavaToBValue;
-import static org.ballerinax.asb.util.ASBUtils.getRetryOptions;
-import static org.ballerinax.asb.util.ASBUtils.getValueWithIntendedType;
 
 /**
  * This facilitates the client operations of MessageReceiver client in
@@ -119,8 +89,8 @@ public class MessageReceiver {
                                             String receiveMode, long maxAutoLockRenewDuration,
                                             String logLevel, BMap<BString, Object> retryConfigs) {
         try {
-            AmqpRetryOptions retryOptions = getRetryOptions(retryConfigs);
-            ServiceBusReceiverClient nativeReceiverClient = constructReceiverClient(retryOptions, connectionString,
+            AmqpRetryOptions retryOptions = ASBUtils.getRetryOptions(retryConfigs);
+            ServiceBusReceiverClient nativeReceiverClient = ASBUtils.constructReceiverClient(retryOptions, connectionString,
                     queueName, receiveMode, maxAutoLockRenewDuration, topicName, subscriptionName, false);
             setClientData(receiverClient, connectionString, queueName, topicName, subscriptionName, receiveMode,
                     maxAutoLockRenewDuration, logLevel, retryConfigs);
@@ -201,10 +171,10 @@ public class MessageReceiver {
 
                 Object messageBody = getMessagePayload(message);
                 if (messageBody instanceof byte[] binaryPayload) {
-                    Object messagePayload = getValueWithIntendedType(binaryPayload, expectedType.getDescribingType());
+                    Object messagePayload = ASBUtils.getValueWithIntendedType(binaryPayload, expectedType.getDescribingType());
                     future.complete(messagePayload);
                 } else {
-                    Optional<Object> bValue = convertJavaToBValue(message.getMessageId(), messageBody);
+                    Optional<Object> bValue = ASBUtils.convertJavaToBValue(message.getMessageId(), messageBody);
                     String payloadBindingErr = String.format(
                             "Failed to bind the received ASB message value to the expected Ballerina type: '%s'",
                             expectedType.toString());
@@ -252,7 +222,7 @@ public class MessageReceiver {
                 }
                 List<BMap<BString, Object>> bMessages = receivedMessageStream.stream().map(msg -> {
                     BMap<BString, Object> bMsg = constructExpectedMessageRecord(msg, null);
-                    bMsg.addNativeData(NATIVE_MESSAGE, msg);
+                    bMsg.addNativeData(ASBConstants.NATIVE_MESSAGE, msg);
                     return bMsg;
                 }).toList();
                 BMap<BString, Object> messageRecord = ValueCreator.createRecordValue(ModuleUtils.getModule(),
@@ -508,44 +478,44 @@ public class MessageReceiver {
         Object messageBody = getMessagePayload(message);
         if (messageBody instanceof byte[]) {
             if (expectedType != null) {
-                map.put(BODY, getValueWithIntendedType((byte[]) messageBody, expectedType.getFields().get(BODY)
+                map.put(ASBConstants.BODY, ASBUtils.getValueWithIntendedType((byte[]) messageBody, expectedType.getFields().get(ASBConstants.BODY)
                         .getFieldType()));
             } else {
-                map.put(BODY, getValueWithIntendedType((byte[]) messageBody, PredefinedTypes.TYPE_ANYDATA));
+                map.put(ASBConstants.BODY, ASBUtils.getValueWithIntendedType((byte[]) messageBody, PredefinedTypes.TYPE_ANYDATA));
             }
         } else {
-            map.put(BODY, messageBody);
+            map.put(ASBConstants.BODY, messageBody);
         }
         BMap<BString, Object> constructedMessage = createBRecordValue(map, expectedType);
         // Only add the native message if the message received in peek lock mode.
-        if (!message.getLockToken().equals(DEFAULT_MESSAGE_LOCK_TOKEN)) {
-            constructedMessage.addNativeData(NATIVE_MESSAGE, message);
+        if (!message.getLockToken().equals(ASBConstants.DEFAULT_MESSAGE_LOCK_TOKEN)) {
+            constructedMessage.addNativeData(ASBConstants.NATIVE_MESSAGE, message);
         }
         return constructedMessage;
     }
 
     public static Map<String, Object> populateOptionalFieldsMap(ServiceBusReceivedMessage message) {
         Map<String, Object> map = new HashMap<>();
-        addFieldIfPresent(map, CONTENT_TYPE, message.getContentType());
-        addFieldIfPresent(map, MESSAGE_ID, message.getMessageId());
-        addFieldIfPresent(map, TO, message.getTo());
-        addFieldIfPresent(map, REPLY_TO, message.getReplyTo());
-        addFieldIfPresent(map, REPLY_TO_SESSION_ID, message.getReplyToSessionId());
-        addFieldIfPresent(map, LABEL, message.getSubject());
-        addFieldIfPresent(map, SESSION_ID, message.getSessionId());
-        addFieldIfPresent(map, CORRELATION_ID, message.getCorrelationId());
-        addFieldIfPresent(map, PARTITION_KEY, message.getPartitionKey());
-        addFieldIfPresent(map, TIME_TO_LIVE, message.getTimeToLive().getSeconds());
-        addFieldIfPresent(map, SEQUENCE_NUMBER, message.getSequenceNumber());
-        addFieldIfPresent(map, LOCK_TOKEN, message.getLockToken());
-        addFieldIfPresent(map, DELIVERY_COUNT, message.getDeliveryCount());
-        addFieldIfPresent(map, ENQUEUED_TIME, message.getEnqueuedTime().toString());
-        addFieldIfPresent(map, ENQUEUED_SEQUENCE_NUMBER, message.getEnqueuedSequenceNumber());
-        addFieldIfPresent(map, DEAD_LETTER_ERROR_DESCRIPTION, message.getDeadLetterErrorDescription());
-        addFieldIfPresent(map, DEAD_LETTER_REASON, message.getDeadLetterReason());
-        addFieldIfPresent(map, DEAD_LETTER_SOURCE, message.getDeadLetterSource());
-        addFieldIfPresent(map, STATE, message.getState().toString());
-        addFieldIfPresent(map, APPLICATION_PROPERTY_KEY, getApplicationProperties(message));
+        ASBUtils.addFieldIfPresent(map, ASBConstants.CONTENT_TYPE, message.getContentType());
+        ASBUtils.addFieldIfPresent(map, ASBConstants.MESSAGE_ID, message.getMessageId());
+        ASBUtils.addFieldIfPresent(map, ASBConstants.TO, message.getTo());
+        ASBUtils.addFieldIfPresent(map, ASBConstants.REPLY_TO, message.getReplyTo());
+        ASBUtils.addFieldIfPresent(map, ASBConstants.REPLY_TO_SESSION_ID, message.getReplyToSessionId());
+        ASBUtils.addFieldIfPresent(map, ASBConstants.LABEL, message.getSubject());
+        ASBUtils.addFieldIfPresent(map, ASBConstants.SESSION_ID, message.getSessionId());
+        ASBUtils.addFieldIfPresent(map, ASBConstants.CORRELATION_ID, message.getCorrelationId());
+        ASBUtils.addFieldIfPresent(map, ASBConstants.PARTITION_KEY, message.getPartitionKey());
+        ASBUtils.addFieldIfPresent(map, ASBConstants.TIME_TO_LIVE, message.getTimeToLive().getSeconds());
+        ASBUtils.addFieldIfPresent(map, ASBConstants.SEQUENCE_NUMBER, message.getSequenceNumber());
+        ASBUtils.addFieldIfPresent(map, ASBConstants.LOCK_TOKEN, message.getLockToken());
+        ASBUtils.addFieldIfPresent(map, ASBConstants.DELIVERY_COUNT, message.getDeliveryCount());
+        ASBUtils.addFieldIfPresent(map, ASBConstants.ENQUEUED_TIME, message.getEnqueuedTime().toString());
+        ASBUtils.addFieldIfPresent(map, ASBConstants.ENQUEUED_SEQUENCE_NUMBER, message.getEnqueuedSequenceNumber());
+        ASBUtils.addFieldIfPresent(map, ASBConstants.DEAD_LETTER_ERROR_DESCRIPTION, message.getDeadLetterErrorDescription());
+        ASBUtils.addFieldIfPresent(map, ASBConstants.DEAD_LETTER_REASON, message.getDeadLetterReason());
+        ASBUtils.addFieldIfPresent(map, ASBConstants.DEAD_LETTER_SOURCE, message.getDeadLetterSource());
+        ASBUtils.addFieldIfPresent(map, ASBConstants.STATE, message.getState().toString());
+        ASBUtils.addFieldIfPresent(map, ASBConstants.APPLICATION_PROPERTY_KEY, getApplicationProperties(message));
 
         return map;
     }
@@ -573,7 +543,7 @@ public class MessageReceiver {
                 LOGGER.debug(String.format("Received a message with messageId: %s and AMQPMessageBodyType: %s",
                         receivedMessage.getMessageId(), bodyType));
                 Object amqpValue = rawAmqpMessage.getBody().getValue();
-                amqpValue = convertAMQPToJava(receivedMessage.getMessageId(), amqpValue);
+                amqpValue = ASBUtils.convertAMQPToJava(receivedMessage.getMessageId(), amqpValue);
                 return amqpValue;
             default:
                 throw new RuntimeException("Unsupported message body type: " + receivedMessage.getMessageId());
@@ -621,7 +591,7 @@ public class MessageReceiver {
         if (isDeadLetter) {
             return (ServiceBusReceiverClient) getDeadLetterMessageReceiverFromBObject(bReceiver);
         }
-        return (ServiceBusReceiverClient) bReceiver.getNativeData(RECEIVER_CLIENT);
+        return (ServiceBusReceiverClient) bReceiver.getNativeData(ASBConstants.RECEIVER_CLIENT);
     }
 
     private static Object getDeadLetterMessageReceiverFromBObject(BObject receiverObject) {
@@ -640,8 +610,8 @@ public class MessageReceiver {
             BMap<BString, Object> retryConfigs =
                     (BMap<BString, Object>) receiverObject.getNativeData(ASBConstants.RECEIVER_CLIENT_RETRY_CONFIGS);
             try {
-                AmqpRetryOptions retryOptions = getRetryOptions(retryConfigs);
-                ServiceBusReceiverClient nativeReceiverClient = constructReceiverClient(retryOptions,
+                AmqpRetryOptions retryOptions = ASBUtils.getRetryOptions(retryConfigs);
+                ServiceBusReceiverClient nativeReceiverClient = ASBUtils.constructReceiverClient(retryOptions,
                         connectionString, queueName, receiveMode, maxAutoLockRenewDuration, topicName,
                         subscriptionName, true);
                 LOGGER.debug("ServiceBusReceiverClient initialized");
@@ -681,6 +651,6 @@ public class MessageReceiver {
     }
 
     private static ServiceBusReceivedMessage getNativeMessage(BMap<BString, Object> message) {
-        return (ServiceBusReceivedMessage) message.getNativeData(NATIVE_MESSAGE);
+        return (ServiceBusReceivedMessage) message.getNativeData(ASBConstants.NATIVE_MESSAGE);
     }
 }

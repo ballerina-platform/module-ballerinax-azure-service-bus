@@ -16,15 +16,12 @@
  * under the License.
  */
 
-package org.ballerinax.asb.util;
+package io.ballerina.lib.asb.util;
 import com.azure.core.exception.HttpResponseException;
 import com.azure.messaging.servicebus.ServiceBusException;
 import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BError;
-
-import static org.ballerinax.asb.util.ASBConstants.ASB_ERROR;
-import static org.ballerinax.asb.util.ModuleUtils.getModule;
 
 /**
  * ASB module error related utilities.
@@ -50,7 +47,7 @@ public class ASBErrorCreator {
         return fromBError(error.getMessage(), error.getCause());
     }
     public static BError fromBError(String message, BError cause) {
-        return ErrorCreator.createDistinctError(ASB_ERROR, getModule(), StringUtils.fromString(message), cause);
+        return ErrorCreator.createDistinctError(ASBConstants.ASB_ERROR, ModuleUtils.getModule(), StringUtils.fromString(message), cause);
     }
     private static BError fromJavaException(String message, Throwable cause) {
         return fromBError(message, ErrorCreator.createError(cause));
@@ -58,12 +55,12 @@ public class ASBErrorCreator {
 
     public static BError createError(String message) {
         return ErrorCreator.createError(
-                ModuleUtils.getModule(), ASB_ERROR, StringUtils.fromString(message), null, null);
+                ModuleUtils.getModule(), ASBConstants.ASB_ERROR, StringUtils.fromString(message), null, null);
     }
 
     public static BError createError(String message, Throwable throwable) {
         BError cause = ErrorCreator.createError(throwable);
         return ErrorCreator.createError(
-                ModuleUtils.getModule(), ASB_ERROR, StringUtils.fromString(message), cause, null);
+                ModuleUtils.getModule(), ASBConstants.ASB_ERROR, StringUtils.fromString(message), cause, null);
     }
 }
