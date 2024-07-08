@@ -38,7 +38,7 @@ public isolated class Listener {
 
 
     private isolated function externInit(ListenerConfiguration config) returns Error? = @java:Method {
-        'class: "org.ballerinax.asb.listener.NativeListener"
+        'class: "listener.io.ballerina.lib.asb.NativeListener"
     } external;
 
     # Attaches an `asb:Service` to a listener.
@@ -50,7 +50,7 @@ public isolated class Listener {
     # + name - Name of the service
     # + return - An `asb:Error` if there is an error or else `()`
     public isolated function attach(Service 'service, string[]|string? name = ()) returns Error? = @java:Method {
-        'class: "org.ballerinax.asb.listener.NativeListener"
+        'class: "listener.io.ballerina.lib.asb.NativeListener"
     } external;
 
     # Detaches an `asb:Service` from the the listener.
@@ -61,7 +61,7 @@ public isolated class Listener {
     # + 'service - The service to be detached
     # + return - An `asb:Error` if there is an error or else `()`
     public isolated function detach(Service 'service) returns Error? = @java:Method {
-        'class: "org.ballerinax.asb.listener.NativeListener"
+        'class: "listener.io.ballerina.lib.asb.NativeListener"
     } external;
 
     # Starts the `asb:Listener`.
@@ -71,7 +71,7 @@ public isolated class Listener {
     #
     # + return - An `asb:Error` if there is an error or else `()`
     public isolated function 'start() returns Error? = @java:Method {
-        'class: "org.ballerinax.asb.listener.NativeListener"
+        'class: "listener.io.ballerina.lib.asb.NativeListener"
     } external;
 
     # Stops the `asb:Listener` gracefully.
@@ -81,7 +81,7 @@ public isolated class Listener {
     #
     # + return - An `asb:Error` if there is an error or else `()`
     public isolated function gracefulStop() returns Error? = @java:Method {
-        'class: "org.ballerinax.asb.listener.NativeListener"
+        'class: "listener.io.ballerina.lib.asb.NativeListener"
     } external;
 
     # Stops the `asb:Listener` immediately.
@@ -91,6 +91,6 @@ public isolated class Listener {
     #
     # + return - An `asb:Error` if there is an error or else `()`
     public isolated function immediateStop() returns Error? = @java:Method {
-        'class: "org.ballerinax.asb.listener.NativeListener"
+        'class: "listener.io.ballerina.lib.asb.NativeListener"
     } external;
 }
