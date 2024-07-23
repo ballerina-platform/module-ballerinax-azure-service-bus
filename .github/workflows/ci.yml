@@ -10,6 +10,7 @@ on:
       - "docs/**"
   repository_dispatch:
     types: check_connector_for_breaking_changes
+    workflow_dispatch:
 
 jobs:
   call_workflow:
