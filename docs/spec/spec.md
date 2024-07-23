@@ -1,7 +1,7 @@
 # Specification: Ballerina `asb` Library
 
 _Authors_: @ayeshLK \
-_Reviewers_: @NipunaRanasinghe @niveathika @RDPerera \
+_Reviewers_: @NipunaRanasinghe @RDPerera \
 _Created_: 2024/05/31 \
 _Updated_: 2024/06/03 \
 _Edition_: Swan Lake 
