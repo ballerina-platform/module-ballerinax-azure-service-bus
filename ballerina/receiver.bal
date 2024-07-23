@@ -63,6 +63,9 @@ public isolated client class MessageReceiver {
     }
 
     # Receive message from queue or subscription.
+    # ```ballerina
+    # asb:Message? message = check receiver->receive();
+    # ```
     #
     # + serverWaitTime - Specified server wait time in seconds to receive message (optional)
     # + T - Expected type of the message. This can be either a `asb:Message` or a subtype of it.
@@ -78,6 +81,9 @@ public isolated client class MessageReceiver {
     } external;
 
     # Receive message payload from queue or subscription.
+    # ```ballerina
+    # string messagePayload = check receiver->receivePayload();
+    # ```
     #
     # + serverWaitTime - Specified server wait time in seconds to receive message (optional)
     # + T - Expected type of the message. This can be any subtype of `anydata` type
@@ -93,6 +99,9 @@ public isolated client class MessageReceiver {
     } external;
 
     # Receive batch of messages from queue or subscription.
+    # ```ballerina
+    # asb:MessageBatch batch = check receiver->receiveBatch(10);
+    # ```
     #
     # + maxMessageCount - Maximum message count to receive in a batch
     # + serverWaitTime - Specified server wait time in seconds to receive message (optional)
@@ -110,6 +119,10 @@ public isolated client class MessageReceiver {
 
     # Complete message from queue or subscription based on messageLockToken. Declares the message processing to be 
     # successfully completed, removing the message from the queue.
+    # ```ballerina
+    # asb:Message message = ...;
+    # check receiver->complete(message);
+    # ```
     #
     # + message - `asb:Message` record
     # + return - An `asb:Error` if failed to complete message or else `()`
@@ -125,7 +138,11 @@ public isolated client class MessageReceiver {
     # Abandon message from queue or subscription based on messageLockToken. Abandon processing of the message for 
     # the time being, returning the message immediately back to the queue to be picked up by another (or the same) 
     # receiver.
-    #
+    # ```ballerina
+    # asb:Message message = ...;
+    # check receiver->abandon(message);
+    # ```
+    # 
     # + message - `asb:Message` record
     # + return - An `asb:Error` if failed to abandon message or else `()`
     @display {label: "Abandon Message"}
@@ -138,6 +155,10 @@ public isolated client class MessageReceiver {
 
     # Dead-Letter the message & moves the message to the Dead-Letter Queue based on messageLockToken. Transfer 
     # the message from the primary queue into a special "dead-letter sub-queue".
+    # ```ballerina
+    # asb:Message message = ...;
+    # check receiver->deadLetter(message);
+    # ```
     #
     # + message - `asb:Message` record
     # + deadLetterReason - The deadletter reason (optional)
@@ -156,7 +177,11 @@ public isolated client class MessageReceiver {
 
     # Defer the message in a Queue or Subscription based on messageLockToken.  It prevents the message from being 
     # directly received from the queue by setting it aside such that it must be received by sequence number.
-    #
+    # ```ballerina
+    # asb:Message message = ...;
+    # int sequenceNumber = check receiver->defer(message);
+    # ```
+    # 
     # + message - `asb:Message` record
     # + return - An `asb:Error` if failed to defer message or else sequence number
     @display {label: "Defer Message"}
@@ -168,7 +193,10 @@ public isolated client class MessageReceiver {
 
     # Receives a deferred Message. Deferred messages can only be received by using sequence number and return
     # Message object.
-    #
+    # ```ballerina
+    # asb:Message? message = check receiver->receiveDeferred(1);
+    # ```
+    # 
     # + sequenceNumber - Unique number assigned to a message by Service Bus. The sequence number is a unique 64-bit
     # integer assigned to a message as it is accepted and stored by the broker and functions as
     # its true identifier.
@@ -181,7 +209,11 @@ public isolated client class MessageReceiver {
     } external;
 
     # The operation renews lock on a message in a queue or subscription based on messageLockToken.
-    #
+    # ```ballerina
+    # asb:Message message = ...;
+    # check receiver->renewLock(message);
+    # ```
+    # 
     # + message - `asb:Message` record
     # + return - An `asb:Error` if failed to renew message or else `()`
     @display {label: "Renew Lock On Message"}
@@ -192,7 +224,10 @@ public isolated client class MessageReceiver {
         return createError(string `Failed to renew lock on message with ID: ${message?.messageId.toString()}`);
     }
 
-    # Closes the ASB sender connection.
+    # Closes the ASB receiver connection.
+    # ```ballerina
+    # check receiver->close();
+    # ```
     #
     # + return - An `asb:Error` if failed to close connection or else `()`
     @display {label: "Close Receiver Connection"}
