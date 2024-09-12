@@ -45,6 +45,9 @@ public isolated client class MessageSender {
     }
 
     # Send message to queue or topic with a message body.
+    # ```ballerina
+    # check sender->send({body: "Sample text message", contentType: asb:TEXT});
+    # ```
     #
     # + message - Azure service bus message representation (`asb:Message` record)
     # + return - An `asb:Error` if failed to send message or else `()`
@@ -55,6 +58,9 @@ public isolated client class MessageSender {
     }
 
     # Send message to queue or topic with a message body.
+    # ```ballerina
+    # check sender->sendPayload("Sample text message");
+    # ```
     #
     # + messagePayload - Message body
     # + return - An `asb:Error` if failed to send message or else `()`
@@ -67,6 +73,10 @@ public isolated client class MessageSender {
 
     # Sends a scheduled message to the Azure Service Bus entity this sender is connected to. 
     # A scheduled message is enqueued and made available to receivers only at the scheduled enqueue time.
+    # ```ballerina
+    # time:Civil scheduledTime = check time:civilFromString("2007-12-03T10:15:30.00Z");
+    # check sender->send({body: "Sample text message", contentType: asb:TEXT}, scheduledTime);
+    # ```
     #
     # + message - Message to be scheduled  
     # + scheduledEnqueueTime - Datetime at which the message should appear in the Service Bus queue or topic
@@ -78,14 +88,21 @@ public isolated client class MessageSender {
     }
 
     # Cancels the enqueuing of a scheduled message, if they are not already enqueued.
+    # ```ballerina
+    # check sender->cancel(1);
+    # ```
     #
     # + sequenceNumber - The sequence number of the message to cancel
-    # + return - If the message could not be cancelled
+    # + return - An `asb:Error` if the message could not be cancelled or else `()`.
     isolated remote function cancel(@display {label: "Sequence Number"} int sequenceNumber) returns Error? = @java:Method {
         'class: "io.ballerina.lib.asb.sender.MessageSender"
     } external;
 
     # Send batch of messages to queue or topic.
+    # ```ballerina
+    # asb:MessageBatch batch = ...;
+    # check sender->sendBatch(batch);
+    # ```
     #
     # + messageBatch - Azure service bus batch message representation (`asb:MessageBatch` record)
     # + return - An `asb:Error` if failed to send message or else `()`
@@ -98,6 +115,9 @@ public isolated client class MessageSender {
     }
 
     # Closes the ASB sender connection.
+    # ```ballerina
+    # check sender->close();
+    # ```
     #
     # + return - An `asb:Error` if failed to close connection or else `()`
     @display {label: "Close Sender Connection"}
