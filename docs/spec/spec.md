@@ -69,17 +69,6 @@ Ballerina `asb` provides several core APIs:
 
 An Azure Service Bus message is a unit of communication that carries data for exchange between components that interact with Microsoft's Azure service bus resource. Messages can encapsulate different types of data, including text, binary, and custom-defined objects structured as key-value pairs.
 
-A Message Batch in Azure Service Bus is a collection of messages that are sent as a single batched transaction to optimize performance and resource utilization. This approach is useful when sending multiple messages to the same queue or topic to ensure atomicity and reduce network calls.
-
-- `ApplicationProperties` record represents the application-specific properties.
-
-```ballerina
-public type ApplicationProperties record {|
-    # Key-value pairs for each brokered property (optional)
-    map<anydata> properties?;
-|};
-```
-
 - `Message` record represents the Azure service bus message.
 
 ```ballerina
@@ -131,6 +120,17 @@ public type Message record {|
     string state?;
 |};
 ```
+
+- `ApplicationProperties` record represents the application-specific properties.
+
+```ballerina
+public type ApplicationProperties record {|
+    # Key-value pairs for each brokered property (optional)
+    map<anydata> properties?;
+|};
+```
+
+A Message Batch in Azure Service Bus is a collection of messages that are sent as a single batched transaction to optimize performance and resource utilization. This approach is useful when sending multiple messages to the same queue or topic to ensure atomicity and reduce network calls.
 
 - `MessageBatch` record represents an Azure service bus message batch.
 
