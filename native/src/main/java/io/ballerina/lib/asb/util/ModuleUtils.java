@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.ballerinax.asb.util;
+package io.ballerina.lib.asb.util;
 
 import io.ballerina.runtime.api.Environment;
 import io.ballerina.runtime.api.Module;

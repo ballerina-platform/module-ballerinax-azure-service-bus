@@ -16,8 +16,9 @@
  * under the License.
  */
 
-package org.ballerinax.asb.listener;
+package io.ballerina.lib.asb.listener;
 
+import com.azure.messaging.servicebus.ServiceBusReceivedMessageContext;
 import io.ballerina.runtime.api.async.Callback;
 import io.ballerina.runtime.api.values.BError;
 
@@ -25,25 +26,33 @@ import java.util.concurrent.Semaphore;
 
 /**
  * Callback code to be executed when the message-listener complete a `onMessage` invocation of the ballerina service.
+ * This particular callback implementation will mark the messages complete/abandon automatically once the remote
+ * functions return the results.
  */
-public class OnMessageCallback implements Callback {
+public class OnMessageAutoCompletableCallback implements Callback {
     private final Semaphore semaphore;
+    private final ServiceBusReceivedMessageContext messageContext;
 
-    public OnMessageCallback(Semaphore semaphore) {
+    public OnMessageAutoCompletableCallback(Semaphore semaphore, ServiceBusReceivedMessageContext messageContext) {
         this.semaphore = semaphore;
+        this.messageContext = messageContext;
     }
 
     @Override
     public void notifySuccess(Object o) {
         semaphore.release();
         if (o instanceof BError) {
+            messageContext.abandon();
             ((BError) o).printStackTrace();
+            return;
         }
+        messageContext.complete();
     }
 
     @Override
     public void notifyFailure(BError bError) {
         semaphore.release();
+        messageContext.abandon();
         bError.printStackTrace();
         System.exit(1);
     }

@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.ballerinax.asb.listener;
+package io.ballerina.lib.asb.listener;
 
 import io.ballerina.runtime.api.async.Callback;
 import io.ballerina.runtime.api.values.BError;

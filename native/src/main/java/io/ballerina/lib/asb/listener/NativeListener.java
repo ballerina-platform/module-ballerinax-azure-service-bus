@@ -16,16 +16,16 @@
  * under the License.
  */
 
-package org.ballerinax.asb.listener;
+package io.ballerina.lib.asb.listener;
 
 import com.azure.messaging.servicebus.ServiceBusClientBuilder;
 import com.azure.messaging.servicebus.ServiceBusProcessorClient;
 import com.azure.messaging.servicebus.models.ServiceBusReceiveMode;
+import io.ballerina.lib.asb.util.ASBErrorCreator;
 import io.ballerina.runtime.api.Environment;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
-import org.ballerinax.asb.util.ASBErrorCreator;
 
 import java.time.Duration;
 import java.util.Objects;

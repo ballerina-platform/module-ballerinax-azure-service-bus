@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- [Implement ASB sender/receiver client actions in a non-blocking way](https://github.com/ballerina-platform/ballerina-library/issues/4982)
+- [Improve Azure service bus administrator client actions to work in a non-blocking manner](https://github.com/ballerina-platform/ballerina-library/issues/6603)
+
+## [3.8.0] - 2024-05-31
+
 ### Added
 
 - [Add the listener-service implementation of the Azure service-bus connector](https://github.com/ballerina-platform/ballerina-library/issues/6495)

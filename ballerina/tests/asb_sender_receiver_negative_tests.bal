@@ -31,7 +31,13 @@ function testReceivePayloadWithIncorrectExpectedType() returns error? {
     check messageSender->sendPayload(mapContent);
 
     log:printInfo("Creating Asb message receiver.");
-    receiverConfig.receiveMode = RECEIVE_AND_DELETE;
+    ASBServiceReceiverConfig receiverConfig = {
+        connectionString: connectionString,
+        entityConfig: {
+            queueName: testQueue1
+        },
+        receiveMode: RECEIVE_AND_DELETE
+    };
     MessageReceiver messageReceiver = check new (receiverConfig);
     log:printInfo("Receiving from Asb receiver client.");
 
@@ -61,7 +67,13 @@ function testInvalidComplete() returns error? {
     MessageSender messageSender = check new (senderConfig);
 
     log:printInfo("Initializing Asb receiver client.");
-    receiverConfig.receiveMode = RECEIVE_AND_DELETE;
+    ASBServiceReceiverConfig receiverConfig = {
+        connectionString: connectionString,
+        entityConfig: {
+            queueName: testQueue1
+        },
+        receiveMode: RECEIVE_AND_DELETE
+    };
 
     MessageReceiver messageReceiver = check new (receiverConfig);
 
@@ -102,7 +114,13 @@ function testInvalidAbandon() returns error? {
     MessageSender messageSender = check new (senderConfig);
 
     log:printInfo("Initializing Asb receiver client.");
-    receiverConfig.receiveMode = RECEIVE_AND_DELETE;
+    ASBServiceReceiverConfig receiverConfig = {
+        connectionString: connectionString,
+        entityConfig: {
+            queueName: testQueue1
+        },
+        receiveMode: RECEIVE_AND_DELETE
+    };
 
     MessageReceiver messageReceiver = check new (receiverConfig);
 
@@ -145,7 +163,13 @@ function testReceivePayloadWithUnsupportedUnionExpectedType() returns error? {
     check messageSender->sendPayload(mapContent);
 
     log:printInfo("Creating Asb message receiver.");
-    receiverConfig.receiveMode = RECEIVE_AND_DELETE;
+    ASBServiceReceiverConfig receiverConfig = {
+        connectionString: connectionString,
+        entityConfig: {
+            queueName: testQueue1
+        },
+        receiveMode: RECEIVE_AND_DELETE
+    };
     MessageReceiver messageReceiver = check new (receiverConfig);
     log:printInfo("Receiving from Asb receiver client.");
 
@@ -170,8 +194,12 @@ function testReceivePayloadWithUnsupportedUnionExpectedType() returns error? {
 function testSendToInvalidTopic() returns error? {
     log:printInfo("[[testSendToInvalidTopic]]");
     log:printInfo("Creating Asb message sender.");
-    senderConfig.topicOrQueueName = "non-existing-topic";
-    MessageSender messageSender = check new (senderConfig);
+    ASBServiceSenderConfig invalidSenderConfig = {
+        connectionString: connectionString,
+        entityType: QUEUE,
+        topicOrQueueName: "non-existing-topic"
+    };
+    MessageSender messageSender = check new (invalidSenderConfig);
 
     log:printInfo("Sending payloads via ASB sender");
     Error? e = messageSender->sendPayload("message");
@@ -190,8 +218,14 @@ function testSendToInvalidTopic() returns error? {
 function testReceiveFromInvalidQueue() returns error? {
     log:printInfo("[[testReceiveFromInvalidQueue]]");
     log:printInfo("Creating Asb message receiver.");
-    receiverConfig.entityConfig = {queueName: "non-existing-queue"};
-    MessageReceiver messageReceiver = check new (receiverConfig);
+    ASBServiceReceiverConfig invalidReceiverConfig = {
+        connectionString: connectionString,
+        entityConfig: {
+            queueName: "non-existing-queue"
+        },
+        receiveMode: PEEK_LOCK
+    };
+    MessageReceiver messageReceiver = check new (invalidReceiverConfig);
 
     log:printInfo("Sending payloads via ASB sender");
     Message|error? e = messageReceiver->receive(5);
@@ -210,8 +244,12 @@ function testReceiveFromInvalidQueue() returns error? {
 function testInvalidConnectionString() returns error? {
     log:printInfo("[[testInvalidConnectionString]]");
     log:printInfo("Creating Asb message sender.");
-    senderConfig.connectionString = "invalid-connection-string";
-    MessageSender|Error messageSender = new (senderConfig);
+    ASBServiceSenderConfig invalidSenderConfig = {
+        connectionString: "invalid-connection-string",
+        entityType: QUEUE,
+        topicOrQueueName: "testQueue1"
+    };
+    MessageSender|Error messageSender = new (invalidSenderConfig);
 
     test:assertTrue(messageSender is error, msg = "Client creation should have failed.");
     test:assertEquals((<Error>messageSender).message(), "Error occurred while processing request: " +

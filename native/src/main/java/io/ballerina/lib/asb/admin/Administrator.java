@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.ballerinax.asb.admin;
+package io.ballerina.lib.asb.admin;
 
 import com.azure.core.exception.HttpResponseException;
 import com.azure.core.http.rest.PagedIterable;
@@ -34,6 +34,12 @@ import com.azure.messaging.servicebus.administration.models.SqlRuleAction;
 import com.azure.messaging.servicebus.administration.models.SqlRuleFilter;
 import com.azure.messaging.servicebus.administration.models.SubscriptionProperties;
 import com.azure.messaging.servicebus.administration.models.TopicProperties;
+import io.ballerina.lib.asb.util.ASBConstants;
+import io.ballerina.lib.asb.util.ASBErrorCreator;
+import io.ballerina.lib.asb.util.ASBUtils;
+import io.ballerina.lib.asb.util.ModuleUtils;
+import io.ballerina.runtime.api.Environment;
+import io.ballerina.runtime.api.Future;
 import io.ballerina.runtime.api.PredefinedTypes;
 import io.ballerina.runtime.api.creators.TypeCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
@@ -45,10 +51,6 @@ import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BMap;
 import io.ballerina.runtime.api.values.BObject;
 import io.ballerina.runtime.api.values.BString;
-import org.ballerinax.asb.util.ASBConstants;
-import org.ballerinax.asb.util.ASBErrorCreator;
-import org.ballerinax.asb.util.ASBUtils;
-import org.ballerinax.asb.util.ModuleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,6 +59,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static io.ballerina.runtime.api.creators.ValueCreator.createRecordValue;
 
@@ -64,6 +68,8 @@ import static io.ballerina.runtime.api.creators.ValueCreator.createRecordValue;
  * This facilitates the client operations of ASB Administrator client in Ballerina.
  */
 public class Administrator {
+    private static final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool(
+            new AdminNetworkThreadFactory());
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Administrator.class);
 
@@ -97,26 +103,33 @@ public class Administrator {
      * @param topicProperties     properties of the Topic (Requires TopicProperties object)
      * @return topicProperties
      */
-    public static Object createTopic(BObject administratorClient, BString topicName,
+    public static Object createTopic(Environment env, BObject administratorClient, BString topicName,
                                      BMap<BString, Object> topicProperties) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
-        TopicProperties topicProp;
-        try {
-            if (topicProperties == null) {
-                topicProp = clientEp.createTopic(topicName.toString());
-            } else {
-                topicProp = clientEp.createTopic(topicName.toString(),
-                        ASBUtils.getCreateTopicPropertiesFromBObject(topicProperties));
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            TopicProperties topicProp;
+            try {
+                if (topicProperties == null) {
+                    topicProp = clientEp.createTopic(topicName.toString());
+                } else {
+                    topicProp = clientEp.createTopic(topicName.toString(),
+                            ASBUtils.getCreateTopicPropertiesFromBObject(topicProperties));
+                }
+                BMap<BString, Object> updatedTopicProperties = constructTopicCreatedRecord(topicProp);
+                future.complete(updatedTopicProperties);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
             }
-            LOGGER.debug("Created topic successfully with name: " + topicProp.getName());
-            return constructTopicCreatedRecord(topicProp);
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
+        });
+        return null;
     }
 
     /**
@@ -126,21 +139,29 @@ public class Administrator {
      * @param topicName           name of the topic
      * @return topicProperties
      */
-    public static Object getTopic(BObject administratorClient, BString topicName) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
-        try {
-            TopicProperties topicProp = clientEp.getTopic(topicName.toString());
-            LOGGER.debug("Retrieved topic successfully with name: " + topicProp.getName());
-            return constructTopicCreatedRecord(topicProp);
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (HttpResponseException e) {
-            return ASBErrorCreator.fromASBHttpResponseException(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
+    public static Object getTopic(Environment env, BObject administratorClient, BString topicName) {
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            try {
+                TopicProperties topicProp = clientEp.getTopic(topicName.toString());
+                BMap<BString, Object> topicProperties = constructTopicCreatedRecord(topicProp);
+                future.complete(topicProperties);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            } catch (HttpResponseException e) {
+                BError bError = ASBErrorCreator.fromASBHttpResponseException(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
+            }
+        });
+        return null;
     }
 
     /**
@@ -151,25 +172,32 @@ public class Administrator {
      * @param topicProperties     properties of the Topic (Requires TopicProperties object)
      * @return topicProperties
      */
-    public static Object updateTopic(BObject administratorClient, BString topicName,
+    public static Object updateTopic(Environment env, BObject administratorClient, BString topicName,
                                      BMap<BString, Object> topicProperties) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
-        try {
-            TopicProperties topicProp = clientEp.getTopic(topicName.toString());
-            TopicProperties updatedTopicProps = clientEp.updateTopic(
-                    ASBUtils.getUpdatedTopicPropertiesFromBObject(topicProperties, topicProp));
-            LOGGER.debug("Updated topic successfully with name: " + updatedTopicProps.getName());
-            return constructTopicCreatedRecord(updatedTopicProps);
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (HttpResponseException e) {
-            return ASBErrorCreator.fromASBHttpResponseException(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
-
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            try {
+                TopicProperties topicProp = clientEp.getTopic(topicName.toString());
+                TopicProperties updatedTopicProps = clientEp.updateTopic(
+                        ASBUtils.getUpdatedTopicPropertiesFromBObject(topicProperties, topicProp));
+                BMap<BString, Object> updatedTopicProperties = constructTopicCreatedRecord(updatedTopicProps);
+                future.complete(updatedTopicProperties);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            } catch (HttpResponseException e) {
+                BError bError = ASBErrorCreator.fromASBHttpResponseException(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
+            }
+        });
+        return null;
     }
 
     /**
@@ -178,21 +206,29 @@ public class Administrator {
      * @param administratorClient Azure Service Bus Administrator Client
      * @return topicProperties
      */
-    public static Object listTopics(BObject administratorClient) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
-        try {
-            PagedIterable<TopicProperties> topicProp = clientEp.listTopics();
-            LOGGER.debug("Retrieved all topics successfully");
-            return constructTopicPropertiesArray(topicProp);
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (HttpResponseException e) {
-            return ASBErrorCreator.fromASBHttpResponseException(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
+    public static Object listTopics(Environment env, BObject administratorClient) {
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            try {
+                PagedIterable<TopicProperties> topicProp = clientEp.listTopics();
+                BMap<BString, Object> topicProperties = constructTopicPropertiesArray(topicProp);
+                future.complete(topicProperties);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            } catch (HttpResponseException e) {
+                BError bError = ASBErrorCreator.fromASBHttpResponseException(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
+            }
+        });
+        return null;
     }
 
     private static BMap<BString, Object> constructTopicPropertiesArray(PagedIterable<TopicProperties> topicProp) {
@@ -218,18 +254,24 @@ public class Administrator {
      * @param topicName           name of the topic
      * @return null
      */
-    public static Object deleteTopic(BObject administratorClient, BString topicName) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
-        try {
-            clientEp.deleteTopic(topicName.toString());
-            LOGGER.debug("Deleted topic successfully with name: " + topicName);
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
+    public static Object deleteTopic(Environment env, BObject administratorClient, BString topicName) {
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            try {
+                clientEp.deleteTopic(topicName.toString());
+                future.complete(null);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
+            }
+        });
         return null;
     }
 
@@ -240,22 +282,32 @@ public class Administrator {
      * @param topicName           name of the Topic
      * @return null
      */
-    public static Object topicExists(BObject administratorClient, BString topicName) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
-        try {
-            return clientEp.getTopicExists(topicName.toString());
-        } catch (HttpResponseException e) {
-            if (e.getResponse().getStatusCode() == 404) {
-                return false;
+    public static Object topicExists(Environment env, BObject administratorClient, BString topicName) {
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            try {
+                boolean topicExists = clientEp.getTopicExists(topicName.toString());
+                future.complete(topicExists);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            }  catch (HttpResponseException e) {
+                if (e.getResponse().getStatusCode() == 404) {
+                    future.complete(false);
+                    return;
+                }
+                BError bError = ASBErrorCreator.fromASBHttpResponseException(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
             }
-            return ASBErrorCreator.fromASBHttpResponseException(e);
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
+        });
+        return null;
     }
 
     /**
@@ -267,27 +319,35 @@ public class Administrator {
      * @param subscriptionProperties properties of the Subscription (Requires SubscriptionProperties object)
      * @return subscriptionProperties
      */
-    public static Object createSubscription(BObject administratorClient,
+    public static Object createSubscription(Environment env, BObject administratorClient,
                                             BString topicName, BString subscriptionName,
                                             BMap<BString, Object> subscriptionProperties) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
-        SubscriptionProperties subscriptionProps;
-        try {
-            if (subscriptionProperties.isEmpty()) {
-                subscriptionProps = clientEp.createSubscription(topicName.toString(), subscriptionName.toString());
-            } else {
-                subscriptionProps = clientEp.createSubscription(topicName.toString(), subscriptionName.toString(),
-                        ASBUtils.getCreateSubscriptionPropertiesFromBObject(subscriptionProperties));
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            SubscriptionProperties subscriptionProps;
+            try {
+                if (subscriptionProperties.isEmpty()) {
+                    subscriptionProps = clientEp.createSubscription(topicName.toString(), subscriptionName.toString());
+                } else {
+                    subscriptionProps = clientEp.createSubscription(topicName.toString(), subscriptionName.toString(),
+                            ASBUtils.getCreateSubscriptionPropertiesFromBObject(subscriptionProperties));
+                }
+                BMap<BString, Object> updatedSubscriptionProperties = constructSubscriptionCreatedRecord(
+                        subscriptionProps);
+                future.complete(updatedSubscriptionProperties);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            }  catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
             }
-            LOGGER.debug("Created subscription successfully with name: " + subscriptionProps.getSubscriptionName());
-            return constructSubscriptionCreatedRecord(subscriptionProps);
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
+        });
+        return null;
     }
 
     /**
@@ -298,20 +358,28 @@ public class Administrator {
      * @param subscriptionName    name of the Subscription
      * @return subscriptionProperties
      */
-    public static Object getSubscription(BObject administratorClient, BString topicName, BString subscriptionName) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
-        try {
-            SubscriptionProperties subscriptionProps = clientEp.getSubscription(topicName.toString(),
-                    subscriptionName.toString());
-            LOGGER.debug("Retrieved subscription successfully with name: " + subscriptionProps.getSubscriptionName());
-            return constructSubscriptionCreatedRecord(subscriptionProps);
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
+    public static Object getSubscription(Environment env, BObject administratorClient, BString topicName,
+                                         BString subscriptionName) {
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            try {
+                SubscriptionProperties subscriptionProps = clientEp.getSubscription(topicName.toString(),
+                        subscriptionName.toString());
+                BMap<BString, Object> subscriptionProperties = constructSubscriptionCreatedRecord(subscriptionProps);
+                future.complete(subscriptionProperties);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            }  catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
+            }
+        });
+        return null;
     }
 
     /**
@@ -323,26 +391,35 @@ public class Administrator {
      * @param subscriptionProperties properties of the Subscription (Requires SubscriptionProperties object)
      * @return subscriptionProperties
      */
-    public static Object updateSubscription(BObject administratorClient, BString topicName, BString subscriptionName,
-                                            BMap<BString, Object> subscriptionProperties) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
-        try {
-            SubscriptionProperties subscriptionProps = clientEp.getSubscription(topicName.toString(),
-                    subscriptionName.toString());
-            SubscriptionProperties updatedSubscriptionProps = clientEp.updateSubscription(
-                    ASBUtils.getUpdatedSubscriptionPropertiesFromBObject(subscriptionProperties, subscriptionProps));
-            LOGGER.debug("Updated subscription successfully with name: " +
-                    updatedSubscriptionProps.getSubscriptionName() + "in topic: " + topicName);
-            return constructSubscriptionCreatedRecord(updatedSubscriptionProps);
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (HttpResponseException e) {
-            return ASBErrorCreator.fromASBHttpResponseException(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
+    public static Object updateSubscription(Environment env, BObject administratorClient, BString topicName,
+                                            BString subscriptionName, BMap<BString, Object> subscriptionProperties) {
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            try {
+                SubscriptionProperties subscriptionProps = clientEp.getSubscription(topicName.toString(),
+                        subscriptionName.toString());
+                SubscriptionProperties updatedSubscriptionProps = clientEp.updateSubscription(
+                        ASBUtils.getUpdatedSubscriptionPropertiesFromBObject(
+                                subscriptionProperties, subscriptionProps));
+                BMap<BString, Object> updatedSubscriptionProperties = constructSubscriptionCreatedRecord(
+                        updatedSubscriptionProps);
+                future.complete(updatedSubscriptionProperties);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            } catch (HttpResponseException e) {
+                BError bError = ASBErrorCreator.fromASBHttpResponseException(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
+            }
+        });
+        return null;
     }
 
     /**
@@ -352,21 +429,30 @@ public class Administrator {
      * @param topicName           name of the Topic
      * @return subscriptionProperties
      */
-    public static Object listSubscriptions(BObject administratorClient, BString topicName) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
-        try {
-            PagedIterable<SubscriptionProperties> subscriptionProp = clientEp.listSubscriptions(topicName.toString());
-            LOGGER.debug("Retrieved all subscriptions successfully");
-            return constructSubscriptionPropertiesArray(subscriptionProp);
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (HttpResponseException e) {
-            return ASBErrorCreator.fromASBHttpResponseException(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
+    public static Object listSubscriptions(Environment env, BObject administratorClient, BString topicName) {
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            try {
+                PagedIterable<SubscriptionProperties> subscriptionProp = clientEp.listSubscriptions(
+                        topicName.toString());
+                BMap<BString, Object> subscriptionProperties = constructSubscriptionPropertiesArray(subscriptionProp);
+                future.complete(subscriptionProperties);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            } catch (HttpResponseException e) {
+                BError bError = ASBErrorCreator.fromASBHttpResponseException(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
+            }
+        });
+        return null;
     }
 
     private static BMap<BString, Object> constructSubscriptionPropertiesArray(
@@ -395,19 +481,25 @@ public class Administrator {
      * @param subscriptionName    name of the Subscription
      * @return null
      */
-    public static Object deleteSubscription(BObject administratorClient, BString topicName, BString subscriptionName) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
-        try {
-            clientEp.deleteSubscription(topicName.toString(), subscriptionName.toString());
-            LOGGER.debug("Deleted subscription successfully with name: " + subscriptionName + "in topic: "
-                    + topicName);
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
+    public static Object deleteSubscription(Environment env, BObject administratorClient, BString topicName,
+                                            BString subscriptionName) {
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            try {
+                clientEp.deleteSubscription(topicName.toString(), subscriptionName.toString());
+                future.complete(null);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
+            }
+        });
         return null;
     }
 
@@ -419,22 +511,34 @@ public class Administrator {
      * @param subscriptionName    name of the Subscription
      * @return null
      */
-    public static Object subscriptionExists(BObject administratorClient, BString topicName, BString subscriptionName) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
-        try {
-            return clientEp.getSubscriptionExists(topicName.toString(), subscriptionName.toString());
-        } catch (HttpResponseException e) {
-            if (e.getResponse().getStatusCode() == 404) {
-                return false;
+    public static Object subscriptionExists(Environment env, BObject administratorClient, BString topicName,
+                                            BString subscriptionName) {
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            try {
+                boolean subscriptionExists = clientEp.getSubscriptionExists(
+                        topicName.toString(), subscriptionName.toString());
+                future.complete(subscriptionExists);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            } catch (HttpResponseException e) {
+                if (e.getResponse().getStatusCode() == 404) {
+                    future.complete(false);
+                    return;
+                }
+                BError bError = ASBErrorCreator.fromASBHttpResponseException(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
             }
-            return ASBErrorCreator.fromASBHttpResponseException(e);
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
+        });
+        return null;
     }
 
     /**
@@ -447,28 +551,35 @@ public class Administrator {
      * @param ruleProperties      properties of the Rule (Requires RuleProperties object)
      * @return ruleProperties object
      */
-    public static Object createRule(BObject administratorClient,
+    public static Object createRule(Environment env, BObject administratorClient,
                                     BString topicName, BString subscriptionName, BString ruleName,
                                     BMap<BString, Object> ruleProperties) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
-        RuleProperties ruleProp;
-        try {
-            if (ruleProperties.isEmpty()) {
-                ruleProp = clientEp.createRule(topicName.toString(), subscriptionName.toString(), ruleName.toString());
-            } else {
-                ruleProp = clientEp.createRule(topicName.toString(), ruleName.toString(), subscriptionName.toString(),
-                        ASBUtils.getCreateRulePropertiesFromBObject(ruleProperties));
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            RuleProperties ruleProp;
+            try {
+                if (ruleProperties.isEmpty()) {
+                    ruleProp = clientEp.createRule(
+                            topicName.toString(), subscriptionName.toString(), ruleName.toString());
+                } else {
+                    ruleProp = clientEp.createRule(topicName.toString(), ruleName.toString(),
+                            subscriptionName.toString(), ASBUtils.getCreateRulePropertiesFromBObject(ruleProperties));
+                }
+                BMap<BString, Object> updatedRuleProperties = constructRuleCreatedRecord(ruleProp);
+                future.complete(updatedRuleProperties);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
             }
-            LOGGER.debug("Created rule successfully with name: " + ruleProp.getName() + "in subscription: "
-                    + subscriptionName + "in topic: " + topicName);
-            return constructRuleCreatedRecord(ruleProp);
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
+        });
+        return null;
     }
 
     /**
@@ -480,24 +591,31 @@ public class Administrator {
      * @param ruleName            name of the Rule
      * @return ruleProperties object
      */
-    public static Object getRule(BObject administratorClient, BString topicName, BString subscriptionName,
-                                 BString ruleName) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
-        try {
-            RuleProperties ruleProp = clientEp.getRule(topicName.toString(), subscriptionName.toString(),
-                    ruleName.toString());
-            LOGGER.debug("Retrieved rule successfully with name: " + ruleProp.getName() + "in subscription: "
-                    + subscriptionName + "in topic: " + topicName);
-            return constructRuleCreatedRecord(ruleProp);
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (HttpResponseException e) {
-            return ASBErrorCreator.fromASBHttpResponseException(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
+    public static Object getRule(Environment env, BObject administratorClient, BString topicName,
+                                 BString subscriptionName, BString ruleName) {
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            try {
+                RuleProperties ruleProp = clientEp.getRule(topicName.toString(), subscriptionName.toString(),
+                        ruleName.toString());
+                BMap<BString, Object> ruleProperties = constructRuleCreatedRecord(ruleProp);
+                future.complete(ruleProperties);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            } catch (HttpResponseException e) {
+                BError bError = ASBErrorCreator.fromASBHttpResponseException(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
+            }
+        });
+        return null;
     }
 
     /**
@@ -510,28 +628,34 @@ public class Administrator {
      * @param updateRuleProperties properties of the Rule (Requires RuleProperties object)
      * @return ruleProperties object
      */
-    public static Object updateRule(BObject administratorClient, BString topicName, BString subscriptionName,
-                                    BString ruleName,
+    public static Object updateRule(Environment env, BObject administratorClient, BString topicName,
+                                    BString subscriptionName, BString ruleName,
                                     BMap<BString, Object> updateRuleProperties) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
-        try {
-            RuleProperties currentRuleProperties = clientEp.getRule(topicName.toString(), subscriptionName.toString(),
-                    ruleName.toString());
-            RuleProperties updatedRuleProperties = clientEp.updateRule(topicName.toString(),
-                    subscriptionName.toString(),
-                    ASBUtils.getUpdatedRulePropertiesFromBObject(updateRuleProperties, currentRuleProperties));
-            LOGGER.debug("Updated rule successfully with name: " + updatedRuleProperties.getName() + "in subscription: "
-                    + subscriptionName + "in topic: " + topicName);
-            return constructRuleCreatedRecord(updatedRuleProperties);
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (HttpResponseException e) {
-            return ASBErrorCreator.fromASBHttpResponseException(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            try {
+                RuleProperties currentRuleProperties = clientEp.getRule(
+                        topicName.toString(), subscriptionName.toString(), ruleName.toString());
+                RuleProperties updatedRuleProperties = clientEp.updateRule(topicName.toString(),
+                        subscriptionName.toString(),
+                        ASBUtils.getUpdatedRulePropertiesFromBObject(updateRuleProperties, currentRuleProperties));
+                future.complete(constructRuleCreatedRecord(updatedRuleProperties));
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            } catch (HttpResponseException e) {
+                BError bError = ASBErrorCreator.fromASBHttpResponseException(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
+            }
+        });
+        return null;
     }
 
     /**
@@ -542,23 +666,32 @@ public class Administrator {
      * @param subscriptionName    name of the Subscription
      * @return ruleProperties object
      */
-    public static Object listRules(BObject administratorClient, BString topicName, BString subscriptionName) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
-        try {
-            PagedIterable<RuleProperties> ruleProp = clientEp.listRules(topicName.toString(),
-                    subscriptionName.toString());
-            LOGGER.debug("Retrieved all rules successfully");
-            return constructRulePropertiesArray(ruleProp);
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (HttpResponseException e) {
-            return ASBErrorCreator.fromASBHttpResponseException(e);
-
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
+    public static Object listRules(Environment env, BObject administratorClient, BString topicName,
+                                   BString subscriptionName) {
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            try {
+                PagedIterable<RuleProperties> ruleProp = clientEp.listRules(topicName.toString(),
+                        subscriptionName.toString());
+                LOGGER.debug("Retrieved all rules successfully");
+                BMap<BString, Object> ruleProperties = constructRulePropertiesArray(ruleProp);
+                future.complete(ruleProperties);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            } catch (HttpResponseException e) {
+                BError bError = ASBErrorCreator.fromASBHttpResponseException(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
+            }
+        });
+        return null;
     }
 
     private static BMap<BString, Object> constructRulePropertiesArray(PagedIterable<RuleProperties> ruleProp) {
@@ -586,21 +719,26 @@ public class Administrator {
      * @param ruleName            name of the Rule
      * @return null
      */
-    public static Object deleteRule(BObject administratorClient, BString topicName,
+    public static Object deleteRule(Environment env, BObject administratorClient, BString topicName,
                                     BString subscriptionName, BString ruleName) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
-        try {
-            clientEp.deleteRule(topicName.toString(), subscriptionName.toString(), ruleName.toString());
-            LOGGER.debug("Deleted rule successfully with name: " + ruleName + "in subscription: " + subscriptionName
-                    + "in topic: " + topicName);
-            return null;
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            try {
+                clientEp.deleteRule(topicName.toString(), subscriptionName.toString(), ruleName.toString());
+                future.complete(null);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
+            }
+        });
+        return null;
     }
 
     /**
@@ -611,26 +749,33 @@ public class Administrator {
      * @param queueProperties     properties of the Queue (Requires QueueProperties object)
      * @return queueProperties object
      */
-    public static Object createQueue(BObject administratorClient,
+    public static Object createQueue(Environment env, BObject administratorClient,
                                      BString queueName, BMap<BString, Object> queueProperties) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
-        try {
-            QueueProperties queueProp;
-            if (queueProperties.isEmpty()) {
-                queueProp = clientEp.createQueue(queueName.toString());
-            } else {
-                queueProp = clientEp.createQueue(queueName.toString(),
-                        ASBUtils.getQueuePropertiesFromBObject(queueProperties));
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            try {
+                QueueProperties queueProp;
+                if (queueProperties.isEmpty()) {
+                    queueProp = clientEp.createQueue(queueName.toString());
+                } else {
+                    queueProp = clientEp.createQueue(queueName.toString(),
+                            ASBUtils.getQueuePropertiesFromBObject(queueProperties));
+                }
+                BMap<BString, Object> updatedQueueProperties = constructQueueCreatedRecord(queueProp);
+                future.complete(updatedQueueProperties);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
             }
-            LOGGER.debug("Created queue successfully with name: " + queueProp.getName());
-            return constructQueueCreatedRecord(queueProp);
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
+        });
+        return null;
     }
 
     /**
@@ -640,19 +785,26 @@ public class Administrator {
      * @param queueName           name of the Queue
      * @return queueProperties object
      */
-    public static Object getQueue(BObject administratorClient, BString queueName) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
-        try {
-            QueueProperties queueProp = clientEp.getQueue(queueName.toString());
-            LOGGER.debug("Retrieved queue successfully with name: " + queueProp.getName());
-            return constructQueueCreatedRecord(queueProp);
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
+    public static Object getQueue(Environment env, BObject administratorClient, BString queueName) {
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            try {
+                QueueProperties queueProp = clientEp.getQueue(queueName.toString());
+                BMap<BString, Object> queueProperties = constructQueueCreatedRecord(queueProp);
+                future.complete(queueProperties);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
+            }
+        });
+        return null;
     }
 
     /**
@@ -663,25 +815,32 @@ public class Administrator {
      * @param queueProperties     properties of the Queue (Requires QueueProperties object)
      * @return queueProperties object
      */
-    public static Object updateQueue(BObject administratorClient, BString queueName,
+    public static Object updateQueue(Environment env, BObject administratorClient, BString queueName,
                                      BMap<BString, Object> queueProperties) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
-        try {
-            QueueProperties queueProp = clientEp.getQueue(queueName.toString());
-            QueueProperties updatedQueueProps = clientEp.updateQueue(
-                    ASBUtils.getUpdatedQueuePropertiesFromBObject(queueProperties, queueProp));
-            LOGGER.debug("Updated queue successfully with name: " + updatedQueueProps.getName());
-            return constructQueueCreatedRecord(updatedQueueProps);
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (HttpResponseException e) {
-            return ASBErrorCreator.fromASBHttpResponseException(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-
-        }
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            try {
+                QueueProperties queueProp = clientEp.getQueue(queueName.toString());
+                QueueProperties updatedQueueProps = clientEp.updateQueue(
+                        ASBUtils.getUpdatedQueuePropertiesFromBObject(queueProperties, queueProp));
+                BMap<BString, Object> updatedQueueProperties = constructQueueCreatedRecord(updatedQueueProps);
+                future.complete(updatedQueueProperties);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            } catch (HttpResponseException e) {
+                BError bError = ASBErrorCreator.fromASBHttpResponseException(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
+            }
+        });
+        return null;
     }
 
     /**
@@ -690,21 +849,29 @@ public class Administrator {
      * @param administratorClient Azure Service Bus Administrator Client
      * @return queueProperties object
      */
-    public static Object listQueues(BObject administratorClient) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
-        try {
-            PagedIterable<QueueProperties> queueProp = clientEp.listQueues();
-            LOGGER.debug("Retrieved all queues successfully");
-            return constructQueuePropertiesArray(queueProp);
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (HttpResponseException e) {
-            return ASBErrorCreator.fromASBHttpResponseException(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
+    public static Object listQueues(Environment env, BObject administratorClient) {
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            try {
+                PagedIterable<QueueProperties> queueProp = clientEp.listQueues();
+                BMap<BString, Object> queueProperties = constructQueuePropertiesArray(queueProp);
+                future.complete(queueProperties);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            } catch (HttpResponseException e) {
+                BError bError = ASBErrorCreator.fromASBHttpResponseException(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
+            }
+        });
+        return null;
     }
 
     private static BMap<BString, Object> constructQueuePropertiesArray(PagedIterable<QueueProperties> queueProp) {
@@ -730,19 +897,25 @@ public class Administrator {
      * @param queueName           name of the Queue
      * @return null
      */
-    public static Object deleteQueue(BObject administratorClient, BString queueName) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
-        try {
-            clientEp.deleteQueue(queueName.toString());
-            LOGGER.debug("Deleted queue successfully with name: " + queueName);
-            return null;
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
+    public static Object deleteQueue(Environment env, BObject administratorClient, BString queueName) {
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            try {
+                clientEp.deleteQueue(queueName.toString());
+                future.complete(null);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
+            }
+        });
+        return null;
     }
 
     /**
@@ -752,22 +925,32 @@ public class Administrator {
      * @param queueName           name of the Queue
      * @return null
      */
-    public static Object queueExists(BObject administratorClient, BString queueName) {
-        ServiceBusAdministrationClient clientEp = getAdminFromBObject(administratorClient);
-        try {
-            return clientEp.getQueueExists(queueName.toString());
-        } catch (HttpResponseException e) {
-            if (e.getResponse().getStatusCode() == 404) {
-                return false;
+    public static Object queueExists(Environment env, BObject administratorClient, BString queueName) {
+        ServiceBusAdministrationClient clientEp = getNativeAdminClient(administratorClient);
+        Future future = env.markAsync();
+        EXECUTOR_SERVICE.execute(() -> {
+            try {
+                boolean queueExists = clientEp.getQueueExists(queueName.toString());
+                future.complete(queueExists);
+            } catch (BError e) {
+                BError bError = ASBErrorCreator.fromBError(e);
+                future.complete(bError);
+            } catch (HttpResponseException e) {
+                if (e.getResponse().getStatusCode() == 404) {
+                    future.complete(false);
+                    return;
+                }
+                BError bError = ASBErrorCreator.fromASBHttpResponseException(e);
+                future.complete(bError);
+            } catch (ServiceBusException e) {
+                BError bError = ASBErrorCreator.fromASBException(e);
+                future.complete(bError);
+            } catch (Exception e) {
+                BError bError = ASBErrorCreator.fromUnhandledException(e);
+                future.complete(bError);
             }
-            return ASBErrorCreator.fromASBHttpResponseException(e);
-        } catch (BError e) {
-            return ASBErrorCreator.fromBError(e);
-        } catch (ServiceBusException e) {
-            return ASBErrorCreator.fromASBException(e);
-        } catch (Exception e) {
-            return ASBErrorCreator.fromUnhandledException(e);
-        }
+        });
+        return null;
     }
 
     private static BMap<BString, Object> constructRuleCreatedRecord(RuleProperties properties) {
@@ -912,7 +1095,7 @@ public class Administrator {
         return map;
     }
 
-    private static ServiceBusAdministrationClient getAdminFromBObject(BObject adminObject) {
+    private static ServiceBusAdministrationClient getNativeAdminClient(BObject adminObject) {
         return (ServiceBusAdministrationClient) adminObject.getNativeData(ASBConstants.ADMINISTRATOR_CLIENT);
     }
 

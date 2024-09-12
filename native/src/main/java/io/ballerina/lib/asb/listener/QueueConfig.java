@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.ballerinax.asb.listener;
+package io.ballerina.lib.asb.listener;
 
 /**
  * {@code QueueConfig} represents an ASB queue configurations.
