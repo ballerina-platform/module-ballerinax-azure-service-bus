@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- [When importing `ballerinax/asb` to package, a conflicting JAR warning is getting printed](https://github.com/ballerina-platform/ballerina-library/issues/7052)
+
 ### Changed
 
 - [Implement ASB sender/receiver client actions in a non-blocking way](https://github.com/ballerina-platform/ballerina-library/issues/4982)

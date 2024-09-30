@@ -40,7 +40,10 @@ dependencies {
     implementation group: 'org.slf4j', name: 'slf4j-api', version: "${slf4jVersion}"
     implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: "${azureServiceBusVersion}"
 
-    dist group: 'com.azure', name: 'azure-messaging-servicebus', version: "${azureServiceBusVersion}"
+    dist (group: 'com.azure', name: 'azure-messaging-servicebus', version: "${azureServiceBusVersion}") {
+        exclude group: "com.fasterxml.woodstox", module: "woodstox-core"
+        exclude group: "org.codehaus.woodstox", module: "stax2-api"
+    }
 }
 
 tasks.withType(JavaCompile) {
