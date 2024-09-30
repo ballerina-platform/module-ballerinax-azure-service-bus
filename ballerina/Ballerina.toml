@@ -2,7 +2,7 @@
 distribution = "2201.8.0"
 org = "ballerinax"
 name = "asb"
-version = "3.8.1-SNAPSHOT"
+version = "3.8.1"
 license= ["Apache-2.0"]
 authors = ["Ballerina"]
 keywords = ["IT Operations/Message Brokers", "Cost/Paid", "Vendor/Microsoft"]
@@ -19,5 +19,5 @@ graalvmCompatible = true
 groupId = "org.ballerinax"
 artifactId = "asb-native"
 module = "asb-native" 
-version = "3.8.1-SNAPSHOT"
-path = "../native/build/libs/asb-native-3.8.1-SNAPSHOT.jar"
+version = "3.8.1"
+path = "../native/build/libs/asb-native-3.8.1.jar"
