@@ -56,10 +56,21 @@ configurations {
     externalJars
 }
 
+dependencies {
+    externalJars(group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: "${jacksonVersion}") {
+        transitive = false
+    }
+    externalJars(group: 'io.netty', name: 'netty-buffer', version: "${nettyVersion}") {
+        transitive = false
+    }
+}
+
 task updateTomlFiles {
     doLast {
         def newBallerinaToml = ballerinaTomlFilePlaceHolder.text.replace("@project.version@", project.version)
         newBallerinaToml = newBallerinaToml.replace("@toml.version@", tomlVersion)
+        newBallerinaToml = newBallerinaToml.replace("@jackson.version@", project.jacksonVersion)
+        newBallerinaToml = newBallerinaToml.replace("@netty.version@", project.nettyVersion)
         ballerinaTomlFile.text = newBallerinaToml
     }
 }
