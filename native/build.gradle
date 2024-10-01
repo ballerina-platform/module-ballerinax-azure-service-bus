@@ -43,8 +43,6 @@ dependencies {
     dist (group: 'com.azure', name: 'azure-messaging-servicebus', version: "${azureServiceBusVersion}") {
         exclude group: "com.fasterxml.woodstox", module: "woodstox-core"
         exclude group: "org.codehaus.woodstox", module: "stax2-api"
-        exclude group: "com.fasterxml.jackson.core", module: "jackson-annotations"
-        exclude group: "io.netty", module: "netty-buffer"
     }
 }
 
