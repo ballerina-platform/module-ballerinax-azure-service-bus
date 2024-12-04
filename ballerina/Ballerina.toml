@@ -2,7 +2,7 @@
 distribution = "2201.8.0"
 org = "ballerinax"
 name = "asb"
-version = "3.8.2"
+version = "3.8.3-SNAPSHOT"
 license= ["Apache-2.0"]
 authors = ["Ballerina"]
 keywords = ["IT Operations/Message Brokers", "Cost/Paid", "Vendor/Microsoft"]
@@ -19,8 +19,8 @@ graalvmCompatible = true
 groupId = "org.ballerinax"
 artifactId = "asb-native"
 module = "asb-native" 
-version = "3.8.2"
-path = "../native/build/libs/asb-native-3.8.2.jar"
+version = "3.8.3-SNAPSHOT"
+path = "../native/build/libs/asb-native-3.8.3-SNAPSHOT.jar"
 
 [[platform.java17.dependency]]
 groupId = "com.fasterxml.jackson.core"
