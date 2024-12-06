@@ -16,18 +16,37 @@
  * under the License.
  */
 
+import org.apache.tools.ant.taskdefs.condition.Os
+
 apply plugin: 'java-library'
 
 description = 'Ballerina - Azure Service Bus Examples'
 
+def packageName = "asb"
 def filePath = project.fileTree("${project.projectDir}")
 def examples = filePath.matching {
     include("**/*.bal")
     exclude("**/deprecated/**/*.bal")
 }
 
+def executeBalCommand(String command, String dir) {
+    try {
+        exec {
+            workingDir dir
+            if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+                commandLine 'cmd', '/c', "bal.bat ${command} && exit %%ERRORLEVEL%%"
+            } else {
+                commandLine 'sh', '-c', "bal ${command}"
+            }
+        }
+    } catch (Exception e) {
+        println("bal command failed. " + e.message)
+        throw e
+    }
+}
+
 task testExamples {
-    dependsOn ":${project.packageName}-ballerina:build"
+    dependsOn ":${packageName}-ballerina:build"
 
     doLast {
         examples.each { example ->  executeBalCommand ("run ${example}", "${project.rootDir}") }
@@ -35,10 +54,10 @@ task testExamples {
 }
 
 task buildExamples {
-    dependsOn ":${project.packageName}-ballerina:build"
+    dependsOn ":${packageName}-ballerina:build"
     
     gradle.taskGraph.whenReady { graph ->
-        if (graph.hasTask(":${project.packageName}-examples:test")) {
+        if (graph.hasTask(":${packageName}-examples:test")) {
             buildExamples.enabled = false
         } else {
             testExamples.enabled = false
@@ -50,5 +69,5 @@ task buildExamples {
     }
 }
 
-// test.dependsOn testExamples
+test.dependsOn testExamples
 build.dependsOn buildExamples
