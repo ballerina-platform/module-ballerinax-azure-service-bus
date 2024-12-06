@@ -19,27 +19,23 @@ import ballerinax/asb;
 
 configurable string connectionString = ?;
 
-// Listner Configurations
-asb:ListenerConfig configuration = {
-    connectionString: connectionString
-};
-
-listener asb:Listener asbListener = new (configuration);
-
-@asb:ServiceConfig {
-    queueName: "test-queue",
-    peekLockModeEnabled: true,
-    maxConcurrency: 1,
+listener asb:Listener asbListener = check new ({
+    connectionString,
+    entityConfig: {
+        queueName: "test-queue"
+    },
     prefetchCount: 10,
-    maxAutoLockRenewDuration: 300
-}
-service asb:MessageService on asbListener {
-    isolated remote function onMessage(asb:Message message, asb:Caller caller) returns asb:Error? {
+    autoComplete: false
+});
+
+service asb:Service on asbListener {
+
+    isolated remote function onMessage(asb:Message message, asb:Caller caller) returns error? {
         log:printInfo("Message received from queue: " + message.toBalString());
-        _ = check caller.complete(message);
+        return caller->complete();
     }
 
-    isolated remote function onError(asb:ErrorContext context, error 'error) returns asb:Error? {
-        log:printInfo("Error received from queue: " + context.toBalString());
+    isolated remote function onError(asb:MessageRetrievalError 'error) returns error? {
+        log:printError("Error occurred while retrieving messages from the queue", 'error);
     }
-};
+}
