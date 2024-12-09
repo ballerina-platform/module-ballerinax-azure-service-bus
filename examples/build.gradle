@@ -65,6 +65,8 @@ task buildExamples {
     }
     doLast {
         // TODO: Enabled --offline due to a bug in pulling incorrect versions from the central repository.
+        executeBalCommand ("pack", "${project.rootDir}/ballerina")
+        executeBalCommand ("push --repository=local", "${project.rootDir}/ballerina")
         examples.each { example ->  executeBalCommand ("build --offline ${example}", "${project.rootDir}") }
     }
 }
