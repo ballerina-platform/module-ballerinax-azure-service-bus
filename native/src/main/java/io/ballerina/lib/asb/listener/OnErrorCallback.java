@@ -18,13 +18,13 @@
 
 package io.ballerina.lib.asb.listener;
 
-import io.ballerina.runtime.api.async.Callback;
+import io.ballerina.lib.asb.util.CallbackHandler;
 import io.ballerina.runtime.api.values.BError;
 
 /**
  * Callback code to be executed when the message-listener complete a `onError` invocation of the ballerina service.
  */
-public class OnErrorCallback implements Callback {
+public class OnErrorCallback implements CallbackHandler {
     private static final OnErrorCallback INSTANCE = new OnErrorCallback();
 
     static OnErrorCallback getInstance() {

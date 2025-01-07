@@ -18,7 +18,7 @@
 
 package io.ballerina.lib.asb.listener;
 
-import io.ballerina.runtime.api.async.Callback;
+import io.ballerina.lib.asb.util.CallbackHandler;
 import io.ballerina.runtime.api.values.BError;
 
 import java.util.concurrent.Semaphore;
@@ -26,7 +26,7 @@ import java.util.concurrent.Semaphore;
 /**
  * Callback code to be executed when the message-listener complete a `onMessage` invocation of the ballerina service.
  */
-public class OnMessageCallback implements Callback {
+public class OnMessageCallback implements CallbackHandler {
     private final Semaphore semaphore;
 
     public OnMessageCallback(Semaphore semaphore) {

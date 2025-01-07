@@ -24,11 +24,11 @@ import io.ballerina.lib.asb.receiver.MessageReceiver;
 import io.ballerina.lib.asb.util.ASBConstants;
 import io.ballerina.lib.asb.util.ASBErrorCreator;
 import io.ballerina.lib.asb.util.ASBUtils;
+import io.ballerina.lib.asb.util.CallbackHandler;
 import io.ballerina.lib.asb.util.ModuleUtils;
-import io.ballerina.runtime.api.PredefinedTypes;
-import io.ballerina.runtime.api.async.Callback;
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.Parameter;
+import io.ballerina.runtime.api.types.PredefinedTypes;
 import io.ballerina.runtime.api.types.Type;
 import io.ballerina.runtime.api.utils.TypeUtils;
 import io.ballerina.runtime.api.values.BMap;
@@ -39,8 +39,8 @@ import java.util.Map;
 import java.util.concurrent.Semaphore;
 import java.util.function.Consumer;
 
-import static io.ballerina.runtime.api.TypeTags.OBJECT_TYPE_TAG;
-import static io.ballerina.runtime.api.TypeTags.RECORD_TYPE_TAG;
+import static io.ballerina.runtime.api.types.TypeTags.OBJECT_TYPE_TAG;
+import static io.ballerina.runtime.api.types.TypeTags.RECORD_TYPE_TAG;
 
 /**
  * {@code MessageConsumer} provides the capability to invoke `onMessage` function of the ASB service.
@@ -66,12 +66,12 @@ public class MessageConsumer implements Consumer<ServiceBusReceivedMessageContex
                     String.format("Error occurred while acquiring the native lock: %s", e.getMessage()), e);
         }
         NativeBServiceAdaptor bService = NativeListener.getBallerinaSvc(this.bListener);
-        Callback callback = getBRuntimeCallback(messageContext);
+        CallbackHandler callback = getBRuntimeCallback(messageContext);
         Object[] params = getMethodParams(bService.getOnMessageParams(), messageContext);
         bService.invokeOnMessage(callback, params);
     }
 
-    private Callback getBRuntimeCallback(ServiceBusReceivedMessageContext messageContext) {
+    private CallbackHandler getBRuntimeCallback(ServiceBusReceivedMessageContext messageContext) {
         if (isAutoCompleteEnabled) {
             return new OnMessageAutoCompletableCallback(semaphore, messageContext);
         }

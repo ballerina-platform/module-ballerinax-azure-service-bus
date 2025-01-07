@@ -21,8 +21,8 @@ package io.ballerina.lib.asb.listener;
 import com.azure.messaging.servicebus.ServiceBusErrorContext;
 import com.azure.messaging.servicebus.ServiceBusException;
 import com.azure.messaging.servicebus.ServiceBusFailureReason;
+import io.ballerina.lib.asb.util.CallbackHandler;
 import io.ballerina.lib.asb.util.ModuleUtils;
-import io.ballerina.runtime.api.async.Callback;
 import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.Parameter;
@@ -57,7 +57,7 @@ public class ErrorConsumer implements Consumer<ServiceBusErrorContext> {
     public void accept(ServiceBusErrorContext errorContext) {
         NativeBServiceAdaptor bService = NativeListener.getBallerinaSvc(this.bListener);
         Object[] params = getMethodParams(bService.getOnErrorParams(), errorContext);
-        Callback callback = OnErrorCallback.getInstance();
+        CallbackHandler callback = OnErrorCallback.getInstance();
         bService.invokeOnError(callback, params);
     }
 
