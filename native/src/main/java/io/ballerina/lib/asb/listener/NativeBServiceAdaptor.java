@@ -20,6 +20,7 @@ package io.ballerina.lib.asb.listener;
 
 import io.ballerina.lib.asb.util.ASBErrorCreator;
 import io.ballerina.lib.asb.util.CallbackHandler;
+import io.ballerina.lib.asb.util.ModuleUtils;
 import io.ballerina.runtime.api.Runtime;
 import io.ballerina.runtime.api.concurrent.StrandMetadata;
 import io.ballerina.runtime.api.types.FunctionType;
@@ -98,13 +99,15 @@ public final class NativeBServiceAdaptor {
     }
 
     public void invokeOnMessage(CallbackHandler callback, Object[] params) {
-        try {
-            Object result = bRuntime.callMethod(bServiceObj, ON_MESSAGE_METHOD,
-                    new StrandMetadata(isolated, null), params);
-            callback.notifySuccess(result);
-        } catch (BError bError) {
-            callback.notifyFailure(bError);
-        }
+        Thread.startVirtualThread(() -> {
+            try {
+                Object result = bRuntime.callMethod(bServiceObj, ON_MESSAGE_METHOD,
+                        new StrandMetadata(isolated, ModuleUtils.getProperties(ON_MESSAGE_METHOD)), params);
+                callback.notifySuccess(result);
+            } catch (BError bError) {
+                callback.notifyFailure(bError);
+            }
+        });
     }
 
     public Parameter[] getOnErrorParams() {
@@ -115,12 +118,14 @@ public final class NativeBServiceAdaptor {
         if (onError.isEmpty()) {
             return;
         }
-        try {
-            Object result = bRuntime.callMethod(bServiceObj, ON_ERROR_METHOD,
-                    new StrandMetadata(isolated, null), params);
-            callback.notifySuccess(result);
-        } catch (BError bError) {
-            callback.notifyFailure(bError);
-        }
+        Thread.startVirtualThread(() -> {
+            try {
+                Object result = bRuntime.callMethod(bServiceObj, ON_ERROR_METHOD,
+                        new StrandMetadata(isolated, ModuleUtils.getProperties(ON_ERROR_METHOD)), params);
+                callback.notifySuccess(result);
+            } catch (BError bError) {
+                callback.notifyFailure(bError);
+            }
+        });
     }
 }

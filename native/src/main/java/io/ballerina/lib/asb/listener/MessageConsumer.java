@@ -79,18 +79,16 @@ public class MessageConsumer implements Consumer<ServiceBusReceivedMessageContex
     }
 
     private Object[] getMethodParams(Parameter[] parameters, ServiceBusReceivedMessageContext messageContext) {
-        Object[] args = new Object[parameters.length * 2];
+        Object[] args = new Object[parameters.length];
         int idx = 0;
         for (Parameter param: parameters) {
             Type referredType = TypeUtils.getReferredType(param.type);
             switch (referredType.getTag()) {
                 case OBJECT_TYPE_TAG:
                     args[idx++] = NativeCaller.createCaller(messageContext);
-                    args[idx++] = true;
                     break;
                 case RECORD_TYPE_TAG:
                     args[idx++] = constructBMessage(messageContext.getMessage());
-                    args[idx++] = true;
                     break;
                 default:
                     throw ASBErrorCreator.createError(

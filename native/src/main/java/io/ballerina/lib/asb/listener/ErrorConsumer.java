@@ -62,9 +62,8 @@ public class ErrorConsumer implements Consumer<ServiceBusErrorContext> {
     }
 
     private Object[] getMethodParams(Parameter[] parameters, ServiceBusErrorContext errorContext) {
-        Object[] args = new Object[parameters.length * 2];
+        Object[] args = new Object[parameters.length];
         args[0] = createError(errorContext);
-        args[1] = true;
         return args;
     }
 
