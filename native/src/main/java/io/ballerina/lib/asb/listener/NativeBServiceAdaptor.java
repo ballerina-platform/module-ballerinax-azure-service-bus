@@ -19,24 +19,23 @@
 package io.ballerina.lib.asb.listener;
 
 import io.ballerina.lib.asb.util.ASBErrorCreator;
+import io.ballerina.lib.asb.util.CallbackHandler;
 import io.ballerina.lib.asb.util.ModuleUtils;
-import io.ballerina.runtime.api.Module;
-import io.ballerina.runtime.api.PredefinedTypes;
 import io.ballerina.runtime.api.Runtime;
-import io.ballerina.runtime.api.async.Callback;
-import io.ballerina.runtime.api.async.StrandMetadata;
+import io.ballerina.runtime.api.concurrent.StrandMetadata;
 import io.ballerina.runtime.api.types.FunctionType;
 import io.ballerina.runtime.api.types.MethodType;
 import io.ballerina.runtime.api.types.ObjectType;
 import io.ballerina.runtime.api.types.Parameter;
 import io.ballerina.runtime.api.types.Type;
 import io.ballerina.runtime.api.utils.TypeUtils;
+import io.ballerina.runtime.api.values.BError;
 import io.ballerina.runtime.api.values.BObject;
 
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static io.ballerina.runtime.api.TypeTags.OBJECT_TYPE_TAG;
+import static io.ballerina.runtime.api.types.TypeTags.OBJECT_TYPE_TAG;
 
 /**
  * {@code NativeBServiceAdaptor} represents a native wrapper for ballerina service object.
@@ -99,38 +98,34 @@ public final class NativeBServiceAdaptor {
         return onMessage.getParameters();
     }
 
-    public void invokeOnMessage(Callback callback, Object[] params) {
-        Module module = ModuleUtils.getModule();
-        StrandMetadata metadata = new StrandMetadata(
-                module.getOrg(), module.getName(), module.getMajorVersion(), ON_MESSAGE_METHOD);
-        if (isolated) {
-            bRuntime.invokeMethodAsyncConcurrently(
-                    bServiceObj, ON_MESSAGE_METHOD, null, metadata, callback, null, PredefinedTypes.TYPE_NULL, params);
-        } else {
-            bRuntime.invokeMethodAsyncSequentially(
-                    bServiceObj, ON_MESSAGE_METHOD, null, metadata, callback, null, PredefinedTypes.TYPE_NULL, params);
-        }
+    public void invokeOnMessage(CallbackHandler callback, Object[] params) {
+        Thread.startVirtualThread(() -> {
+            try {
+                Object result = bRuntime.callMethod(bServiceObj, ON_MESSAGE_METHOD,
+                        new StrandMetadata(isolated, ModuleUtils.getProperties(ON_MESSAGE_METHOD)), params);
+                callback.notifySuccess(result);
+            } catch (BError bError) {
+                callback.notifyFailure(bError);
+            }
+        });
     }
 
     public Parameter[] getOnErrorParams() {
         return onError.map(FunctionType::getParameters).orElse(new Parameter[]{});
     }
 
-    public void invokeOnError(Callback callback, Object[] params) {
+    public void invokeOnError(CallbackHandler callback, Object[] params) {
         if (onError.isEmpty()) {
             return;
         }
-        Module module = ModuleUtils.getModule();
-        StrandMetadata metadata = new StrandMetadata(
-                module.getOrg(), module.getName(), module.getMajorVersion(), ON_ERROR_METHOD);
-        if (isolated) {
-            bRuntime.invokeMethodAsyncConcurrently(
-                    bServiceObj, ON_ERROR_METHOD, null, metadata, callback, null, PredefinedTypes.TYPE_NULL,
-                    params);
-        } else {
-            bRuntime.invokeMethodAsyncSequentially(
-                    bServiceObj, ON_ERROR_METHOD, null, metadata, callback, null, PredefinedTypes.TYPE_NULL,
-                    params);
-        }
+        Thread.startVirtualThread(() -> {
+            try {
+                Object result = bRuntime.callMethod(bServiceObj, ON_ERROR_METHOD,
+                        new StrandMetadata(isolated, ModuleUtils.getProperties(ON_ERROR_METHOD)), params);
+                callback.notifySuccess(result);
+            } catch (BError bError) {
+                callback.notifyFailure(bError);
+            }
+        });
     }
 }

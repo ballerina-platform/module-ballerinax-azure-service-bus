@@ -24,6 +24,8 @@ import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.values.BString;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.LogManager;
 
 /**
@@ -60,5 +62,14 @@ public class ModuleUtils {
         }
         asbModule = env.getCurrentModule();
         return null;
+    }
+
+    public static Map<String, Object> getProperties(String resourceName) {
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("moduleOrg", getModule().getOrg());
+        properties.put("moduleName", getModule().getName());
+        properties.put("moduleVersion", getModule().getMajorVersion());
+        properties.put("parentFunctionName", resourceName);
+        return properties;
     }
 }

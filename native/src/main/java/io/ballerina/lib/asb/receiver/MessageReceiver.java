@@ -31,13 +31,12 @@ import io.ballerina.lib.asb.util.ASBErrorCreator;
 import io.ballerina.lib.asb.util.ASBUtils;
 import io.ballerina.lib.asb.util.ModuleUtils;
 import io.ballerina.runtime.api.Environment;
-import io.ballerina.runtime.api.Future;
-import io.ballerina.runtime.api.PredefinedTypes;
 import io.ballerina.runtime.api.creators.ErrorCreator;
 import io.ballerina.runtime.api.creators.TypeCreator;
 import io.ballerina.runtime.api.creators.ValueCreator;
 import io.ballerina.runtime.api.types.ArrayType;
 import io.ballerina.runtime.api.types.MapType;
+import io.ballerina.runtime.api.types.PredefinedTypes;
 import io.ballerina.runtime.api.types.RecordType;
 import io.ballerina.runtime.api.utils.StringUtils;
 import io.ballerina.runtime.api.utils.TypeUtils;
@@ -55,8 +54,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static io.ballerina.runtime.api.creators.ValueCreator.createRecordValue;
 
@@ -65,8 +62,6 @@ import static io.ballerina.runtime.api.creators.ValueCreator.createRecordValue;
  * Ballerina.
  */
 public class MessageReceiver {
-    private static final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool(
-            new ReceiverNetworkThreadFactory());
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageReceiver.class);
 
@@ -120,32 +115,25 @@ public class MessageReceiver {
     public static Object receive(Environment env, BObject receiverClient, Object serverWaitTime, BTypedesc expectedType,
                                  boolean deadLettered) {
         ServiceBusReceiverClient receiver = getNativeReceiver(receiverClient, deadLettered);
-        Future future = env.markAsync();
-        EXECUTOR_SERVICE.execute(() -> {
+        return env.yieldAndRun(() -> {
             try {
                 List<ServiceBusReceivedMessage> messages = receiver
                         .receiveMessages(1, Duration.ofSeconds((long) serverWaitTime))
                         .stream().toList();
                 if (messages.isEmpty()) {
-                    future.complete(null);
-                    return;
+                    return null;
                 }
                 ServiceBusReceivedMessage message = messages.get(0);
                 RecordType expectedRecordType = ASBUtils.getRecordType(expectedType);
-                BMap<BString, Object> bMsg = constructExpectedMessageRecord(message, expectedRecordType);
-                future.complete(bMsg);
+                return constructExpectedMessageRecord(message, expectedRecordType);
             } catch (BError e) {
-                BError bError = ASBErrorCreator.fromBError(e);
-                future.complete(bError);
+                return ASBErrorCreator.fromBError(e);
             } catch (ServiceBusException e) {
-                BError bError = ASBErrorCreator.fromASBException(e);
-                future.complete(bError);
+                return ASBErrorCreator.fromASBException(e);
             } catch (Exception e) {
-                BError bError = ASBErrorCreator.fromUnhandledException(e);
-                future.complete(bError);
+                return ASBErrorCreator.fromUnhandledException(e);
             }
         });
-        return null;
     }
 
     /**
@@ -158,44 +146,36 @@ public class MessageReceiver {
     public static Object receivePayload(Environment env, BObject receiverClient, Object serverWaitTime,
                                         BTypedesc expectedType, boolean deadLettered) {
         ServiceBusReceiverClient receiver = getNativeReceiver(receiverClient, deadLettered);
-        Future future = env.markAsync();
-        EXECUTOR_SERVICE.execute(() -> {
+        return env.yieldAndRun(() -> {
             try {
                 List<ServiceBusReceivedMessage> messages = receiver
                         .receiveMessages(1, Duration.ofSeconds((long) serverWaitTime))
                         .stream().toList();
                 if (messages.isEmpty()) {
-                    future.complete(null);
-                    return;
+                    return null;
                 }
                 ServiceBusReceivedMessage message = messages.get(0);
 
                 Object messageBody = getMessagePayload(message);
                 if (messageBody instanceof byte[] binaryPayload) {
-                    Object messagePayload = ASBUtils.getValueWithIntendedType(binaryPayload,
+                    return ASBUtils.getValueWithIntendedType(binaryPayload,
                             expectedType.getDescribingType());
-                    future.complete(messagePayload);
                 } else {
                     Optional<Object> bValue = ASBUtils.convertJavaToBValue(message.getMessageId(), messageBody);
                     String payloadBindingErr = String.format(
                             "Failed to bind the received ASB message value to the expected Ballerina type: '%s'",
                             expectedType.toString());
-                    Object messagePayload = bValue.orElseGet(() -> ErrorCreator.createError(
+                    return bValue.orElseGet(() -> ErrorCreator.createError(
                             StringUtils.fromString(payloadBindingErr)));
-                    future.complete(messagePayload);
                 }
             } catch (BError e) {
-                BError bError = ASBErrorCreator.fromBError(e);
-                future.complete(bError);
+                return ASBErrorCreator.fromBError(e);
             } catch (ServiceBusException e) {
-                BError bError = ASBErrorCreator.fromASBException(e);
-                future.complete(bError);
+                return ASBErrorCreator.fromASBException(e);
             } catch (Exception e) {
-                BError bError = ASBErrorCreator.fromUnhandledException(e);
-                future.complete(bError);
+                return ASBErrorCreator.fromUnhandledException(e);
             }
         });
-        return null;
     }
 
     /**
@@ -212,8 +192,7 @@ public class MessageReceiver {
     public static Object receiveBatch(Environment env, BObject receiverClient, long maxMessageCount,
                                       Object serverWaitTime, boolean deadLettered) {
         ServiceBusReceiverClient receiver = getNativeReceiver(receiverClient, deadLettered);
-        Future future = env.markAsync();
-        EXECUTOR_SERVICE.execute(() -> {
+        return env.yieldAndRun(() -> {
             try {
                 IterableStream<ServiceBusReceivedMessage> receivedMessageStream;
                 if (Objects.isNull(serverWaitTime)) {
@@ -234,21 +213,16 @@ public class MessageReceiver {
                 Map<String, Object> value = new HashMap<>();
                 value.put("messageCount", bMessages.size());
                 value.put("messages", ValueCreator.createArrayValue(bMessages.toArray(new Object[0]), sourceArrayType));
-                BMap<BString, Object> bMsgBatch = createRecordValue(
+                return createRecordValue(
                         ModuleUtils.getModule(), ASBConstants.MESSAGE_BATCH_RECORD, value);
-                future.complete(bMsgBatch);
             } catch (BError e) {
-                BError bError = ASBErrorCreator.fromBError(e);
-                future.complete(bError);
+                return ASBErrorCreator.fromBError(e);
             } catch (ServiceBusException e) {
-                BError bError = ASBErrorCreator.fromASBException(e);
-                future.complete(bError);
+                return ASBErrorCreator.fromASBException(e);
             } catch (Exception e) {
-                BError bError = ASBErrorCreator.fromUnhandledException(e);
-                future.complete(bError);
+                return ASBErrorCreator.fromUnhandledException(e);
             }
         });
-        return null;
     }
 
     /**
@@ -262,23 +236,18 @@ public class MessageReceiver {
         ServiceBusReceivedMessage nativeMessage = getNativeMessage(message);
         ServiceBusReceiverClient receiver = getNativeReceiver(
                 receiverClient, Objects.nonNull(nativeMessage.getDeadLetterReason()));
-        Future future = env.markAsync();
-        EXECUTOR_SERVICE.execute(() -> {
+        return env.yieldAndRun(() -> {
             try {
                 receiver.complete(nativeMessage);
-                future.complete(null);
+                return null;
             } catch (BError e) {
-                BError bError = ASBErrorCreator.fromBError(e);
-                future.complete(bError);
+                return ASBErrorCreator.fromBError(e);
             } catch (ServiceBusException e) {
-                BError bError = ASBErrorCreator.fromASBException(e);
-                future.complete(bError);
+                return ASBErrorCreator.fromASBException(e);
             } catch (Exception e) {
-                BError bError = ASBErrorCreator.fromUnhandledException(e);
-                future.complete(bError);
+                return ASBErrorCreator.fromUnhandledException(e);
             }
         });
-        return null;
     }
 
     /**
@@ -291,23 +260,18 @@ public class MessageReceiver {
     public static Object abandon(Environment env, BObject receiverClient, BMap<BString, Object> message) {
         ServiceBusReceivedMessage nativeMessage = getNativeMessage(message);
         ServiceBusReceiverClient receiver = getNativeReceiver(receiverClient, false);
-        Future future = env.markAsync();
-        EXECUTOR_SERVICE.execute(() -> {
+        return env.yieldAndRun(() -> {
             try {
                 receiver.abandon(nativeMessage);
-                future.complete(null);
+                return null;
             } catch (BError e) {
-                BError bError = ASBErrorCreator.fromBError(e);
-                future.complete(bError);
+                return ASBErrorCreator.fromBError(e);
             } catch (ServiceBusException e) {
-                BError bError = ASBErrorCreator.fromASBException(e);
-                future.complete(bError);
+                return ASBErrorCreator.fromASBException(e);
             } catch (Exception e) {
-                BError bError = ASBErrorCreator.fromUnhandledException(e);
-                future.complete(bError);
+                return ASBErrorCreator.fromUnhandledException(e);
             }
         });
-        return null;
     }
 
     /**
@@ -323,26 +287,21 @@ public class MessageReceiver {
                                     Object deadLetterReason, Object deadLetterErrorDescription) {
         ServiceBusReceivedMessage nativeMessage = getNativeMessage(message);
         ServiceBusReceiverClient receiver = getNativeReceiver(receiverClient, false);
-        Future future = env.markAsync();
-        EXECUTOR_SERVICE.execute(() -> {
+        return env.yieldAndRun(() -> {
             try {
                 DeadLetterOptions options = new DeadLetterOptions()
                         .setDeadLetterErrorDescription(ASBUtils.convertString(deadLetterErrorDescription));
                 options.setDeadLetterReason(ASBUtils.convertString(deadLetterReason));
                 receiver.deadLetter(nativeMessage, options);
-                future.complete(null);
+                return null;
             } catch (BError e) {
-                BError bError = ASBErrorCreator.fromBError(e);
-                future.complete(bError);
+                return ASBErrorCreator.fromBError(e);
             } catch (ServiceBusException e) {
-                BError bError = ASBErrorCreator.fromASBException(e);
-                future.complete(bError);
+                return ASBErrorCreator.fromASBException(e);
             } catch (Exception e) {
-                BError bError = ASBErrorCreator.fromUnhandledException(e);
-                future.complete(bError);
+                return ASBErrorCreator.fromUnhandledException(e);
             }
         });
-        return null;
     }
 
     /**
@@ -355,23 +314,18 @@ public class MessageReceiver {
     public static Object defer(Environment env, BObject receiverClient, BMap<BString, Object> message) {
         ServiceBusReceivedMessage nativeMessage = getNativeMessage(message);
         ServiceBusReceiverClient receiver = getNativeReceiver(receiverClient, false);
-        Future future = env.markAsync();
-        EXECUTOR_SERVICE.execute(() -> {
+        return env.yieldAndRun(() -> {
             try {
                 receiver.defer(nativeMessage);
-                future.complete(null);
+                return null;
             } catch (BError e) {
-                BError bError = ASBErrorCreator.fromBError(e);
-                future.complete(bError);
+                return ASBErrorCreator.fromBError(e);
             } catch (ServiceBusException e) {
-                BError bError = ASBErrorCreator.fromASBException(e);
-                future.complete(bError);
+                return ASBErrorCreator.fromASBException(e);
             } catch (Exception e) {
-                BError bError = ASBErrorCreator.fromUnhandledException(e);
-                future.complete(bError);
+                return ASBErrorCreator.fromUnhandledException(e);
             }
         });
-        return null;
     }
 
     /**
@@ -388,28 +342,21 @@ public class MessageReceiver {
      */
     public static Object receiveDeferred(Environment env, BObject receiverClient, long sequenceNumber) {
         ServiceBusReceiverClient receiver = getNativeReceiver(receiverClient, false);
-        Future future = env.markAsync();
-        EXECUTOR_SERVICE.execute(() -> {
+        return env.yieldAndRun(() -> {
             try {
                 ServiceBusReceivedMessage message = receiver.receiveDeferredMessage(sequenceNumber);
                 if (Objects.isNull(message)) {
-                    future.complete(null);
-                    return;
+                    return null;
                 }
-                BMap<BString, Object> bMsg = constructExpectedMessageRecord(message, null);
-                future.complete(bMsg);
+                return constructExpectedMessageRecord(message, null);
             } catch (BError e) {
-                BError bError = ASBErrorCreator.fromBError(e);
-                future.complete(bError);
+                return ASBErrorCreator.fromBError(e);
             } catch (ServiceBusException e) {
-                BError bError = ASBErrorCreator.fromASBException(e);
-                future.complete(bError);
+                return ASBErrorCreator.fromASBException(e);
             } catch (Exception e) {
-                BError bError = ASBErrorCreator.fromUnhandledException(e);
-                future.complete(bError);
+                return ASBErrorCreator.fromUnhandledException(e);
             }
         });
-        return null;
     }
 
     /**
@@ -423,23 +370,18 @@ public class MessageReceiver {
     public static Object renewLock(Environment env, BObject receiverClient, BMap<BString, Object> message) {
         ServiceBusReceivedMessage nativeMessage = getNativeMessage(message);
         ServiceBusReceiverClient receiver = getNativeReceiver(receiverClient, false);
-        Future future = env.markAsync();
-        EXECUTOR_SERVICE.execute(() -> {
+        return env.yieldAndRun(() -> {
             try {
                 receiver.renewMessageLock(nativeMessage);
-                future.complete(null);
+                return null;
             } catch (BError e) {
-                BError bError = ASBErrorCreator.fromBError(e);
-                future.complete(bError);
+                return ASBErrorCreator.fromBError(e);
             } catch (ServiceBusException e) {
-                BError bError = ASBErrorCreator.fromASBException(e);
-                future.complete(bError);
+                return ASBErrorCreator.fromASBException(e);
             } catch (Exception e) {
-                BError bError = ASBErrorCreator.fromUnhandledException(e);
-                future.complete(bError);
+                return ASBErrorCreator.fromUnhandledException(e);
             }
         });
-        return null;
     }
 
     /**
@@ -449,23 +391,18 @@ public class MessageReceiver {
      */
     public static Object closeReceiver(Environment env, BObject receiverClient) {
         ServiceBusReceiverClient receiver = getNativeReceiver(receiverClient, false);
-        Future future = env.markAsync();
-        EXECUTOR_SERVICE.execute(() -> {
+        return env.yieldAndRun(() -> {
             try {
                 receiver.close();
-                future.complete(null);
+                return null;
             } catch (BError e) {
-                BError bError = ASBErrorCreator.fromBError(e);
-                future.complete(bError);
+                return ASBErrorCreator.fromBError(e);
             } catch (ServiceBusException e) {
-                BError bError = ASBErrorCreator.fromASBException(e);
-                future.complete(bError);
+                return ASBErrorCreator.fromASBException(e);
             } catch (Exception e) {
-                BError bError = ASBErrorCreator.fromUnhandledException(e);
-                future.complete(bError);
+                return ASBErrorCreator.fromUnhandledException(e);
             }
         });
-        return null;
     }
 
     /**

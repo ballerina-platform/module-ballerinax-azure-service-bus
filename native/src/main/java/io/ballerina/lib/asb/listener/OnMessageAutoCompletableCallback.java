@@ -19,7 +19,7 @@
 package io.ballerina.lib.asb.listener;
 
 import com.azure.messaging.servicebus.ServiceBusReceivedMessageContext;
-import io.ballerina.runtime.api.async.Callback;
+import io.ballerina.lib.asb.util.CallbackHandler;
 import io.ballerina.runtime.api.values.BError;
 
 import java.util.concurrent.Semaphore;
@@ -29,7 +29,7 @@ import java.util.concurrent.Semaphore;
  * This particular callback implementation will mark the messages complete/abandon automatically once the remote
  * functions return the results.
  */
-public class OnMessageAutoCompletableCallback implements Callback {
+public class OnMessageAutoCompletableCallback implements CallbackHandler {
     private final Semaphore semaphore;
     private final ServiceBusReceivedMessageContext messageContext;
 
