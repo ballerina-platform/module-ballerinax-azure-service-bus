@@ -45,6 +45,7 @@ Config.toml
 
 # Ignore Gradle build output directory
 build
+.cache/
 
 # Environment files
 *.env
