@@ -24,12 +24,6 @@ plugins {
 
 description = 'Ballerina - Azure Service Bus Native'
 
-configurations {
-    dist {
-        transitive true
-    }
-}
-
 dependencies {
     checkstyle project(":checkstyle")
     checkstyle "com.puppycrawl.tools:checkstyle:${checkstylePluginVersion}"
@@ -38,14 +32,7 @@ dependencies {
     implementation group: 'org.ballerinalang', name: 'ballerina-lang', version: "${ballerinaLangVersion}"
     implementation group: 'org.ballerinalang', name: 'value', version: "${ballerinaLangVersion}"
     implementation group: 'org.slf4j', name: 'slf4j-api', version: "${slf4jVersion}"
-    implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: "${azureServiceBusVersion}"
-
-    dist (group: 'com.azure', name: 'azure-messaging-servicebus', version: "${azureServiceBusVersion}") {
-        exclude group: "com.fasterxml.woodstox", module: "woodstox-core"
-        exclude group: "org.codehaus.woodstox", module: "stax2-api"
-        exclude group: "com.fasterxml.jackson.core", module: "jackson-annotations"
-        exclude group: "io.netty", module: "netty-buffer"
-    }
+    implementation group: 'com.azure', name: 'azure-messaging-servicebus', version: "${asbVersion}"
 }
 
 tasks.withType(JavaCompile) {
@@ -97,13 +84,13 @@ checkstyle {
 
 checkstyleMain.dependsOn ':checkstyle:downloadCheckstyleRuleFiles'
 
-jar {
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    dependsOn configurations.dist
-    from { configurations.dist.collect { it.isDirectory() ? it : zipTree(it) } } {
-        exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA', 'org/slf4j/**'
-    }
-}
+// jar {
+//     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+//     dependsOn configurations.dist
+//     from { configurations.dist.collect { it.isDirectory() ? it : zipTree(it) } } {
+//         exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA', 'org/slf4j/**'
+//     }
+// }
 
 compileJava {
     doFirst {
