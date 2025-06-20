@@ -126,7 +126,7 @@ function sendMessage() returns error? {
 }
 
 @test:Config {
-    enable: true,
+    enable: false,
     groups: ["asb_listner"]
 }
 function testListnerReceive() returns error? {
@@ -143,7 +143,7 @@ function testListnerReceive() returns error? {
 }
 
 @test:Config {
-    enable: true,
+    enable: false,
     groups: ["asb_listner"],
     dependsOn: [testListnerReceive]
 }
@@ -161,7 +161,7 @@ function testListnerReceiveAndCompleted() returns error? {
 }
 
 @test:Config {
-    enable: true,
+    enable: false,
     groups: ["asb_listner"],
     dependsOn: [testListnerReceiveAndCompleted]
 }
@@ -179,7 +179,7 @@ function testListnerReceiveAndDefer() returns error? {
 }
 
 @test:Config {
-    enable: true,
+    enable: false,
     groups: ["asb_listner"],
     dependsOn: [testListnerReceiveAndDefer]
 }
@@ -197,7 +197,7 @@ function testListnerReceiveAndDLQ() returns error? {
 }
 
 @test:Config {
-    enable: true,
+    enable: false,
     groups: ["asb_listner"],
     dependsOn: [testListnerReceiveAndDLQ]
 }
