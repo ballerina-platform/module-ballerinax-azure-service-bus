@@ -62,6 +62,68 @@ dependencies {
     externalJars(group: 'io.netty', name: 'netty-buffer', version: "${nettyVersion}") {
         transitive = false
     }
+    externalJars(group: 'io.netty', name: 'netty-codec', version: "${nettyVersion}") {
+        transitive = false
+    }
+    externalJars(group: 'io.netty', name: 'netty-codec-dns', version: "${nettyVersion}") {
+        transitive = false
+    }
+    externalJars(group: 'io.netty', name: 'netty-common', version: "${nettyVersion}") {
+        transitive = false
+    }
+    externalJars(group: 'io.netty', name: 'netty-resolver', version: "${nettyVersion}") {
+        transitive = false
+    }
+    externalJars(group: 'io.netty', name: 'netty-transport', version: "${nettyVersion}") {
+        transitive = false
+    }
+    externalJars(group: 'io.netty', name: 'netty-transport-native-unix-common', version: "${nettyVersion}") {
+        transitive = false
+    }
+    externalJars(group: 'io.netty', name: 'netty-handler-proxy', version: "${nettyVersion}") {
+        transitive = false
+    }
+    externalJars(group: 'io.netty', name: 'netty-codec-socks', version: "${nettyVersion}") {
+        transitive = false
+    }
+    externalJars(group: 'io.netty', name: 'netty-handler', version: "${nettyVersion}") {
+        transitive = false
+    }
+    externalJars(group: 'io.netty', name: 'netty-codec-http', version: "${nettyVersion}") {
+        transitive = false
+    }
+    externalJars(group: 'io.netty', name: 'netty-codec-http2', version: "${nettyVersion}") {
+        transitive = false
+    }
+    externalJars(group: 'io.netty', name: 'netty-transport-native-epoll', version: "${nettyVersion}") {
+        transitive = false
+    }
+    externalJars(group: 'io.netty', name: 'netty-transport-classes-epoll', version: "${nettyVersion}") {
+        transitive = false
+    }
+    externalJars(group: 'io.netty', name: 'netty-transport-native-kqueue', version: "${nettyVersion}") {
+        transitive = false
+    }
+    externalJars(group: 'io.netty', name: 'netty-transport-classes-kqueue', version: "${nettyVersion}") {
+        transitive = false
+    }
+    externalJars(group: 'io.netty', name: 'netty-tcnative-boringssl-static', version: "${boringSslVersion}") {
+        transitive = false
+    }
+    externalJars(group: 'io.netty', name: 'netty-tcnative-classes', version: "${boringSslVersion}") {
+        transitive = false
+    }
+    externalJars(group: 'io.netty', name: 'netty-resolver-dns', version: "${nettyVersion}") {
+        transitive = false
+    }
+    externalJars(group: 'io.netty', name: 'netty-resolver-dns-native-macos', version: "${nettyVersion}") {
+        transitive = false
+    }
+    externalJars 'io.netty:netty-tcnative-boringssl-static::windows-x86_64'
+    externalJars 'io.netty:netty-tcnative-boringssl-static::linux-aarch_64'
+    externalJars 'io.netty:netty-tcnative-boringssl-static::linux-x86_64'
+    externalJars 'io.netty:netty-tcnative-boringssl-static::osx-aarch_64'
+    externalJars 'io.netty:netty-tcnative-boringssl-static::osx-x86_64'
 }
 
 task updateTomlFiles {
@@ -70,6 +132,7 @@ task updateTomlFiles {
         newBallerinaToml = newBallerinaToml.replace("@toml.version@", tomlVersion)
         newBallerinaToml = newBallerinaToml.replace("@jackson.version@", project.jacksonVersion)
         newBallerinaToml = newBallerinaToml.replace("@netty.version@", project.nettyVersion)
+        newBallerinaToml = newBallerinaToml.replace("@boringssl.version@", project.boringSslVersion)
         ballerinaTomlFile.text = newBallerinaToml
     }
 }
