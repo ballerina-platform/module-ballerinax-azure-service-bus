@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+#### Fixed
+
+- [Resolve conflicting JAR warning with netty-codec](https://github.com/ballerina-platform/ballerina-library/issues/8135)
+
 ## [3.8.2] - 2024-10-01
 
 ### Fixed
